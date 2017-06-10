@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="none">
+
+        <item
+            android:id="@+id/menu_item1_id"
+            android:icon="@drawable/ic_create_new_project"
+            android:title="@string/navigation_main_new_project">
+
+        </item>
+
+        <item
+            android:id="@+id/menu_item2_id"
+            android:icon="@drawable/ic_project_open"
+            android:title="@string/navigation_main_open_project">
+            
+        </item>
+
+        <item
+            android:id="@+id/menu_item3_id"
+            android:icon="@drawable/ic_add_location"
+            android:title="@string/navigation_main_start_gps_survey">
+
+        </item>
+
+
+    </group>
+
+
+</menu>

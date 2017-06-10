@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/card_gps_satellite_status_small"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?android:attr/selectableItemBackground"
+    app:cardCornerRadius="5dp"
+    app:cardElevation="5dp"
+    android:layout_margin="3dp"
+    android:layout_width="match_parent"
+    android:layout_height="50dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/prnID"
+            android:text="@string/gps_status_prn_id"
+            android:textAppearance="?android:textAppearanceLarge"
+            android:textColor="@color/primary_text"
+            android:layout_marginStart="25dp"
+            android:gravity="center_vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent" />
+
+        <LinearLayout
+            android:id="@+id/signal_strength"
+            android:orientation="vertical"
+            android:layout_toEndOf="@id/prnID"
+            android:layout_marginTop="3dp"
+            android:layout_marginStart="15dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/signal_strength_lbl"
+                android:text="@string/gps_status_signal_strength_header"
+                android:textSize="@dimen/card_header_text"
+                android:textColor="@color/secondary_text"
+                android:layout_gravity="center_horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/signal_strength_value"
+                android:text="@string/gps_status_signal_strength_default"
+                android:textAppearance="?android:textAppearanceLarge"
+                android:textColor="@color/primary_text"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/gps_elevation"
+            android:orientation="vertical"
+            android:layout_toEndOf="@id/signal_strength"
+            android:layout_marginTop="3dp"
+            android:layout_marginStart="15dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/satellite_elevation_lbl"
+                android:text="@string/gps_status_elevation_header"
+                android:textSize="@dimen/card_header_text"
+                android:textColor="@color/secondary_text"
+                android:layout_gravity="center_horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/satellite_elevation_value"
+                android:text="@string/gps_status_elevation_default"
+                android:textAppearance="?android:textAppearanceMedium"
+                android:layout_gravity="center"
+                android:textColor="@color/primary_text"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/gps_azimuth"
+            android:orientation="vertical"
+            android:layout_toEndOf="@id/gps_elevation"
+            android:layout_marginTop="3dp"
+            android:layout_marginStart="15dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/satellite_azimuth_lbl"
+                android:text="@string/gps_status_azimuth_header"
+                android:textSize="@dimen/card_header_text"
+                android:textColor="@color/secondary_text"
+                android:layout_gravity="center_horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/satellite_azimuth_value"
+                android:text="@string/gps_status_azimuth_default"
+                android:textAppearance="?android:textAppearanceMedium"
+                android:layout_gravity="center"
+                android:textColor="@color/primary_text"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/gps_navigation"
+            android:orientation="vertical"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="3dp"
+            android:layout_marginEnd="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/satellite_almanac_value"
+                android:text="@string/gps_status_almanac_default"
+                android:textSize="10sp"
+                android:textColor="@color/secondary_text"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent" />
+
+            <TextView
+                android:id="@+id/satellite_ephemeris_value"
+                android:text="@string/gps_status_ephemeris_default"
+                android:textSize="10sp"
+                android:textColor="@color/secondary_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/satellite_lock"
+            android:layout_marginTop="2dp"
+            android:layout_marginStart="2dp"
+            android:background="@drawable/ic_gps_sat_lock_no"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+
+        <ImageView
+            android:id="@+id/constellation_flag"
+            android:background="@drawable/ic_flag_usa"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="2dp"
+            android:layout_marginStart="2dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+
+    </RelativeLayout>
+
+
+
+
+
+</android.support.v7.widget.CardView>

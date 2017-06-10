@@ -1,0 +1,91 @@
+<resources>
+    <string name="app_name">SurvLogic</string>
+
+    <!--General App strings-->
+    <string name="general_save">Save</string>
+    <string name="general_cancel">Cancel</string>
+    <string name="general_start">Start</string>
+    <string name="general_yes">Yes</string>
+    <string name="general_no">No</string>
+
+    <string name="activity_main_toolbar_title">Welcome</string>
+
+    <!--Navigation Menu at Activity_Main-->
+    <string name="navigation_header_value1">Welcome to survLOGIC</string>
+    <string name="navigation_main_new_project">Create New Project</string>
+    <string name="navigation_main_open_project">Open Existing Project</string>
+    <string name="navigation_main_start_gps_survey">Start GPS Survey</string>
+    <string name="navigation_main_settings">Settings</string>
+    <!-- REQUIRED: NavigationActivity.java -->
+    <string name="drawer_open">drawer open</string>
+    <string name="drawer_close">drawer close</string>
+
+    <!--Action Bar tool item-->
+    <string name="toolbar_main_menu_item1">About</string>
+    <string name="toolbar_gps_survey_menu_item1">Settings</string>
+    <string name="toolbar_gps_survey_menu_item2">About</string>
+
+    <!--fragment_gps_survey_map-->
+    <string name="debug_error_gps_not_found">This device does not Support GPS Locations</string>
+    <string name="enable_gps_message">GPS Service is disabled.  Would you like to enable it now?</string>
+    <string name="gps_warm_boot_go">Started GNSS Services \nInterval = %1$ss min. \nDist. = %2$sm</string>
+    <string name="gps_stop">GNSS Services Terminated</string>
+    <string name="gps_pause">GNSS Services Paused</string>
+    <string name="header_gnss_status">GNSS Status</string>
+    <string name="header_accuracy_status">Accuracy:</string>
+    <string name="gnss_status_default">Waiting</string>
+    <string name="gnss_status_search">Searching…</string>
+    <string name="gnss_status_no_fix">No Fix</string>
+    <string name="gnss_status_autonomous">Autonomous</string>
+    <string name="gnss_status_float">Float</string>
+    <string name="gnss_status_fix">3D Fix</string>
+    <string name="header_gps_position">Current Position</string>
+    <string name="header_gps_logdata">Log Dataset</string>
+    <string name="header_gps_logdata_default">Waiting to Log Data</string>
+    <string name="gps_satellites_default">00</string>
+    <string name="gps_pdop_default">PDOP:</string>
+    <string name="gps_hdop_default">HDOP:</string>
+    <string name="gps_vdop_default">VDOP:</string>
+    <string name="gps_pdop_value">PDOP: %1$.1f</string>
+    <string name="gps_hdop_value">HDOP: %1$.1f</string>
+    <string name="gps_vdop_value">VDOP: %1$.1f</string>
+    <string name="gps_ttff_default">TTFF:</string>
+    <string name="gps_ttff_value">TTFF:</string>
+    <string name="header_epoch_lbl">Epoch</string>
+    <string name="epoch_default">0</string>
+    <string name="satellite_default">0</string>
+    <string name="gps_latitude_default">Latitude:</string>
+    <string name="gps_longitude_default">Longitude:</string>
+    <string name="gps_ellipsoid_default">Ellipsoid:</string>
+    <string name="gps_msl_default">Ortho Height:</string>
+    <string name="gps_latitude_value_string">Latitude: %1$s</string>
+    <string name="gps_longitude_value_string">Longitude: %1$s</string>
+    <string name="gps_latitude_value">Latitude: %1$.7f\u00B0</string>
+    <string name="gps_longitude_value">Longitude: %1$.7f\u00B0</string>
+    <string name="gps_ellipsoid_value_metric">Ellipsoid: %1$.1f m</string>
+    <string name="gps_msl_value_metric">Ortho Height: %1$.1f m</string>
+    <string name="gps_cn0_label">C/N0</string>
+    <string name="gps_snr_label">SNR</string>
+    <string name="title_activity_maps">Map</string>
+
+    <!--CARD - gps_satellite_status-->
+    <string name="gps_status_prn_header">ID</string>
+    <string name="gps_status_prn_id">##</string>
+    <string name="gps_status_signal_strength_header">S/NO</string>
+    <string name="gps_status_signal_strength_default">##.#</string>
+    <string name="gps_status_elevation_header">Elev.</string>
+    <string name="gps_status_elevation_default">##.#\u00B0</string>
+    <string name="gps_status_elevation_value">%1$s\u00B0</string>
+    <string name="gps_status_azimuth_header">Azimuth</string>
+    <string name="gps_status_azimuth_default">##.#\u00B0</string>
+    <string name="gps_status_azimuth_value">%1$s\u00B0</string>
+    <string name="gps_status_flags_header">Flags</string>
+    <string name="gps_status_ephemeris_default">Ephemeris</string>
+    <string name="gps_status_almanac_default">Almanac</string>
+    <string name="gps_status_constellation_header">From</string>
+    <string name="gps_status_lat_default">Lat:</string>
+    <string name="gps_status_lat_value_string">Lat: %1$s</string>
+    <string name="gps_status_long_default">Long:</string>
+    <string name="gps_status_long_value_string">Long: %1$s</string>
+
+</resources>

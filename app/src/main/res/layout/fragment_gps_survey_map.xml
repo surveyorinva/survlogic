@@ -1,0 +1,431 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/main_background"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+        <RelativeLayout
+            android:background="@drawable/table_background_white"
+            android:layout_marginTop="5dp"
+            android:layout_marginStart="3dp"
+            android:layout_marginEnd="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="40dp">
+
+            <ImageButton
+                android:id="@+id/gps_satellite_btn"
+                android:src="@drawable/ic_gps_icon_36"
+                android:background="@drawable/table_background_white"
+                android:layout_marginTop="10dp"
+                android:layout_marginStart="15dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+
+            <TextView
+                android:id="@+id/gps_status_noSatellites"
+                android:text="@string/gps_satellites_default"
+                android:textSize="12sp"
+                android:textColor="@color/primary_text"
+                android:layout_toEndOf="@id/gps_satellite_btn"
+                android:layout_marginTop="5dp"
+                android:layout_marginStart="2dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/gps_status_noSatellitesLocked"
+                android:text="@string/gps_satellites_default"
+                android:textSize="12sp"
+                android:textColor="@color/header_text"
+                android:layout_toEndOf="@id/gps_satellite_btn"
+                android:layout_marginStart="2dp"
+                android:layout_below="@id/gps_status_noSatellites"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/PDOP_value"
+                android:text="@string/gps_pdop_default"
+                android:textSize="12sp"
+                android:textColor="@color/primary_text"
+                android:layout_toEndOf="@id/gps_status_noSatellites"
+                android:layout_marginStart="20dp"
+                android:layout_alignTop="@id/gps_status_noSatellites"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/HDOP_value"
+                android:text="@string/gps_hdop_default"
+                android:textSize="12sp"
+                android:textColor="@color/primary_text"
+                android:layout_toRightOf="@id/PDOP_value"
+                android:layout_marginStart="20dp"
+                android:layout_alignTop="@id/PDOP_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/VDOP_value"
+                android:text="@string/gps_vdop_default"
+                android:textSize="12sp"
+                android:textColor="@color/primary_text"
+                android:layout_toRightOf="@id/HDOP_value"
+                android:layout_marginStart="20dp"
+                android:layout_alignTop="@id/HDOP_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/ttff_value"
+                android:text="@string/gps_ttff_default"
+                android:textSize="12sp"
+                android:textColor="@color/primary_text"
+                android:layout_toEndOf="@id/VDOP_value"
+                android:layout_marginStart="20dp"
+                android:layout_alignTop="@id/VDOP_value"
+                android:visibility="gone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <ProgressBar
+                android:id="@+id/progressBarRecording"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:indeterminate="false"
+                android:theme="@style/AppTheme.RecordingProgressBar"
+                android:layout_alignStart="@+id/PDOP_value"
+                android:layout_marginStart="30dp"
+                android:layout_below="@id/PDOP_value"
+                android:visibility="invisible"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"/>
+
+
+        </RelativeLayout>
+
+
+
+        <LinearLayout
+            android:weightSum="4"
+            android:orientation="horizontal"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_width="fill_parent"
+            android:layout_height="40dp">
+
+            <Button
+                android:id="@+id/btnStartGPSLog"
+                android:text="@string/general_start"
+                android:textColor="@color/contextualText"
+                android:layout_weight="1"
+                android:background="@drawable/button_framed_green"
+                android:layout_marginStart="2dp"
+                android:layout_width="0dp"
+                android:layout_height="match_parent" />
+
+            <android.support.v4.widget.Space
+                android:layout_weight=".05"
+                android:layout_width="0dp"
+                android:layout_height="match_parent" />
+
+            <Button
+                android:id="@+id/btnSaveGPSLog"
+                android:layout_weight="1"
+                android:text="@string/general_save"
+                android:textColor="@color/contextualText"
+                android:background="@drawable/button_framed_blue"
+                android:visibility="invisible"
+                android:layout_width="0dp"
+                android:layout_height="match_parent" />
+
+            <android.support.v4.widget.Space
+                android:layout_weight="0.05"
+                android:layout_width="0dp"
+                android:layout_height="match_parent" />
+
+            <TableLayout
+                android:background="@drawable/table_background_white"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_marginStart="2dp"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/gps_epoch_count_lbl"
+                    android:text="@string/header_epoch_lbl"
+                    android:layout_marginTop="2dp"
+                    android:layout_marginStart="5dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:id="@+id/gps_epoch_count_value"
+                    android:text="@string/epoch_default"
+                    android:textColor="@color/header_text"
+                    android:gravity="center_horizontal"
+                    android:layout_marginStart="5dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+
+            </TableLayout>
+
+            <android.support.v4.widget.Space
+                android:layout_weight="0.10"
+                android:layout_width="0dp"
+                android:layout_height="match_parent" />
+
+
+            <ImageButton
+                android:id="@+id/btnGPS_Settings"
+                android:layout_weight=".75"
+                android:src="@drawable/ic_more_vert_36"
+                android:background="@drawable/table_background_white"
+                android:visibility="visible"
+                android:layout_width="0dp"
+                android:layout_height="match_parent" />
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:weightSum="2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TableLayout
+                android:id="@+id/tbl_gps_metadata"
+                android:layout_weight=".9"
+                android:background="@drawable/table_background_white"
+                android:shrinkColumns="*"
+                android:stretchColumns="*"
+                android:layout_marginStart="5dp"
+                android:layout_width="0dp"
+                android:layout_height="125dp">
+
+                <TableRow
+                    android:layout_span="3"
+                    android:padding="5dp"
+                    android:background="@color/grey_800"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:text="@string/header_gnss_status"
+                        android:textColor="@color/contextualText"
+                        android:layout_marginStart="4dp"
+                        android:layout_marginTop="2dp"
+                        android:layout_marginBottom="2dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                </TableRow>
+
+
+                <RelativeLayout
+                    android:orientation="horizontal"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content">
+
+                    <ImageView
+                        android:id="@+id/gnss_status_img"
+                        android:background="@drawable/vc_circle_blue"
+                        android:layout_weight="0"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"/>
+
+                    <TextView
+                        android:id="@+id/gnss_status_Value"
+                        android:text="@string/gnss_status_search"
+                        android:textAppearance="?android:textAppearanceLarge"
+                        android:layout_toEndOf="@id/gnss_status_img"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="3dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:id="@+id/gps_accuracy_lbl"
+                        android:text="@string/header_accuracy_status"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_below="@id/gnss_status_Value"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:id="@+id/gps_accuracy_Value"
+                        android:text="@string/gnss_status_default"
+                        android:textColor="@color/header_text"
+                        android:layout_alignTop="@id/gps_accuracy_lbl"
+                        android:layout_toEndOf="@id/gps_accuracy_lbl"
+                        android:layout_marginStart="5dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                </RelativeLayout>
+
+
+            </TableLayout>
+
+            <TableLayout
+                android:background="@drawable/table_background_white"
+                android:layout_weight="1.1"
+                android:shrinkColumns="*"
+                android:stretchColumns="*"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
+                android:layout_width="0dp"
+                android:layout_height="125dp">
+
+
+                <TableRow
+                    android:layout_span="3"
+                    android:padding="5dp"
+                    android:background="@color/grey_800"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:text="@string/header_gps_position"
+                        android:textColor="@color/contextualText"
+                        android:layout_marginStart="4dp"
+                        android:layout_marginTop="2dp"
+                        android:layout_marginBottom="2dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+
+                </TableRow>
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/gps_position_lat_value"
+                        android:text="@string/gps_latitude_default"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="2dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:id="@+id/gps_position_lon_value"
+                        android:text="@string/gps_longitude_default"
+                        android:layout_below="@id/gps_position_lat_value"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="2dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:id="@+id/gps_position_ellipsoid_value"
+                        android:text="@string/gps_ellipsoid_default"
+                        android:layout_below="@id/gps_position_lon_value"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="2dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:id="@+id/gps_position_msl_value"
+                        android:text="@string/gps_msl_default"
+                        android:layout_below="@id/gps_position_ellipsoid_value"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="2dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+
+
+                </RelativeLayout>
+
+
+            </TableLayout>
+
+        </LinearLayout>
+
+        <TableLayout
+            android:layout_width="match_parent"
+            android:layout_height="290dp"
+            android:layout_margin="5dp"
+            android:background="@drawable/table_background_white">
+
+            <fragment
+                android:id="@+id/map_container"
+                class="com.google.android.gms.maps.SupportMapFragment"
+                android:layout_margin="5dp"
+                app:uiZoomControls = "true"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+        </TableLayout>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:fillViewport="true">
+
+            <TableLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="5dp"
+                android:background="@drawable/table_background_white">
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_span="3"
+                    android:background="@color/grey_800"
+                    android:padding="5dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="2dp"
+                        android:layout_marginStart="4dp"
+                        android:layout_marginTop="2dp"
+                        android:text="@string/header_gps_logdata"
+                        android:textColor="@color/contextualText" />
+
+
+                </TableRow>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/gps_log_value"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginBottom="5dp"
+                        android:layout_marginEnd="5dp"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="5dp" />
+
+                </RelativeLayout>
+
+            </TableLayout>
+
+
+        </ScrollView>
+
+    </LinearLayout>
+
+</android.support.v4.widget.NestedScrollView>

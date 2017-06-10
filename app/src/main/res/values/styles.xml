@@ -1,0 +1,75 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+
+    </style>
+
+    <style name="SuperMaterialTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+
+        <item name="colorControlHighlight">@color/lime_primary</item>
+        <item name="colorButtonNormal">@color/orange_primary</item>
+        <item name="colorControlActivated">@color/deep_orange_primary</item>
+
+        <!-- use to make contextual action mode overlap the Toolbar -->
+        <item name="windowActionModeOverlay">true</item>
+        <item name="actionModeStyle">@style/MyActionMode</item>
+    </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="MyActionMode" parent = "@style/Widget.AppCompat.ActionMode">
+        <!-- background of the Contextual Action Bar -->
+        <item name="background">@color/contextual_background</item>
+        <item name="titleTextStyle">@style/MyTextStyle</item>
+    </style>
+
+    <!-- Contextual ActionBar title text -->
+    <style name="MyTextStyle" parent="@style/TextAppearance.AppCompat.Widget.ActionBar.Title">
+        <item name="android:textAppearance">@color/contextualText</item>
+    </style>
+
+    <style name="MyToolbarTheme" parent="Theme.AppCompat.Light.NoActionBar">
+
+        <item name="android:textColorPrimary">@color/white</item>  <!-- Text color of Toolbar Title -->
+        <item name="android:textColorSecondary">@color/white</item><!-- Color of Overflow Menu ( 3 dots icon ) and color of Navigation Drawer Icon-->
+    </style>
+
+    <style name="MyPopupTheme" parent="ThemeOverlay.AppCompat.Light">
+        <item name="android:background">@color/overflowMenuBg</item><!--Background of Overflow Menu-->
+        <item name="android:textColorPrimary">@color/grey_800</item><!-- Text color of Overflow Menu items-->
+    </style>
+
+    <style name="DialogHintStyle" parent = "TextAppearance.AppCompat.Small">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/contextual_background</item>
+
+    </style>
+
+
+    <style name="AppTheme.RunningProgressBar">
+        <item name="android:colorAccent">@color/indigo_primary_dark</item>
+    </style>
+
+    <style name="AppTheme.RecordingProgressBar">
+        <item name="android:colorAccent">@color/green_primary_dark</item>
+    </style>
+
+    <style name = "LargeTextForScreen">
+
+        <item name="android:textSize">@dimen/text_size_larger</item>
+
+    </style>
+
+    <style name = "MediumTextForScreen">
+
+        <item name="android:textSize">@dimen/text_size_medium</item>
+
+    </style>
+
+</resources>
