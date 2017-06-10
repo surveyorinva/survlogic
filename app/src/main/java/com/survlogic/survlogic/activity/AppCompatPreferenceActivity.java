@@ -1,4 +1,4 @@
-package com.survlogic.survlogic;
+package com.survlogic.survlogic.activity;
 
 import android.content.res.Configuration;
 import android.os.Bundle;

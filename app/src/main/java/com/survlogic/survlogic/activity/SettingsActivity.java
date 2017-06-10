@@ -1,4 +1,4 @@
-package com.survlogic.survlogic;
+package com.survlogic.survlogic.activity;
 
 
 import android.annotation.TargetApi;
@@ -19,6 +19,8 @@ import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
 import android.text.TextUtils;
 import android.view.MenuItem;
+
+import com.survlogic.survlogic.R;
 
 import java.util.List;
 
