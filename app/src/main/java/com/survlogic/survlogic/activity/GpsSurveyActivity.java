@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.GnssMeasurementsEvent;
 import android.location.GnssNavigationMessage;
@@ -17,6 +18,7 @@ import android.location.LocationProvider;
 import android.location.OnNmeaMessageListener;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
@@ -28,6 +30,8 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.survlogic.survlogic.R;
@@ -82,10 +86,15 @@ public class GpsSurveyActivity extends AppCompatActivity implements LocationList
 
 
     //    Settings
+    private SharedPreferences sharedPreferences;
+    private SharedPreferences.Editor editor;
+
     private long minTime; //needs to be in milliseconds
     private float minDistance; //in meters
     private boolean autoStartGPS; //hot start GPS when GPS Activity is Loaded
     private boolean useVersionNApi; //Use N APIs for GNSS Status
+
+    private int displayUnits = 3; //Units to display
 
     //    Constants
     private static final int SECONDS_TO_MILLISECONDS = 1000;
@@ -121,6 +130,7 @@ public class GpsSurveyActivity extends AppCompatActivity implements LocationList
 
             Log.e(TAG, "Start: onResume - add Status Listener");
 
+
         addStatusListener();
 
             Log.e(TAG, "Complete: add Status Listener");
@@ -134,6 +144,9 @@ public class GpsSurveyActivity extends AppCompatActivity implements LocationList
             promptEnableGps();
         }
             Log.e(TAG, "Complete: onResume");
+
+        checkPreferenceInterval(sharedPreferences);
+        checkPreferenceUnits(sharedPreferences);
     }
 
     @Override
@@ -236,16 +249,26 @@ public class GpsSurveyActivity extends AppCompatActivity implements LocationList
     }
 
     private void initSettings() {
-        //TODO Settings Preferences Menu Support
-
             Log.e(TAG, "Start: initSettings");
 
-        minTime = 1 * SECONDS_TO_MILLISECONDS;
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        double tempMinTime = Double.valueOf(
+                sharedPreferences.getString(getString(R.string.pref_key_gps_min_time), getString(R.string.pref_gps_min_time_default_sec)));
+
+        minTime = (long) (tempMinTime * SECONDS_TO_MILLISECONDS);
+
         minDistance = 0;
         autoStartGPS = true;
         useVersionNApi = true;
 
-            Log.e(TAG, "Complete: Assign Variables, Checking AutoStart GPS");
+
+        displayUnits = Integer.valueOf(
+                sharedPreferences.getString(getString(R.string.pref_key_gps_unit_measurement), getString(R.string.pref_gps_unit_measurement_default)));
+
+
+
+        Log.e(TAG, "Complete: Assign Variables, Checking AutoStart GPS");
 
         if (autoStartGPS) {
             warmBootGPS();
@@ -253,6 +276,41 @@ public class GpsSurveyActivity extends AppCompatActivity implements LocationList
 
             Log.e(TAG, "Complete: initSettings");
     }
+
+    private void checkPreferenceInterval(SharedPreferences settings) {
+        double tempMinTimeDouble = Double
+                .valueOf(settings.getString(getString(R.string.pref_key_gps_min_time), "1"));
+        long minTimeLong = (long) (tempMinTimeDouble * SECONDS_TO_MILLISECONDS);
+
+        if (minTime != minTimeLong ||
+                minDistance != Float.valueOf(
+                        settings.getString(getString(R.string.pref_key_gps_min_distance), "0"))) {
+            // User changed preference values, get the new ones
+            minTime = minTimeLong;
+
+            // If the GPS is started, reset the location listener with the new values
+
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                promptEnableGps();
+                return;
+            }
+
+            if (gpsRunning) {
+                mLocationManager.requestLocationUpdates(mProvider.getName(), minTime, minDistance, this);
+                Toast.makeText(this, String.format(getString(R.string.gps_warm_boot_go),
+                        String.valueOf((double) minTime / SECONDS_TO_MILLISECONDS),
+                        String.valueOf(minDistance)), Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private void checkPreferenceUnits(SharedPreferences settings){
+        displayUnits = Integer.valueOf(
+                sharedPreferences.getString(getString(R.string.pref_key_gps_unit_measurement), getString(R.string.pref_gps_unit_measurement_default)));
+
+    }
+
+
     public static GpsSurveyActivity getInstance() {
             Log.e(TAG, "Start: GpsSurveyActivity - getInstance");
 
@@ -268,7 +326,7 @@ public class GpsSurveyActivity extends AppCompatActivity implements LocationList
     }
 
     private synchronized void warmBootGPS() {
-            Log.e(TAG, "Start: warmBootGPS");
+            Log.e(TAG, "Start: warmBootGPS1");
 
         if (!gpsRunning) {
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -276,11 +334,11 @@ public class GpsSurveyActivity extends AppCompatActivity implements LocationList
                 return;
             }
 
-            Log.e(TAG, "Start: warmBoot - requestLocationUpdates");
+            Log.e(TAG, "Start: warmBoot - requestLocationUpdates2");
             mLocationManager.requestLocationUpdates(mProvider.getName(), minTime, minDistance, this);
             gpsRunning = true;
 
-            Log.e(TAG, "Complete: warmBoot - requestLocationUpdates");
+            Log.e(TAG, "Complete: warmBoot - requestLocationUpdates3");
 
             Toast.makeText(this, String.format(getString(R.string.gps_warm_boot_go),
                     String.valueOf((double) minTime / SECONDS_TO_MILLISECONDS),
@@ -288,13 +346,13 @@ public class GpsSurveyActivity extends AppCompatActivity implements LocationList
 
         }
 
-            Log.e(TAG, "Start: warmBootGPS - Set Listener");
+            Log.e(TAG, "Start: warmBootGPS - Set Listener4");
 
         for (GpsSurveyListener listener : mGpsSurveyListener) {
             listener.gpsStart();
 
         }
-            Log.e(TAG, "Complete: warmBootGPS - Set Listener");
+            Log.e(TAG, "Complete: warmBootGPS - Set Listener5");
 
     }
 
@@ -640,7 +698,7 @@ public class GpsSurveyActivity extends AppCompatActivity implements LocationList
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.toolbar_gps_survey_item1:
-                //some action here
+                goToSettingsMenu();
                 break;
 
             case R.id.toolbar_gps_survey_item2:
@@ -652,6 +710,12 @@ public class GpsSurveyActivity extends AppCompatActivity implements LocationList
         return super.onOptionsItemSelected(item);
     }
 
+
+    private void goToSettingsMenu() {
+        Intent i = new Intent(this,SettingsGpsSurveyActivity.class);
+        startActivity(i);
+
+    }
 
 
 }

@@ -34,7 +34,9 @@
 
     <dimen name="text_size_larger">25sp</dimen>
     <dimen name="text_size_medium">20sp</dimen>
-
+    <dimen name="text_size_header">15sp</dimen>
+    <dimen name="text_size_normal">12sp</dimen>
+    <dimen name="text_size_small">10sp</dimen>
 
 
 

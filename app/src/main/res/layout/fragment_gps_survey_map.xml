@@ -149,7 +149,7 @@
                 android:layout_height="match_parent" />
 
             <android.support.v4.widget.Space
-                android:layout_weight="0.05"
+                android:layout_weight=".9"
                 android:layout_width="0dp"
                 android:layout_height="match_parent" />
 
@@ -163,6 +163,7 @@
                 <TextView
                     android:id="@+id/gps_epoch_count_lbl"
                     android:text="@string/header_epoch_lbl"
+                    android:textSize="12sp"
                     android:layout_marginTop="2dp"
                     android:layout_marginStart="5dp"
                     android:layout_width="match_parent"
@@ -171,6 +172,7 @@
                 <TextView
                     android:id="@+id/gps_epoch_count_value"
                     android:text="@string/epoch_default"
+                    android:textSize="@dimen/text_size_header"
                     android:textColor="@color/header_text"
                     android:gravity="center_horizontal"
                     android:layout_marginStart="5dp"
@@ -178,22 +180,6 @@
                     android:layout_height="match_parent"/>
 
             </TableLayout>
-
-            <android.support.v4.widget.Space
-                android:layout_weight="0.10"
-                android:layout_width="0dp"
-                android:layout_height="match_parent" />
-
-
-            <ImageButton
-                android:id="@+id/btnGPS_Settings"
-                android:layout_weight=".75"
-                android:src="@drawable/ic_more_vert_36"
-                android:background="@drawable/table_background_white"
-                android:visibility="visible"
-                android:layout_width="0dp"
-                android:layout_height="match_parent" />
-
 
         </LinearLayout>
 

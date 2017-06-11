@@ -171,12 +171,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.toolbar_main_item1:
-                //some action here
+                goToSettingsMenu();
                 break;
 
         }
 
         return super.onOptionsItemSelected(item);
     }
+
+    private void goToSettingsMenu() {
+        Intent i = new Intent(this,SettingsActivity.class);
+        startActivity(i);
+
+    }
+
 
 }

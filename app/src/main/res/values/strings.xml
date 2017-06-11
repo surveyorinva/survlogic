@@ -7,6 +7,8 @@
     <string name="general_start">Start</string>
     <string name="general_yes">Yes</string>
     <string name="general_no">No</string>
+    <string name="general_unit_meters">%1$.1f m</string>
+    <string name="general_unit_feet">%1$.1f ft</string>
 
     <string name="activity_main_toolbar_title">Welcome</string>
 
@@ -51,7 +53,8 @@
     <string name="gps_vdop_value">VDOP: %1$.1f</string>
     <string name="gps_ttff_default">TTFF:</string>
     <string name="gps_ttff_value">TTFF:</string>
-    <string name="header_epoch_lbl">Epoch</string>
+    <string name="header_epoch_lbl">Epoch:</string>
+    <string name="header_epoch_value">Epoch: (%1$s s) </string>
     <string name="epoch_default">0</string>
     <string name="satellite_default">0</string>
     <string name="gps_latitude_default">Latitude:</string>
@@ -63,7 +66,9 @@
     <string name="gps_latitude_value">Latitude: %1$.7f\u00B0</string>
     <string name="gps_longitude_value">Longitude: %1$.7f\u00B0</string>
     <string name="gps_ellipsoid_value_metric">Ellipsoid: %1$.1f m</string>
+    <string name="gps_ellipsoid_value_feet">Ellipsoid: %1$.1f ft</string>
     <string name="gps_msl_value_metric">Ortho Height: %1$.1f m</string>
+    <string name="gps_msl_value_feet">Ortho Height: %1$.1f ft</string>
     <string name="gps_cn0_label">C/N0</string>
     <string name="gps_snr_label">SNR</string>
     <string name="title_activity_maps">Map</string>
@@ -93,7 +98,6 @@
 
     <!-- Example General settings -->
     <string name="pref_header_general">General</string>
-
     <string name="pref_title_social_recommendations">Enable social recommendations</string>
     <string name="pref_description_social_recommendations">Recommendations for people to contact
         based on your message history
@@ -118,22 +122,8 @@
     <string name="pref_header_data_sync">Data &amp; sync</string>
 
     <string name="pref_title_sync_frequency">Sync frequency</string>
-    <string-array name="pref_sync_frequency_titles">
-        <item>15 minutes</item>
-        <item>30 minutes</item>
-        <item>1 hour</item>
-        <item>3 hours</item>
-        <item>6 hours</item>
-        <item>Never</item>
-    </string-array>
-    <string-array name="pref_sync_frequency_values">
-        <item>15</item>
-        <item>30</item>
-        <item>60</item>
-        <item>180</item>
-        <item>360</item>
-        <item>-1</item>
-    </string-array>
+
+
 
     <string-array name="list_preference_entries">
         <item>Entry 1</item>
@@ -160,5 +150,35 @@
     <string name="pref_ringtone_silent">Silent</string>
 
     <string name="pref_title_vibrate">Vibrate</string>
+
+
+    <!--GPS Survey Preferences -->
+
+    <string name="pref_gps_survey_header_general">General</string>
+
+    <!-- Preferences -->
+    <string name="pref_title">Settings</string>
+    <string name="pref_map_category_title">Map</string>
+    <string name="pref_map_type_title">Map Type</string>
+    <string name="pref_map_type_summary">Sets the type of map tiles shown</string>
+    <string name="pref_map_type_dialog_title">Choose Map Type</string>
+
+    <string name="pref_gps_category_title">GNSS</string>
+    <string name="pref_auto_start_gps_title">Auto-Start GNSS</string>
+    <string name="pref_auto_start_gps_summary">Start GNSS when the app starts</string>
+
+    <string name="pref_gps_min_time_title">Interval</string>
+    <string name="pref_gps_min_time_summary">Time between GNSS fixes, in seconds</string>
+    <string name="pref_gps_min_time_dialog_title">Enter an interval, in seconds</string>
+    <string name="pref_gps_min_time_invalid_entry">Interval must be a number</string>
+
+    <string name="pref_display_category_title">Display</string>
+    <string name="pref_keep_screen_on_title">Keep Screen On</string>
+    <string name="pref_keep_screen_on_summary">Prevents the screen from turning off</string>
+
+    <string name="pref_values_measurement_title">Display Units</string>
+    <string name="pref_value_measurement_summary">Display units on values</string>
+    <string name="pref_value_measurement_dialog_title">Choose Unit Type</string>
+
 
 </resources>

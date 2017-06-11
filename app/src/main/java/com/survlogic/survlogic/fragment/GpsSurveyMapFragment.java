@@ -3,6 +3,7 @@ package com.survlogic.survlogic.fragment;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.location.GnssMeasurementsEvent;
@@ -12,6 +13,7 @@ import android.location.GpsStatus;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
@@ -32,6 +34,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.LocationSource;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -46,6 +49,8 @@ import com.survlogic.survlogic.utils.LocationConverter;
 
 import java.text.DecimalFormat;
 import java.util.Iterator;
+
+import static com.survlogic.survlogic.utils.LocationConverter.convertMetersToValue;
 
 /**
  * Created by chrisfillmore on 5/2/2017.
@@ -68,7 +73,8 @@ public class GpsSurveyMapFragment extends Fragment implements GpsSurveyListener,
             mFixTimeView, mTTFFView,
             mAccuracyView, mAccuracyStatus,
             mNumSats, mNumSatsLocked,
-            mPdopView, mHdopView, mVdopView;
+            mPdopView, mHdopView, mVdopView,
+            mEpochView;
 
     private ImageView mAccuracyStatusImage;
 
@@ -86,6 +92,8 @@ public class GpsSurveyMapFragment extends Fragment implements GpsSurveyListener,
 
     //    Mapping Variables
     private GoogleMap mMap;
+    private UiSettings mUiSettings;
+
     private LatLng mLatLng;
     private MarkerOptions currentPositionMarker = null;
     private Marker currentLocationMarker;
@@ -93,10 +101,16 @@ public class GpsSurveyMapFragment extends Fragment implements GpsSurveyListener,
     //    Formatting
     DecimalFormat mFixedTwoFormat = new DecimalFormat("#.##");
 
+    //    Settings
+    private SharedPreferences sharedPreferences;
+    private SharedPreferences.Editor editor;
+
     //    System Variables
     private static final float mPositionAutonomousMeters = 20;
     private static final float mPositionFloatMeters = 10;
     private static final float mPositionFixedMeters = 5;
+    private int displayUnits = 3;
+    private int mapType = 1;
 
     @Nullable
     @Override
@@ -140,6 +154,9 @@ public class GpsSurveyMapFragment extends Fragment implements GpsSurveyListener,
         super.onResume();
         GpsSurveyActivity gsa = GpsSurveyActivity.getInstance();
         setStarted(gsa.gpsRunning);
+
+        checkPreferenceUnits(sharedPreferences);
+        checkPreferencesMapType(sharedPreferences);
     }
 
 
@@ -161,12 +178,33 @@ public class GpsSurveyMapFragment extends Fragment implements GpsSurveyListener,
         mVdopView = (TextView) v.findViewById(R.id.VDOP_value);
         mTTFFView = (TextView) v.findViewById(R.id.ttff_value);
 
+        mEpochView = (TextView) v.findViewById(R.id.gps_epoch_count_lbl);
 
         mAccuracyStatusImage = (ImageView) v.findViewById(R.id.gnss_status_img);
 
         progressBarRecording = (ProgressBar) v.findViewById(R.id.progressBarRecording);
 
+        initViewSettings();
+
         Log.e(TAG, "Setup Controls Completed");
+
+    }
+
+
+    private void initViewSettings(){
+
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+
+        double tempMinTime = Double.valueOf(
+                sharedPreferences.getString(getString(R.string.pref_key_gps_min_time), getString(R.string.pref_gps_min_time_default_sec)));
+
+        mEpochView.setText(getString(R.string.header_epoch_value,String.valueOf(tempMinTime)));
+
+        displayUnits = Integer.valueOf(
+                sharedPreferences.getString(getString(R.string.pref_key_gps_unit_measurement), getString(R.string.pref_gps_unit_measurement_default)));
+
+        mapType = Integer.valueOf(
+                sharedPreferences.getString(getString(R.string.pref_key_map_type), getString(R.string.pref_gps_map_type_default)));
 
     }
 
@@ -207,6 +245,41 @@ public class GpsSurveyMapFragment extends Fragment implements GpsSurveyListener,
 
     }
 
+
+    private void checkPreferenceUnits(SharedPreferences settings){
+        displayUnits = Integer.valueOf(
+                sharedPreferences.getString(getString(R.string.pref_key_gps_unit_measurement), getString(R.string.pref_gps_unit_measurement_default)));
+
+    }
+
+    private void checkPreferencesMapType(SharedPreferences settings){
+
+        int mapTypeNew = Integer.valueOf(
+                sharedPreferences.getString(getString(R.string.pref_key_map_type), getString(R.string.pref_gps_map_type_default)));
+
+        if (mapType != mapTypeNew) {
+            switch (mapTypeNew){
+
+                case 1:  //Normal
+                    mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+                    break;
+
+                case 4:  //Hybrid
+                    mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+                    break;
+
+                case 2: //Satellite
+                    mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+                    break;
+
+                case 3:  //Terrain
+                    mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+                    break;
+
+            }
+        }
+    }
+
     @Override
     public void onLocationChanged(Location location) {
         if (!mGotFix) {
@@ -229,7 +302,24 @@ public class GpsSurveyMapFragment extends Fragment implements GpsSurveyListener,
 
 //        Altitude = Ellipsoid Height
         if (location.hasAltitude()) {
-            mEllipsoidView.setText(getString(R.string.gps_ellipsoid_value_metric, location.getAltitude()));
+
+            switch (displayUnits) {
+                case 1:
+                    mEllipsoidView.setText(getString(R.string.gps_ellipsoid_value_feet, convertMetersToValue(location.getAltitude(),1)));
+                    break;
+
+                case 2:
+                    mEllipsoidView.setText(getString(R.string.gps_ellipsoid_value_feet, convertMetersToValue(location.getAltitude(),2)));
+                    break;
+
+                case 3:
+                    mEllipsoidView.setText(getString(R.string.gps_ellipsoid_value_metric, location.getAltitude()));
+                    break;
+
+                default:
+                    mEllipsoidView.setText(getString(R.string.gps_ellipsoid_value_metric, location.getAltitude()));
+                    break;
+            }
         } else {
             mEllipsoidView.setText("");
         }
@@ -238,7 +328,26 @@ public class GpsSurveyMapFragment extends Fragment implements GpsSurveyListener,
 //        Accuracy Model
         if (location.hasAccuracy()) {
 
-            mAccuracyView.setText(mFixedTwoFormat.format(location.getAccuracy()));
+            switch (displayUnits){
+
+                case 1:
+                    mAccuracyView.setText(getString(R.string.general_unit_feet, convertMetersToValue(location.getAccuracy(),displayUnits)));
+                    break;
+
+                case 2:
+                    mAccuracyView.setText(getString(R.string.general_unit_feet, convertMetersToValue(location.getAccuracy(),displayUnits)));
+                    break;
+
+                case 3:
+                    mAccuracyView.setText(getString(R.string.general_unit_meters, convertMetersToValue(location.getAccuracy(),displayUnits)));
+                    break;
+
+                default:
+                    mAccuracyView.setText(getString(R.string.general_unit_meters, convertMetersToValue(location.getAccuracy(),displayUnits)));
+                    break;
+
+            }
+
             setAccuracyView(location,false);
 
         } else {
@@ -343,7 +452,24 @@ public class GpsSurveyMapFragment extends Fragment implements GpsSurveyListener,
         if (message.startsWith("$GPGGA") || message.startsWith("$GNGNS")) {
             Double altitudeMsl = GpsHelper.getAltitudeMeanSeaLevel(message);
             if (altitudeMsl != null && mNavigating) {
-                mOrthoHeightView.setText(getString(R.string.gps_msl_value_metric, altitudeMsl));
+
+                switch (displayUnits) {
+                    case 1:
+                        mOrthoHeightView.setText(getString(R.string.gps_msl_value_feet, convertMetersToValue(altitudeMsl,1)));
+                        break;
+
+                    case 2:
+                        mOrthoHeightView.setText(getString(R.string.gps_msl_value_feet, convertMetersToValue(altitudeMsl,2)));
+                        break;
+
+                    case 3:
+                        mOrthoHeightView.setText(getString(R.string.gps_msl_value_metric, altitudeMsl));
+                        break;
+
+                    default:
+                        mOrthoHeightView.setText(getString(R.string.gps_msl_value_metric, altitudeMsl));
+                        break;
+                }
             }
         }
         if (message.startsWith("$GNGSA") || message.startsWith("$GPGSA")) {
@@ -487,16 +613,48 @@ public class GpsSurveyMapFragment extends Fragment implements GpsSurveyListener,
 
         Log.e(TAG, "Start: onMapReady");
         mMap = googleMap;
+        mUiSettings = mMap.getUiSettings();
+
+        initMapSettings(googleMap,mUiSettings);
 
         if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
         mMap.setMyLocationEnabled(true);
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(19));
 
 
             Log.e(TAG, "Complete: onMapReady");
     }
+
+    private void initMapSettings(GoogleMap map, UiSettings settings){
+
+        switch (mapType){
+
+            case 1:  //Normal
+                map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+                break;
+
+            case 4:  //Hybrid
+                map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+                break;
+
+            case 2: //Satellite
+                map.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+                break;
+
+            case 3:  //Terrain
+                map.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+                break;
+
+        }
+
+        settings.setZoomControlsEnabled(true);  //Zoom Controls Shown
+        settings.setCompassEnabled(true); //Compass controls shown
+
+
+    }
+
 
     public void updateCurrentLocationMarker(Location currentLatLng){
         if(mMap !=null){

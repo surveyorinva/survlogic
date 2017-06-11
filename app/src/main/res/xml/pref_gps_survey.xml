@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        android:title="@string/pref_display_category_title"
+        android:key="@string/pref_key_display_category">
+
+        <CheckBoxPreference
+            android:key="@string/pref_key_keep_screen_on"
+            android:title="@string/pref_keep_screen_on_title"
+            android:summary="@string/pref_keep_screen_on_summary"
+            android:defaultValue="true"/>
+
+        <ListPreference
+            android:key="@string/pref_key_gps_unit_measurement"
+            android:title="@string/pref_values_measurement_title"
+            android:summary="@string/pref_value_measurement_summary"
+            android:dialogTitle="@string/pref_value_measurement_dialog_title"
+            android:entries="@array/unit_measure_entries"
+            android:entryValues="@array/unit_measure_values"
+            android:defaultValue="1"/>
+
+    </PreferenceCategory>
+
+
+    <PreferenceCategory
+        android:title="@string/pref_map_category_title"
+        android:key="@string/pref_key_map_category">
+
+        <ListPreference
+            android:key="@string/pref_key_map_type"
+            android:title="@string/pref_map_type_title"
+            android:summary="@string/pref_map_type_summary"
+            android:dialogTitle="@string/pref_map_type_dialog_title"
+            android:entries="@array/map_type_entries"
+            android:entryValues="@array/map_type_values"
+            android:defaultValue="1"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/pref_gps_category_title"
+        android:key="@string/pref_key_gps_category">
+
+        <CheckBoxPreference
+            android:key="@string/pref_key_auto_start_gps"
+            android:title="@string/pref_auto_start_gps_title"
+            android:summary="@string/pref_auto_start_gps_summary"
+            android:defaultValue="true"/>
+
+        <ListPreference
+            android:defaultValue="1"
+            android:entries="@array/pref_gps_frequency_titles"
+            android:entryValues="@array/pref_gps_frequency_values"
+            android:key="@string/pref_key_gps_min_time"
+            android:negativeButtonText="@null"
+            android:positiveButtonText="@null"
+            android:title="@string/pref_gps_min_time_title"
+            android:summary="@string/pref_gps_min_time_dialog_title"/>
+
+
+    </PreferenceCategory>
+
+</PreferenceScreen>
