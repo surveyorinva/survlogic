@@ -94,6 +94,19 @@
     <string name="gps_status_long_value_string">Long: %1$s</string>
     <string name="title_activity_settings">Settings</string>
 
+
+    <!-- New Project -->
+    <string name="project_new_header_1">PROJECT NAME</string>
+    <string name="project_new_header_2">STORAGE</string>
+    <string name="project_new_header_3">UNITS</string>
+    <string name="project_new_header_4">LOCATION</string>
+    <string name="project_new_header_5">PROJECT PHOTO</string>
+    <string name="project_new_name_hint">Enter the name of the Project/Job</string>
+    <string name="project_new_storage_prompt">Choose where the Project is Stored</string>
+    <string name="project_new_units_prompt">Select unit of measurements</string>
+    <string name="project_new_location_latitude_default">Latitude:  (Not Defined)</string>
+    <string name="project_new_location_longitude_default">Longitude:  (Not Defined)</string>
+    <string name="project_new_photo_button_label">Choose Picture</string>
     <!-- Strings related to Settings -->
 
     <!-- Example General settings -->
