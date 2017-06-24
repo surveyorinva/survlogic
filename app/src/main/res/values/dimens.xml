@@ -15,6 +15,12 @@
     <dimen name="text_margin">16dp</dimen>
     <dimen name="text_margin_small">8dp</dimen>
     <dimen name="text_margin_very_small">4dp</dimen>
+
+    <dimen name="edit_text_padding_start">10dp</dimen>
+    <dimen name="edit_text_padding_top">4dp</dimen>
+    <dimen name="edit_text_padding_bottom">5dp</dimen>
+
+
     <dimen name="btn_padding">20dp</dimen>
     <dimen name="btn_margin">14dp</dimen>
 

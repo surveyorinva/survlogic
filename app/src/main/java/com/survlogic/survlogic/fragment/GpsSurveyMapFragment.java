@@ -2,7 +2,9 @@ package com.survlogic.survlogic.fragment;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
@@ -25,9 +27,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -43,12 +47,16 @@ import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.activity.GpsSurveyActivity;
 import com.survlogic.survlogic.interf.GpsSurveyListener;
 import com.survlogic.survlogic.model.Dop;
+import com.survlogic.survlogic.model.PointGeodetic;
 import com.survlogic.survlogic.utils.GpsHelper;
 import com.survlogic.survlogic.utils.LocationConverter;
+import com.survlogic.survlogic.utils.MathHelper;
 
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import static com.survlogic.survlogic.utils.LocationConverter.convertMetersToValue;
 
@@ -74,11 +82,18 @@ public class GpsSurveyMapFragment extends Fragment implements GpsSurveyListener,
             mAccuracyView, mAccuracyStatus,
             mNumSats, mNumSatsLocked,
             mPdopView, mHdopView, mVdopView,
-            mEpochView;
+            mEpochView, mEpochCount,
+            mGpsLogValue;
 
     private ImageView mAccuracyStatusImage;
 
+    private Button mbtnStartGPSLog, mbtnSaveGPSLog;
+
     private ProgressBar progressBarRecording;
+
+    //Array data
+    private List<Double> mArrayLat, mArrayLong, mArrayEllipsoid;
+
 
     //    Satellite Metadata
     private int mSvCount, mPrns[], mConstellationType[], mUsedInFixCount;
@@ -98,6 +113,9 @@ public class GpsSurveyMapFragment extends Fragment implements GpsSurveyListener,
     private MarkerOptions currentPositionMarker = null;
     private Marker currentLocationMarker;
 
+    //    Objects
+    private PointGeodetic pointGeodetic;
+
     //    Formatting
     DecimalFormat mFixedTwoFormat = new DecimalFormat("#.##");
 
@@ -106,11 +124,18 @@ public class GpsSurveyMapFragment extends Fragment implements GpsSurveyListener,
     private SharedPreferences.Editor editor;
 
     //    System Variables
+    // Accuracy
     private static final float mPositionAutonomousMeters = 20;
     private static final float mPositionFloatMeters = 10;
     private static final float mPositionFixedMeters = 5;
+    //Map
     private int displayUnits = 3;
     private int mapType = 1;
+    //Logging
+    private boolean bolGPSRecording = false;
+    private int intEpochCount = 0;
+    private boolean mAutoEpochCount = true;
+    private int mEpochMaxCount = 5;
 
     @Nullable
     @Override
@@ -157,6 +182,7 @@ public class GpsSurveyMapFragment extends Fragment implements GpsSurveyListener,
 
         checkPreferenceUnits(sharedPreferences);
         checkPreferencesMapType(sharedPreferences);
+        checkPreferencesSurveySettings(sharedPreferences);
     }
 
 
@@ -179,17 +205,53 @@ public class GpsSurveyMapFragment extends Fragment implements GpsSurveyListener,
         mTTFFView = (TextView) v.findViewById(R.id.ttff_value);
 
         mEpochView = (TextView) v.findViewById(R.id.gps_epoch_count_lbl);
+        mEpochCount = (TextView) v.findViewById(R.id.gps_epoch_count_value);
+
+        mGpsLogValue = (TextView) v.findViewById(R.id.gps_log_value);
 
         mAccuracyStatusImage = (ImageView) v.findViewById(R.id.gnss_status_img);
 
         progressBarRecording = (ProgressBar) v.findViewById(R.id.progressBarRecording);
 
+        mbtnStartGPSLog = (Button) v.findViewById(R.id.btnStartGPSLog);
+
+        mbtnSaveGPSLog = (Button) v.findViewById(R.id.btnSaveGPSLog);
+
         initViewSettings();
+
+        setOnClickListeners();
 
         Log.e(TAG, "Setup Controls Completed");
 
     }
 
+
+    private void setOnClickListeners(){
+
+        mbtnStartGPSLog.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if(!bolGPSRecording){
+                    onStartGpsSurvey();
+
+                }else{
+                    onStopGpsSurvey();
+                }
+
+            }
+        });
+
+        mbtnSaveGPSLog.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onSaveGpsSurvey();
+
+            }
+        });
+
+
+    }
 
     private void initViewSettings(){
 
@@ -205,6 +267,100 @@ public class GpsSurveyMapFragment extends Fragment implements GpsSurveyListener,
 
         mapType = Integer.valueOf(
                 sharedPreferences.getString(getString(R.string.pref_key_map_type), getString(R.string.pref_gps_map_type_default)));
+
+        progressBarRecording.setMax(mEpochMaxCount);
+        progressBarRecording.setProgress(0);
+
+        mAutoEpochCount = sharedPreferences.getBoolean(getString(R.string.pref_key_auto_stop_epoch), true);
+
+        mEpochMaxCount = Integer.valueOf(
+                sharedPreferences.getString(getString(R.string.pref_key_epoch_max), getString(R.string.pref_gps_epoch_default)));
+
+
+    }
+
+
+    private void onStartGpsSurvey(){
+
+        mbtnStartGPSLog.setText(R.string.general_stop);
+        mbtnStartGPSLog.setBackgroundResource(R.drawable.button_framed_red);
+
+        progressBarRecording.setVisibility(View.VISIBLE);
+
+        mArrayLat = new ArrayList<>();
+        mArrayLong = new ArrayList<>();
+        mArrayEllipsoid = new ArrayList<>();
+
+        bolGPSRecording = true;
+    }
+
+    private void onStopGpsSurvey(){
+        mbtnStartGPSLog.setText(R.string.general_start);
+        mbtnStartGPSLog.setBackgroundResource(R.drawable.button_framed_green);
+
+        progressBarRecording.setVisibility(View.INVISIBLE);
+
+        mbtnSaveGPSLog.setVisibility(View.VISIBLE);
+
+        bolGPSRecording = false;
+    }
+
+    private void onSaveGpsSurvey(){
+
+        onPause();
+
+        double averageLat = MathHelper.createAverageValueFromArray(mArrayLat);
+        double averageLong = MathHelper.createAverageValueFromArray(mArrayLong);
+        double averageEllipsoid = MathHelper.createAverageValueFromArray(mArrayEllipsoid);
+
+        pointGeodetic = new PointGeodetic(averageLat,averageLong,averageEllipsoid);
+
+        intEpochCount = 0;
+
+        returnResults(pointGeodetic);
+    }
+
+    private boolean incrementEpoch(){
+        boolean checkValue = false;
+
+        intEpochCount++;
+
+        progressBarRecording.setProgress(intEpochCount);
+
+        mEpochCount.setText(""+intEpochCount);
+
+        if (intEpochCount >= mEpochMaxCount){
+            checkValue = true;
+
+        }
+        return checkValue;
+    }
+
+    private void logRawDataGPS(double myLat, double myLon, double myEllipsoid){
+
+        mArrayLat.add(myLat);
+        mArrayLong.add(myLon);
+        mArrayEllipsoid.add(myEllipsoid);
+
+        mGpsLogValue.append("\n " +String.format(this.getString(R.string.gps_log_raw_value), String.valueOf(myLat),String.valueOf(myLon),String.valueOf(myEllipsoid)));
+
+    }
+
+
+    private void returnResults(PointGeodetic mPointGeodetic){
+
+        Intent returnIntent = new Intent();
+        returnIntent.putExtra(getString(R.string.KEY_POSITION_LATITUDE),mPointGeodetic.getLatitude());
+        returnIntent.putExtra(getString(R.string.KEY_POSITION_LONGITUDE),mPointGeodetic.getLongitude());
+        returnIntent.putExtra(getString(R.string.KEY_POSITION_ELLIPSOID),mPointGeodetic.getEllipsoid());
+        getActivity().setResult(Activity.RESULT_OK,returnIntent);
+        getActivity().finish();
+
+    }
+
+    private void showToast(String data){
+
+        Toast.makeText(getActivity(), data, Toast.LENGTH_SHORT).show();
 
     }
 
@@ -245,6 +401,13 @@ public class GpsSurveyMapFragment extends Fragment implements GpsSurveyListener,
 
     }
 
+    private void checkPreferencesSurveySettings(SharedPreferences settings){
+        mAutoEpochCount = sharedPreferences.getBoolean(getString(R.string.pref_key_auto_stop_epoch), true);
+
+        mEpochMaxCount = Integer.valueOf(
+                sharedPreferences.getString(getString(R.string.pref_key_epoch_max), getString(R.string.pref_gps_epoch_default)));
+
+    }
 
     private void checkPreferenceUnits(SharedPreferences settings){
         displayUnits = Integer.valueOf(
@@ -358,6 +521,26 @@ public class GpsSurveyMapFragment extends Fragment implements GpsSurveyListener,
 
 //        Create Map Instances
         updateCurrentLocationMarker(location);
+
+
+//        Check for logging
+
+        if (bolGPSRecording){
+
+            boolean bolEpoch = incrementEpoch();
+
+            if (mAutoEpochCount){
+                if (!bolEpoch){
+                    // Count has not reached max Epoch level on AutoSave
+                    logRawDataGPS(location.getLatitude(),location.getLongitude(),location.getAltitude());
+                }else{
+                    // Count has reached the max Epoch level.  Shut off
+                    onStopGpsSurvey();
+                }
+            }else{
+                logRawDataGPS(location.getLatitude(),location.getLongitude(),location.getAltitude());
+            }
+        }
 
     }
 

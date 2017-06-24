@@ -15,9 +15,29 @@
     <string name="pref_key_display_category">display_category</string>
     <string name="pref_key_keep_screen_on">keep_screen_on</string>
 
+    <string name="pref_key_epoch_category">pref_key_epoch_category</string>
+    <string name="pref_key_auto_stop_epoch">gps_auto_stop_measure</string>
+    <string name="pref_key_epoch_max">gps_epoch_max_value</string>
+
     <!-- Default preference values -->
     <string name="pref_gps_min_time_default_sec">1</string>
     <string name="pref_gps_unit_measurement_default">3</string>
     <string name="pref_gps_map_type_default">1</string>
+    <string name="pref_gps_epoch_default">3</string>
+
+    <!--Intent Keys-->
+    <string name="KEY_Intent_FROM">KEY_Intent_FROM</string>
+    <string name="KEY_POSITION_LATITUDE">KEY_LATITUDE</string>
+    <string name="KEY_POSITION_LONGITUDE">KEY_LONGITUDE</string>
+    <string name="KEY_POSITION_ELLIPSOID">KEY_ELLIPSOID</string>
+    <string name="KEY_POSITION_ORTHO">KEY_ORTHO</string>
+    <string name="KEY_POSITION">KEY_POSITION</string>
+
+    <!--Intent Answers-->
+    <string name="ANSWER_Project_New">ANSWER_project_new</string>
+
+
+    <!--startActivityForResult Activity Assignments-->
+    <string name="VALUE_activity_Project_New_Activity">1</string>
 
 </resources>

@@ -19,6 +19,7 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.adapter.ActivityViewPagerAdapter;
@@ -50,6 +51,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             return;
         }
 
+
+
     }
 
     @Override
@@ -74,7 +77,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         actionBarDrawerToggle.syncState();
 
         fab = (FloatingActionButton) findViewById(R.id.fab_in_app_bar_layout);
-
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goToNewProjectForm();
+            }
+        });
 
     }
 
@@ -183,6 +191,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Intent i = new Intent(this,SettingsActivity.class);
         startActivity(i);
 
+    }
+
+    private void goToNewProjectForm(){
+        Intent i = new Intent(this, ProjectNewActivity.class);
+        startActivity(i);
     }
 
 

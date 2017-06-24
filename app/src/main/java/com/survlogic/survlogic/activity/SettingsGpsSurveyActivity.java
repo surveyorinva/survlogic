@@ -152,8 +152,13 @@ public class SettingsGpsSurveyActivity extends AppCompatPreferenceActivity {
          */
         protected boolean isValidFragment(String fragmentName) {
             return PreferenceFragment.class.getName().equals(fragmentName)
-                    || com.survlogic.survlogic.activity.SettingsGpsSurveyActivity.GeneralPreferenceFragment.class.getName().equals(fragmentName);
+                    || com.survlogic.survlogic.activity.SettingsGpsSurveyActivity.GeneralPreferenceFragment.class.getName().equals(fragmentName)
+                    || com.survlogic.survlogic.activity.SettingsGpsSurveyActivity.SurveyPreferenceFragment.class.getName().equals(fragmentName);
+
+
         }
+
+
 
         /**
          * This fragment shows general preferences only. It is used when the
@@ -164,7 +169,7 @@ public class SettingsGpsSurveyActivity extends AppCompatPreferenceActivity {
             @Override
             public void onCreate(Bundle savedInstanceState) {
                 super.onCreate(savedInstanceState);
-                addPreferencesFromResource(R.xml.pref_gps_survey);
+                addPreferencesFromResource(R.xml.pref_gps_survey_general);
                 setHasOptionsMenu(true);
 
             }
@@ -179,5 +184,30 @@ public class SettingsGpsSurveyActivity extends AppCompatPreferenceActivity {
                 return super.onOptionsItemSelected(item);
             }
         }
+
+    /**
+     * This fragment shows general preferences only. It is used when the
+     * activity is showing a two-pane settings UI.
+     */
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    public static class SurveyPreferenceFragment extends PreferenceFragment {
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            addPreferencesFromResource(R.xml.pref_gps_survey_survey);
+            setHasOptionsMenu(true);
+
+        }
+
+        @Override
+        public boolean onOptionsItemSelected(MenuItem item) {
+            int id = item.getItemId();
+            if (id == android.R.id.home) {
+                startActivity(new Intent(getActivity(), com.survlogic.survlogic.activity.SettingsGpsSurveyActivity.class));
+                return true;
+            }
+            return super.onOptionsItemSelected(item);
+        }
+    }
 
 }

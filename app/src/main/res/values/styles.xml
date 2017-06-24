@@ -44,12 +44,12 @@
 
     <style name="MyPopupTheme" parent="ThemeOverlay.AppCompat.Light">
         <item name="android:background">@color/overflowMenuBg</item><!--Background of Overflow Menu-->
-        <item name="android:textColorPrimary">@color/grey_800</item><!-- Text color of Overflow Menu items-->
+        <item name="android:textColorPrimary">@color/primary_text</item><!-- Text color of Overflow Menu items-->
     </style>
 
     <style name="DialogHintStyle" parent = "TextAppearance.AppCompat.Small">
         <item name="android:textStyle">bold</item>
-        <item name="android:textColor">@color/contextual_background</item>
+        <item name="android:textColor">@color/primary_text</item>
 
     </style>
 
@@ -61,16 +61,6 @@
         <item name="android:colorAccent">@color/green_primary_dark</item>
     </style>
 
-    <style name = "LargeTextForScreen">
 
-        <item name="android:textSize">@dimen/text_size_larger</item>
-
-    </style>
-
-    <style name = "MediumTextForScreen">
-
-        <item name="android:textSize">@dimen/text_size_medium</item>
-
-    </style>
 
 </resources>

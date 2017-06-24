@@ -8,4 +8,9 @@
         android:icon="@drawable/ic_info_black_24dp"
         android:title="@string/pref_gps_survey_header_general" />
 
+    <header
+        android:fragment="com.survlogic.survlogic.activity.SettingsGpsSurveyActivity$SurveyPreferenceFragment"
+        android:icon="@drawable/ic_add_location"
+        android:title="@string/pref_gps_survey_header_survey" />
+
 </preference-headers>

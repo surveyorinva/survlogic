@@ -232,6 +232,7 @@ public class GpsSurveyActivity extends AppCompatActivity implements LocationList
 
     }
 
+
     private void initGNSS() {
             Log.e(TAG, "Start: initGNSS");
 

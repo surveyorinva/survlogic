@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+
+    <!--Input Fields-->
+    <style name="InputField" parent="Widget.AppCompat.EditText"/>
+
+    <style name="InputField.ProjectNewActivity">
+        <item name="android:paddingStart">@dimen/edit_text_padding_start</item>
+        <item name="android:paddingTop">@dimen/edit_text_padding_top</item>
+        <item name="android:paddingBottom">@dimen/edit_text_padding_bottom</item>
+        <item name="android:inputType">textCapWords</item>
+
+    </style>
+
+    <style name="InputField.ProjectNewActivity.ProjectName">
+
+
+
+    </style>
+
+    <!--Labels-->
+    <style name="Labels">
+        <item name="android:fontFamily">sans-serif-condensed</item>
+        <item name="android:alpha">0.86</item>
+
+    </style>
+
+    <style name="Labels.EditBoxHeaders">
+        <item name="android:fontFamily">sans-serif-smallcaps</item>
+        <item name="android:textColor">@color/header_text</item>
+        <item name="android:textSize">15dp</item>
+    </style>
+
+
+    <!--Containers-->
+    <!--Buttons-->
+    <style name="Button.Flat" parent="Widget.AppCompat.Button.Borderless" />
+
+    <style name="Button.Flat.Primary">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textSize">15sp</item>
+
+    </style>
+
+    <style name="Button.Flat.Primary.Save">
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textColor">@color/button_text</item>
+        <item name="android:background">@drawable/button_ripple_green</item>
+
+    </style>
+
+    <style name="Button.Flat.Primary.Cancel">
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textColor">@color/button_text</item>
+        <item name="android:background">@drawable/button_ripple_red</item>
+
+    </style>
+
+
+    <style name="Button.Flat.Primary.GetPicture">
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">@color/button_text</item>
+        <item name="android:background">@drawable/button_ripple_blue</item>
+        <item name="android:padding">10dp</item>
+    </style>
+    
+    <style name="Button.Special" parent="Widget.AppCompat.Button"/>
+
+    <style name="Button.Special.GpsSurvey">
+        <item name="android:background">@drawable/button_ripple_orange</item>
+        <item name="android:textColor">@color/icons</item>
+
+    </style>
+
+
+    <!--Others-->
+
+    <style name = "LargeTextForScreen">
+
+        <item name="android:textSize">@dimen/text_size_larger</item>
+
+    </style>
+
+    <style name = "MediumTextForScreen">
+
+        <item name="android:textSize">@dimen/text_size_medium</item>
+
+    </style>
+
+</resources>

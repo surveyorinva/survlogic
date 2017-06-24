@@ -5,6 +5,7 @@
     <string name="general_save">Save</string>
     <string name="general_cancel">Cancel</string>
     <string name="general_start">Start</string>
+    <string name="general_stop">Stop</string>
     <string name="general_yes">Yes</string>
     <string name="general_no">No</string>
     <string name="general_unit_meters">%1$.1f m</string>
@@ -69,6 +70,7 @@
     <string name="gps_ellipsoid_value_feet">Ellipsoid: %1$.1f ft</string>
     <string name="gps_msl_value_metric">Ortho Height: %1$.1f m</string>
     <string name="gps_msl_value_feet">Ortho Height: %1$.1f ft</string>
+    <string name="gps_log_raw_value">Lat: %1$s, Long: %2$s, El: %3$s</string>
     <string name="gps_cn0_label">C/N0</string>
     <string name="gps_snr_label">SNR</string>
     <string name="title_activity_maps">Map</string>
@@ -96,17 +98,27 @@
 
 
     <!-- New Project -->
-    <string name="project_new_header_1">PROJECT NAME</string>
-    <string name="project_new_header_2">STORAGE</string>
-    <string name="project_new_header_3">UNITS</string>
-    <string name="project_new_header_4">LOCATION</string>
-    <string name="project_new_header_5">PROJECT PHOTO</string>
+    <string name="project_new_header_1">Project Name</string>
+    <string name="project_new_header_2">Storage</string>
+    <string name="project_new_header_3">Units</string>
+    <string name="project_new_header_4">Location</string>
+    <string name="project_new_header_5">Project Photo</string>
+    <string name="project_new_header_6">Projection</string>
+    <string name="project_new_header_7">Zone</string>
     <string name="project_new_name_hint">Enter the name of the Project/Job</string>
     <string name="project_new_storage_prompt">Choose where the Project is Stored</string>
     <string name="project_new_units_prompt">Select unit of measurements</string>
+    <string name="project_new_projection_prompt">Select Projection</string>
+    <string name="project_new_projection_zone_prompt">Select Zone</string>
     <string name="project_new_location_latitude_default">Latitude:  (Not Defined)</string>
+    <string name="project_new_location_latitude_value">Latitude:  %1$s</string>
     <string name="project_new_location_longitude_default">Longitude:  (Not Defined)</string>
+    <string name="project_new_location_longitude_value">Longitude:  %1$s</string>
     <string name="project_new_photo_button_label">Choose Picture</string>
+    <string name="project_new_dialog_title">Get Project Site Photo</string>
+    <string name="project_new_dialog_takePhoto">Take Photo</string>
+    <string name="project_new_dialog_getImage">Choose from Library</string>
+
     <!-- Strings related to Settings -->
 
     <!-- Example General settings -->
@@ -168,8 +180,9 @@
     <!--GPS Survey Preferences -->
 
     <string name="pref_gps_survey_header_general">General</string>
+    <string name="pref_gps_survey_header_survey">Survey</string>
 
-    <!-- Preferences -->
+    <!-- General -->
     <string name="pref_title">Settings</string>
     <string name="pref_map_category_title">Map</string>
     <string name="pref_map_type_title">Map Type</string>
@@ -193,5 +206,13 @@
     <string name="pref_value_measurement_summary">Display units on values</string>
     <string name="pref_value_measurement_dialog_title">Choose Unit Type</string>
 
+    <!--Survey-->
+    <string name="pref_gps_auto_stop_category_title">Store Point</string>
+    <string name="pref_gps_auto_stop_gps_title">Auto-Stop Survey </string>
+    <string name="pref_gps_auto_stop_gps_summary">Stops the observations after a defined number of Epochs</string>
+
+    <string name="pref_gps_epoch_max_title">Number of Epochs </string>
+    <string name="pref_gps_epoch_max_summary">Number of Epochs to collect when Auto-Stop is turned on</string>
+    <string name="pref_gps_epoch_max_dialog_title">Choose Epoch Interval</string>
 
 </resources>
