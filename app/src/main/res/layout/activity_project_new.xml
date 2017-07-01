@@ -34,6 +34,7 @@
 
 
         <EditText
+            android:id="@+id/project_name_in_project_new"
             android:hint="@string/project_new_name_hint"
             style="@style/InputField.ProjectNewActivity.ProjectName"
             android:background="@drawable/editbox_dropdown_background"
@@ -78,7 +79,8 @@
 
                 <Spinner
                     android:id="@+id/storage_prompt_in_project_new"
-                    android:entries="@array/project_storage_values"
+                    android:entries="@array/project_storage_titles"
+                    android:entryValues="@array/project_storage_values"
                     android:prompt="@string/project_new_storage_prompt"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"/>
@@ -114,6 +116,7 @@
                 <Spinner
                     android:id="@+id/units_prompt_in_project_new"
                     android:entries="@array/unit_measure_entries_short"
+                    android:entryValues="@array/unit_measure_values"
                     android:prompt="@string/project_new_units_prompt"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"/>
@@ -157,7 +160,17 @@
                 android:text="@string/project_new_location_latitude_default"
                 android:layout_marginStart="5dp"
                 android:layout_marginTop="5dp"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/location_latitude_value"
+                android:visibility="invisible"
+                style="@style/Labels.NamedValues"
+                android:layout_toRightOf="@id/location_latitude"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="5dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
             <TextView
@@ -166,7 +179,18 @@
                 android:layout_below="@id/location_latitude"
                 android:layout_marginStart="5dp"
                 android:layout_marginTop="5dp"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/location_longitude_value"
+                style="@style/Labels.NamedValues"
+                android:visibility="invisible"
+                android:layout_below="@id/location_latitude"
+                android:layout_toRightOf="@id/location_longitude"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="5dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
             <ImageButton
@@ -217,7 +241,8 @@
 
                 <Spinner
                     android:id="@+id/projection_prompt_in_project_new"
-                    android:entries="@array/project_projection_values"
+                    android:entries="@array/project_projection_titles"
+                    android:entryValues="@array/project_projection_values"
                     android:prompt="@string/project_new_projection_prompt"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"/>
@@ -253,7 +278,8 @@
 
                 <Spinner
                     android:id="@+id/projection_zone_prompt_in_project_new"
-                    android:entries="@array/project_projection_zones_values"
+                    android:entries="@array/project_projection_zones_titles"
+                    android:entryValues="@array/project_projection_zones_values"
                     android:prompt="@string/project_new_projection_zone_prompt"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"/>
@@ -328,6 +354,7 @@
         android:layout_height="70dp">
 
         <Button
+            android:id="@+id/Save_button"
             android:text="@string/general_save"
             style="@style/Button.Flat.Primary.Save"
             android:layout_margin="1dp"

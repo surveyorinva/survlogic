@@ -66,12 +66,11 @@ import static com.survlogic.survlogic.utils.LocationConverter.convertMetersToVal
 
 public class GpsSurveyMapFragment extends Fragment implements GpsSurveyListener, OnMapReadyCallback {
 
-    //    Fragment Constants
-    View v;
-
     //    Debugging Static Constants
     private static final String TAG = "GpsSurveyMapFragment";
 
+    //    Fragment Constants
+    View v;
     private Resources mRes;
     private Context mContext;
     private SupportMapFragment supportMapFragment;

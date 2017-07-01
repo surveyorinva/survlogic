@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.survlogic.survlogic.R;
+import com.survlogic.survlogic.background.BackgroundProjectList;
 
 /**
  * Created by chrisfillmore on 5/2/2017.
@@ -24,4 +25,22 @@ public class MainHomeFragment extends Fragment {
 
         return v;
     }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        showProjectsLocal();
+
+    }
+
+
+    private void showProjectsLocal(){
+        BackgroundProjectList backgroundProjectList = new BackgroundProjectList(getActivity());
+        backgroundProjectList.execute();
+
+
+    }
+
+
 }

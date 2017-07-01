@@ -1,21 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.NestedScrollView
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="#FFFFFF"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/main_background"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior">
+    android:layout_height="match_parent">
 
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
 
+        <include
+            layout="@layout/card_welcome_version" />
 
-
+        <include
+            layout="@layout/content_project_view" />
 
 
     </LinearLayout>
 
-</android.support.v4.widget.NestedScrollView>
+
+
+
+
+
+
+</RelativeLayout>

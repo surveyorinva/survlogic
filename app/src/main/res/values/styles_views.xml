@@ -29,9 +29,36 @@
     <style name="Labels.EditBoxHeaders">
         <item name="android:fontFamily">sans-serif-smallcaps</item>
         <item name="android:textColor">@color/header_text</item>
-        <item name="android:textSize">15dp</item>
+        <item name="android:textSize">@dimen/text_size_header</item>
     </style>
 
+    <style name="Labels.NamedValues">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/primary_text</item>
+
+    </style>
+
+    <style name="Labels.Card">
+
+
+    </style>
+
+    <style name="Labels.Card.Header">
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:textColor">@color/header_text</item>
+        <item name="android:textSize">@dimen/text_size_medium</item>
+    </style>
+
+    <style name="Labels.Card.Details">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/secondary_text</item>
+    </style>
+
+    <style name="Labels.Card.Footer">
+        <item name="android:fontFamily">sans-serif-condensed-light</item>
+        <item name="android:textStyle">italic</item>
+        <item name="android:textColor">@color/secondary_text</item>
+    </style>
 
     <!--Containers-->
     <!--Buttons-->
@@ -73,8 +100,26 @@
 
     </style>
 
+    <style name="Button.Cards" parent="Widget.AppCompat.Button.Borderless">
+
+
+    </style>
+
+    <style name="Button.Cards.ActionEmphasis">
+        <item name="android:textColor">@color/colorAccent</item>
+
+    </style>
+
+    <style name="Button.Cards.ActionSecondary">
+        <item name="android:textColor">@color/secondary_text</item>
+    </style>
 
     <!--Others-->
+
+    <style name="CardDivider">
+        <item name="android:background">@drawable/divider_horizontal_accent</item>
+
+    </style>
 
     <style name = "LargeTextForScreen">
 

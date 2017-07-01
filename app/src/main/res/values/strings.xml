@@ -10,6 +10,9 @@
     <string name="general_no">No</string>
     <string name="general_unit_meters">%1$.1f m</string>
     <string name="general_unit_feet">%1$.1f ft</string>
+    <string name="general_exit_app">"Please click BACK again to exit"</string>
+    <string name="general_loading_status">Loading…</string>
+    <string name="general_blank"> </string>
 
     <string name="activity_main_toolbar_title">Welcome</string>
 
@@ -110,74 +113,23 @@
     <string name="project_new_units_prompt">Select unit of measurements</string>
     <string name="project_new_projection_prompt">Select Projection</string>
     <string name="project_new_projection_zone_prompt">Select Zone</string>
+    <string name="project_new_location_latitude_title">Latitude: </string>
     <string name="project_new_location_latitude_default">Latitude:  (Not Defined)</string>
     <string name="project_new_location_latitude_value">Latitude:  %1$s</string>
+    <string name="project_new_location_longitude_title">Longitude: </string>
     <string name="project_new_location_longitude_default">Longitude:  (Not Defined)</string>
     <string name="project_new_location_longitude_value">Longitude:  %1$s</string>
     <string name="project_new_photo_button_label">Choose Picture</string>
     <string name="project_new_dialog_title">Get Project Site Photo</string>
     <string name="project_new_dialog_takePhoto">Take Photo</string>
     <string name="project_new_dialog_getImage">Choose from Library</string>
+    <string name="project_new_validation_project_name_error">Project Name is a required field.\nPlease complete prior to continuing</string>
+    <string name="project_new_validation_project_save_success">Project Saved!</string>
+    <string name="project_new_validation_project_save_failed">Error Saving Project.  Please try again.</string>
 
-    <!-- Strings related to Settings -->
+    <!-- ******************************Strings related to Settings****************************** -->
 
-    <!-- Example General settings -->
-    <string name="pref_header_general">General</string>
-    <string name="pref_title_social_recommendations">Enable social recommendations</string>
-    <string name="pref_description_social_recommendations">Recommendations for people to contact
-        based on your message history
-    </string>
-
-    <string name="pref_title_display_name">Display name</string>
-    <string name="pref_default_display_name">John Smith</string>
-
-    <string name="pref_title_add_friends_to_messages">Add friends to messages</string>
-    <string-array name="pref_example_list_titles">
-        <item>Always</item>
-        <item>When possible</item>
-        <item>Never</item>
-    </string-array>
-    <string-array name="pref_example_list_values">
-        <item>1</item>
-        <item>0</item>
-        <item>-1</item>
-    </string-array>
-
-    <!-- Example settings for Data & Sync -->
-    <string name="pref_header_data_sync">Data &amp; sync</string>
-
-    <string name="pref_title_sync_frequency">Sync frequency</string>
-
-
-
-    <string-array name="list_preference_entries">
-        <item>Entry 1</item>
-        <item>Entry 2</item>
-        <item>Entry 3</item>
-    </string-array>
-
-    <string-array name="list_preference_entry_values">
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
-    </string-array>
-
-    <string-array name="multi_select_list_preference_default_value" />
-
-    <string name="pref_title_system_sync_settings">System sync settings</string>
-
-    <!-- Example settings for Notifications -->
-    <string name="pref_header_notifications">Notifications</string>
-
-    <string name="pref_title_new_message_notifications">New message notifications</string>
-
-    <string name="pref_title_ringtone">Ringtone</string>
-    <string name="pref_ringtone_silent">Silent</string>
-
-    <string name="pref_title_vibrate">Vibrate</string>
-
-
-    <!--GPS Survey Preferences -->
+    <!--**************************GPS Survey Preferences**************************-->
 
     <string name="pref_gps_survey_header_general">General</string>
     <string name="pref_gps_survey_header_survey">Survey</string>
@@ -214,5 +166,34 @@
     <string name="pref_gps_epoch_max_title">Number of Epochs </string>
     <string name="pref_gps_epoch_max_summary">Number of Epochs to collect when Auto-Stop is turned on</string>
     <string name="pref_gps_epoch_max_dialog_title">Choose Epoch Interval</string>
+
+    <!-- Example General settings -->
+    <string name="pref_header_general">General</string>
+    <string name="pref_title_social_recommendations">Enable social recommendations</string>
+    <string name="pref_description_social_recommendations">Recommendations for people to contact
+        based on your message history
+    </string>
+
+    <string name="pref_title_display_name">Display name</string>
+    <string name="pref_default_display_name">John Smith</string>
+    <string name="pref_title_add_friends_to_messages">Add friends to messages</string>
+
+
+    <!-- Example settings for Data & Sync -->
+    <string name="pref_header_data_sync">Data &amp; sync</string>
+    <string name="pref_title_sync_frequency">Sync frequency</string>
+    <string-array name="multi_select_list_preference_default_value" />
+    <string name="pref_title_system_sync_settings">System sync settings</string>
+
+    <!-- Example settings for Notifications -->
+    <string name="pref_header_notifications">Notifications</string>
+    <string name="pref_title_new_message_notifications">New message notifications</string>
+    <string name="pref_title_ringtone">Ringtone</string>
+    <string name="pref_ringtone_silent">Silent</string>
+    <string name="pref_title_vibrate">Vibrate</string>
+
+
+
+
 
 </resources>

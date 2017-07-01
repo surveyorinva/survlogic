@@ -31,6 +31,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -104,6 +105,7 @@ public class GpsSurveyActivity extends AppCompatActivity implements LocationList
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gps_survey);
+
         sInstance = this;
 
             Log.e(TAG, "Start: onCreateView");
@@ -145,8 +147,10 @@ public class GpsSurveyActivity extends AppCompatActivity implements LocationList
         }
             Log.e(TAG, "Complete: onResume");
 
+        checkPreferenceScreenOn(sharedPreferences);
         checkPreferenceInterval(sharedPreferences);
         checkPreferenceUnits(sharedPreferences);
+
     }
 
     @Override
@@ -254,6 +258,10 @@ public class GpsSurveyActivity extends AppCompatActivity implements LocationList
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
+        boolean keepScreenOn = sharedPreferences.getBoolean(getString(R.string.pref_key_keep_screen_on),true);
+
+        checkPreferenceScreenOn(sharedPreferences);
+
         double tempMinTime = Double.valueOf(
                 sharedPreferences.getString(getString(R.string.pref_key_gps_min_time), getString(R.string.pref_gps_min_time_default_sec)));
 
@@ -276,6 +284,18 @@ public class GpsSurveyActivity extends AppCompatActivity implements LocationList
         }
 
             Log.e(TAG, "Complete: initSettings");
+    }
+
+
+    private void checkPreferenceScreenOn(SharedPreferences settings){
+        boolean keepScreenOn = settings.getBoolean(getString(R.string.pref_key_keep_screen_on),true);
+
+        if (keepScreenOn){
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        }else{
+            getWindow().clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        }
+
     }
 
     private void checkPreferenceInterval(SharedPreferences settings) {

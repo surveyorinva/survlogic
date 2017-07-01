@@ -20,9 +20,11 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.adapter.ActivityViewPagerAdapter;
+import com.survlogic.survlogic.background.BackgroundProjectList;
 import com.survlogic.survlogic.fragment.MainHomeFragment;
 import com.survlogic.survlogic.fragment.MainToolsFragment;
 
@@ -37,6 +39,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     ActivityViewPagerAdapter viewPagerAdapter;
     FloatingActionButton fab;
 
+    long previousTime;
 
 
     private void initPermissions(){
@@ -50,9 +53,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
             return;
         }
-
-
-
     }
 
     @Override
@@ -64,6 +64,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         initViewPager();
         initViewNavigation();
         initPermissions();
+
     }
 
     private void initView(){
@@ -155,8 +156,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void onBackPressed() {
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START);
-        } else {
+
+        } else if (2000 + previousTime > (previousTime = System.currentTimeMillis())) {
             super.onBackPressed();
+
+        } else {
+            Toast.makeText(getBaseContext(), getString(R.string.general_exit_app), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -197,6 +202,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Intent i = new Intent(this, ProjectNewActivity.class);
         startActivity(i);
     }
+
 
 
 }

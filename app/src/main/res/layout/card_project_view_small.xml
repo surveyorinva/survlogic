@@ -1,0 +1,102 @@
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:style="http://schemas.android.com/tools"
+    android:id="@+id/card_gps_satellite_status_small"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?android:attr/selectableItemBackground"
+    android:layout_margin="3dp"
+    android:layout_width="match_parent"
+    android:layout_height="120dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/card_project_header_divider"
+            style="@style/CardDivider"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="30dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="1dp" />
+
+        <ImageView
+            android:id="@+id/card_project_footer_divider"
+            style="@style/CardDivider"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="20dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="1dp" />
+
+
+        <ImageView
+            android:id="@+id/card_project_view_location_img"
+            android:src="@drawable/ic_add_location"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginStart="5dp"
+            android:layout_width="20dp"
+            android:layout_height="20dp" />
+
+        <TextView
+            android:id="@+id/card_project_view_location_value"
+            android:text="@string/general_blank"
+            android:layout_toEndOf="@id/card_project_view_location_img"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="20dp" />
+
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/card_project_view_project_image"
+            android:src="@drawable/ic_project_icon_32"
+            app:civ_border_color="@color/primary_text"
+            app:civ_border_width="2dp"
+            android:layout_below="@id/card_project_header_divider"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="10dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp" />
+
+        <TextView
+            android:id="@+id/card_project_view_project_name"
+            android:text="@string/general_loading_status"
+            style="@style/Labels.Card.Header"
+            android:layout_below="@id/card_project_header_divider"
+            android:layout_toEndOf="@id/card_project_view_project_image"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/card_project_view_project_details"
+            android:text="@string/general_blank"
+            style="@style/Labels.Card.Details"
+            android:layout_alignStart="@id/card_project_view_project_name"
+            android:layout_below="@id/card_project_view_project_name"
+            android:layout_above="@+id/card_project_footer_divider"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/card_project_view_last_opened"
+            android:text="@string/general_blank"
+            style="@style/Labels.Card.Footer"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="20dp" />
+
+
+
+    </RelativeLayout>
+
+</android.support.v7.widget.CardView>
