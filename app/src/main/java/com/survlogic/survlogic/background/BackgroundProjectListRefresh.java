@@ -22,10 +22,9 @@ import java.util.ArrayList;
  * Created by chrisfillmore on 6/29/2017.
  */
 
-public class BackgroundProjectList extends AsyncTask <Project,Project,String> {
+public class BackgroundProjectListRefresh extends AsyncTask <Project,Project,String> {
 
     private String TAG = getClass().getSimpleName();
-    private ProgressDialog dialog;
 
     private Context context;
     private Activity activity;
@@ -34,13 +33,16 @@ public class BackgroundProjectList extends AsyncTask <Project,Project,String> {
     ProjectListAdaptor adapter;
     RecyclerView.LayoutManager layoutManager;
 
+    SwipeRefreshLayout swipeRefreshLayout;
+
     ArrayList<Project> arrayList = new ArrayList<Project>();
 
-    public BackgroundProjectList(Context context) {
+    public BackgroundProjectListRefresh(Context context, SwipeRefreshLayout swipeRefreshLayout) {
         this.context = context;
-        this.dialog = new ProgressDialog(context);
+        this.swipeRefreshLayout = swipeRefreshLayout;
 
         activity = (Activity) context;
+
     }
 
 
@@ -71,13 +73,11 @@ public class BackgroundProjectList extends AsyncTask <Project,Project,String> {
 
     @Override
     protected void onPreExecute() {
-        dialog.setMessage("Retrieving ");
-        dialog.setIndeterminate(true);
-        dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        dialog.setCancelable(false);
-        dialog.show();
-
         initProjectListRecyclerView();
+
+        if(!swipeRefreshLayout.isRefreshing()){
+            swipeRefreshLayout.setRefreshing(true);
+        }
 
 
         super.onPreExecute();
@@ -96,9 +96,10 @@ public class BackgroundProjectList extends AsyncTask <Project,Project,String> {
     protected void onPostExecute(String result) {
         super.onPostExecute(result);
 
-        if (dialog.isShowing()) {
-            dialog.dismiss();
+        if(swipeRefreshLayout.isRefreshing()){
+            swipeRefreshLayout.setRefreshing(false);
         }
+
 
         if (result.equals("get_info")) {
 

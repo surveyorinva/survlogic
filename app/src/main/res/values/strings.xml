@@ -99,6 +99,8 @@
     <string name="gps_status_long_value_string">Long: %1$s</string>
     <string name="title_activity_settings">Settings</string>
 
+    <!--CARD - project_view -->
+    <string name="project_card_location_geo">Lat: %1$s, Long: %2$s</string>
 
     <!-- New Project -->
     <string name="project_new_header_1">Project Name</string>

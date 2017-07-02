@@ -12,12 +12,9 @@ import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.model.Satellite;
 import com.survlogic.survlogic.utils.GnssType;
 import com.survlogic.survlogic.utils.GpsHelper;
-import com.survlogic.survlogic.view.Satellite_Card_View_Holder_Small;
+import com.survlogic.survlogic.view.Card_View_Holder_Satellite_Small;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-
-import static java.security.AccessController.getContext;
 
 /**
  * Created by chrisfillmore on 5/26/2017.
@@ -45,22 +42,22 @@ public class SatelliteAdaptor extends RecyclerView.Adapter<RecyclerView.ViewHold
         switch (viewType){
             case SMALL:
                 View v1 = mInflater.inflate(R.layout.card_gps_satellite_status_small,parent,false);
-                viewHolder = new Satellite_Card_View_Holder_Small(v1);
+                viewHolder = new Card_View_Holder_Satellite_Small(v1);
                 break;
 
             case MEDIUM:
                 View v2 = mInflater.inflate(R.layout.card_gps_satellite_status_small,parent,false);
-                viewHolder = new Satellite_Card_View_Holder_Small(v2);
+                viewHolder = new Card_View_Holder_Satellite_Small(v2);
                 break;
 
             case LARGE:
                 View v3 = mInflater.inflate(R.layout.card_gps_satellite_status_small,parent,false);
-                viewHolder = new Satellite_Card_View_Holder_Small(v3);
+                viewHolder = new Card_View_Holder_Satellite_Small(v3);
                 break;
 
             default:
                 View v = mInflater.inflate(R.layout.card_gps_satellite_status_small,parent,false);
-                viewHolder = new Satellite_Card_View_Holder_Small(v);
+                viewHolder = new Card_View_Holder_Satellite_Small(v);
                 break;
        }
         return viewHolder;
@@ -86,7 +83,7 @@ public class SatelliteAdaptor extends RecyclerView.Adapter<RecyclerView.ViewHold
 
         switch (holder.getItemViewType()){
             case SMALL:
-                Satellite_Card_View_Holder_Small vh1 = (Satellite_Card_View_Holder_Small) holder;
+                Card_View_Holder_Satellite_Small vh1 = (Card_View_Holder_Satellite_Small) holder;
                 configureViewHolderSmall(vh1,position);
                 break;
 
@@ -107,7 +104,7 @@ public class SatelliteAdaptor extends RecyclerView.Adapter<RecyclerView.ViewHold
     }
 
 
-    private void configureViewHolderSmall(Satellite_Card_View_Holder_Small vh1, int position) {
+    private void configureViewHolderSmall(Card_View_Holder_Satellite_Small vh1, int position) {
         Satellite SAT = satellites.get(position);
 
         vh1.txtPrn.setText(String.valueOf(SAT.getmPrnNo()));

@@ -14,10 +14,6 @@ public class ProjectContract {
     public ProjectContract() {
 
     }
-
-    //this is an abstract class.  The purpose of this class is to create the necessary variables that will be
-    //used to define the database.
-
     public static abstract class ProjectEntry{
 
         public static final String TABLE_NAME = "project_table";
@@ -32,8 +28,6 @@ public class ProjectContract {
         public static final String KEY_GEOLON = "longitude";
         public static final String KEY_IMAGE_SYSTEM = "systemImage";
         public static final String KEY_IMAGE = "image";
-
-
 
 
     }

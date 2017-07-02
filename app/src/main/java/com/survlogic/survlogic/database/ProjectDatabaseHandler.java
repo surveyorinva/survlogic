@@ -112,7 +112,8 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
     public List<Project> getProjectsAll(SQLiteDatabase db){
 
         List<Project> lstprojects = new ArrayList<Project>();
-        String selectQuery = "SELECT  * FROM " + ProjectContract.ProjectEntry.TABLE_NAME;
+        String selectQuery = "SELECT * FROM " + ProjectContract.ProjectEntry.TABLE_NAME
+                + " ORDER BY " + ProjectContract.ProjectEntry.KEY_PROJECTNAME + " ASC";
 
         Log.e(TAG, selectQuery);
 

@@ -28,6 +28,8 @@ public class MathHelper {
         boolean neg = angle < 0;
         String myAngleDMS;
 
+        //TODO Deal with 0 for decimal place.  right now returns with "."  need to return " "
+
         angle = Math.abs(angle);
 
         if (angle ==0){

@@ -12,12 +12,12 @@ import com.survlogic.survlogic.R;
  * Created by chrisfillmore on 5/26/2017.
  */
 
-public class Satellite_Card_View_Holder_Small extends RecyclerView.ViewHolder {
+public class Card_View_Holder_Satellite_Small extends RecyclerView.ViewHolder {
     public CardView cv;
     public ImageView imgLocked, imgConstellation;
     public TextView txtPrn,txtSignalStrength,txtElevation,txtAzimuth,txtAlmanac, txtEphemeris;
 
-    public Satellite_Card_View_Holder_Small(View itemView) {
+    public Card_View_Holder_Satellite_Small(View itemView) {
         super(itemView);
 
         txtPrn = (TextView) itemView.findViewById(R.id.prnID);

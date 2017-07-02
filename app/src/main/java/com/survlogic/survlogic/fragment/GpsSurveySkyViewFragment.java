@@ -35,7 +35,6 @@ import com.survlogic.survlogic.model.Satellite;
 import com.survlogic.survlogic.utils.GnssType;
 import com.survlogic.survlogic.utils.GpsHelper;
 import com.survlogic.survlogic.utils.LocationConverter;
-import com.survlogic.survlogic.view.Satellite_Card_View_Holder_Small;
 
 import java.util.ArrayList;
 import java.util.HashMap;

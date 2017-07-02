@@ -55,7 +55,6 @@
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/card_project_view_project_image"
-            android:src="@drawable/ic_project_icon_32"
             app:civ_border_color="@color/primary_text"
             app:civ_border_width="2dp"
             android:layout_below="@id/card_project_header_divider"

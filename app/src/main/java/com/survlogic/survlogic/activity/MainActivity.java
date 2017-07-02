@@ -30,16 +30,16 @@ import com.survlogic.survlogic.fragment.MainToolsFragment;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
-    Toolbar toolbar;
-    DrawerLayout drawerLayout;
-    ActionBarDrawerToggle actionBarDrawerToggle;
-    NavigationView navigationView;
-    TabLayout tabLayout;
-    ViewPager viewPager;
-    ActivityViewPagerAdapter viewPagerAdapter;
-    FloatingActionButton fab;
+    private Toolbar toolbar;
+    private DrawerLayout drawerLayout;
+    private ActionBarDrawerToggle actionBarDrawerToggle;
+    private NavigationView navigationView;
+    private TabLayout tabLayout;
+    private ViewPager viewPager;
+    private ActivityViewPagerAdapter viewPagerAdapter;
+    public FloatingActionButton fab;
 
-    long previousTime;
+    private long previousTime;
 
 
     private void initPermissions(){
@@ -86,6 +86,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
 
     }
+
 
     private void initViewPager(){
         tabLayout = (TabLayout) findViewById(R.id.tab_in_app_bar_layout);
@@ -203,6 +204,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         startActivity(i);
     }
 
+    public FloatingActionButton getFloatingActionButton() {
+        return fab;
+    }
 
 
 }

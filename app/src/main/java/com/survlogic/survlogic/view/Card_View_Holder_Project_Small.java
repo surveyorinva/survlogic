@@ -16,13 +16,13 @@ import de.hdodenhof.circleimageview.CircleImageView;
  * Created by chrisfillmore on 6/30/2017.
  */
 
-public class Project_Card_View_Holder_Small extends RecyclerView.ViewHolder  {
+public class Card_View_Holder_Project_Small extends RecyclerView.ViewHolder  {
 
     public TextView txtProjectName, txtLocation, txtLastModify, txtProjectDesc;
     public CircleImageView imgProjectImage;
 
 
-    public Project_Card_View_Holder_Small(View itemView) {
+    public Card_View_Holder_Project_Small(View itemView) {
         super(itemView);
 
         txtProjectName = (TextView) itemView.findViewById(R.id.card_project_view_project_name);
