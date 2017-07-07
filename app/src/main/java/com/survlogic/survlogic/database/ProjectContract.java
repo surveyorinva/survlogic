@@ -28,6 +28,9 @@ public class ProjectContract {
         public static final String KEY_GEOLON = "longitude";
         public static final String KEY_IMAGE_SYSTEM = "systemImage";
         public static final String KEY_IMAGE = "image";
+        public static final String KEY_DATE_CREATED = "created";
+        public static final String KEY_DATE_ACCESSED = "accessed";
+        public static final String KEY_DATE_MODIFIED = "modified";
 
 
     }

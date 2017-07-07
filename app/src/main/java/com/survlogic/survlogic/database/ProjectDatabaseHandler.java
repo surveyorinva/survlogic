@@ -11,6 +11,7 @@ import android.util.Log;
 import com.survlogic.survlogic.model.Project;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -40,7 +41,10 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
             + ProjectContract.ProjectEntry.KEY_GEOLAT + " DOUBLE,"
             + ProjectContract.ProjectEntry.KEY_GEOLON + " DOUBLE,"
             + ProjectContract.ProjectEntry.KEY_IMAGE_SYSTEM + " INTEGER,"
-            + ProjectContract.ProjectEntry.KEY_IMAGE + " BLOB);";
+            + ProjectContract.ProjectEntry.KEY_IMAGE + " BLOB,"
+            + ProjectContract.ProjectEntry.KEY_DATE_CREATED + " INTEGER,"
+            + ProjectContract.ProjectEntry.KEY_DATE_MODIFIED + " INTEGER,"
+            + ProjectContract.ProjectEntry.KEY_DATE_ACCESSED + " INTEGER);";
 
 
     public ProjectDatabaseHandler(Context context) {
@@ -90,6 +94,9 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
         contentValues.put(ProjectContract.ProjectEntry.KEY_IMAGE_SYSTEM,project.getmSystemImage());
         contentValues.put(ProjectContract.ProjectEntry.KEY_IMAGE,project.getmImage());
 
+        //  Metadata Fields
+        contentValues.put(ProjectContract.ProjectEntry.KEY_DATE_CREATED,(int) (new Date().getTime()/1000));
+
         Log.d(TAG, "addData: Adding " + project.getmProjectName() + " to " + ProjectContract.ProjectEntry.TABLE_NAME);
 
         //        Inserts new row
@@ -135,6 +142,10 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
                 project.setmLocationLong(c.getDouble(c.getColumnIndex(ProjectContract.ProjectEntry.KEY_GEOLON)));
                 project.setmSystemImage(c.getInt(c.getColumnIndex(ProjectContract.ProjectEntry.KEY_IMAGE_SYSTEM)));
                 project.setmImage(c.getBlob(c.getColumnIndex(ProjectContract.ProjectEntry.KEY_IMAGE)));
+
+                // Project MetaData
+                project.setmDateCreated(c.getInt(c.getColumnIndex(ProjectContract.ProjectEntry.KEY_DATE_CREATED)));
+
 
                 lstprojects.add(project);
             } while (c.moveToNext());

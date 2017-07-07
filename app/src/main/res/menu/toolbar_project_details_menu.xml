@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+    <item
+        android:id="@+id/toolbar_project_details_item1"
+        android:title="@string/general_menu_settings"
+        android:orderInCategory="100"
+        app:showAsAction="never">
+
+    </item>
+
+    <item
+        android:id="@+id/toolbar_project_details_item2"
+        android:title="@string/general_delete"
+        android:orderInCategory="100"
+        app:showAsAction="never">
+
+    </item>
+
+    <item
+        android:id="@+id/toolbar_project_details_item3"
+        android:title="@string/general_menu_about"
+        android:orderInCategory="100"
+        app:showAsAction="never">
+
+    </item>
+
+
+</menu>

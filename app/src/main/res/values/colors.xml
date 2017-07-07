@@ -23,6 +23,9 @@
     <color name="table_border_black">#212121</color>
     <color name="table_border_primaryDark">#303F9F</color>
 
+    <color name="box_accent_border_grey_o170">#aa838493</color>
+    <color name="box_accent_border_grey_o100">#64838493</color>
+
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
     <color name="gray">#999999</color>

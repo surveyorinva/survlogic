@@ -23,6 +23,12 @@
 
         </item>
 
+        <item
+            android:id="@+id/menu_item4_id"
+            android:icon="@drawable/ic_project_open"
+            android:title="@string/navigation_main_start_test_activity">
+
+        </item>
 
     </group>
 

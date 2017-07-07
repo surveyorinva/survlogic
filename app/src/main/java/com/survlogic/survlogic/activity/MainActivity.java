@@ -28,7 +28,7 @@ import com.survlogic.survlogic.background.BackgroundProjectList;
 import com.survlogic.survlogic.fragment.MainHomeFragment;
 import com.survlogic.survlogic.fragment.MainToolsFragment;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
 
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
@@ -78,12 +78,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         actionBarDrawerToggle.syncState();
 
         fab = (FloatingActionButton) findViewById(R.id.fab_in_app_bar_layout);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                goToNewProjectForm();
-            }
-        });
+        fab.setOnClickListener(this);
 
     }
 
@@ -145,6 +140,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             case R.id.menu_item3_id:
                 intent.setClass(this, GpsSurveyActivity.class);
+                startActivity(intent);
+                break;
+
+            case R.id.menu_item4_id:
+                intent.setClass(this,ProjectDetailsActivity.class);
                 startActivity(intent);
                 break;
         }
@@ -209,4 +209,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
 
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.fab_in_app_bar_layout:
+                goToNewProjectForm();
+                break;
+
+
+        }
+    }
 }

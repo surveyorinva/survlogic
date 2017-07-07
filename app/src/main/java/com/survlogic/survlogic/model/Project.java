@@ -1,14 +1,18 @@
 package com.survlogic.survlogic.model;
 
+import org.parceler.Parcel;
+
 /**
  * Created by chrisfillmore on 6/25/2017.
  */
 
+@Parcel
 public class Project {
 
     String mProjectName;
     int mId, mStorage, mUnits;
     int mProjection, mZone, mSystemImage;
+    int mDateCreated, mDateAccessed, mDateModified;
     double mLocationLat, mLocationLong;
     byte[] mImage;
 
@@ -26,6 +30,18 @@ public class Project {
         this.mLocationLat = mLocationLat;
         this.mLocationLong = mLocationLong;
         this.mImage = mImage;
+    }
+
+    public Project(String mProjectName, int mStorage, int mUnits, int mProjection, int mZone, double mLocationLat, double mLocationLong, int mSystemImage, byte[] mImage, int mDateCreated) {
+        this.mProjectName = mProjectName;
+        this.mStorage = mStorage;
+        this.mUnits = mUnits;
+        this.mProjection = mProjection;
+        this.mZone = mZone;
+        this.mLocationLat = mLocationLat;
+        this.mLocationLong = mLocationLong;
+        this.mImage = mImage;
+        this.mDateCreated = mDateCreated;
     }
 
     public Project(int mId, String mProjectName, int mStorage, int mUnits, int mProjection, int mZone, double mLocationLat, double mLocationLong, int mSystemImage, byte[] mImage) {
@@ -120,5 +136,13 @@ public class Project {
 
     public void setmImage(byte[] mImage) {
         this.mImage = mImage;
+    }
+
+    public int getmDateCreated() {
+        return mDateCreated;
+    }
+
+    public void setmDateCreated(int mDateCreated) {
+        this.mDateCreated = mDateCreated;
     }
 }

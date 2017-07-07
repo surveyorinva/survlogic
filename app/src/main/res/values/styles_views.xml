@@ -60,6 +60,26 @@
         <item name="android:textColor">@color/secondary_text</item>
     </style>
 
+    <style name="Labels.Card.ProjectCategory">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/colorPrimaryDark</item>
+        <item name="android:textSize">@dimen/text_size_header</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="Labels.Card.ProjectHeader">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/secondary_text</item>
+        <item name="android:textSize">@dimen/text_size_normal</item>
+    </style>
+
+    <style name="Labels.Card.ProjectValues">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/colorPrimaryDark</item>
+        <item name="android:textSize">@dimen/text_size_detail_value</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
     <!--Containers-->
     <!--Buttons-->
     <style name="Button.Flat" parent="Widget.AppCompat.Button.Borderless" />

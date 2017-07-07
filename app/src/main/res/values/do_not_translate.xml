@@ -36,7 +36,6 @@
     <!--Intent Answers-->
     <string name="ANSWER_Project_New">ANSWER_project_new</string>
 
-
     <!--startActivityForResult Activity Assignments-->
     <string name="VALUE_activity_Project_New_Activity">1</string>
 

@@ -13,57 +13,18 @@
         android:layout_height="wrap_content"
         android:layout_width="match_parent" />
 
-    <LinearLayout
-        android:id="@+id/layout_area_1"
-        android:layout_below="@id/toolbar_in_project_new"
-        android:orientation="vertical"
-        android:weightSum="2"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="10dp"
-        android:layout_width="match_parent"
-        android:layout_height="70dp">
-
-        <TextView
-            android:text="@string/project_new_header_1"
-            style="@style/Labels.EditBoxHeaders"
-            android:layout_weight="1"
-            android:gravity="bottom"
-            android:layout_marginBottom="2dp"
-            android:layout_width="match_parent"
-            android:layout_height="0dp" />
-
-
-        <EditText
-            android:id="@+id/project_name_in_project_new"
-            android:hint="@string/project_new_name_hint"
-            style="@style/InputField.ProjectNewActivity.ProjectName"
-            android:background="@drawable/editbox_dropdown_background"
-            android:layout_gravity="center"
-            android:layout_weight="1"
-            android:layout_width="match_parent"
-            android:layout_height="0dp" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/layout_area_2"
-        android:orientation="horizontal"
-        android:weightSum="2"
-        android:layout_below="@id/layout_area_1"
-        android:layout_width="match_parent"
-        android:layout_height="70dp">
-
         <LinearLayout
+            android:id="@+id/layout_area_1"
+            android:layout_below="@id/toolbar_in_project_new"
             android:orientation="vertical"
-            android:layout_weight="1"
             android:weightSum="2"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="10dp"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="70dp">
 
             <TextView
-                android:text="@string/project_new_header_2"
+                android:text="@string/project_new_header_1"
                 style="@style/Labels.EditBoxHeaders"
                 android:layout_weight="1"
                 android:gravity="bottom"
@@ -71,313 +32,350 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp" />
 
-            <RelativeLayout
+
+            <EditText
+                android:id="@+id/project_name_in_project_new"
+                android:hint="@string/project_new_name_hint"
+                style="@style/InputField.ProjectNewActivity.ProjectName"
                 android:background="@drawable/editbox_dropdown_background"
+                android:layout_gravity="center"
                 android:layout_weight="1"
                 android:layout_width="match_parent"
-                android:layout_height="0dp">
-
-                <Spinner
-                    android:id="@+id/storage_prompt_in_project_new"
-                    android:entries="@array/project_storage_titles"
-                    android:entryValues="@array/project_storage_values"
-                    android:prompt="@string/project_new_storage_prompt"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"/>
-
-            </RelativeLayout>
+                android:layout_height="0dp" />
 
         </LinearLayout>
 
         <LinearLayout
-            android:orientation="vertical"
-            android:layout_weight="1"
+            android:id="@+id/layout_area_2"
+            android:orientation="horizontal"
             android:weightSum="2"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="10dp"
-            android:layout_width="0dp"
+            android:layout_below="@id/layout_area_1"
+            android:layout_width="match_parent"
             android:layout_height="70dp">
 
-            <TextView
-                android:text="@string/project_new_header_3"
-                style="@style/Labels.EditBoxHeaders"
+            <LinearLayout
+                android:orientation="vertical"
                 android:layout_weight="1"
+                android:weightSum="2"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="10dp"
+                android:layout_width="0dp"
+                android:layout_height="70dp">
+
+                <TextView
+                    android:text="@string/project_new_header_2"
+                    style="@style/Labels.EditBoxHeaders"
+                    android:layout_weight="1"
+                    android:gravity="bottom"
+                    android:layout_marginBottom="2dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp" />
+
+                <RelativeLayout
+                    android:background="@drawable/editbox_dropdown_background"
+                    android:layout_weight="1"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp">
+
+                    <Spinner
+                        android:id="@+id/storage_prompt_in_project_new"
+                        android:entries="@array/project_storage_titles"
+                        android:entryValues="@array/project_storage_values"
+                        android:prompt="@string/project_new_storage_prompt"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"/>
+
+                </RelativeLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_weight="1"
+                android:weightSum="2"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="10dp"
+                android:layout_width="0dp"
+                android:layout_height="70dp">
+
+                <TextView
+                    android:text="@string/project_new_header_3"
+                    style="@style/Labels.EditBoxHeaders"
+                    android:layout_weight="1"
+                    android:gravity="bottom"
+                    android:layout_marginBottom="2dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp" />
+
+                <RelativeLayout
+                    android:background="@drawable/editbox_dropdown_background"
+                    android:layout_weight="1"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp">
+
+                    <Spinner
+                        android:id="@+id/units_prompt_in_project_new"
+                        android:entries="@array/unit_measure_entries_short"
+                        android:entryValues="@array/unit_measure_values"
+                        android:prompt="@string/project_new_units_prompt"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"/>
+
+                </RelativeLayout>
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layout_area_3"
+            android:layout_below="@id/layout_area_2"
+            android:orientation="vertical"
+            android:weightSum="2"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="80dp">
+
+            <TextView
+                android:text="@string/project_new_header_4"
+                style="@style/Labels.EditBoxHeaders"
+                android:layout_weight=".5"
                 android:gravity="bottom"
                 android:layout_marginBottom="2dp"
                 android:layout_width="match_parent"
                 android:layout_height="0dp" />
 
+
             <RelativeLayout
                 android:background="@drawable/editbox_dropdown_background"
-                android:layout_weight="1"
+                android:layout_weight="1.5"
                 android:layout_width="match_parent"
                 android:layout_height="0dp">
 
-                <Spinner
-                    android:id="@+id/units_prompt_in_project_new"
-                    android:entries="@array/unit_measure_entries_short"
-                    android:entryValues="@array/unit_measure_values"
-                    android:prompt="@string/project_new_units_prompt"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"/>
+                <TextView
+                    android:id="@+id/location_latitude"
+                    android:text="@string/project_new_location_latitude_default"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:id="@+id/location_latitude_value"
+                    android:visibility="invisible"
+                    style="@style/Labels.NamedValues"
+                    android:layout_toRightOf="@id/location_latitude"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:id="@+id/location_longitude"
+                    android:text="@string/project_new_location_longitude_default"
+                    android:layout_below="@id/location_latitude"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:id="@+id/location_longitude_value"
+                    style="@style/Labels.NamedValues"
+                    android:visibility="invisible"
+                    android:layout_below="@id/location_latitude"
+                    android:layout_toRightOf="@id/location_longitude"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <ImageButton
+                    android:id="@+id/location_get_from_gps_survey"
+                    style="@style/Button.Special.GpsSurvey"
+                    android:src="@drawable/ic_add_location"
+                    android:layout_width="50dp"
+                    android:layout_margin="5dp"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentEnd="true" />
 
             </RelativeLayout>
 
         </LinearLayout>
 
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/layout_area_3"
-        android:layout_below="@id/layout_area_2"
-        android:orientation="vertical"
-        android:weightSum="2"
-        android:layout_marginTop="10dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="10dp"
-        android:layout_width="match_parent"
-        android:layout_height="80dp">
-
-        <TextView
-            android:text="@string/project_new_header_4"
-            style="@style/Labels.EditBoxHeaders"
-            android:layout_weight=".5"
-            android:gravity="bottom"
-            android:layout_marginBottom="2dp"
-            android:layout_width="match_parent"
-            android:layout_height="0dp" />
-
-
-        <RelativeLayout
-            android:background="@drawable/editbox_dropdown_background"
-            android:layout_weight="1.5"
-            android:layout_width="match_parent"
-            android:layout_height="0dp">
-
-            <TextView
-                android:id="@+id/location_latitude"
-                android:text="@string/project_new_location_latitude_default"
-                android:layout_marginStart="5dp"
-                android:layout_marginTop="5dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-            <TextView
-                android:id="@+id/location_latitude_value"
-                android:visibility="invisible"
-                style="@style/Labels.NamedValues"
-                android:layout_toRightOf="@id/location_latitude"
-                android:layout_marginStart="5dp"
-                android:layout_marginTop="5dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-            <TextView
-                android:id="@+id/location_longitude"
-                android:text="@string/project_new_location_longitude_default"
-                android:layout_below="@id/location_latitude"
-                android:layout_marginStart="5dp"
-                android:layout_marginTop="5dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-            <TextView
-                android:id="@+id/location_longitude_value"
-                style="@style/Labels.NamedValues"
-                android:visibility="invisible"
-                android:layout_below="@id/location_latitude"
-                android:layout_toRightOf="@id/location_longitude"
-                android:layout_marginStart="5dp"
-                android:layout_marginTop="5dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-            <ImageButton
-                android:id="@+id/location_get_from_gps_survey"
-                style="@style/Button.Special.GpsSurvey"
-                android:src="@drawable/ic_add_location"
-                android:layout_width="50dp"
-                android:layout_margin="5dp"
-                android:layout_height="match_parent"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentEnd="true" />
-
-        </RelativeLayout>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/layout_area_4"
-        android:orientation="horizontal"
-        android:weightSum="2"
-        android:layout_below="@id/layout_area_3"
-        android:layout_width="match_parent"
-        android:layout_height="70dp">
-
         <LinearLayout
-            android:orientation="vertical"
-            android:layout_weight="1"
+            android:id="@+id/layout_area_4"
+            android:orientation="horizontal"
             android:weightSum="2"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="10dp"
-            android:layout_width="0dp"
+            android:layout_below="@id/layout_area_3"
+            android:layout_width="match_parent"
             android:layout_height="70dp">
 
-            <TextView
-                android:text="@string/project_new_header_6"
-                style="@style/Labels.EditBoxHeaders"
+            <LinearLayout
+                android:orientation="vertical"
                 android:layout_weight="1"
+                android:weightSum="2"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="10dp"
+                android:layout_width="0dp"
+                android:layout_height="70dp">
+
+                <TextView
+                    android:text="@string/project_new_header_6"
+                    style="@style/Labels.EditBoxHeaders"
+                    android:layout_weight="1"
+                    android:gravity="bottom"
+                    android:layout_marginBottom="2dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp" />
+
+                <RelativeLayout
+                    android:background="@drawable/editbox_dropdown_background"
+                    android:layout_weight="1"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp">
+
+                    <Spinner
+                        android:id="@+id/projection_prompt_in_project_new"
+                        android:entries="@array/project_projection_titles"
+                        android:entryValues="@array/project_projection_values"
+                        android:prompt="@string/project_new_projection_prompt"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"/>
+
+                </RelativeLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_weight="1"
+                android:weightSum="2"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="10dp"
+                android:layout_width="0dp"
+                android:layout_height="70dp">
+
+                <TextView
+                    android:text="@string/project_new_header_7"
+                    style="@style/Labels.EditBoxHeaders"
+                    android:layout_weight="1"
+                    android:gravity="bottom"
+                    android:layout_marginBottom="2dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:visibility="visible"/>
+
+                <RelativeLayout
+                    android:background="@drawable/editbox_dropdown_background"
+                    android:layout_weight="1"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp">
+
+                    <Spinner
+                        android:id="@+id/projection_zone_prompt_in_project_new"
+                        android:entries="@array/project_projection_zones_titles"
+                        android:entryValues="@array/project_projection_zones_values"
+                        android:prompt="@string/project_new_projection_zone_prompt"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"/>
+
+                </RelativeLayout>
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layout_area_5"
+            android:layout_below="@id/layout_area_4"
+            android:orientation="vertical"
+            android:weightSum="2"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="80dp">
+
+            <TextView
+                android:text="@string/project_new_header_5"
+                style="@style/Labels.EditBoxHeaders"
+                android:layout_weight=".5"
                 android:gravity="bottom"
                 android:layout_marginBottom="2dp"
                 android:layout_width="match_parent"
                 android:layout_height="0dp" />
 
+
             <RelativeLayout
                 android:background="@drawable/editbox_dropdown_background"
-                android:layout_weight="1"
+                android:layout_weight="1.5"
                 android:layout_width="match_parent"
                 android:layout_height="0dp">
 
-                <Spinner
-                    android:id="@+id/projection_prompt_in_project_new"
-                    android:entries="@array/project_projection_titles"
-                    android:entryValues="@array/project_projection_values"
-                    android:prompt="@string/project_new_projection_prompt"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"/>
+                <ImageView
+                    android:id="@+id/photo_camera_image"
+                    android:src="@drawable/ic_camera_full"
+                    android:layout_marginStart="5dp"
+                    android:layout_centerVertical="true"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp" />
+
+                <Button
+                    android:id="@+id/photo_camera_get_photo"
+                    android:text="@string/project_new_photo_button_label"
+                    style="@style/Button.Flat.Primary.GetPicture"
+                    android:layout_toEndOf="@id/photo_camera_image"
+                    android:layout_centerVertical="true"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
 
             </RelativeLayout>
 
         </LinearLayout>
 
         <LinearLayout
-            android:orientation="vertical"
-            android:layout_weight="1"
-            android:weightSum="2"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="10dp"
-            android:layout_width="0dp"
+            android:id="@+id/layout_area_footer"
+            android:orientation="horizontal"
+            android:weightSum="2.1"
+            android:layout_alignParentBottom="true"
+            android:padding="5dp"
+            android:layout_width="match_parent"
             android:layout_height="70dp">
-
-            <TextView
-                android:text="@string/project_new_header_7"
-                style="@style/Labels.EditBoxHeaders"
-                android:layout_weight="1"
-                android:gravity="bottom"
-                android:layout_marginBottom="2dp"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:visibility="visible"/>
-
-            <RelativeLayout
-                android:background="@drawable/editbox_dropdown_background"
-                android:layout_weight="1"
-                android:layout_width="match_parent"
-                android:layout_height="0dp">
-
-                <Spinner
-                    android:id="@+id/projection_zone_prompt_in_project_new"
-                    android:entries="@array/project_projection_zones_titles"
-                    android:entryValues="@array/project_projection_zones_values"
-                    android:prompt="@string/project_new_projection_zone_prompt"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"/>
-
-            </RelativeLayout>
-
-        </LinearLayout>
-
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/layout_area_5"
-        android:layout_below="@id/layout_area_4"
-        android:orientation="vertical"
-        android:weightSum="2"
-        android:layout_marginTop="10dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="10dp"
-        android:layout_width="match_parent"
-        android:layout_height="80dp">
-
-        <TextView
-            android:text="@string/project_new_header_5"
-            style="@style/Labels.EditBoxHeaders"
-            android:layout_weight=".5"
-            android:gravity="bottom"
-            android:layout_marginBottom="2dp"
-            android:layout_width="match_parent"
-            android:layout_height="0dp" />
-
-
-        <RelativeLayout
-            android:background="@drawable/editbox_dropdown_background"
-            android:layout_weight="1.5"
-            android:layout_width="match_parent"
-            android:layout_height="0dp">
-
-            <ImageView
-                android:id="@+id/photo_camera_image"
-                android:src="@drawable/ic_camera_full"
-                android:layout_marginStart="5dp"
-                android:layout_centerVertical="true"
-                android:layout_width="50dp"
-                android:layout_height="50dp" />
 
             <Button
-                android:id="@+id/photo_camera_get_photo"
-                android:text="@string/project_new_photo_button_label"
-                style="@style/Button.Flat.Primary.GetPicture"
-                android:layout_toEndOf="@id/photo_camera_image"
-                android:layout_centerVertical="true"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="5dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:id="@+id/Save_button"
+                android:text="@string/general_save"
+                style="@style/Button.Flat.Primary.Save"
+                android:layout_margin="1dp"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent" />
 
-        </RelativeLayout>
+            <Space
+                android:layout_weight=".1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent" />
 
-    </LinearLayout>
+            <Button
+                android:id="@+id/Cancel_button"
+                style="@style/Button.Flat.Primary.Cancel"
+                android:text="@string/general_cancel"
+                android:layout_margin="1dp"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent" />
 
-
-    <LinearLayout
-        android:id="@+id/layout_area_footer"
-        android:orientation="horizontal"
-        android:weightSum="2.1"
-        android:layout_alignParentBottom="true"
-        android:padding="5dp"
-        android:layout_width="match_parent"
-        android:layout_height="70dp">
-
-        <Button
-            android:id="@+id/Save_button"
-            android:text="@string/general_save"
-            style="@style/Button.Flat.Primary.Save"
-            android:layout_margin="1dp"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="match_parent" />
-
-        <Space
-            android:layout_weight=".1"
-            android:layout_width="0dp"
-            android:layout_height="match_parent" />
-
-        <Button
-            android:id="@+id/Cancel_button"
-            style="@style/Button.Flat.Primary.Cancel"
-            android:text="@string/general_cancel"
-            android:layout_margin="1dp"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="match_parent" />
-
-    </LinearLayout>
-
+        </LinearLayout>
 
 
 </RelativeLayout>

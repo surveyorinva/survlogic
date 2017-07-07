@@ -2,11 +2,14 @@ package com.survlogic.survlogic.activity;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -16,6 +19,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -52,6 +56,8 @@ public class ProjectNewActivity extends AppCompatActivity {
     private static final int ACTIVITY_KEY = 1;
     private static final int REQUEST_TAKE_PHOTO= 2;
     private static final int REQUEST_SELECT_PICTURE=3;
+    private static Context mContext;
+
 
     private EditText etProjectName;
     private TextView tvLocation_latitude, tvLocation_longitude, tvLocation_latitude_value,tvLocation_longitude_value ;
@@ -61,7 +67,7 @@ public class ProjectNewActivity extends AppCompatActivity {
     private ImageButton btnlocation_get_from_gps_survey;
 
     private String mCurrentPhotoPath;
-    private Bitmap mBitmap;
+    private Bitmap mBitmap, mBitmapPolished, mBitmapRaw;
 
     String mProjectName;
     int mId, mStorage, mUnits;
@@ -85,6 +91,8 @@ public class ProjectNewActivity extends AppCompatActivity {
 
 
     private void initView(){
+
+        mContext = ProjectNewActivity.this;
 
         etProjectName = (EditText) findViewById(R.id.project_name_in_project_new);
 
@@ -304,14 +312,14 @@ public class ProjectNewActivity extends AppCompatActivity {
             Uri imageUri = Uri.parse(mCurrentPhotoPath);
             File file = new File(imageUri.getPath());
             try {
-                InputStream ims = new FileInputStream(file);
-                ivPreview.setImageBitmap(BitmapFactory.decodeStream(ims));
-                mBitmap=decodeUri(imageUri,400);
+                mBitmapRaw=decodeUri(imageUri,400);
+                mBitmap = rotateImageIfRequired(mBitmapRaw,imageUri);
+                ivPreview.setImageBitmap(mBitmap);
                 mImageSystem = 1;
 
-            } catch (FileNotFoundException e) {
+            } catch (Exception e) {
                 showToast("Caught Error: Could not set Photo to Image from Camera",true);
-                return;
+
             }
 
         }else if(this.REQUEST_SELECT_PICTURE == requestCode && resultCode == RESULT_OK){
@@ -320,18 +328,21 @@ public class ProjectNewActivity extends AppCompatActivity {
 
                 try {
                     final Uri imageUri = data.getData();
+                    File file = new File(imageUri.getPath());
 //                    final InputStream imageStream = getContentResolver().openInputStream(imageUri);
 //                    final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
 
                     if (imageUri !=null){
-                        mBitmap=decodeUri(imageUri,400);
+                        mBitmapRaw=decodeUri(imageUri,400);
+                        mBitmap = rotateImageIfRequired(mBitmapRaw,imageUri);
+                        ivPreview.setImageBitmap(mBitmap);
+                        mImageSystem = 1;
                     }
 
-                    ivPreview.setImageBitmap(mBitmap);
 
                 } catch (Exception e) {
                     showToast("Caught Error: Could not set Photo to Image from Gallery",true);
-                    return;
+
                 }
             }
         }
@@ -371,6 +382,37 @@ public class ProjectNewActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         return null;
+    }
+
+    private static Bitmap rotateImageIfRequired(Bitmap img, Uri selectedImage) throws IOException {
+
+        InputStream input = mContext.getContentResolver().openInputStream(selectedImage);
+        ExifInterface ei;
+        if (Build.VERSION.SDK_INT > 23)
+            ei = new ExifInterface(input);
+        else
+            ei = new ExifInterface(selectedImage.getPath());
+
+        int orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+
+        switch (orientation) {
+            case ExifInterface.ORIENTATION_ROTATE_90:
+                return rotateImage(img, 90);
+            case ExifInterface.ORIENTATION_ROTATE_180:
+                return rotateImage(img, 180);
+            case ExifInterface.ORIENTATION_ROTATE_270:
+                return rotateImage(img, 270);
+            default:
+                return img;
+        }
+    }
+
+    private static Bitmap rotateImage(Bitmap img, int degree) {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(degree);
+        Bitmap rotatedImg = Bitmap.createBitmap(img, 0, 0, img.getWidth(), img.getHeight(), matrix, true);
+        img.recycle();
+        return rotatedImg;
     }
 
     //Convert bitmap to bytes

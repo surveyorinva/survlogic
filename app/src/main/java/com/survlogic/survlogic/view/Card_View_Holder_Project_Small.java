@@ -18,13 +18,16 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class Card_View_Holder_Project_Small extends RecyclerView.ViewHolder  {
 
-    public TextView txtProjectName, txtLocation, txtLastModify, txtProjectDesc;
+    public TextView txtProjectName, txtLocation, txtLastModify, txtProjectDesc, txtProjectId;
     public CircleImageView imgProjectImage;
-
+    public View mCardView;
 
     public Card_View_Holder_Project_Small(View itemView) {
         super(itemView);
 
+        mCardView = itemView;
+
+        txtProjectId = (TextView) itemView.findViewById(R.id.card_project_view_card_id);
         txtProjectName = (TextView) itemView.findViewById(R.id.card_project_view_project_name);
         txtLocation  = (TextView) itemView.findViewById(R.id.card_project_view_location_value);
         txtLastModify  = (TextView) itemView.findViewById(R.id.card_project_view_last_opened);

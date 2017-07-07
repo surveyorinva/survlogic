@@ -17,6 +17,10 @@
         <!-- use to make contextual action mode overlap the Toolbar -->
         <item name="windowActionModeOverlay">true</item>
         <item name="actionModeStyle">@style/MyActionMode</item>
+
+        <!--Transition Style between Activities-->
+        <item name="android:windowContentTransitions">true</item>
+
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
