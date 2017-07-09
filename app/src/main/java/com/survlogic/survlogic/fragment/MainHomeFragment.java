@@ -1,5 +1,7 @@
 package com.survlogic.survlogic.fragment;
 
+import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -10,11 +12,13 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.activity.MainActivity;
 import com.survlogic.survlogic.background.BackgroundProjectList;
 import com.survlogic.survlogic.background.BackgroundProjectListRefresh;
+import com.survlogic.survlogic.database.ProjectDatabaseHandler;
 
 /**
  * Created by chrisfillmore on 5/2/2017.
@@ -27,6 +31,8 @@ public class MainHomeFragment extends Fragment {
     private SwipeRefreshLayout swipeRefreshLayout;
     private RecyclerView mRecyclerView;
     private FloatingActionButton fab;
+
+    private Context mContext = this.getContext();
 
     @Nullable
     @Override
@@ -109,5 +115,18 @@ public class MainHomeFragment extends Fragment {
 
 
     }
+
+    private void showToast(String data, boolean shortTime) {
+
+        if (shortTime) {
+            Toast.makeText(getActivity(), data, Toast.LENGTH_SHORT).show();
+
+        } else{
+            Toast.makeText(getActivity(), data, Toast.LENGTH_LONG).show();
+
+        }
+
+    }
+
 
 }

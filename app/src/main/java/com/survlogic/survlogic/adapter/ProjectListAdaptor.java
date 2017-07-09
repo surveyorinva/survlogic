@@ -10,6 +10,7 @@ import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.util.Pair;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,6 +39,8 @@ import java.util.Date;
  */
 
 public class ProjectListAdaptor extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+
+    private static final String TAG = "ProjectListAdaptor";
 
     private ArrayList<Project> projects = new ArrayList<Project>();
     private final int SMALL = 0, MEDIUM = 1, LARGE = 2;
@@ -173,12 +176,20 @@ public class ProjectListAdaptor extends RecyclerView.Adapter<RecyclerView.ViewHo
         vh1.mCardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.e(TAG, "Set Onclick Listener: Start");
+
                 Intent intent = new Intent(mContext, ProjectDetailsActivity.class);
                 intent.putExtra("PROJECT_ID",projectID);
-                intent.putExtra("project", Parcels.wrap(project));
+                //intent.putExtra("project", Parcels.wrap(project));
 
-                mContext.startActivity(intent, ActivityOptions.makeSceneTransitionAnimation
-                        ((Activity) mContext, vh1.imgProjectImage,"profile").toBundle());
+                Log.e(TAG, "Set Onclick Listener: Bundled");
+
+                ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation
+                        ((Activity) mContext, vh1.imgProjectImage,"profile");
+
+                mContext.startActivity(intent, options.toBundle());
+
+                Log.e(TAG, "Set Onclick Listener: Complete");
 
             }
         });

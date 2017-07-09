@@ -27,7 +27,7 @@
             android:layout_height="match_parent">
 
             <android.support.v7.widget.CardView
-                android:id="@+id/card_1"
+                android:id="@+id/card_general"
                 app:cardCornerRadius="3dp"
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="10dp"
@@ -67,10 +67,19 @@
 
                     <ImageView
                         android:id="@+id/footer_area_background"
-                        android:background="@drawable/box_accent_border_grey"
+                        android:background="@drawable/box_accent_border_orange"
                         android:layout_alignParentBottom="true"
                         android:layout_width="match_parent"
                         android:layout_height="40dp" />
+
+                    <TextView
+                        android:id="@+id/project_storage_space_value"
+                        style="@style/Labels.Card.ProjectFooter"
+                        android:layout_alignTop="@id/footer_area_background"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginStart="5dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
 
                 </RelativeLayout>
 
@@ -78,8 +87,8 @@
             </android.support.v7.widget.CardView>
 
             <TextView
-                android:id="@+id/card_label_2"
-                android:text="Summary"
+                android:id="@+id/card_label_summary"
+                android:text="@string/project_details_category_summary"
                 style="@style/Labels.Card.ProjectCategory"
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="@dimen/card_margin_between_headers"
@@ -87,54 +96,204 @@
                 android:layout_height="wrap_content" />
 
             <android.support.v7.widget.CardView
-                android:id="@+id/card_2"
+                android:id="@+id/card_summary"
                 app:cardCornerRadius="3dp"
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="10dp"
                 android:layout_marginTop="5dp"
                 android:layout_marginBottom="5dp"
                 android:layout_width="match_parent"
-                android:layout_height="200dp">
+                android:layout_height="165dp">
 
-                <RelativeLayout
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:weightSum="2"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
 
-                    <ImageView
-                        android:id="@+id/item1_img"
-                        android:background="@drawable/vc_circle_green"
-                        android:layout_marginStart="10dp"
-                        android:layout_marginTop="10dp"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp" />
+                    <RelativeLayout
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent">
 
-                    <TextView
-                        android:id="@+id/item1_header"
-                        android:text="@string/project_details_header_units"
-                        style="@style/Labels.Card.ProjectHeader"
-                        android:layout_alignTop="@id/item1_img"
-                        android:layout_toEndOf="@id/item1_img"
-                        android:layout_marginStart="5dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
+                        <ImageView
+                            android:id="@+id/left_item1_img"
+                            android:background="@drawable/vc_circle_green"
+                            android:layout_marginStart="10dp"
+                            android:layout_marginTop="10dp"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp" />
 
-                    <TextView
-                        android:id="@+id/item1_value"
-                        style="@style/Labels.Card.ProjectValues"
-                        android:layout_alignStart="@id/item1_header"
-                        android:layout_below="@id/item1_header"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
+                        <TextView
+                            android:id="@+id/left_item1_header"
+                            android:text="@string/project_details_header_units"
+                            style="@style/Labels.Card.ProjectHeader"
+                            android:layout_alignTop="@id/left_item1_img"
+                            android:layout_toEndOf="@id/left_item1_img"
+                            android:layout_marginStart="5dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                        <TextView
+                            android:id="@+id/left_item1_value"
+                            style="@style/Labels.Card.ProjectValues"
+                            android:layout_alignStart="@id/left_item1_header"
+                            android:layout_below="@id/left_item1_header"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                        <ImageView
+                            android:id="@+id/left_item2_img"
+                            android:background="@drawable/vc_circle_green"
+                            android:layout_marginStart="10dp"
+                            android:layout_below="@id/left_item1_img"
+                            android:layout_marginTop="10dp"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp" />
+
+                        <TextView
+                            android:id="@+id/left_item2_header"
+                            android:text="@string/project_details_header_projection"
+                            style="@style/Labels.Card.ProjectHeader"
+                            android:layout_alignTop="@id/left_item2_img"
+                            android:layout_toEndOf="@id/left_item2_img"
+                            android:layout_marginStart="5dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                        <TextView
+                            android:id="@+id/left_item2_value"
+                            style="@style/Labels.Card.ProjectValues"
+                            android:layout_alignStart="@id/left_item2_header"
+                            android:layout_below="@id/left_item2_header"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                        <ImageView
+                            android:id="@+id/left_item3_img"
+                            android:background="@drawable/vc_circle_green"
+                            android:layout_marginStart="10dp"
+                            android:layout_below="@id/left_item2_img"
+                            android:layout_marginTop="10dp"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp" />
+
+                        <TextView
+                            android:id="@+id/left_item3_header"
+                            android:text="@string/project_details_header_zone"
+                            style="@style/Labels.Card.ProjectHeader"
+                            android:layout_alignTop="@id/left_item3_img"
+                            android:layout_toEndOf="@id/left_item3_img"
+                            android:layout_marginStart="5dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                        <TextView
+                            android:id="@+id/left_item3_value"
+                            style="@style/Labels.Card.ProjectValues"
+                            android:layout_alignStart="@id/left_item3_header"
+                            android:layout_below="@id/left_item3_header"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                    </RelativeLayout>
 
 
-                </RelativeLayout>
+                    <RelativeLayout
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:visibility="gone">
 
+                        <ImageView
+                            android:id="@+id/right_item1_img"
+                            android:background="@drawable/vc_circle_green"
+                            android:layout_marginStart="10dp"
+                            android:layout_marginTop="10dp"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp" />
+
+                        <TextView
+                            android:id="@+id/right_item1_header"
+                            android:text="@string/project_details_header_units"
+                            style="@style/Labels.Card.ProjectHeader"
+                            android:layout_alignTop="@id/right_item1_img"
+                            android:layout_toEndOf="@id/right_item1_img"
+                            android:layout_marginStart="5dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                        <TextView
+                            android:id="@+id/right_item1_value"
+                            style="@style/Labels.Card.ProjectValues"
+                            android:layout_alignStart="@id/right_item1_header"
+                            android:layout_below="@id/right_item1_header"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                        <ImageView
+                            android:id="@+id/right_item2_img"
+                            android:background="@drawable/vc_circle_green"
+                            android:layout_marginStart="10dp"
+                            android:layout_below="@id/right_item1_img"
+                            android:layout_marginTop="10dp"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp" />
+
+                        <TextView
+                            android:id="@+id/right_item2_header"
+                            android:text="@string/project_details_header_projection"
+                            style="@style/Labels.Card.ProjectHeader"
+                            android:layout_alignTop="@id/right_item2_img"
+                            android:layout_toEndOf="@id/right_item2_img"
+                            android:layout_marginStart="5dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                        <TextView
+                            android:id="@+id/right_item2_value_lat"
+                            style="@style/Labels.Card.ProjectValues"
+                            android:layout_alignStart="@id/right_item2_header"
+                            android:layout_below="@id/right_item2_header"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                        <ImageView
+                            android:id="@+id/right_item3_img"
+                            android:background="@drawable/vc_circle_green"
+                            android:layout_marginStart="10dp"
+                            android:layout_below="@id/right_item2_img"
+                            android:layout_marginTop="10dp"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp" />
+
+                        <TextView
+                            android:id="@+id/right_item3_header"
+                            android:text="@string/project_details_header_zone"
+                            style="@style/Labels.Card.ProjectHeader"
+                            android:layout_alignTop="@id/right_item3_img"
+                            android:layout_toEndOf="@id/right_item3_img"
+                            android:layout_marginStart="5dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                        <TextView
+                            android:id="@+id/right_item4_value_lat"
+                            style="@style/Labels.Card.ProjectValues"
+                            android:layout_alignStart="@id/right_item3_header"
+                            android:layout_below="@id/right_item3_header"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                    </RelativeLayout>
+
+                </LinearLayout>
 
             </android.support.v7.widget.CardView>
 
             <TextView
-                android:id="@+id/card_label_3"
-                android:text="Photos"
+                android:id="@+id/card_label_map"
+                android:text="@string/project_details_category_map"
                 style="@style/Labels.Card.ProjectCategory"
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="@dimen/card_margin_between_headers"
@@ -142,7 +301,103 @@
                 android:layout_height="wrap_content" />
 
             <android.support.v7.widget.CardView
-                android:id="@+id/card_3"
+                android:id="@+id/card_map"
+                app:cardCornerRadius="3dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:layout_width="match_parent"
+                android:layout_height="300dp">
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:weightSum="4"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <RelativeLayout
+                        android:layout_weight=".75"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp">
+
+                        <ImageView
+                            android:id="@+id/map_item1_img"
+                            android:background="@drawable/vc_circle_red"
+                            android:layout_marginStart="10dp"
+                            android:layout_marginTop="10dp"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp" />
+
+                        <TextView
+                            android:id="@+id/map_item1_header"
+                            android:text="@string/project_details_header_location"
+                            style="@style/Labels.Card.ProjectHeader"
+                            android:layout_alignTop="@id/map_item1_img"
+                            android:layout_toEndOf="@id/map_item1_img"
+                            android:layout_marginStart="5dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                        <LinearLayout
+                            android:layout_alignStart="@id/map_item1_header"
+                            android:layout_below="@id/map_item1_header"
+                            android:weightSum="2"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent">
+
+                            <TextView
+                                android:id="@+id/map_item1_value_lat"
+                                style="@style/Labels.Card.ProjectLocation"
+                                android:layout_gravity="center_vertical"
+                                android:layout_weight="1"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content" />
+
+                            <TextView
+                                android:id="@+id/map_item1_value_long"
+                                style="@style/Labels.Card.ProjectLocation"
+                                android:layout_gravity="center_vertical"
+                                android:layout_weight="1"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content" />
+                        </LinearLayout>
+
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:layout_weight="3"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp">
+
+                        <fragment
+                            android:id="@+id/map_container_in_project_details"
+                            class="com.google.android.gms.maps.SupportMapFragment"
+                            android:layout_margin="5dp"
+                            app:liteMode="true"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"/>
+
+                    </RelativeLayout>
+
+                </LinearLayout>
+
+
+            </android.support.v7.widget.CardView>
+
+
+
+            <TextView
+                android:id="@+id/card_label_photos"
+                android:text="@string/project_details_category_photos"
+                style="@style/Labels.Card.ProjectCategory"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="@dimen/card_margin_between_headers"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <android.support.v7.widget.CardView
+                android:id="@+id/card_photos"
                 app:cardCornerRadius="3dp"
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="10dp"
@@ -198,8 +453,8 @@
             </android.support.v7.widget.CardView>
 
             <TextView
-                android:id="@+id/card_label_4"
-                android:text="Project Notes"
+                android:id="@+id/card_label_notes"
+                android:text="@string/project_details_category_notes"
                 style="@style/Labels.Card.ProjectCategory"
                 android:layout_marginTop="@dimen/card_margin_between_headers"
                 android:layout_marginStart="10dp"
@@ -207,7 +462,7 @@
                 android:layout_height="wrap_content" />
 
             <android.support.v7.widget.CardView
-                android:id="@+id/card_4"
+                android:id="@+id/card_notes"
                 app:cardCornerRadius="3dp"
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="10dp"
@@ -263,31 +518,44 @@
             </android.support.v7.widget.CardView>
 
             <TextView
-                android:id="@+id/card_label_5"
-                android:text="Project Files"
+                android:id="@+id/card_label_files"
+                android:text="@string/project_details_category_files"
                 style="@style/Labels.Card.ProjectCategory"
                 android:layout_marginTop="@dimen/card_margin_between_headers"
                 android:layout_marginStart="10dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
-            <android.support.v4.widget.SwipeRefreshLayout
-                android:id="@+id/swipe_view_in_content_card_project_details"
-                app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            <android.support.v7.widget.CardView
+                android:id="@+id/card_files"
+                app:cardCornerRadius="3dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="wrap_content">
 
-                <android.support.v7.widget.RecyclerView
-                    android:id="@+id/recycler_view_in_card_project_detail"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginEnd="10dp"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginBottom="5dp"
+                <LinearLayout
+                    android:orientation="vertical"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@color/app_background" />
+                    android:layout_height="200dp">
 
-            </android.support.v4.widget.SwipeRefreshLayout>
+                    <android.support.v7.widget.RecyclerView
+                        android:id="@+id/recycler_view_in_card_project_detail"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginEnd="10dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginBottom="5dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:visibility="gone"
+                        android:background="@color/app_background" />
+
+
+                    </LinearLayout>
+
+            </android.support.v7.widget.CardView>
 
         </LinearLayout>
 

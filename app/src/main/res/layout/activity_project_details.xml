@@ -47,41 +47,16 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/appbar_fab1"
-        android:src="@drawable/ic_add_location"
-        app:fabSize="normal"
-        android:layout_marginBottom="16dp"
-        android:layout_marginEnd="16dp"
-        app:layout_anchor="@id/appbar_in_activity_project_details"
-        app:layout_anchorGravity="bottom|right"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
     <android.support.v4.widget.NestedScrollView
         android:id="@+id/nestedScrollView_in_activity_project_details"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
             <include
                 layout="@layout/content_project_detail"/>
 
-        </LinearLayout>
-
-
-
     </android.support.v4.widget.NestedScrollView>
-
-
-
-
-
 
 
 </android.support.design.widget.CoordinatorLayout>

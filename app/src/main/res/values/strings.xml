@@ -100,8 +100,8 @@
     <string name="gps_status_constellation_header">From</string>
     <string name="gps_status_lat_default">Lat:</string>
     <string name="gps_status_lat_value_string">Lat: %1$s</string>
-    <string name="gps_status_long_default">Long:</string>
-    <string name="gps_status_long_value_string">Long: %1$s</string>
+    <string name="gps_status_long_default">Lon:</string>
+    <string name="gps_status_long_value_string">Lon: %1$s</string>
     <string name="title_activity_settings">Settings</string>
 
     <!--CARD - project_view -->
@@ -139,7 +139,16 @@
 
 
     <!--Project Details View-->
+    <string name="project_details_category_summary">Summary</string>
+    <string name="project_details_category_map">Map</string>
+    <string name="project_details_category_photos">Photos</string>
+    <string name="project_details_category_notes">Project Notes</string>
+    <string name="project_details_category_files">Project Files</string>
     <string name="project_details_header_units">UNITS</string>
+    <string name="project_details_header_location">LOCATION</string>
+    <string name="project_details_header_projection">PROJECTION</string>
+    <string name="project_details_header_zone">ZONE</string>
+
 
     <!-- ******************************Strings related to Settings****************************** -->
 

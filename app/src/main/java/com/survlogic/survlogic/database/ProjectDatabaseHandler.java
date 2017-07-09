@@ -26,7 +26,7 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
 
     //  Database Constants
     private static final int DB_VERSION = 1;
-    private static final String DB_NAME = "projects_v1.db";
+    private static final String DB_NAME = "projects_v11.db";
 
     // Table Creation Queries
     private static final String CREATE_TABLE_PROJECT = "CREATE TABLE "
@@ -46,10 +46,11 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
             + ProjectContract.ProjectEntry.KEY_DATE_MODIFIED + " INTEGER,"
             + ProjectContract.ProjectEntry.KEY_DATE_ACCESSED + " INTEGER);";
 
-
     public ProjectDatabaseHandler(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
-        Log.d(TAG,"Database created...");;
+        Log.d(TAG,"Database created...");
+
+
     }
 
     @Override
@@ -116,6 +117,23 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
     //  Reading
         //  ALL Projects
 
+    public static int getCountProjectsAll(SQLiteDatabase db){
+        int results = 0;
+
+        String selectQuery = "SELECT * FROM " + ProjectContract.ProjectEntry.TABLE_NAME
+                + " ORDER BY " + ProjectContract.ProjectEntry.KEY_PROJECTNAME + " ASC";
+
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        c.moveToFirst();
+
+        results = c.getCount();
+        c.close();
+
+        return results;
+    }
+
+
     public List<Project> getProjectsAll(SQLiteDatabase db){
 
         List<Project> lstprojects = new ArrayList<Project>();
@@ -156,6 +174,25 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
 
 
     //  Specific Project
+
+    public int getCountProjectsById(long project_id){
+        int results = 0;
+
+        String selectQuery = "SELECT  * FROM " + ProjectContract.ProjectEntry.TABLE_NAME + " WHERE "
+                + ProjectContract.ProjectEntry.KEY_ID + " = " + project_id;
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        c.moveToFirst();
+
+        results = c.getCount();
+        c.close();
+
+        return results;
+    }
+
+
     public Project getProjectById(SQLiteDatabase db, long project_id){
 //        Version 1 - Pull db in with method.  If possible, see if below will work w/o pull in.
 //        SQLiteDatabase db = this.getReadableDatabase();

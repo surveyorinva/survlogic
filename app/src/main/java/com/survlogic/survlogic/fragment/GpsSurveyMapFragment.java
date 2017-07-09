@@ -845,7 +845,7 @@ public class GpsSurveyMapFragment extends Fragment implements GpsSurveyListener,
                 currentPositionMarker = new MarkerOptions();
 
                 currentPositionMarker.position(latlng);
-                currentPositionMarker.title("I am a Title");
+                currentPositionMarker.title("New Project");
                 //currentPositionMarker.icon(BitmapDescriptorFactory.fromResource(R.drawable.button_framed_blue));
 
                 currentLocationMarker = mMap.addMarker(currentPositionMarker);
