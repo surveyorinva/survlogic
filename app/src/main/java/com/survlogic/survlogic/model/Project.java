@@ -1,12 +1,10 @@
 package com.survlogic.survlogic.model;
 
-import org.parceler.Parcel;
 
 /**
  * Created by chrisfillmore on 6/25/2017.
  */
 
-@Parcel
 public class Project {
 
     String mProjectName;

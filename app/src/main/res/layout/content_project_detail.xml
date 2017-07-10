@@ -415,20 +415,30 @@
                         android:layout_width="match_parent"
                         android:layout_height="25dp" />
 
-                    <ImageView
-                        android:id="@+id/photo1_img"
-                        android:background="@drawable/vc_circle_green"
+                    <GridView
+                        android:id="@+id/photo_grid_view"
                         android:layout_marginStart="10dp"
                         android:layout_marginTop="10dp"
                         android:layout_marginBottom="10dp"
+                        android:numColumns="4"
+                        android:verticalSpacing="1dp"
+                        android:horizontalSpacing="1dp"
+                        android:stretchMode="columnWidth"
+                        android:gravity="center"
                         android:visibility="gone"
-                        android:layout_width="100dp"
+                        android:layout_width="match_parent"
                         android:layout_height="100dp" />
 
                     <RelativeLayout
                         android:background="@drawable/box_accent_border_ltgrey"
                         android:layout_width="match_parent"
                         android:layout_height="50dp" >
+
+                        <Button
+                            android:id="@+id/card3_take_photo"
+                            android:background="?android:attr/selectableItemBackground"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent" />
 
                         <ImageView
                             android:id="@+id/card3_take_photo_img"
@@ -478,7 +488,7 @@
 
                     <android.support.v4.widget.Space
                         android:layout_width="match_parent"
-                        android:layout_height="10dp" />
+                        android:layout_height="25dp" />
 
                     <TextView
                         android:id="@+id/card4_projectNotes"

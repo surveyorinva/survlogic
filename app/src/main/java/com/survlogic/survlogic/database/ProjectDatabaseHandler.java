@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import com.survlogic.survlogic.model.Project;
+import com.survlogic.survlogic.model.ProjectImages;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -46,17 +47,28 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
             + ProjectContract.ProjectEntry.KEY_DATE_MODIFIED + " INTEGER,"
             + ProjectContract.ProjectEntry.KEY_DATE_ACCESSED + " INTEGER);";
 
+    private static final String CREATE_TABLE_PROJECT_IMAGES = "CREATE TABLE "
+            + ProjectContract.ProjectImageEntry.TABLE_NAME
+            + "("
+            + ProjectContract.ProjectImageEntry.KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+            + ProjectContract.ProjectImageEntry.KEY_PROJECT_ID + " INTEGER,"
+            + ProjectContract.ProjectImageEntry.KEY_POINT_ID + " INTEGER,"
+            + ProjectContract.ProjectImageEntry.KEY_IMAGE + " BLOB,"
+            + ProjectContract.ProjectImageEntry.KEY_BEARING + " FLOAT,"
+            + ProjectContract.ProjectImageEntry.KEY_GEOLAT + " DOUBLE,"
+            + ProjectContract.ProjectImageEntry.KEY_GEOLON + " DOUBLE);";
+
+
     public ProjectDatabaseHandler(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
         Log.d(TAG,"Database created...");
-
 
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_TABLE_PROJECT);
-
+        db.execSQL(CREATE_TABLE_PROJECT_IMAGES);
         Log.d(TAG,"Table created...");
     }
 
@@ -64,6 +76,7 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // Drop older table if existed
         db.execSQL("DROP IF TABLE EXISTS " + ProjectContract.ProjectEntry.TABLE_NAME);
+        db.execSQL("DROP IF TABLE EXISTS " + ProjectContract.ProjectImageEntry.TABLE_NAME);
 
         // Create tables again
         onCreate(db);
@@ -73,8 +86,11 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
      * All CRUD(Create, Read, Update, Delete) Operations
      */
 
-    //  Creating
+    //  Creating---------------------------------------------------------------------------------------------------
 
+    /**
+     * Adding Project to Database
+     */
     public long addProjectToDB(SQLiteDatabase db, Project project){
 
         //  ContentValues is a name value pair, used to get the values from database tables.  Content values object
@@ -113,6 +129,45 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
         }
 
     }
+
+    /**
+     * Adding Project Images to Database
+     */
+    public long addProjectImageToDB(SQLiteDatabase db, ProjectImages projectImages){
+
+        //  ContentValues is a name value pair, used to get the values from database tables.  Content values object
+        //  returned from SQLiteDatabase objects query() function.
+        ContentValues contentValues = new ContentValues();
+
+        //  Required Fields
+        contentValues.put(ProjectContract.ProjectImageEntry.KEY_PROJECT_ID, projectImages.getProjectId());
+        contentValues.put(ProjectContract.ProjectImageEntry.KEY_POINT_ID, projectImages.getPointId());
+        contentValues.put(ProjectContract.ProjectImageEntry.KEY_IMAGE, projectImages.getImage());
+
+        //  Optional Fields
+        contentValues.put(ProjectContract.ProjectImageEntry.KEY_BEARING, projectImages.getBearingAngle());
+        contentValues.put(ProjectContract.ProjectImageEntry.KEY_GEOLAT, projectImages.getLocationLat());
+        contentValues.put(ProjectContract.ProjectImageEntry.KEY_GEOLON, projectImages.getLocationLong());
+
+        //  Metadata Fields
+
+
+        Log.d(TAG, "addData: Adding Image to " + ProjectContract.ProjectImageEntry.TABLE_NAME);
+
+        //        Inserts new row
+        Long result =  db.insert(ProjectContract.ProjectImageEntry.TABLE_NAME,null,contentValues);
+        db.close();
+
+        if (result==-1){
+            Log.d(TAG,"Error, Something went wrong...");
+            return -1;
+        } else {
+            Log.d(TAG,"Success, Row inserted into Table...");
+            return result;
+        }
+
+    }
+
 
     //  Reading
         //  ALL Projects
@@ -246,9 +301,8 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
 
     }
 
-
     //  Deleting
-    public boolean deleteProject(SQLiteDatabase db, long project_id){
+    public boolean deleteProjectById(SQLiteDatabase db, long project_id){
         boolean results = false;
 
         db.delete(ProjectContract.ProjectEntry.TABLE_NAME, ProjectContract.ProjectEntry.KEY_ID + "= ?",
@@ -258,6 +312,155 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
         results = true;
         return results;
     }
+
+
+    public List<ProjectImages> getProjectImagesAll(SQLiteDatabase db){
+
+        List<ProjectImages> lstprojectImages = new ArrayList<ProjectImages>();
+        String selectQuery = "SELECT * FROM " + ProjectContract.ProjectImageEntry.TABLE_NAME;
+
+        Log.e(TAG, selectQuery);
+
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        // looping through all rows and adding to list
+        if (c.moveToFirst()) {
+            do {
+
+                ProjectImages projectImages = new ProjectImages();
+
+                //Required
+                projectImages.setId(c.getInt((c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_ID))));
+                projectImages.setProjectId(c.getInt((c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_PROJECT_ID))));
+                projectImages.setPointId(c.getInt((c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_POINT_ID))));
+                projectImages.setImage(c.getBlob(c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_IMAGE)));
+
+                //Optional
+                projectImages.setBearingAngle(c.getFloat(c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_BEARING)));
+                projectImages.setLocationLat(c.getDouble(c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_GEOLAT)));
+                projectImages.setLocationLong(c.getDouble(c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_GEOLON)));
+
+                // MetaData
+
+                lstprojectImages.add(projectImages);
+            } while (c.moveToNext());
+        }
+
+        return lstprojectImages;
+    }
+
+    public ProjectImages getProjectImageById(SQLiteDatabase db, long project_image_id){
+        String selectQuery = "SELECT * FROM " + ProjectContract.ProjectImageEntry.TABLE_NAME + " WHERE "
+                + ProjectContract.ProjectImageEntry.KEY_ID + " = " + project_image_id;
+
+        Log.e(TAG, selectQuery);
+
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        if (c != null)
+            c.moveToFirst();
+
+        ProjectImages projectImages = new ProjectImages();
+
+        //Required
+        projectImages.setId(c.getInt((c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_ID))));
+        projectImages.setProjectId(c.getInt((c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_PROJECT_ID))));
+        projectImages.setPointId(c.getInt((c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_POINT_ID))));
+        projectImages.setImage(c.getBlob(c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_IMAGE)));
+
+        //Optional
+        projectImages.setBearingAngle(c.getFloat(c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_BEARING)));
+        projectImages.setLocationLat(c.getDouble(c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_GEOLAT)));
+        projectImages.setLocationLong(c.getDouble(c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_GEOLON)));
+
+        // MetaData
+
+
+        return projectImages;
+    }
+
+    public List<ProjectImages> getProjectImagesbyProjectID(SQLiteDatabase db, long project_id){
+
+        List<ProjectImages> lstprojectImages = new ArrayList<ProjectImages>();
+        String selectQuery = "SELECT * FROM " + ProjectContract.ProjectImageEntry.TABLE_NAME+  " WHERE "
+                + ProjectContract.ProjectImageEntry.KEY_ID + " = " + project_id;
+
+        Log.e(TAG, selectQuery);
+
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        // looping through all rows and adding to list
+        if (c.moveToFirst()) {
+            do {
+
+                ProjectImages projectImages = new ProjectImages();
+
+                //Required
+                projectImages.setId(c.getInt((c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_ID))));
+                projectImages.setProjectId(c.getInt((c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_PROJECT_ID))));
+                projectImages.setPointId(c.getInt((c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_POINT_ID))));
+                projectImages.setImage(c.getBlob(c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_IMAGE)));
+
+                //Optional
+                projectImages.setBearingAngle(c.getFloat(c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_BEARING)));
+                projectImages.setLocationLat(c.getDouble(c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_GEOLAT)));
+                projectImages.setLocationLong(c.getDouble(c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_GEOLON)));
+
+                // MetaData
+
+                lstprojectImages.add(projectImages);
+            } while (c.moveToNext());
+        }
+
+        return lstprojectImages;
+    }
+
+    public int updateProjectImages(SQLiteDatabase db, ProjectImages projectImages){
+        //  Version 1 - Pull db in with method.  If possible, see if below will work w/o pull in.
+//        SQLiteDatabase db = this.getReadableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(ProjectContract.ProjectImageEntry.KEY_PROJECT_ID, projectImages.getProjectId());
+        values.put(ProjectContract.ProjectImageEntry.KEY_POINT_ID, projectImages.getPointId());
+        values.put(ProjectContract.ProjectImageEntry.KEY_IMAGE, projectImages.getImage());
+
+        values.put(ProjectContract.ProjectImageEntry.KEY_BEARING, projectImages.getBearingAngle());
+        values.put(ProjectContract.ProjectImageEntry.KEY_GEOLAT, projectImages.getLocationLat());
+        values.put(ProjectContract.ProjectImageEntry.KEY_GEOLON, projectImages.getLocationLong());
+
+        Log.e(TAG,"Updating Project ID=" + projectImages.getId());
+
+        return db.update(ProjectContract.ProjectImageEntry.TABLE_NAME,values, ProjectContract.ProjectImageEntry.KEY_ID + " = ?",
+                new String[] {String.valueOf(projectImages.getId())});
+
+    }
+
+
+    //  Deleting
+    public boolean deleteProjectImageById(SQLiteDatabase db, long project_image_id){
+        boolean results = false;
+
+        db.delete(ProjectContract.ProjectImageEntry.TABLE_NAME, ProjectContract.ProjectImageEntry.KEY_ID + "= ?",
+                new String[] {String.valueOf(project_image_id)});
+
+        db.close();
+        results = true;
+        return results;
+    }
+
+    public boolean deleteProjectImageByProjectId(SQLiteDatabase db, long project_id){
+        boolean results = false;
+
+        db.delete(ProjectContract.ProjectImageEntry.TABLE_NAME, ProjectContract.ProjectImageEntry.KEY_PROJECT_ID + "= ?",
+                new String[] {String.valueOf(project_id)});
+
+        db.close();
+        results = true;
+        return results;
+    }
+
+
+
 
     public void closeProjectDB(){
         SQLiteDatabase db = this.getReadableDatabase();

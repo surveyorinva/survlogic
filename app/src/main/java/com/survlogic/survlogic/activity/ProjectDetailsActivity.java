@@ -14,6 +14,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -55,6 +56,7 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
     private TextView tvProjectName, tvProjectCreated, tvUnits, tvLocationLat, tvLocationLong,
             tvProjection, tvZone, tvStorage;
     private ImageView ivProjectImage;
+    private Button btTakePhoto;
 
     private static SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM dd,yyyy");
 
@@ -100,6 +102,8 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
         tvLocationLong = (TextView) findViewById(R.id.map_item1_value_long);
 
         ivProjectImage = (ImageView) findViewById(R.id.header_image_in_activity_project_details);
+
+        btTakePhoto = (Button) findViewById(R.id.card3_take_photo);
 
         Log.e(TAG, "initView: Views formed");
 

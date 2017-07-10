@@ -35,4 +35,19 @@ public class ProjectContract {
 
     }
 
+    public static abstract class ProjectImageEntry{
+        public static final String TABLE_NAME = "project_image_table";
+
+        public static final String KEY_ID = "id";
+        public static final String KEY_PROJECT_ID = "projectid";
+        public static final String KEY_POINT_ID = "pointid";
+        public static final String KEY_IMAGE = "image";
+        public static final String KEY_BEARING = "bearing";
+        public static final String KEY_GEOLAT = "latitude";
+        public static final String KEY_GEOLON = "longitude";
+
+    }
+
+
+
 }

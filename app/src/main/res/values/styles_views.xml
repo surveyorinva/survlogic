@@ -117,6 +117,11 @@
 
     </style>
 
+    <style name="Button.Flat.Transparent">
+
+
+
+    </style>
 
     <style name="Button.Flat.Primary.GetPicture">
         <item name="android:textAllCaps">false</item>
