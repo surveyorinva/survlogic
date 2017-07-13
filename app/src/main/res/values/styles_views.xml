@@ -14,8 +14,7 @@
     </style>
 
     <style name="InputField.ProjectNewActivity.ProjectName">
-
-
+        <item name="android:inputType">textAutoCorrect|textCapSentences</item>
 
     </style>
 
@@ -37,6 +36,13 @@
         <item name="android:textColor">@color/primary_text</item>
 
     </style>
+
+    <style name="Labels.Dialog">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">@dimen/text_size_medium</item>
+    </style>
+
 
     <style name="Labels.Card">
 

@@ -29,6 +29,15 @@ public class ProjectImages {
         this.image = image;
     }
 
+    public ProjectImages(int projectId, int pointId, byte[] image, float bearingAngle, double locationLat, double locationLong) {
+        this.projectId = projectId;
+        this.pointId = pointId;
+        this.image = image;
+        this.bearingAngle = bearingAngle;
+        LocationLat = locationLat;
+        LocationLong = locationLong;
+    }
+
     public int getId() {
         return id;
     }

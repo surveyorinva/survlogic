@@ -10,12 +10,13 @@ import android.widget.Toast;
 import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.database.ProjectDatabaseHandler;
 import com.survlogic.survlogic.model.Project;
+import com.survlogic.survlogic.model.ProjectImages;
 
 /**
  * Created by chrisfillmore on 6/29/2017.
  */
 
-public class BackgroundProjectSetup extends AsyncTask <Project,Project,String> {
+public class BackgroundProjectImagesSetup extends AsyncTask <ProjectImages,ProjectImages,String> {
 
     private String TAG = getClass().getSimpleName();
     private ProgressDialog dialog;
@@ -23,9 +24,9 @@ public class BackgroundProjectSetup extends AsyncTask <Project,Project,String> {
     private Context context;
     private Activity activity;
 
-    long project_id = 0;
+    long project_photo_id = 0;
 
-    public BackgroundProjectSetup(Context context) {
+    public BackgroundProjectImagesSetup(Context context) {
         this.context = context;
         this.dialog = new ProgressDialog(context);
 
@@ -33,21 +34,21 @@ public class BackgroundProjectSetup extends AsyncTask <Project,Project,String> {
     }
 
     @Override
-    protected String doInBackground(Project... params) {
+    protected String doInBackground(ProjectImages... params) {
 
         ProjectDatabaseHandler projectDb = new ProjectDatabaseHandler(context);
         SQLiteDatabase db = projectDb.getWritableDatabase();
 
-        Project project = params[0];
+        ProjectImages projectImages = params[0];
 
         try{
-            project_id = projectDb.addProjectToDB(db,project);
+            project_photo_id = projectDb.addProjectImageToDB(db,projectImages);
 
         }catch (Exception e){
             e.printStackTrace();
         }
 
-        if (project_id>0){
+        if (project_photo_id>0){
             return "One Row Inserted";
         }else{
             return "Error Inserting Row";
@@ -58,7 +59,7 @@ public class BackgroundProjectSetup extends AsyncTask <Project,Project,String> {
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        dialog.setMessage("Saving Project");
+        dialog.setMessage("Saving Project Photo");
         dialog.setIndeterminate(true);
         dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         dialog.setCancelable(false);
@@ -75,16 +76,16 @@ public class BackgroundProjectSetup extends AsyncTask <Project,Project,String> {
         }
 
         if (result.equals("One Row Inserted")){
-            showToast(context.getString(R.string.project_new_validation_project_save_success),true);
+            showToast(context.getString(R.string.project_photo_new_validation_save_success),true);
 
         }else if (result.equals("Error Inserting Row")){
-            showToast(context.getString(R.string.project_new_validation_project_save_failed),true);
+            showToast(context.getString(R.string.project_photo_new_validation_save_failed),true);
         }
 
     }
 
     @Override
-    protected void onProgressUpdate(Project... values) {
+    protected void onProgressUpdate(ProjectImages... values) {
         super.onProgressUpdate(values);
     }
 

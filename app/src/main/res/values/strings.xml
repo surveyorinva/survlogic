@@ -137,7 +137,6 @@
     <string name="project_new_validation_project_save_success">Project Saved!</string>
     <string name="project_new_validation_project_save_failed">Error Saving Project.  Please try again.</string>
 
-
     <!--Project Details View-->
     <string name="project_details_category_summary">Summary</string>
     <string name="project_details_category_map">Map</string>
@@ -149,6 +148,12 @@
     <string name="project_details_header_projection">PROJECTION</string>
     <string name="project_details_header_zone">ZONE</string>
 
+    <!--Project Details - Add New Photo-->
+    <string name="photo_dialog_title">Add Photo to Project</string>
+    <string name="dialog_photo_header_1">Description</string>
+    <string name="dialog_photo_description">Enter in Photo Description"</string>
+    <string name="project_photo_new_validation_save_success">Project Photo Saved!</string>
+    <string name="project_photo_new_validation_save_failed">Error Saving Project Photo.  Please try again.</string>
 
     <!-- ******************************Strings related to Settings****************************** -->
 

@@ -1,19 +1,33 @@
 package com.survlogic.survlogic.activity;
 
+import android.annotation.TargetApi;
+import android.app.DialogFragment;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.v4.content.FileProvider;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -25,14 +39,21 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.survlogic.survlogic.BuildConfig;
 import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.background.BackgroundProjectDetails;
 import com.survlogic.survlogic.database.ProjectDatabaseHandler;
 import com.survlogic.survlogic.model.Project;
 import com.survlogic.survlogic.utils.MathHelper;
 import com.survlogic.survlogic.utils.TimeHelper;
+import com.survlogic.survlogic.view.DialogProjectPhotoAdd;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Created by chrisfillmore on 7/2/2017.
@@ -41,17 +62,20 @@ import java.text.SimpleDateFormat;
 public class ProjectDetailsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private static final String TAG = "ProjectDetailsActivity";
+    private static final int REQUEST_TAKE_PHOTO= 2;
+    private static final int REQUEST_SELECT_PICTURE=3;
 
     private CoordinatorLayout rootLayout;
     private Toolbar toolbar;
     private CollapsingToolbarLayout collapsingToolbar;
-    private Context mContext = this;
     private GoogleMap mMap;
 
+    private static Context mContext;
     private Project project;
     private int projectID;
     private double locationLatitude, locationLongitude;
-
+    private String mCurrentPhotoPath;
+    private Bitmap mBitmap, mBitmapPolished, mBitmapRaw;
 
     private TextView tvProjectName, tvProjectCreated, tvUnits, tvLocationLat, tvLocationLong,
             tvProjection, tvZone, tvStorage;
@@ -65,7 +89,7 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_project_details);
-
+        mContext = ProjectDetailsActivity.this;
 
         Log.e(TAG, "onCreate: Started");
 
@@ -79,6 +103,7 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
         super.onBackPressed();
         supportFinishAfterTransition();
     }
+
 
     private void initView(){
 
@@ -105,6 +130,8 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
 
         btTakePhoto = (Button) findViewById(R.id.card3_take_photo);
 
+        setOnClickListeners();
+
         Log.e(TAG, "initView: Views formed");
 
         boolean results = initValuesFromObject();
@@ -115,6 +142,18 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
         }else{
             Log.e(TAG, "initView: Populated fields Failed");
         }
+
+    }
+
+    private void setOnClickListeners(){
+
+        btTakePhoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                callImageSelectionDialog();
+            }
+        });
+
 
     }
 
@@ -265,6 +304,238 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
             }
         });
 
+    }
+
+    private void callImageSelectionDialog(){
+        final CharSequence[] items = { getString(R.string.project_new_dialog_takePhoto), getString(R.string.project_new_dialog_getImage),
+                getString(R.string.general_cancel) };
+
+        TextView title = new TextView(this);  //was context not this
+
+        title.setText(getString(R.string.photo_dialog_title));
+        title.setBackgroundColor(Color.WHITE);
+        title.setPadding(10, 15, 15, 10);
+        title.setGravity(Gravity.CENTER);
+        title.setTextColor(Color.BLACK);
+        title.setTextSize(22);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(ProjectDetailsActivity.this);
+
+        builder.setCustomTitle(title);
+
+        builder.setItems(items, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int arg) {
+
+                switch (arg) {
+
+                    case 0: //Camera
+                        startCamera();
+                        break;
+
+                    case 1: //Photo
+                        startPhotoGallery();
+                        break;
+
+                    case 2: //Cancel
+
+                        dialog.dismiss();
+                        break;
+                }
+
+            }
+        });
+        builder.show();
+    }
+
+    private void startCamera() {
+        try {
+            dispatchTakePictureIntent();
+
+        } catch (IOException e) {
+            showToast("Caught Error: Accessing Camera Exception",true);
+        }
+    }
+
+    private void startPhotoGallery(){
+
+        try{
+            dispatchPhotoFromGalleryIntent();
+
+        } catch (IOException e){
+            showToast("caught Error: Accessing Gallery Exception",true);
+        }
+
+    }
+
+    private void dispatchTakePictureIntent() throws IOException {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        // Ensure that there's a camera activity to handle the intent
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            // Create the File where the photo should go
+            File photoFile = null;
+            try {
+                photoFile = createImageFile();
+            } catch (IOException ex) {
+                // Error occurred while creating the File
+                showToast("Caught Error: Could not create file",true);
+                return;
+            }
+            // Continue only if the File was successfully created
+            if (photoFile != null) {
+                Uri photoURI = FileProvider.getUriForFile(this,
+                        BuildConfig.APPLICATION_ID + ".provider", createImageFile());
+
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+            }
+        }
+    }
+
+    private void dispatchPhotoFromGalleryIntent() throws IOException{
+        Intent intent = new Intent(Intent.ACTION_PICK,android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        intent.setType("image/*");
+        startActivityForResult(Intent.createChooser(intent, "Select Picture"),REQUEST_SELECT_PICTURE);
+
+    }
+
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        // Save a file: path for use with ACTION_VIEW intents
+        mCurrentPhotoPath = "file:" + image.getAbsolutePath();
+        return image;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (this.REQUEST_TAKE_PHOTO == requestCode && resultCode == RESULT_OK) {
+            Uri imageUri = Uri.parse(mCurrentPhotoPath);
+            File file = new File(imageUri.getPath());
+            try {
+                mBitmapRaw=decodeUri(imageUri,400);
+                mBitmap = rotateImageIfRequired(mBitmapRaw,imageUri);
+                createDialogFragment(mBitmap);
+
+            } catch (Exception e) {
+                showToast("Caught Error: Could not set Photo to Image from Camera",true);
+
+            }
+        } else if (this.REQUEST_SELECT_PICTURE == requestCode && resultCode == RESULT_OK) {
+            if (data != null) {
+
+
+                try {
+                    final Uri imageUri = data.getData();
+                    File file = new File(imageUri.getPath());
+
+                    if (imageUri !=null){
+                        mBitmapRaw=decodeUri(imageUri,400);
+                        mBitmap = rotateImageIfRequired(mBitmapRaw,imageUri);
+                        createDialogFragment(mBitmap);
+
+                    }
+
+
+                } catch (Exception e) {
+                    showToast("Caught Error: Could not set Photo to Image from Gallery",true);
+
+                }
+            }
+        }
+    }
+
+    protected Bitmap decodeUri(Uri selectedImage, int REQUIRED_SIZE) {
+
+        try {
+
+            // Decode image size
+            BitmapFactory.Options o = new BitmapFactory.Options();
+            o.inJustDecodeBounds = true;
+            BitmapFactory.decodeStream(getContentResolver().openInputStream(selectedImage), null, o);
+
+            // The new size we want to scale to
+            // final int REQUIRED_SIZE =  size;
+
+            // Find the correct scale value. It should be the power of 2.
+            int width_tmp = o.outWidth, height_tmp = o.outHeight;
+            int scale = 1;
+            while (true) {
+                if (width_tmp / 2 < REQUIRED_SIZE
+                        || height_tmp / 2 < REQUIRED_SIZE) {
+                    break;
+                }
+                width_tmp /= 2;
+                height_tmp /= 2;
+                scale *= 2;
+            }
+
+            // Decode with inSampleSize
+            BitmapFactory.Options o2 = new BitmapFactory.Options();
+            o2.inSampleSize = scale;
+            return BitmapFactory.decodeStream(getContentResolver().openInputStream(selectedImage), null, o2);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private static Bitmap rotateImageIfRequired(Bitmap img, Uri selectedImage) throws IOException {
+
+        InputStream input = mContext.getContentResolver().openInputStream(selectedImage);
+        ExifInterface ei;
+        if (Build.VERSION.SDK_INT > 23)
+            ei = new ExifInterface(input);
+        else
+            ei = new ExifInterface(selectedImage.getPath());
+
+        int orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+
+        switch (orientation) {
+            case ExifInterface.ORIENTATION_ROTATE_90:
+                return rotateImage(img, 90);
+            case ExifInterface.ORIENTATION_ROTATE_180:
+                return rotateImage(img, 180);
+            case ExifInterface.ORIENTATION_ROTATE_270:
+                return rotateImage(img, 270);
+            default:
+                return img;
+        }
+    }
+
+    private static Bitmap rotateImage(Bitmap img, int degree) {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(degree);
+        Bitmap rotatedImg = Bitmap.createBitmap(img, 0, 0, img.getWidth(), img.getHeight(), matrix, true);
+        img.recycle();
+        return rotatedImg;
+    }
+
+    //Convert bitmap to bytes
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR1)
+    private byte[] convertImageToByte(Bitmap b){
+
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        b.compress(Bitmap.CompressFormat.PNG, 0, bos);
+        return bos.toByteArray();
+
+    }
+
+    private void createDialogFragment(Bitmap bitmap){
+        DialogFragment pointDialog = DialogProjectPhotoAdd.newInstance(projectID, bitmap);
+        pointDialog.show(getFragmentManager(),"dialog");
 
     }
 }

@@ -51,12 +51,6 @@
         <item name="android:textColorPrimary">@color/primary_text</item><!-- Text color of Overflow Menu items-->
     </style>
 
-    <style name="DialogHintStyle" parent = "TextAppearance.AppCompat.Small">
-        <item name="android:textStyle">bold</item>
-        <item name="android:textColor">@color/primary_text</item>
-
-    </style>
-
     <style name="AppTheme.RunningProgressBar">
         <item name="android:colorAccent">@color/indigo_primary_dark</item>
     </style>
@@ -65,6 +59,17 @@
         <item name="android:colorAccent">@color/green_primary_dark</item>
     </style>
 
+    <style name="DialogPopupStyle" parent="@android:style/Theme.Material.Light.Dialog.Alert">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:statusBarColor">@color/colorPrimaryDark</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation.Dialog</item>
 
+    </style>
+
+    <style name="DialogHintStyle" parent = "TextAppearance.AppCompat.Small">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/primary_text</item>
+
+    </style>
 
 </resources>

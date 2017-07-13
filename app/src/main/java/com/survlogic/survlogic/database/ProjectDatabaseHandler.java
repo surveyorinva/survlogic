@@ -27,7 +27,7 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
 
     //  Database Constants
     private static final int DB_VERSION = 1;
-    private static final String DB_NAME = "projects_v11.db";
+    private static final String DB_NAME = "projects_v12.db";
 
     // Table Creation Queries
     private static final String CREATE_TABLE_PROJECT = "CREATE TABLE "
@@ -93,6 +93,7 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
      */
     public long addProjectToDB(SQLiteDatabase db, Project project){
 
+        Log.d(TAG, "addProjectToDB: Start");
         //  ContentValues is a name value pair, used to get the values from database tables.  Content values object
         //  returned from SQLiteDatabase objects query() function.
         ContentValues contentValues = new ContentValues();
@@ -134,7 +135,7 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
      * Adding Project Images to Database
      */
     public long addProjectImageToDB(SQLiteDatabase db, ProjectImages projectImages){
-
+        Log.d(TAG, "addProjectImageToDB: Start");
         //  ContentValues is a name value pair, used to get the values from database tables.  Content values object
         //  returned from SQLiteDatabase objects query() function.
         ContentValues contentValues = new ContentValues();

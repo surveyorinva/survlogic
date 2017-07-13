@@ -190,7 +190,6 @@ public class ProjectNewActivity extends AppCompatActivity {
 
         builder.setCustomTitle(title);
 
-        // builder.setTitle("Add Photo!");
         builder.setItems(items, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int arg) {
