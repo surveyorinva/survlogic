@@ -2,6 +2,7 @@ package com.survlogic.survlogic.activity;
 
 import android.annotation.TargetApi;
 import android.app.DialogFragment;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -15,11 +16,14 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.content.FileProvider;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -29,6 +33,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -41,9 +46,11 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.survlogic.survlogic.BuildConfig;
 import com.survlogic.survlogic.R;
+import com.survlogic.survlogic.adapter.GridImageAdapter;
 import com.survlogic.survlogic.background.BackgroundProjectDetails;
 import com.survlogic.survlogic.database.ProjectDatabaseHandler;
 import com.survlogic.survlogic.model.Project;
+import com.survlogic.survlogic.model.ProjectImages;
 import com.survlogic.survlogic.utils.MathHelper;
 import com.survlogic.survlogic.utils.TimeHelper;
 import com.survlogic.survlogic.view.DialogProjectPhotoAdd;
@@ -53,19 +60,22 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 /**
  * Created by chrisfillmore on 7/2/2017.
  */
 
-public class ProjectDetailsActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class ProjectDetailsActivity extends AppCompatActivity implements OnMapReadyCallback, AppBarLayout.OnOffsetChangedListener {
 
     private static final String TAG = "ProjectDetailsActivity";
     private static final int REQUEST_TAKE_PHOTO= 2;
     private static final int REQUEST_SELECT_PICTURE=3;
 
+    private SwipeRefreshLayout swipeRefreshLayout;
     private CoordinatorLayout rootLayout;
+    private AppBarLayout appBarLayout;
     private Toolbar toolbar;
     private CollapsingToolbarLayout collapsingToolbar;
     private GoogleMap mMap;
@@ -82,6 +92,11 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
     private ImageView ivProjectImage;
     private Button btTakePhoto;
 
+    private GridView gridView;
+    private GridImageAdapter gridAdapter;
+
+    private ProgressDialog progressDialog;
+
     private static SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM dd,yyyy");
 
     @Override
@@ -93,10 +108,13 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
 
         Log.e(TAG, "onCreate: Started");
 
-        initView();
         initViewNavigation();
+        initView();
+        setOnClickListeners();
 
+        initGridView();
     }
+
 
     @Override
     public void onBackPressed() {
@@ -104,6 +122,22 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
         supportFinishAfterTransition();
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        appBarLayout.removeOnOffsetChangedListener(this);
+
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        appBarLayout.addOnOffsetChangedListener(this);
+
+    }
 
     private void initView(){
 
@@ -111,9 +145,6 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
 
         Bundle extras = getIntent().getExtras();
         projectID = extras.getInt("PROJECT_ID");
-        //project = (Project) Parcels.unwrap(getIntent().getParcelableExtra("project"));
-
-        Log.e(TAG, "initView: Bundle Processed");
 
         tvProjectName = (TextView) findViewById(R.id.project_name_in_card_project_detail);
         tvProjectCreated = (TextView) findViewById(R.id.project_created_date_in_card_project_detail);
@@ -130,7 +161,8 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
 
         btTakePhoto = (Button) findViewById(R.id.card3_take_photo);
 
-        setOnClickListeners();
+        gridView = (GridView) findViewById(R.id.photo_grid_view);
+
 
         Log.e(TAG, "initView: Views formed");
 
@@ -154,6 +186,19 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
             }
         });
 
+
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        showProjectsDetailsLocalRefresh();
+
+                    }
+                }, 1000);
+            }
+        });
 
     }
 
@@ -209,7 +254,7 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
 
     }
 
-    private void initValuesfromBackground(){
+    private void initValuesfromBackground(){  //Not currently used.  This would be used if and when we want to AsyncTask load.
         BackgroundProjectDetails backgroundProjectList = new BackgroundProjectDetails(this);
         backgroundProjectList.execute(projectID);
 
@@ -217,12 +262,17 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
     }
 
     private void initViewNavigation(){
+        appBarLayout = (AppBarLayout) findViewById(R.id.appbar_in_activity_project_details);
+
         toolbar = (Toolbar) findViewById(R.id.toolbar_in_activity_project_details);
         setSupportActionBar(toolbar);
 
         collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsingToolbar_in_activity_project_details);
         collapsingToolbar.setExpandedTitleColor(Color.parseColor("#00FFFFFF"));
         collapsingToolbar.setTitle("Project View");
+
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_view_in_activity_project_details);
+        swipeRefreshLayout.setColorSchemeResources(R.color.google_blue, R.color.google_green, R.color.google_red, R.color.google_yellow);
     }
 
     private void initMapView(){
@@ -232,6 +282,28 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
         mapFragment.getMapAsync(this);
 
 
+    }
+
+    private void initGridView(){
+
+        if(getImageCount(projectID)){
+
+            gridAdapter = new GridImageAdapter(this, R.layout.layout_grid_imageview, getImageFromProjectData(projectID));
+            gridView.setAdapter(gridAdapter);
+            gridView.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void refreshGridView() {
+        if(getImageCount(projectID)){
+            gridAdapter.clear();
+
+            gridAdapter = new GridImageAdapter(this, R.layout.layout_grid_imageview, getImageFromProjectData(projectID));
+            gridView.setAdapter(gridAdapter);
+            gridView.setVisibility(View.VISIBLE);
+
+
+        }
     }
 
     @Override
@@ -538,4 +610,51 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
         pointDialog.show(getFragmentManager(),"dialog");
 
     }
+
+    private ArrayList<ProjectImages> getImageFromProjectData(Integer projectId){
+
+            ProjectDatabaseHandler projectDb = new ProjectDatabaseHandler(mContext);
+            SQLiteDatabase db = projectDb.getReadableDatabase();
+
+            ArrayList<ProjectImages> projectImages = new ArrayList<ProjectImages>(projectDb.getProjectImagesbyProjectID(db,projectId));
+
+
+
+        return projectImages;
+
+    }
+
+    private boolean getImageCount(Integer projectId){
+        long count = 0;
+        boolean results = false;
+        ProjectDatabaseHandler projectDb = new ProjectDatabaseHandler(mContext);
+        SQLiteDatabase db = projectDb.getReadableDatabase();
+
+        count = ProjectDatabaseHandler.getCountProjectImagesByProjectID(db,projectId);
+
+        if (count !=0){
+            results = true;
+        }
+
+        db.close();
+        return results;
+    }
+
+
+
+
+    private void showProjectsDetailsLocalRefresh(){
+        refreshGridView();
+
+        if(swipeRefreshLayout.isRefreshing()){
+            swipeRefreshLayout.setRefreshing(false);
+        }
+
+    }
+
+    @Override
+    public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+        swipeRefreshLayout.setEnabled(verticalOffset == 0);
+    }
 }
+

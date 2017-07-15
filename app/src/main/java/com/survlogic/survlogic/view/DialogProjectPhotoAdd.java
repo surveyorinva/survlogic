@@ -120,6 +120,7 @@ public class DialogProjectPhotoAdd extends DialogFragment {
 
             // Execute background task
             backgroundProjectImagesSetup.execute(projectImages);
+            Log.d(TAG, "submitForm: Complete.  Photo with ProjectID: " + project_id + " Saved");
             getDialog().dismiss();
         }
 

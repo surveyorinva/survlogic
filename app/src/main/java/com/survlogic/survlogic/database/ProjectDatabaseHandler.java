@@ -384,7 +384,7 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
 
         List<ProjectImages> lstprojectImages = new ArrayList<ProjectImages>();
         String selectQuery = "SELECT * FROM " + ProjectContract.ProjectImageEntry.TABLE_NAME+  " WHERE "
-                + ProjectContract.ProjectImageEntry.KEY_ID + " = " + project_id;
+                + ProjectContract.ProjectImageEntry.KEY_PROJECT_ID + " = " + project_id;
 
         Log.e(TAG, selectQuery);
 
@@ -414,6 +414,17 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
         }
 
         return lstprojectImages;
+    }
+
+    public static long getCountProjectImagesByProjectID(SQLiteDatabase db, long project_id){
+        String countQuery = "SELECT * FROM " + ProjectContract.ProjectImageEntry.TABLE_NAME+  " WHERE "
+                + ProjectContract.ProjectImageEntry.KEY_PROJECT_ID + " = " + project_id;
+
+        Cursor cursor = db.rawQuery(countQuery, null);
+        int cnt = cursor.getCount();
+        cursor.close();
+
+        return cnt;
     }
 
     public int updateProjectImages(SQLiteDatabase db, ProjectImages projectImages){
