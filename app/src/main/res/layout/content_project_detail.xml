@@ -417,7 +417,8 @@
 
                     <GridView
                         android:id="@+id/photo_grid_view"
-                        android:layout_marginStart="10dp"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginEnd="5dp"
                         android:layout_marginTop="10dp"
                         android:layout_marginBottom="10dp"
                         android:numColumns="4"
@@ -427,7 +428,7 @@
                         android:gravity="center"
                         android:visibility="gone"
                         android:layout_width="match_parent"
-                        android:layout_height="100dp" />
+                        android:layout_height="200dp" />
 
                     <RelativeLayout
                         android:background="@drawable/box_accent_border_ltgrey"
@@ -436,7 +437,7 @@
 
                         <Button
                             android:id="@+id/card3_take_photo"
-                            android:background="?android:attr/selectableItemBackground"
+                            android:background="@drawable/button_ripple_transparent"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent" />
 

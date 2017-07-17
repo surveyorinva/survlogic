@@ -329,7 +329,7 @@
                 <Button
                     android:id="@+id/photo_camera_get_photo"
                     android:text="@string/project_new_photo_button_label"
-                    style="@style/Button.Flat.Primary.GetPicture"
+                    style="@style/Button.Flat.Primary.BlueButton"
                     android:layout_toEndOf="@id/photo_camera_image"
                     android:layout_centerVertical="true"
                     android:layout_marginTop="5dp"

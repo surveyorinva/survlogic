@@ -20,7 +20,7 @@
     <RelativeLayout
         android:id="@+id/container_layout"
         android:layout_below="@id/header_layout"
-        android:padding="20dp"
+        android:padding="10dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -32,16 +32,25 @@
             android:layout_height="200dp" />
 
         <RelativeLayout
-            android:id="@+id/photo_description_layout"
+            android:id="@+id/photo_description_layout1"
             android:layout_below="@id/photo_in_dialog_project_picture"
             android:background="@drawable/divider_horizontal_bottom_grey"
             android:layout_marginTop="50dp"
             android:layout_width="match_parent"
-            android:layout_height="50dp">
+            android:layout_height="60dp">
+
+            <TextView
+                android:id="@+id/description_header"
+                android:text="@string/dialog_photo_header_1"
+                style="@style/Labels.EditBoxHeaders"
+                android:layout_marginBottom="5dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
             <ImageView
                 android:src="@drawable/ic_description"
                 android:layout_centerVertical="true"
+                android:layout_below="@id/description_header"
                 android:layout_width="35dp"
                 android:layout_height="35dp" />
 
@@ -50,11 +59,38 @@
                 android:hint="@string/dialog_photo_description"
                 android:layout_marginStart="40dp"
                 android:layout_centerVertical="true"
+                android:layout_alignParentBottom="true"
+                android:layout_marginBottom="10dp"
                 android:background="@null"
                 android:inputType="textAutoCorrect|textCapSentences"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/photo_description_layout2"
+            android:layout_below="@id/photo_description_layout1"
+            android:layout_marginTop="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="50dp">
+
+            <Button
+                android:id="@+id/btn_revert_watermark"
+                android:text="@string/general_clear"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="110dp"
+                style="@style/Button.Flat.Primary.RedButton"
+                android:layout_width="100dp"
+                android:layout_height="50dp" />
+
+            <Button
+                android:id="@+id/btn_add_watermark"
+                android:text="@string/general_add"
+                android:layout_alignParentEnd="true"
+                style="@style/Button.Flat.Primary.BlueButton"
+                android:layout_width="100dp"
+                android:layout_height="50dp" />
 
 
         </RelativeLayout>

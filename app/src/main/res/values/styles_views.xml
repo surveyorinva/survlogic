@@ -129,10 +129,17 @@
 
     </style>
 
-    <style name="Button.Flat.Primary.GetPicture">
+    <style name="Button.Flat.Primary.BlueButton">
         <item name="android:textAllCaps">false</item>
         <item name="android:textColor">@color/button_text</item>
         <item name="android:background">@drawable/button_ripple_blue</item>
+        <item name="android:padding">10dp</item>
+    </style>
+
+    <style name="Button.Flat.Primary.RedButton">
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">@color/button_text</item>
+        <item name="android:background">@drawable/button_ripple_red</item>
         <item name="android:padding">10dp</item>
     </style>
     

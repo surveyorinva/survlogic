@@ -8,6 +8,8 @@
     <string name="general_stop">Stop</string>
     <string name="general_yes">Yes</string>
     <string name="general_no">No</string>
+    <string name="general_add">Add</string>
+    <string name="general_clear">Clear</string>
     <string name="general_delete">Delete</string>
     <string name="general_unit_meters">%1$.1f m</string>
     <string name="general_unit_feet">%1$.1f ft</string>
@@ -153,7 +155,7 @@
 
     <!--Project Details - Add New Photo-->
     <string name="photo_dialog_title">Add Photo to Project</string>
-    <string name="dialog_photo_header_1">Description</string>
+    <string name="dialog_photo_header_1">ADD WATERMARK TO IMAGE</string>
     <string name="dialog_photo_description">Enter in Photo Description"</string>
     <string name="project_photo_new_validation_save_success">Project Photo Saved!</string>
     <string name="project_photo_new_validation_save_failed">Error Saving Project Photo.  Please try again.</string>
