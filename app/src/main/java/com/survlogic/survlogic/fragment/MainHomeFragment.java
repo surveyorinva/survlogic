@@ -9,11 +9,17 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.MapsInitializer;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.activity.MainActivity;
 import com.survlogic.survlogic.background.BackgroundProjectList;
@@ -24,14 +30,17 @@ import com.survlogic.survlogic.database.ProjectDatabaseHandler;
  * Created by chrisfillmore on 5/2/2017.
  */
 
-public class MainHomeFragment extends Fragment {
+public class MainHomeFragment extends Fragment implements OnMapReadyCallback {
 
+    private static final String TAG = "MainHomeFragment";
     private View v;
 
     private SwipeRefreshLayout swipeRefreshLayout;
     private RecyclerView mRecyclerView;
     private FloatingActionButton fab;
 
+    private GoogleMap mMap;
+    MapView mMapView;
     private Context mContext = this.getContext();
 
     @Nullable
@@ -40,6 +49,7 @@ public class MainHomeFragment extends Fragment {
         v = inflater.inflate(R.layout.fragment_main_home,container,false);
 
         initView();
+        initMapView();
 
         return v;
     }
@@ -116,6 +126,16 @@ public class MainHomeFragment extends Fragment {
 
     }
 
+
+    private void initMapView(){
+        Log.d(TAG, "initMapView: Creating map");
+        MapsInitializer.initialize(this.getActivity());
+        mMapView = (MapView) v.findViewById(R.id.map);
+        mMapView.getMapAsync(this);
+
+
+    }
+
     private void showToast(String data, boolean shortTime) {
 
         if (shortTime) {
@@ -128,5 +148,10 @@ public class MainHomeFragment extends Fragment {
 
     }
 
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        Log.d(TAG, "onMapReady: Initialized a dummy map to speed process");
+    }
 
 }

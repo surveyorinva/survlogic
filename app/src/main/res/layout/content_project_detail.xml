@@ -13,13 +13,22 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true" >
+
+        <ProgressBar
+            android:id="@+id/progressBar_Loading"
+            android:visibility="gone"
+            android:indeterminate="true"
+            android:layout_width="50dp"
+            android:layout_height="50dp" />
+
     </LinearLayout>
 
     <ScrollView
         android:id="@+id/scrollView_in_card_project_detail"
-        android:layout_below="@+id/header_in_card_project_detail"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true">
 
         <LinearLayout
             android:orientation="vertical"
@@ -308,7 +317,7 @@
                 android:layout_marginTop="5dp"
                 android:layout_marginBottom="5dp"
                 android:layout_width="match_parent"
-                android:layout_height="300dp">
+                android:layout_height="wrap_content">
 
                 <LinearLayout
                     android:orientation="vertical"
@@ -376,7 +385,7 @@
                             android:layout_margin="5dp"
                             app:liteMode="true"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"/>
+                            android:layout_height="300dp"/>
 
                     </RelativeLayout>
 
@@ -426,9 +435,11 @@
                         android:horizontalSpacing="1dp"
                         android:stretchMode="columnWidth"
                         android:gravity="center"
+                        android:drawSelectorOnTop="true"
+                        android:listSelector="@drawable/grid_view_highlight_transparent"
                         android:visibility="gone"
                         android:layout_width="match_parent"
-                        android:layout_height="200dp" />
+                        android:layout_height="100dp" />
 
                     <RelativeLayout
                         android:background="@drawable/box_accent_border_ltgrey"

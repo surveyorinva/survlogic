@@ -41,6 +41,8 @@
     <!--Dialog Boxes -->>
     <string name="progress_title_Refreshing">Loading...</string>
 
+    <string name="dialog_delete_image">Remove this photo?</string>
+
     <!--fragment_gps_survey_map-->
     <string name="debug_error_gps_not_found">This device does not Support GPS Locations</string>
     <string name="enable_gps_message">GPS Service is disabled.  Would you like to enable it now?</string>

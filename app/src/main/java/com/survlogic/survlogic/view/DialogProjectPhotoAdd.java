@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -12,8 +13,12 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,8 +31,14 @@ import android.widget.Toast;
 import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.background.BackgroundProjectImagesSetup;
 import com.survlogic.survlogic.model.ProjectImages;
+import com.survlogic.survlogic.utils.ImageHelper;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Created by chrisfillmore on 7/12/2017.
@@ -36,9 +47,12 @@ import java.io.ByteArrayOutputStream;
 public class DialogProjectPhotoAdd extends DialogFragment {
 
     private static final String TAG = "DialogProjectPhotoAdd";
+    private Context mContext;
+    private ImageHelper imageHelper;
 
-    private byte[] mImage;
     private Bitmap mImageLocal, mImageWatermark;
+    private String mCurrentPhotoPath;
+
     private int project_id;
 
     private boolean mAddWatermark = false;
@@ -89,6 +103,9 @@ public class DialogProjectPhotoAdd extends DialogFragment {
     public void onResume() {
         super.onResume();
 
+
+        mContext = getActivity();
+        imageHelper = new ImageHelper(mContext);
         AlertDialog alertDialog = (AlertDialog) getDialog();
 
         etDescription = (EditText) getDialog().findViewById(R.id.photo_description);
@@ -111,8 +128,10 @@ public class DialogProjectPhotoAdd extends DialogFragment {
                 String description = etDescription.getText().toString();
                 if(!isStringNull(description)){
                     mAddWatermark = true;
-                    mImageWatermark = setWatermark(mImageLocal, description, true);
+
+                    mImageWatermark = imageHelper.setWatermark(mImageLocal, description, true);
                     ivPhoto.setImageBitmap(mImageWatermark);
+
                     Log.d(TAG, "btnAddWatermark: Added Watermark ");
                 }
 
@@ -135,10 +154,12 @@ public class DialogProjectPhotoAdd extends DialogFragment {
 
     private void submitForm(View v) {
 
+        byte[] mImage;
+
             if (mAddWatermark){
-                mImage = convertImageToByte(mImageWatermark);
+                mImage = imageHelper.convertImageToByte(mImageWatermark);
             }else{
-                mImage = convertImageToByte(mImageLocal);
+                mImage = imageHelper.convertImageToByte(mImageLocal);
             }
 
             // Create Project model
@@ -155,85 +176,6 @@ public class DialogProjectPhotoAdd extends DialogFragment {
 
     }
 
-    private static Bitmap setWatermark(Bitmap src, String watermark, Boolean createOverlay){
-        Log.d(TAG, "setWatermark: Starting method");
-
-        Paint rectBlackStroke,rectBlackFill;
-        Rect rectWatermarkBounds = new Rect();
-        RectF rectOverlay;
-
-        int mTextSize = 40, mTextAlpha = 245;
-        int bottomPadding = 20;
-        float mLineWidth = 3;
-
-        int w = src.getWidth();
-        int h = src.getHeight();
-
-        Bitmap result = Bitmap.createBitmap(w,h,src.getConfig());
-
-        Canvas canvas = new Canvas(result);
-        canvas.drawBitmap(src,0,0,null);
-
-
-//        Text
-        Paint paint = new Paint();
-        paint.setColor(Color.WHITE);
-        paint.setAlpha(mTextAlpha);
-        paint.setTextSize(mTextSize);
-        paint.setStyle(Paint.Style.FILL);
-        paint.setAntiAlias(true);
-
-        paint.getTextBounds(watermark,0, watermark.length(),rectWatermarkBounds);
-        int headerHeight = rectWatermarkBounds.height();
-        int headerWidth = rectWatermarkBounds.width();
-
-        int intStartTextX = 1;
-        int intStartTextY = h - headerHeight - bottomPadding;
-
-        canvas.drawText(watermark, intStartTextX, intStartTextY, paint);
-
-//        Overlay
-        if (createOverlay) {
-            rectBlackFill = new Paint();
-            rectBlackFill.setStyle(Paint.Style.FILL);
-            rectBlackFill.setColor(Color.BLACK);
-            rectBlackFill.setAlpha(180);
-
-            rectBlackStroke = new Paint();
-            rectBlackStroke.setStyle(Paint.Style.STROKE);
-            rectBlackStroke.setColor(Color.BLACK);
-            rectBlackStroke.setStrokeWidth(mLineWidth);
-            rectBlackStroke.setAntiAlias(true);
-
-            int intStartBoxX = 0;
-            int StartBoxY = intStartTextY - headerHeight - bottomPadding;
-
-            rectOverlay = new RectF(intStartBoxX, StartBoxY, w, h);
-            canvas.drawRect(rectOverlay, rectBlackFill);
-
-        }
-
-        canvas.save(Canvas.ALL_SAVE_FLAG);
-        Log.d(TAG, "setWatermark: finish creating watermark");
-
-        return result;
-    }
-
-    //Convert bitmap to bytes
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR1)
-    private static byte[] convertImageToByte(Bitmap b){
-
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        b.compress(Bitmap.CompressFormat.PNG, 0, bos);
-        return bos.toByteArray();
-
-    }
-
-    private Bitmap convertToBitmap(byte[] b){
-
-        return BitmapFactory.decodeByteArray(b, 0, b.length);
-
-    }
 
 
     private boolean isStringNull(String string){
@@ -246,5 +188,6 @@ public class DialogProjectPhotoAdd extends DialogFragment {
             return false;
         }
     }
+
 
 }

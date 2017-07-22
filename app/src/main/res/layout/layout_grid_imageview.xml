@@ -7,7 +7,9 @@
     <com.survlogic.survlogic.utils.SquareImageView
         android:id="@+id/gridImageView"
         android:scaleType="centerCrop"
+        android:background="@drawable/grid_view_highlight_transparent"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+
 
 </RelativeLayout>

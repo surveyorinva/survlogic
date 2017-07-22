@@ -1,6 +1,7 @@
 package com.survlogic.survlogic.activity;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.app.DialogFragment;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -22,6 +23,8 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
@@ -32,9 +35,11 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -51,9 +56,11 @@ import com.survlogic.survlogic.background.BackgroundProjectDetails;
 import com.survlogic.survlogic.database.ProjectDatabaseHandler;
 import com.survlogic.survlogic.model.Project;
 import com.survlogic.survlogic.model.ProjectImages;
+import com.survlogic.survlogic.utils.ImageHelper;
 import com.survlogic.survlogic.utils.MathHelper;
 import com.survlogic.survlogic.utils.TimeHelper;
 import com.survlogic.survlogic.view.DialogProjectPhotoAdd;
+import com.survlogic.survlogic.view.DialogProjectPhotoView;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -81,16 +88,20 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
     private GoogleMap mMap;
 
     private static Context mContext;
+    private ImageHelper imageHelper;
+
     private Project project;
     private int projectID;
     private double locationLatitude, locationLongitude;
     private String mCurrentPhotoPath;
     private Bitmap mBitmap, mBitmapPolished, mBitmapRaw;
+    private boolean mProgressBarShow = false;
 
     private TextView tvProjectName, tvProjectCreated, tvUnits, tvLocationLat, tvLocationLong,
             tvProjection, tvZone, tvStorage;
-    private ImageView ivProjectImage;
+    private ImageView ivProjectImage, ivGridImage;
     private Button btTakePhoto;
+    private ProgressBar pbLoading;
 
     private GridView gridView;
     private GridImageAdapter gridAdapter;
@@ -105,14 +116,17 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
 
         setContentView(R.layout.activity_project_details);
         mContext = ProjectDetailsActivity.this;
+        imageHelper = new ImageHelper(mContext);
 
         Log.e(TAG, "onCreate: Started");
+
 
         initViewNavigation();
         initView();
         setOnClickListeners();
+        showProgressBar();
 
-        initGridView();
+
     }
 
 
@@ -136,6 +150,19 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
         super.onResume();
 
         appBarLayout.addOnOffsetChangedListener(this);
+
+        boolean results = initValuesFromObject();
+
+        if (results){
+            Log.e(TAG, "initView: Populated fields OK");
+            showMapView();
+            initGridView();
+            showProgressBar();
+
+        }else{
+            Log.e(TAG, "initView: Populated fields Failed");
+            showProgressBar();
+        }
 
     }
 
@@ -163,17 +190,9 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
 
         gridView = (GridView) findViewById(R.id.photo_grid_view);
 
+        pbLoading = (ProgressBar) findViewById(R.id.progressBar_Loading);
 
         Log.e(TAG, "initView: Views formed");
-
-        boolean results = initValuesFromObject();
-
-        if (results){
-            Log.e(TAG, "initView: Populated fields OK");
-
-        }else{
-            Log.e(TAG, "initView: Populated fields Failed");
-        }
 
     }
 
@@ -200,6 +219,27 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
             }
         });
 
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                ProjectImages item = (ProjectImages) parent.getItemAtPosition(position);
+
+                viewPhotoDialog(item.getProjectId(),convertToBitmap(item.getImage()), position);
+
+            }
+        });
+
+        gridView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                ProjectImages item = (ProjectImages) parent.getItemAtPosition(position);
+
+
+                deletePhotoDialog(item.getId(), position);
+                return true;
+            }
+        });
+
     }
 
     private boolean initValuesFromObject(){
@@ -213,7 +253,6 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
 
             locationLatitude = project.getmLocationLat();
             locationLongitude = project.getmLocationLong();
-            initMapView();
 
             ivProjectImage.setImageBitmap(convertToBitmap(project.getmImage()));
 
@@ -244,7 +283,8 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
             tvLocationLong.setText(this.getString(R.string.gps_status_long_value_string,
                     MathHelper.convertDECtoDMS(project.getmLocationLong(),3,true)));
 
-            results = true;
+            mProgressBarShow = true;
+            results = mProgressBarShow;
 
         }catch (Exception e){
             e.printStackTrace();
@@ -275,11 +315,34 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
         swipeRefreshLayout.setColorSchemeResources(R.color.google_blue, R.color.google_green, R.color.google_red, R.color.google_yellow);
     }
 
+    private void showMapView(){
+        if(locationLatitude!=0) {
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    initMapView();
+                }
+            },1000);
+        }else{
+            hideMapView();
+        }
+    }
+
     private void initMapView(){
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map_container_in_project_details);
 
         mapFragment.getMapAsync(this);
+
+
+    }
+
+    private void hideMapView(){
+        tvLocationLat.setVisibility(View.GONE);
+        tvLocationLong.setVisibility(View.GONE);
+
+        View myMap = (View) findViewById(R.id.map_container_in_project_details);
+        myMap.setVisibility(View.GONE);
 
 
     }
@@ -304,6 +367,15 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
 
 
         }
+    }
+
+    private void showProgressBar(){
+        if (mProgressBarShow){
+            pbLoading.setVisibility(View.GONE);
+        }else{
+            pbLoading.setVisibility(View.VISIBLE);
+        }
+
     }
 
     @Override
@@ -498,7 +570,7 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
             try {
                 mBitmapRaw=decodeUri(imageUri,400);
                 mBitmap = rotateImageIfRequired(mBitmapRaw,imageUri);
-                createDialogFragment(mBitmap);
+                createPhotoDialog(mBitmap);
 
             } catch (Exception e) {
                 showToast("Caught Error: Could not set Photo to Image from Camera",true);
@@ -515,7 +587,7 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
                     if (imageUri !=null){
                         mBitmapRaw=decodeUri(imageUri,400);
                         mBitmap = rotateImageIfRequired(mBitmapRaw,imageUri);
-                        createDialogFragment(mBitmap);
+                        createPhotoDialog(mBitmap);
 
                     }
 
@@ -535,7 +607,7 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
             // Decode image size
             BitmapFactory.Options o = new BitmapFactory.Options();
             o.inJustDecodeBounds = true;
-            BitmapFactory.decodeStream(getContentResolver().openInputStream(selectedImage), null, o);
+            BitmapFactory.decodeStream(mContext.getContentResolver().openInputStream(selectedImage), null, o);
 
             // The new size we want to scale to
             // final int REQUIRED_SIZE =  size;
@@ -595,19 +667,44 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
         return rotatedImg;
     }
 
-    //Convert bitmap to bytes
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR1)
-    private byte[] convertImageToByte(Bitmap b){
-
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        b.compress(Bitmap.CompressFormat.PNG, 0, bos);
-        return bos.toByteArray();
+    private void createPhotoDialog(Bitmap bitmap){
+        DialogFragment pointDialog = DialogProjectPhotoAdd.newInstance(projectID, bitmap);
+        pointDialog.show(getFragmentManager(),"dialog");
 
     }
 
-    private void createDialogFragment(Bitmap bitmap){
-        DialogFragment pointDialog = DialogProjectPhotoAdd.newInstance(projectID, bitmap);
-        pointDialog.show(getFragmentManager(),"dialog");
+    private void viewPhotoDialog(Integer project_id, Bitmap bitmap, int position){
+        if(position == 3){
+            Intent intent = new Intent(mContext, PhotoGalleryActivity.class);
+            intent.putExtra("PROJECT_ID",projectID);
+            startActivity(intent);
+
+        }else{
+            DialogFragment viewDialog = DialogProjectPhotoView.newInstance(project_id,bitmap);
+            viewDialog.show(getFragmentManager(),"dialog_view");
+        }
+
+    }
+
+    private void deletePhotoDialog(Integer photo_id, int position){
+
+        if(position == 3){
+            showToast("Gallery Item!",true);
+
+        }else{
+            new AlertDialog.Builder(mContext)
+                    .setMessage(getString(R.string.dialog_delete_image))
+                    .setPositiveButton(getString(R.string.general_yes), new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            showToast("Deleting Photo", true);
+                        }
+                    })
+                    .setNegativeButton(getString(R.string.general_no), null)
+                    .show();
+
+
+        }
 
     }
 
@@ -639,8 +736,6 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
         db.close();
         return results;
     }
-
-
 
 
     private void showProjectsDetailsLocalRefresh(){

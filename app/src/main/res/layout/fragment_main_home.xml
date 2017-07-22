@@ -7,24 +7,43 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout
-        android:orientation="vertical"
+
+    <RelativeLayout
+        android:id="@+id/rlHeader"
+        android:visibility="visible"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
         <include
             layout="@layout/card_welcome_version" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/rlContainer"
+        android:layout_below="@id/rlHeader"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
         <include
             layout="@layout/content_project_view" />
 
 
-    </LinearLayout>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/rlMapHidden"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.google.android.gms.maps.MapView
+            android:id="@+id/map"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
 
-
-
-
+    </RelativeLayout>
 
 
 </RelativeLayout>
