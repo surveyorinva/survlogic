@@ -19,7 +19,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -33,14 +32,12 @@ import android.widget.Toast;
 
 import com.survlogic.survlogic.BuildConfig;
 import com.survlogic.survlogic.R;
-import com.survlogic.survlogic.background.BackgroundProjectSetup;
+import com.survlogic.survlogic.background.BackgroundProjectNew;
 import com.survlogic.survlogic.model.Project;
 import com.survlogic.survlogic.utils.MathHelper;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
@@ -160,10 +157,10 @@ public class ProjectNewActivity extends AppCompatActivity {
                     Project project = new Project(mProjectName,mStorage,mUnits,mProjection,mZone,mLocationLat,mLocationLong,mImageSystem,mImage);
 
                     // Setup Background Task
-                    BackgroundProjectSetup backgroundProjectSetup = new BackgroundProjectSetup(ProjectNewActivity.this);
+                    BackgroundProjectNew backgroundProjectNew = new BackgroundProjectNew(ProjectNewActivity.this);
 
                     // Execute background task
-                    backgroundProjectSetup.execute(project);
+                    backgroundProjectNew.execute(project);
                     finish();
                 }
 

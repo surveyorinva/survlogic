@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -30,7 +31,7 @@ import com.survlogic.survlogic.database.ProjectDatabaseHandler;
  * Created by chrisfillmore on 5/2/2017.
  */
 
-public class MainHomeFragment extends Fragment implements OnMapReadyCallback {
+public class MainHomeFragment extends Fragment implements OnMapReadyCallback{
 
     private static final String TAG = "MainHomeFragment";
     private View v;
@@ -39,9 +40,8 @@ public class MainHomeFragment extends Fragment implements OnMapReadyCallback {
     private RecyclerView mRecyclerView;
     private FloatingActionButton fab;
 
-    private GoogleMap mMap;
-    MapView mMapView;
-    private Context mContext = this.getContext();
+    private Context mContext = getActivity();
+    private SupportMapFragment supportMapFragment;
 
     @Nullable
     @Override
@@ -49,9 +49,16 @@ public class MainHomeFragment extends Fragment implements OnMapReadyCallback {
         v = inflater.inflate(R.layout.fragment_main_home,container,false);
 
         initView();
-        initMapView();
-
+        
+        
         return v;
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        
+        initMapView();
     }
 
     @Override
@@ -66,7 +73,6 @@ public class MainHomeFragment extends Fragment implements OnMapReadyCallback {
     public void onResume() {
         super.onResume();
 
-        showProjectsLocalRefresh();
 
     }
 
@@ -128,12 +134,23 @@ public class MainHomeFragment extends Fragment implements OnMapReadyCallback {
 
 
     private void initMapView(){
-        Log.d(TAG, "initMapView: Creating map");
-        MapsInitializer.initialize(this.getActivity());
-        mMapView = (MapView) v.findViewById(R.id.map);
-        mMapView.getMapAsync(this);
+        Log.d(TAG, "initMapView: Map Initializing");
+        FragmentManager fm = getActivity().getSupportFragmentManager();
+        supportMapFragment = (SupportMapFragment) fm.findFragmentById(R.id.map_container);
+
+        if (supportMapFragment == null) {
+            supportMapFragment = SupportMapFragment.newInstance();
+            fm.beginTransaction().replace(R.id.map_container, supportMapFragment).commit();
+        }
+
+        supportMapFragment.getMapAsync(this);
+        Log.d(TAG, "initMapView: Map Sync'ed");
+    }
 
 
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        
     }
 
     private void showToast(String data, boolean shortTime) {
@@ -148,10 +165,5 @@ public class MainHomeFragment extends Fragment implements OnMapReadyCallback {
 
     }
 
-
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        Log.d(TAG, "onMapReady: Initialized a dummy map to speed process");
-    }
 
 }

@@ -59,13 +59,17 @@ import com.survlogic.survlogic.model.ProjectImages;
 import com.survlogic.survlogic.utils.ImageHelper;
 import com.survlogic.survlogic.utils.MathHelper;
 import com.survlogic.survlogic.utils.TimeHelper;
+import com.survlogic.survlogic.view.DialogProjectDescriptionAdd;
 import com.survlogic.survlogic.view.DialogProjectPhotoAdd;
 import com.survlogic.survlogic.view.DialogProjectPhotoView;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -93,14 +97,14 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
     private Project project;
     private int projectID;
     private double locationLatitude, locationLongitude;
-    private String mCurrentPhotoPath;
+    private String mCurrentPhotoPath, projectDescription;
     private Bitmap mBitmap, mBitmapPolished, mBitmapRaw;
     private boolean mProgressBarShow = false;
 
     private TextView tvProjectName, tvProjectCreated, tvUnits, tvLocationLat, tvLocationLong,
             tvProjection, tvZone, tvStorage;
     private ImageView ivProjectImage, ivGridImage;
-    private Button btTakePhoto;
+    private Button btTakePhoto, btPostDescription;
     private ProgressBar pbLoading;
 
     private GridView gridView;
@@ -126,9 +130,7 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
         setOnClickListeners();
         showProgressBar();
 
-
     }
-
 
     @Override
     public void onBackPressed() {
@@ -143,7 +145,6 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
         appBarLayout.removeOnOffsetChangedListener(this);
 
     }
-
 
     @Override
     protected void onResume() {
@@ -166,216 +167,52 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
 
     }
 
-    private void initView(){
 
-        Log.e(TAG, "initView: Started");
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
 
-        Bundle extras = getIntent().getExtras();
-        projectID = extras.getInt("PROJECT_ID");
+        if (this.REQUEST_TAKE_PHOTO == requestCode && resultCode == RESULT_OK) {
+            Uri imageUri = Uri.parse(mCurrentPhotoPath);
+            File file = new File(imageUri.getPath());
 
-        tvProjectName = (TextView) findViewById(R.id.project_name_in_card_project_detail);
-        tvProjectCreated = (TextView) findViewById(R.id.project_created_date_in_card_project_detail);
-        tvStorage = (TextView) findViewById(R.id.project_storage_space_value);
+            try {
+                mBitmapRaw=decodeUri(imageUri,400);
+                mBitmap = rotateImageIfRequired(mBitmapRaw,imageUri);
 
-        tvUnits = (TextView) findViewById(R.id.left_item1_value);
-        tvProjection = (TextView) findViewById(R.id.left_item2_value);
-        tvZone = (TextView) findViewById(R.id.left_item3_value);
+                createPhotoDialog(mBitmap);
 
-        tvLocationLat = (TextView) findViewById(R.id.map_item1_value_lat);
-        tvLocationLong = (TextView) findViewById(R.id.map_item1_value_long);
+            } catch (Exception e) {
+                showToast("Caught Error: Could not set Photo to Image from Camera",true);
 
-        ivProjectImage = (ImageView) findViewById(R.id.header_image_in_activity_project_details);
-
-        btTakePhoto = (Button) findViewById(R.id.card3_take_photo);
-
-        gridView = (GridView) findViewById(R.id.photo_grid_view);
-
-        pbLoading = (ProgressBar) findViewById(R.id.progressBar_Loading);
-
-        Log.e(TAG, "initView: Views formed");
-
-    }
-
-    private void setOnClickListeners(){
-
-        btTakePhoto.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                callImageSelectionDialog();
             }
-        });
+        } else if (this.REQUEST_SELECT_PICTURE == requestCode && resultCode == RESULT_OK) {
+            if (data != null) {
 
 
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        showProjectsDetailsLocalRefresh();
+                try {
+                    final Uri imageUri = data.getData();
+                    File file = new File(imageUri.getPath());
+
+                    if (imageUri !=null){
+                        mBitmapRaw=decodeUri(imageUri,400);
+                        mBitmap = rotateImageIfRequired(mBitmapRaw,imageUri);
+                        createPhotoDialog(mBitmap);
 
                     }
-                }, 1000);
-            }
-        });
-
-        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                ProjectImages item = (ProjectImages) parent.getItemAtPosition(position);
-
-                viewPhotoDialog(item.getProjectId(),convertToBitmap(item.getImage()), position);
-
-            }
-        });
-
-        gridView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                ProjectImages item = (ProjectImages) parent.getItemAtPosition(position);
 
 
-                deletePhotoDialog(item.getId(), position);
-                return true;
-            }
-        });
+                } catch (Exception e) {
+                    showToast("Caught Error: Could not set Photo to Image from Gallery",true);
 
-    }
-
-    private boolean initValuesFromObject(){
-        boolean results = false;
-
-        try{
-            ProjectDatabaseHandler projectDb = new ProjectDatabaseHandler(this);
-            SQLiteDatabase db = projectDb.getReadableDatabase();
-
-            Project project = projectDb.getProjectById(db,projectID);
-
-            locationLatitude = project.getmLocationLat();
-            locationLongitude = project.getmLocationLong();
-
-            ivProjectImage.setImageBitmap(convertToBitmap(project.getmImage()));
-
-            tvProjectName.setText(project.getmProjectName());
-
-            int d = project.getmDateCreated();
-            String stringDate = TimeHelper.getDateinFormat(d,dateFormat);
-            tvProjectCreated.setText(getString(R.string.project_card_last_modified_date_create, stringDate));
-
-            int units_pos = project.getmUnits()-1;
-            String [] units_values = getResources().getStringArray(R.array.unit_measure_entries);
-            tvUnits.setText(units_values[units_pos]);
-
-            int projection_pos = project.getmProjection();
-            String [] projection_values = getResources().getStringArray(R.array.project_projection_titles);
-            tvProjection.setText(projection_values[projection_pos]);
-
-            int zone_pos = project.getmZone();
-            String [] zone_values = getResources().getStringArray(R.array.project_projection_zones_titles);
-            tvZone.setText(zone_values[zone_pos]);
-
-            int storage_pos = project.getmStorage();
-            String [] storage_values = getResources().getStringArray(R.array.project_storage_titles);
-            tvStorage.setText(storage_values[storage_pos]);
-
-            tvLocationLat.setText(this.getString(R.string.gps_status_lat_value_string,
-                    MathHelper.convertDECtoDMS(project.getmLocationLat(),3,true)));
-            tvLocationLong.setText(this.getString(R.string.gps_status_long_value_string,
-                    MathHelper.convertDECtoDMS(project.getmLocationLong(),3,true)));
-
-            mProgressBarShow = true;
-            results = mProgressBarShow;
-
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-
-        return results;
-
-    }
-
-    private void initValuesfromBackground(){  //Not currently used.  This would be used if and when we want to AsyncTask load.
-        BackgroundProjectDetails backgroundProjectList = new BackgroundProjectDetails(this);
-        backgroundProjectList.execute(projectID);
-
-
-    }
-
-    private void initViewNavigation(){
-        appBarLayout = (AppBarLayout) findViewById(R.id.appbar_in_activity_project_details);
-
-        toolbar = (Toolbar) findViewById(R.id.toolbar_in_activity_project_details);
-        setSupportActionBar(toolbar);
-
-        collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsingToolbar_in_activity_project_details);
-        collapsingToolbar.setExpandedTitleColor(Color.parseColor("#00FFFFFF"));
-        collapsingToolbar.setTitle("Project View");
-
-        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_view_in_activity_project_details);
-        swipeRefreshLayout.setColorSchemeResources(R.color.google_blue, R.color.google_green, R.color.google_red, R.color.google_yellow);
-    }
-
-    private void showMapView(){
-        if(locationLatitude!=0) {
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    initMapView();
                 }
-            },1000);
-        }else{
-            hideMapView();
+            }
         }
     }
 
-    private void initMapView(){
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map_container_in_project_details);
-
-        mapFragment.getMapAsync(this);
-
-
-    }
-
-    private void hideMapView(){
-        tvLocationLat.setVisibility(View.GONE);
-        tvLocationLong.setVisibility(View.GONE);
-
-        View myMap = (View) findViewById(R.id.map_container_in_project_details);
-        myMap.setVisibility(View.GONE);
-
-
-    }
-
-    private void initGridView(){
-
-        if(getImageCount(projectID)){
-
-            gridAdapter = new GridImageAdapter(this, R.layout.layout_grid_imageview, getImageFromProjectData(projectID));
-            gridView.setAdapter(gridAdapter);
-            gridView.setVisibility(View.VISIBLE);
-        }
-    }
-
-    private void refreshGridView() {
-        if(getImageCount(projectID)){
-            gridAdapter.clear();
-
-            gridAdapter = new GridImageAdapter(this, R.layout.layout_grid_imageview, getImageFromProjectData(projectID));
-            gridView.setAdapter(gridAdapter);
-            gridView.setVisibility(View.VISIBLE);
-
-
-        }
-    }
-
-    private void showProgressBar(){
-        if (mProgressBarShow){
-            pbLoading.setVisibility(View.GONE);
-        }else{
-            pbLoading.setVisibility(View.VISIBLE);
-        }
-
+    @Override
+    public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+        swipeRefreshLayout.setEnabled(verticalOffset == 0);
     }
 
     @Override
@@ -412,21 +249,290 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
         return super.onOptionsItemSelected(item);
     }
 
+    //-------------------------------------------------------------------------------------------------------------------------//
 
-    private Bitmap convertToBitmap(byte[] b){
-        return BitmapFactory.decodeByteArray(b, 0, b.length);
+    private void initView(){
+
+        Log.e(TAG, "initView: Started");
+
+        Bundle extras = getIntent().getExtras();
+        projectID = extras.getInt("PROJECT_ID");
+
+        tvProjectName = (TextView) findViewById(R.id.project_name_in_card_project_detail);
+        tvProjectCreated = (TextView) findViewById(R.id.project_created_date_in_card_project_detail);
+        tvStorage = (TextView) findViewById(R.id.project_storage_space_value);
+
+        tvUnits = (TextView) findViewById(R.id.left_item1_value);
+        tvProjection = (TextView) findViewById(R.id.left_item2_value);
+        tvZone = (TextView) findViewById(R.id.left_item3_value);
+
+        tvLocationLat = (TextView) findViewById(R.id.map_item1_value_lat);
+        tvLocationLong = (TextView) findViewById(R.id.map_item1_value_long);
+
+        ivProjectImage = (ImageView) findViewById(R.id.header_image_in_activity_project_details);
+
+        btTakePhoto = (Button) findViewById(R.id.card3_take_photo);
+        btPostDescription = (Button) findViewById(R.id.card4_post_description);
+
+        gridView = (GridView) findViewById(R.id.photo_grid_view);
+
+        pbLoading = (ProgressBar) findViewById(R.id.progressBar_Loading);
+
+        Log.e(TAG, "initView: Views formed");
 
     }
 
-    private void showToast(String data, boolean shortTime) {
+    private void setOnClickListeners(){
 
-        if (shortTime) {
-            Toast.makeText(this, data, Toast.LENGTH_SHORT).show();
+        btTakePhoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                callImageSelectionDialog();
+            }
+        });
 
-        } else{
-            Toast.makeText(this, data, Toast.LENGTH_LONG).show();
+        btPostDescription.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                createProjectNoteDialog(projectID,projectDescription);
+            }
+        });
+
+
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        showProjectsDetailsLocalRefresh();
+
+                    }
+                }, 1000);
+            }
+        });
+
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                ProjectImages item = (ProjectImages) parent.getItemAtPosition(position);
+
+                viewPhotoDialog(item.getProjectId(),imageHelper.convertToBitmap(item.getImage()), position);
+
+            }
+        });
+
+        gridView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                ProjectImages item = (ProjectImages) parent.getItemAtPosition(position);
+
+
+                deletePhotoDialog(item.getId(), position);
+                return true;
+            }
+        });
+
+    }
+
+    private boolean initValuesFromObject(){
+        boolean results = false;
+
+        try{
+            ProjectDatabaseHandler projectDb = new ProjectDatabaseHandler(this);
+            SQLiteDatabase db = projectDb.getReadableDatabase();
+
+            Project project = projectDb.getProjectById(db,projectID);
+
+            locationLatitude = project.getmLocationLat();
+            locationLongitude = project.getmLocationLong();
+
+            ivProjectImage.setImageBitmap(imageHelper.convertToBitmap(project.getmImage()));
+
+            tvProjectName.setText(project.getmProjectName());
+
+            int d = project.getmDateCreated();
+            String stringDate = TimeHelper.getDateinFormat(d,dateFormat);
+            tvProjectCreated.setText(getString(R.string.project_card_last_modified_date_create, stringDate));
+
+            int units_pos = project.getmUnits()-1;
+            String [] units_values = getResources().getStringArray(R.array.unit_measure_entries);
+            tvUnits.setText(units_values[units_pos]);
+
+            int projection_pos = project.getmProjection();
+            String [] projection_values = getResources().getStringArray(R.array.project_projection_titles);
+            tvProjection.setText(projection_values[projection_pos]);
+
+            int zone_pos = project.getmZone();
+            String [] zone_values = getResources().getStringArray(R.array.project_projection_zones_titles);
+            tvZone.setText(zone_values[zone_pos]);
+
+            int storage_pos = project.getmStorage();
+            String [] storage_values = getResources().getStringArray(R.array.project_storage_titles);
+            tvStorage.setText(storage_values[storage_pos]);
+
+            tvLocationLat.setText(this.getString(R.string.gps_status_lat_value_string,
+                    MathHelper.convertDECtoDMS(project.getmLocationLat(),3,true)));
+            tvLocationLong.setText(this.getString(R.string.gps_status_long_value_string,
+                    MathHelper.convertDECtoDMS(project.getmLocationLong(),3,true)));
+            
+            projectDescription = project.getmProjectDescription();
+
+            mProgressBarShow = true;
+            results = mProgressBarShow;
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return results;
+
+    }
+
+    private void initValuesfromBackground(){  //Not currently used.  This would be used if and when we want to AsyncTask load.
+        BackgroundProjectDetails backgroundProjectList = new BackgroundProjectDetails(this);
+        backgroundProjectList.execute(projectID);
+
+
+    }
+
+    private void initViewNavigation(){
+        appBarLayout = (AppBarLayout) findViewById(R.id.appbar_in_activity_project_details);
+
+        toolbar = (Toolbar) findViewById(R.id.toolbar_in_activity_project_details);
+        setSupportActionBar(toolbar);
+
+        collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsingToolbar_in_activity_project_details);
+        collapsingToolbar.setExpandedTitleColor(Color.parseColor("#00FFFFFF"));
+        collapsingToolbar.setTitle("Project View");
+
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_view_in_activity_project_details);
+        swipeRefreshLayout.setColorSchemeResources(R.color.google_blue, R.color.google_green, R.color.google_red, R.color.google_yellow);
+    }
+
+    //-------------------------------------------------------------------------------------------------------------------------//
+    private ArrayList<ProjectImages> getImageFromProjectData(Integer projectId){
+
+        ProjectDatabaseHandler projectDb = new ProjectDatabaseHandler(mContext);
+        SQLiteDatabase db = projectDb.getReadableDatabase();
+
+        ArrayList<ProjectImages> projectImages = new ArrayList<ProjectImages>(projectDb.getProjectImagesbyProjectID(db,projectId));
+
+
+
+        return projectImages;
+
+    }
+
+    private boolean getImageCount(Integer projectId){
+        long count = 0;
+        boolean results = false;
+        ProjectDatabaseHandler projectDb = new ProjectDatabaseHandler(mContext);
+        SQLiteDatabase db = projectDb.getReadableDatabase();
+
+        count = ProjectDatabaseHandler.getCountProjectImagesByProjectID(db,projectId);
+
+        if (count !=0){
+            results = true;
+        }
+
+        db.close();
+        return results;
+    }
+
+
+    //-------------------------------------------------------------------------------------------------------------------------//
+
+    /**
+     *Dialog Inputs (DI)
+     */
+
+    private void createPhotoDialog(Bitmap bitmap){
+        DialogFragment pointDialog = DialogProjectPhotoAdd.newInstance(projectID, bitmap);
+        pointDialog.show(getFragmentManager(),"dialog");
+
+    }
+
+    private void viewPhotoDialog(Integer project_id, Bitmap bitmap, int position){
+        if(position == 3){
+            Intent intent = new Intent(mContext, PhotoGalleryActivity.class);
+            intent.putExtra("PROJECT_ID",projectID);
+            startActivity(intent);
+
+        }else{
+            DialogFragment viewDialog = DialogProjectPhotoView.newInstance(project_id,bitmap);
+            viewDialog.show(getFragmentManager(),"dialog_view");
+        }
+
+    }
+
+    private void deletePhotoDialog(final Integer photo_id, int position){
+
+        if(position == 3){
+
+
+        }else{
+            new AlertDialog.Builder(mContext)
+                    .setMessage(getString(R.string.dialog_delete_image))
+                    .setPositiveButton(getString(R.string.general_yes), new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            ProjectDatabaseHandler projectDb = new ProjectDatabaseHandler(mContext);
+                            SQLiteDatabase db = projectDb.getWritableDatabase();
+
+                            projectDb.deleteProjectImageById(db,photo_id);
+
+                            showToast("Deleting Photo", true);
+                            showProjectDetailsDialogRefresh();
+                        }
+                    })
+                    .setNegativeButton(getString(R.string.general_no), null)
+                    .show();
+
 
         }
+
+    }
+
+    private void createProjectNoteDialog(final Integer project_id, String description){
+        DialogFragment viewDialog = DialogProjectDescriptionAdd.newInstance(projectID,description);
+        viewDialog.show(getFragmentManager(),"dialog");
+    }
+
+    //-------------------------------------------------------------------------------------------------------------------------//
+
+    /**
+     * Map View
+     */
+    private void showMapView(){
+        if(locationLatitude!=0) {
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    initMapView();
+                }
+            },5000);
+        }else{
+            hideMapView();
+        }
+    }
+
+    private void initMapView(){
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map_container_in_project_details);
+
+        mapFragment.getMapAsync(this);
+
+
+    }
+
+    private void hideMapView(){
+        tvLocationLat.setVisibility(View.GONE);
+        tvLocationLong.setVisibility(View.GONE);
+
+        View myMap = (View) findViewById(R.id.map_container_in_project_details);
+        myMap.setVisibility(View.GONE);
+
 
     }
 
@@ -449,6 +555,79 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
         });
 
     }
+
+    //-------------------------------------------------------------------------------------------------------------------------//
+
+    /**
+     * Grid View (GV)
+     */
+
+    private void initGridView(){
+
+        if(getImageCount(projectID)){
+
+            gridAdapter = new GridImageAdapter(this, R.layout.layout_grid_imageview, getImageFromProjectData(projectID));
+            gridView.setAdapter(gridAdapter);
+            gridView.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void refreshGridView() {
+        if(getImageCount(projectID)){
+
+            //Todo GridAdapter on 1st run does not exist.  Need to check and see if gridAdapter has been created, if not, create
+
+
+            gridAdapter.clear();
+
+            gridAdapter = new GridImageAdapter(this, R.layout.layout_grid_imageview, getImageFromProjectData(projectID));
+            gridView.setAdapter(gridAdapter);
+            gridView.setVisibility(View.VISIBLE);
+
+
+        }
+    }
+
+    private void showProjectsDetailsLocalRefresh(){
+        refreshGridView();
+
+        if(swipeRefreshLayout.isRefreshing()){
+            swipeRefreshLayout.setRefreshing(false);
+        }
+
+    }
+
+    public void showProjectDetailsDialogRefresh(){
+        if(!swipeRefreshLayout.isRefreshing()){
+            swipeRefreshLayout.setRefreshing(true);
+        }
+
+        refreshGridView();
+
+        if(swipeRefreshLayout.isRefreshing()){
+            swipeRefreshLayout.setRefreshing(false);
+        }
+
+
+    }
+
+
+    //-------------------------------------------------------------------------------------------------------------------------//
+
+    private void showProgressBar(){
+        if (mProgressBarShow){
+            pbLoading.setVisibility(View.GONE);
+        }else{
+            pbLoading.setVisibility(View.VISIBLE);
+        }
+
+    }
+
+    //-------------------------------------------------------------------------------------------------------------------------//
+
+    /**
+     * Image Objects
+     */
 
     private void callImageSelectionDialog(){
         final CharSequence[] items = { getString(R.string.project_new_dialog_takePhoto), getString(R.string.project_new_dialog_getImage),
@@ -560,45 +739,7 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
         return image;
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
 
-        if (this.REQUEST_TAKE_PHOTO == requestCode && resultCode == RESULT_OK) {
-            Uri imageUri = Uri.parse(mCurrentPhotoPath);
-            File file = new File(imageUri.getPath());
-            try {
-                mBitmapRaw=decodeUri(imageUri,400);
-                mBitmap = rotateImageIfRequired(mBitmapRaw,imageUri);
-                createPhotoDialog(mBitmap);
-
-            } catch (Exception e) {
-                showToast("Caught Error: Could not set Photo to Image from Camera",true);
-
-            }
-        } else if (this.REQUEST_SELECT_PICTURE == requestCode && resultCode == RESULT_OK) {
-            if (data != null) {
-
-
-                try {
-                    final Uri imageUri = data.getData();
-                    File file = new File(imageUri.getPath());
-
-                    if (imageUri !=null){
-                        mBitmapRaw=decodeUri(imageUri,400);
-                        mBitmap = rotateImageIfRequired(mBitmapRaw,imageUri);
-                        createPhotoDialog(mBitmap);
-
-                    }
-
-
-                } catch (Exception e) {
-                    showToast("Caught Error: Could not set Photo to Image from Gallery",true);
-
-                }
-            }
-        }
-    }
 
     protected Bitmap decodeUri(Uri selectedImage, int REQUIRED_SIZE) {
 
@@ -667,89 +808,37 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
         return rotatedImg;
     }
 
-    private void createPhotoDialog(Bitmap bitmap){
-        DialogFragment pointDialog = DialogProjectPhotoAdd.newInstance(projectID, bitmap);
-        pointDialog.show(getFragmentManager(),"dialog");
 
-    }
 
-    private void viewPhotoDialog(Integer project_id, Bitmap bitmap, int position){
-        if(position == 3){
-            Intent intent = new Intent(mContext, PhotoGalleryActivity.class);
-            intent.putExtra("PROJECT_ID",projectID);
-            startActivity(intent);
 
-        }else{
-            DialogFragment viewDialog = DialogProjectPhotoView.newInstance(project_id,bitmap);
-            viewDialog.show(getFragmentManager(),"dialog_view");
-        }
+    //-------------------------------------------------------------------------------------------------------------------------//
 
-    }
+    /**
+     * Method Helpers
+     */
 
-    private void deletePhotoDialog(Integer photo_id, int position){
 
-        if(position == 3){
-            showToast("Gallery Item!",true);
+    private void showToast(String data, boolean shortTime) {
 
-        }else{
-            new AlertDialog.Builder(mContext)
-                    .setMessage(getString(R.string.dialog_delete_image))
-                    .setPositiveButton(getString(R.string.general_yes), new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            showToast("Deleting Photo", true);
-                        }
-                    })
-                    .setNegativeButton(getString(R.string.general_no), null)
-                    .show();
+        if (shortTime) {
+            Toast.makeText(this, data, Toast.LENGTH_SHORT).show();
 
+        } else{
+            Toast.makeText(this, data, Toast.LENGTH_LONG).show();
 
         }
-
     }
 
-    private ArrayList<ProjectImages> getImageFromProjectData(Integer projectId){
 
-            ProjectDatabaseHandler projectDb = new ProjectDatabaseHandler(mContext);
-            SQLiteDatabase db = projectDb.getReadableDatabase();
-
-            ArrayList<ProjectImages> projectImages = new ArrayList<ProjectImages>(projectDb.getProjectImagesbyProjectID(db,projectId));
-
-
-
-        return projectImages;
-
-    }
-
-    private boolean getImageCount(Integer projectId){
-        long count = 0;
-        boolean results = false;
-        ProjectDatabaseHandler projectDb = new ProjectDatabaseHandler(mContext);
-        SQLiteDatabase db = projectDb.getReadableDatabase();
-
-        count = ProjectDatabaseHandler.getCountProjectImagesByProjectID(db,projectId);
-
-        if (count !=0){
-            results = true;
-        }
-
-        db.close();
+    private String uriToString(Uri uri){
+        String results = uri.toString();
         return results;
     }
 
-
-    private void showProjectsDetailsLocalRefresh(){
-        refreshGridView();
-
-        if(swipeRefreshLayout.isRefreshing()){
-            swipeRefreshLayout.setRefreshing(false);
-        }
-
+    private Uri stringToUri(String stringUri){
+        Uri results = Uri.parse(stringUri);
+        return results;
     }
 
-    @Override
-    public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-        swipeRefreshLayout.setEnabled(verticalOffset == 0);
-    }
 }
 

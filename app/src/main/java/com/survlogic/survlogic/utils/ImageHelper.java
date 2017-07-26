@@ -16,11 +16,14 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.survlogic.survlogic.view.DialogProjectPhotoView;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
@@ -36,8 +39,7 @@ public class ImageHelper {
     static Context mContext;
 
     public ImageHelper(Context mContext) {
-        mContext = this.mContext;
-
+        this.mContext = mContext;
 
     }
 
@@ -208,6 +210,18 @@ public class ImageHelper {
         Log.d(TAG, "setWatermark: finish creating watermark");
 
         return result;
+    }
+
+
+    private void showToast(String data, boolean shortTime) {
+
+        if (shortTime) {
+            Toast.makeText(mContext, data, Toast.LENGTH_SHORT).show();
+
+        } else{
+            Toast.makeText(mContext, data, Toast.LENGTH_LONG).show();
+
+        }
     }
 
 }

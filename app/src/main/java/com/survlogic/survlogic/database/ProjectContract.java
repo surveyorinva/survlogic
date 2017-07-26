@@ -20,6 +20,7 @@ public class ProjectContract {
 
         public static final String KEY_ID = "id";
         public static final String KEY_PROJECTNAME = "name";
+        public static final String KEY_PROJECTDESC = "description";
         public static final String KEY_STORAGESPACE = "storage";
         public static final String KEY_UNITSMEASURE = "units";
         public static final String KEY_PROJECTION = "projection";
@@ -41,6 +42,7 @@ public class ProjectContract {
         public static final String KEY_ID = "id";
         public static final String KEY_PROJECT_ID = "projectid";
         public static final String KEY_POINT_ID = "pointid";
+        public static final String KEY_IMAGE_PATH = "imagepath";
         public static final String KEY_IMAGE = "image";
         public static final String KEY_BEARING = "bearing";
         public static final String KEY_GEOLAT = "latitude";

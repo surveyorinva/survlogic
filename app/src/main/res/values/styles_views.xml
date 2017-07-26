@@ -18,6 +18,12 @@
 
     </style>
 
+    <style name="InputField.DetailText">
+        <item name="android:textSize">@dimen/text_size_location_value</item>
+        <item name="android:textColor">@color/black</item>
+
+    </style>
+
     <!--Labels-->
     <style name="Labels">
         <item name="android:fontFamily">sans-serif-condensed</item>

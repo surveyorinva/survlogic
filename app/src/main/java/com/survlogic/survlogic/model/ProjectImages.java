@@ -8,6 +8,7 @@ public class ProjectImages {
 
     int id, projectId, pointId;
     byte[] image;
+    String imagePath;
     float bearingAngle;
     double LocationLat, LocationLong;
 
@@ -22,6 +23,12 @@ public class ProjectImages {
         this.image = image;
     }
 
+    public ProjectImages(int projectId, int pointId, String imagePath) {
+        this.projectId = projectId;
+        this.pointId = pointId;
+        this.imagePath = imagePath;
+    }
+
     public ProjectImages(int id, int projectId, int pointId, byte[] image) {
         this.id = id;
         this.projectId = projectId;
@@ -29,10 +36,26 @@ public class ProjectImages {
         this.image = image;
     }
 
+    public ProjectImages(int id, int projectId, int pointId, String imagePath) {
+        this.id = id;
+        this.projectId = projectId;
+        this.pointId = pointId;
+        this.imagePath = imagePath;
+    }
+
     public ProjectImages(int projectId, int pointId, byte[] image, float bearingAngle, double locationLat, double locationLong) {
         this.projectId = projectId;
         this.pointId = pointId;
         this.image = image;
+        this.bearingAngle = bearingAngle;
+        LocationLat = locationLat;
+        LocationLong = locationLong;
+    }
+
+    public ProjectImages(int projectId, int pointId, String imagePath, float bearingAngle, double locationLat, double locationLong) {
+        this.projectId = projectId;
+        this.pointId = pointId;
+        this.imagePath = imagePath;
         this.bearingAngle = bearingAngle;
         LocationLat = locationLat;
         LocationLong = locationLong;
@@ -60,6 +83,14 @@ public class ProjectImages {
 
     public void setPointId(int pointId) {
         this.pointId = pointId;
+    }
+
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
     }
 
     public byte[] getImage() {

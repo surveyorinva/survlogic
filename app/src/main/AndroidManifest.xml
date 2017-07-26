@@ -100,6 +100,13 @@
 
         </activity>
 
+        <activity android:name=".activity.WelcomeActivity"
+            android:screenOrientation="portrait"
+            android:label="Welcome"
+            android:theme="@style/SuperMaterialTheme">
+
+        </activity>
+
     </application>
 
 </manifest>

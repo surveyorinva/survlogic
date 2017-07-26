@@ -26,8 +26,8 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
     private String TAG = getClass().getSimpleName();
 
     //  Database Constants
-    private static final int DB_VERSION = 1;
-    private static final String DB_NAME = "projects_v12.db";
+    private static final int DB_VERSION = 3;
+    private static final String DB_NAME = "projects.db";
 
     // Table Creation Queries
     private static final String CREATE_TABLE_PROJECT = "CREATE TABLE "
@@ -35,6 +35,7 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
             + "("
             + ProjectContract.ProjectEntry.KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
             + ProjectContract.ProjectEntry.KEY_PROJECTNAME + " TEXT,"
+            + ProjectContract.ProjectEntry.KEY_PROJECTDESC + " TEXT,"
             + ProjectContract.ProjectEntry.KEY_STORAGESPACE + " INTEGER,"
             + ProjectContract.ProjectEntry.KEY_UNITSMEASURE + " INTEGER,"
             + ProjectContract.ProjectEntry.KEY_PROJECTION + " INTEGER,"
@@ -53,6 +54,7 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
             + ProjectContract.ProjectImageEntry.KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
             + ProjectContract.ProjectImageEntry.KEY_PROJECT_ID + " INTEGER,"
             + ProjectContract.ProjectImageEntry.KEY_POINT_ID + " INTEGER,"
+            + ProjectContract.ProjectImageEntry.KEY_IMAGE_PATH + " TEXT,"
             + ProjectContract.ProjectImageEntry.KEY_IMAGE + " BLOB,"
             + ProjectContract.ProjectImageEntry.KEY_BEARING + " FLOAT,"
             + ProjectContract.ProjectImageEntry.KEY_GEOLAT + " DOUBLE,"
@@ -112,6 +114,8 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
         contentValues.put(ProjectContract.ProjectEntry.KEY_IMAGE_SYSTEM,project.getmSystemImage());
         contentValues.put(ProjectContract.ProjectEntry.KEY_IMAGE,project.getmImage());
 
+        contentValues.put(ProjectContract.ProjectEntry.KEY_PROJECTDESC,project.getmProjectDescription());
+
         //  Metadata Fields
         contentValues.put(ProjectContract.ProjectEntry.KEY_DATE_CREATED,(int) (new Date().getTime()/1000));
 
@@ -143,6 +147,7 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
         //  Required Fields
         contentValues.put(ProjectContract.ProjectImageEntry.KEY_PROJECT_ID, projectImages.getProjectId());
         contentValues.put(ProjectContract.ProjectImageEntry.KEY_POINT_ID, projectImages.getPointId());
+        contentValues.put(ProjectContract.ProjectImageEntry.KEY_IMAGE_PATH, projectImages.getImagePath());
         contentValues.put(ProjectContract.ProjectImageEntry.KEY_IMAGE, projectImages.getImage());
 
         //  Optional Fields
@@ -170,7 +175,7 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
     }
 
 
-    //  Reading
+    //  Reading---------------------------------------------------------------------------------------------------
         //  ALL Projects
 
     public static int getCountProjectsAll(SQLiteDatabase db){
@@ -216,6 +221,7 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
                 project.setmLocationLong(c.getDouble(c.getColumnIndex(ProjectContract.ProjectEntry.KEY_GEOLON)));
                 project.setmSystemImage(c.getInt(c.getColumnIndex(ProjectContract.ProjectEntry.KEY_IMAGE_SYSTEM)));
                 project.setmImage(c.getBlob(c.getColumnIndex(ProjectContract.ProjectEntry.KEY_IMAGE)));
+                project.setmProjectDescription((c.getString(c.getColumnIndex(ProjectContract.ProjectEntry.KEY_PROJECTDESC))));
 
                 // Project MetaData
                 project.setmDateCreated(c.getInt(c.getColumnIndex(ProjectContract.ProjectEntry.KEY_DATE_CREATED)));
@@ -274,6 +280,10 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
             project.setmLocationLong(c.getDouble(c.getColumnIndex(ProjectContract.ProjectEntry.KEY_GEOLON)));
             project.setmSystemImage(c.getInt(c.getColumnIndex(ProjectContract.ProjectEntry.KEY_IMAGE_SYSTEM)));
             project.setmImage(c.getBlob(c.getColumnIndex(ProjectContract.ProjectEntry.KEY_IMAGE)));
+            project.setmProjectDescription((c.getString(c.getColumnIndex(ProjectContract.ProjectEntry.KEY_PROJECTDESC))));
+
+        // Project MetaData
+            project.setmDateCreated(c.getInt(c.getColumnIndex(ProjectContract.ProjectEntry.KEY_DATE_CREATED)));
 
         return project;
     }
@@ -294,6 +304,7 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
         values.put(ProjectContract.ProjectEntry.KEY_GEOLON, project.getmLocationLong());
         values.put(ProjectContract.ProjectEntry.KEY_IMAGE_SYSTEM, project.getmSystemImage());
         values.put(ProjectContract.ProjectEntry.KEY_IMAGE, project.getmImage());
+        values.put(ProjectContract.ProjectEntry.KEY_PROJECTDESC, project.getmProjectDescription());
 
         Log.e(TAG,"Updating Project ID=" + project.getmId());
 
@@ -314,6 +325,11 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
         return results;
     }
 
+    //---------------------------------------------------------------------------------------------------------------------------//
+
+    /**
+     *Project Images CRUD
+     */
 
     public List<ProjectImages> getProjectImagesAll(SQLiteDatabase db){
 
@@ -334,6 +350,7 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
                 projectImages.setId(c.getInt((c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_ID))));
                 projectImages.setProjectId(c.getInt((c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_PROJECT_ID))));
                 projectImages.setPointId(c.getInt((c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_POINT_ID))));
+                projectImages.setImagePath(c.getString((c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_IMAGE_PATH))));
                 projectImages.setImage(c.getBlob(c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_IMAGE)));
 
                 //Optional
@@ -367,6 +384,7 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
         projectImages.setId(c.getInt((c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_ID))));
         projectImages.setProjectId(c.getInt((c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_PROJECT_ID))));
         projectImages.setPointId(c.getInt((c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_POINT_ID))));
+        projectImages.setImagePath(c.getString((c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_IMAGE_PATH))));
         projectImages.setImage(c.getBlob(c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_IMAGE)));
 
         //Optional
@@ -400,6 +418,7 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
                 projectImages.setId(c.getInt((c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_ID))));
                 projectImages.setProjectId(c.getInt((c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_PROJECT_ID))));
                 projectImages.setPointId(c.getInt((c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_POINT_ID))));
+                projectImages.setImagePath(c.getString((c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_IMAGE_PATH))));
                 projectImages.setImage(c.getBlob(c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_IMAGE)));
 
                 //Optional
@@ -434,6 +453,7 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(ProjectContract.ProjectImageEntry.KEY_PROJECT_ID, projectImages.getProjectId());
         values.put(ProjectContract.ProjectImageEntry.KEY_POINT_ID, projectImages.getPointId());
+        values.put(ProjectContract.ProjectImageEntry.KEY_IMAGE_PATH, projectImages.getImagePath());
         values.put(ProjectContract.ProjectImageEntry.KEY_IMAGE, projectImages.getImage());
 
         values.put(ProjectContract.ProjectImageEntry.KEY_BEARING, projectImages.getBearingAngle());
@@ -472,7 +492,7 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
     }
 
 
-
+    //--------------------------------------------------------------------------------------------------------------------------//
 
     public void closeProjectDB(){
         SQLiteDatabase db = this.getReadableDatabase();

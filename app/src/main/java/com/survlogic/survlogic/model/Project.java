@@ -7,7 +7,7 @@ package com.survlogic.survlogic.model;
 
 public class Project {
 
-    String mProjectName;
+    String mProjectName, mProjectDescription;
     int mId, mStorage, mUnits;
     int mProjection, mZone, mSystemImage;
     int mDateCreated, mDateAccessed, mDateModified;
@@ -17,6 +17,11 @@ public class Project {
 
     public Project() {
 
+    }
+
+    public Project(int mId, String mProjectDescription){
+        this.mId = mId;
+        this.mProjectDescription = mProjectDescription;
     }
 
     public Project(String mProjectName, int mStorage, int mUnits, int mProjection, int mZone, double mLocationLat, double mLocationLong, int mSystemImage, byte[] mImage) {
@@ -42,9 +47,9 @@ public class Project {
         this.mDateCreated = mDateCreated;
     }
 
-    public Project(int mId, String mProjectName, int mStorage, int mUnits, int mProjection, int mZone, double mLocationLat, double mLocationLong, int mSystemImage, byte[] mImage) {
-        this.mProjectName = mProjectName;
+    public Project(int mId, String mProjectName, int mStorage, int mUnits, int mProjection, int mZone, double mLocationLat, double mLocationLong, int mSystemImage, byte[] mImage, String mProjectDescription) {
         this.mId = mId;
+        this.mProjectName = mProjectName;
         this.mStorage = mStorage;
         this.mUnits = mUnits;
         this.mProjection = mProjection;
@@ -52,6 +57,7 @@ public class Project {
         this.mLocationLat = mLocationLat;
         this.mLocationLong = mLocationLong;
         this.mImage = mImage;
+        this.mProjectDescription = mProjectDescription;
     }
 
     public int getmId() {
@@ -142,5 +148,13 @@ public class Project {
 
     public void setmDateCreated(int mDateCreated) {
         this.mDateCreated = mDateCreated;
+    }
+
+    public String getmProjectDescription() {
+        return mProjectDescription;
+    }
+
+    public void setmProjectDescription(String mProjectDescription) {
+        this.mProjectDescription = mProjectDescription;
     }
 }

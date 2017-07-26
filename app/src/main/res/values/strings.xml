@@ -9,6 +9,7 @@
     <string name="general_yes">Yes</string>
     <string name="general_no">No</string>
     <string name="general_add">Add</string>
+    <string name="general_post">Post</string>
     <string name="general_clear">Clear</string>
     <string name="general_delete">Delete</string>
     <string name="general_unit_meters">%1$.1f m</string>

@@ -516,6 +516,12 @@
                         android:layout_width="match_parent"
                         android:layout_height="50dp" >
 
+                        <Button
+                            android:id="@+id/card4_post_description"
+                            android:background="@drawable/button_ripple_transparent"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent" />
+
                         <ImageView
                             android:id="@+id/card4_notes_background"
                             android:layout_marginStart="10dp"

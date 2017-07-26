@@ -1,6 +1,7 @@
 package com.survlogic.survlogic.view;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
@@ -29,8 +30,10 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.survlogic.survlogic.R;
+import com.survlogic.survlogic.activity.ProjectDetailsActivity;
 import com.survlogic.survlogic.background.BackgroundProjectImagesSetup;
 import com.survlogic.survlogic.model.ProjectImages;
+import com.survlogic.survlogic.utils.FileHelper;
 import com.survlogic.survlogic.utils.ImageHelper;
 
 import java.io.ByteArrayOutputStream;
@@ -49,6 +52,7 @@ public class DialogProjectPhotoAdd extends DialogFragment {
     private static final String TAG = "DialogProjectPhotoAdd";
     private Context mContext;
     private ImageHelper imageHelper;
+    private FileHelper fileHelper;
 
     private Bitmap mImageLocal, mImageWatermark;
     private String mCurrentPhotoPath;
@@ -106,8 +110,18 @@ public class DialogProjectPhotoAdd extends DialogFragment {
 
         mContext = getActivity();
         imageHelper = new ImageHelper(mContext);
-        AlertDialog alertDialog = (AlertDialog) getDialog();
+        fileHelper = new FileHelper(mContext);
 
+        initView();
+
+
+
+
+    }
+
+    private void initView(){
+
+        AlertDialog alertDialog = (AlertDialog) getDialog();
         etDescription = (EditText) getDialog().findViewById(R.id.photo_description);
 
         final ImageView ivPhoto = (ImageView) getDialog().findViewById(R.id.photo_in_dialog_project_picture);
@@ -130,6 +144,7 @@ public class DialogProjectPhotoAdd extends DialogFragment {
                     mAddWatermark = true;
 
                     mImageWatermark = imageHelper.setWatermark(mImageLocal, description, true);
+
                     ivPhoto.setImageBitmap(mImageWatermark);
 
                     Log.d(TAG, "btnAddWatermark: Added Watermark ");
@@ -151,27 +166,37 @@ public class DialogProjectPhotoAdd extends DialogFragment {
 
 
     }
-
     private void submitForm(View v) {
 
         byte[] mImage;
+        String mImagePath;
 
             if (mAddWatermark){
+                Uri uri = fileHelper.saveImageToExternal(mImageWatermark);
+                mImagePath = uriToString(uri);
+
                 mImage = imageHelper.convertImageToByte(mImageWatermark);
             }else{
+                Uri uri = fileHelper.saveImageToExternal(mImageWatermark);
+                mImagePath = uriToString(uri);
+
                 mImage = imageHelper.convertImageToByte(mImageLocal);
             }
 
             // Create Project model
-            ProjectImages projectImages = new ProjectImages(project_id,0,mImage,0,0,0);
+        //ProjectImages projectImages = new ProjectImages(project_id,0,mImage,0,0,0);
+        ProjectImages projectImages = new ProjectImages(project_id,0,mImagePath,0,0,0);
 
             // Setup Background Task
-            BackgroundProjectImagesSetup backgroundProjectImagesSetup = new BackgroundProjectImagesSetup(getActivity());
+        BackgroundProjectImagesSetup backgroundProjectImagesSetup = new BackgroundProjectImagesSetup(getActivity());
 
             // Execute background task
-            backgroundProjectImagesSetup.execute(projectImages);
-            Log.d(TAG, "submitForm: Complete.  Photo with ProjectID: " + project_id + " Saved");
-            getDialog().dismiss();
+        backgroundProjectImagesSetup.execute(projectImages);
+        Log.d(TAG, "submitForm: Complete.  Photo with ProjectID: " + project_id + " Saved");
+
+        ((ProjectDetailsActivity) getActivity()).showProjectDetailsDialogRefresh();
+
+        getDialog().dismiss();
 
 
     }
@@ -187,6 +212,14 @@ public class DialogProjectPhotoAdd extends DialogFragment {
         else{
             return false;
         }
+    }
+
+    private String uriToString(Uri uri){
+        return uri.toString();
+    }
+
+    private Uri stringToUri(String stringUri){
+        return Uri.parse(stringUri);
     }
 
 

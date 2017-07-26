@@ -15,7 +15,7 @@ import com.survlogic.survlogic.model.Project;
  * Created by chrisfillmore on 6/29/2017.
  */
 
-public class BackgroundProjectSetup extends AsyncTask <Project,Project,String> {
+public class BackgroundProjectNew extends AsyncTask <Project,Project,String> {
 
     private String TAG = getClass().getSimpleName();
     private ProgressDialog dialog;
@@ -25,7 +25,7 @@ public class BackgroundProjectSetup extends AsyncTask <Project,Project,String> {
 
     long project_id = 0;
 
-    public BackgroundProjectSetup(Context context) {
+    public BackgroundProjectNew(Context context) {
         this.context = context;
         this.dialog = new ProgressDialog(context);
 
