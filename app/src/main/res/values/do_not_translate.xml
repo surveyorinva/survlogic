@@ -2,6 +2,8 @@
 <resources>
     <!-- Strings in this file should NOT be translated -->
 
+    <string name="pref_first_run">projects.survlogic.firstrun</string>
+
     <!-- Preference keys -->
     <string name="pref_key_map_category">map_category</string>
     <string name="pref_key_map_type">map_type</string>

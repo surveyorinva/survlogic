@@ -69,6 +69,14 @@ public class ImageHelper {
 
     }
 
+    public Bitmap convertFileURLToBitmap(String mPathURL){
+        Log.d(TAG, "convertFileURLToBitmap: Converting Bitmap for:" + mPathURL);
+        File imgFile = new File(mPathURL);
+        Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+
+        return myBitmap;
+
+    }
 
     /**
      * Creates a smaller overlay box at bottom of image and single row of text for detailing.

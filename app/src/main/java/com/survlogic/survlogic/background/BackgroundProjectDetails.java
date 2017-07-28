@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,7 +22,7 @@ import com.survlogic.survlogic.model.Project;
 
 public class BackgroundProjectDetails extends AsyncTask <Integer,Project,String> {
 
-    private String TAG = getClass().getSimpleName();
+    private static final String TAG = "BackgroundProjectDetail";
     private ProgressDialog dialog;
 
     private Context context;
@@ -98,11 +99,13 @@ public class BackgroundProjectDetails extends AsyncTask <Integer,Project,String>
     protected void onProgressUpdate(Project... values) {
         super.onProgressUpdate(values);
 
+        Log.d(TAG, "onProgressUpdate: Starting Progress Update");
         Project project = values[0];
 
         tvProjectName.setText(project.getmProjectName());
         ivProjectImage.setImageBitmap(convertToBitmap(project.getmImage()));
 
+        Log.d(TAG, "onProgressUpdate: Completing Progress Update");
     }
 
     private void showToast(String data, boolean shortTime) {

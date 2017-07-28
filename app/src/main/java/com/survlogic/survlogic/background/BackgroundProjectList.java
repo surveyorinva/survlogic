@@ -24,7 +24,7 @@ import java.util.ArrayList;
 
 public class BackgroundProjectList extends AsyncTask <Project,Project,String> {
 
-    private String TAG = getClass().getSimpleName();
+    private static final String TAG = "BackgroundProjectList";
     private ProgressDialog dialog;
 
     private Context context;
@@ -47,6 +47,7 @@ public class BackgroundProjectList extends AsyncTask <Project,Project,String> {
     @Override
     protected String doInBackground(Project... params) {
         try{
+            Log.d(TAG, "doInBackground: Connecting to db");
             ProjectDatabaseHandler projectDb = new ProjectDatabaseHandler(context);
             SQLiteDatabase db = projectDb.getReadableDatabase();
 
@@ -56,7 +57,8 @@ public class BackgroundProjectList extends AsyncTask <Project,Project,String> {
                 publishProgress(project);
             }
 
-
+            Log.d(TAG, "doInBackground: Closing connection to DB");
+            db.close();
             //
 
         }catch (Exception e){
@@ -121,7 +123,7 @@ public class BackgroundProjectList extends AsyncTask <Project,Project,String> {
 
     private void initProjectListRecyclerView(){
 
-        Log.e(TAG,"Complete: initProjectListRecyclerView");
+        Log.e(TAG,"Start: initProjectListRecyclerView");
 
         recyclerView = (RecyclerView) activity.findViewById(R.id.recycler_view_in_content_project_view);
 

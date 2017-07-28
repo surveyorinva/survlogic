@@ -28,8 +28,6 @@ import com.survlogic.survlogic.utils.MathHelper;
 import com.survlogic.survlogic.utils.TimeHelper;
 import com.survlogic.survlogic.view.Card_View_Holder_Project_Small;
 
-import org.parceler.Parcels;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;

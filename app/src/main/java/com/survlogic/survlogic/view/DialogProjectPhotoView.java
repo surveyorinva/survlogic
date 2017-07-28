@@ -7,12 +7,15 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 
+import com.nostra13.universalimageloader.core.ImageLoader;
 import com.survlogic.survlogic.R;
+import com.survlogic.survlogic.utils.UniversalImageLoader;
 
 /**
  * Created by chrisfillmore on 7/19/2017.
@@ -20,19 +23,21 @@ import com.survlogic.survlogic.R;
 
 public class DialogProjectPhotoView extends DialogFragment {
 
+    private static final String TAG = "DialogProjectPhotoView";
     private Context mContext;
 
-    private Bitmap mImageLocal;
+    private ImageView ivPhoto;
+    private String mImagePath, mURLSyntex ;
     private int project_id;
 
 
-
-    public static DialogProjectPhotoView newInstance(int mProjectId, Bitmap mBitmap) {
+    public static DialogProjectPhotoView newInstance(int mProjectId, String urlSyntex, String mImagePath) {
         DialogProjectPhotoView frag = new DialogProjectPhotoView();
         Bundle args = new Bundle();
 
         args.putInt("project_id", mProjectId);
-        args.putParcelable("image", mBitmap);
+        args.putString("URLSyntex", urlSyntex);
+        args.putString("imagePath", mImagePath);
 
         frag.setArguments(args);
         return frag;
@@ -40,9 +45,10 @@ public class DialogProjectPhotoView extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-
+        Log.d(TAG, "onCreateDialog: Creating Dialog");
         project_id = getArguments().getInt("project_id");
-        mImageLocal = getArguments().getParcelable("image");
+        mURLSyntex = getArguments().getString("URLSyntex");
+        mImagePath = getArguments().getString("imagePath");
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.DialogGalleryStyle);
         LayoutInflater inflater = getActivity().getLayoutInflater();
@@ -60,14 +66,20 @@ public class DialogProjectPhotoView extends DialogFragment {
     public void onResume() {
         super.onResume();
 
-
+        Log.d(TAG, "onResume: Creating Image");
         mContext = getActivity();
         AlertDialog alertDialog = (AlertDialog) getDialog();
 
-        final ImageView ivPhoto = (ImageView) getDialog().findViewById(R.id.photo_in_dialog_project_picture);
-        ivPhoto.setImageBitmap(mImageLocal);
+        ivPhoto = (ImageView) getDialog().findViewById(R.id.photo_in_dialog_project_picture);
 
+        setImage();
     }
 
+
+
+
+    private void setImage(){
+        UniversalImageLoader.setImage(mImagePath,ivPhoto,null, mURLSyntex);
+    }
 
 }

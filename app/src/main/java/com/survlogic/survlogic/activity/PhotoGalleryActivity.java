@@ -15,6 +15,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
@@ -47,11 +48,13 @@ public class PhotoGalleryActivity extends AppCompatActivity {
 
     private ImageHelper imageHelper;
     private int projectId;
+    private String mURLSyntex = "file://";
 
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(TAG, "onCreate: Started----------------->");
         setContentView(R.layout.activity_photo_gallery);
 
         mContext = PhotoGalleryActivity.this;
@@ -67,11 +70,12 @@ public class PhotoGalleryActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-
+        Log.d(TAG, "onResume: Started");
         initGridView();
     }
 
     private void initView(){
+        Log.d(TAG, "initView: Started");
         Bundle extras = getIntent().getExtras();
         projectId = extras.getInt("PROJECT_ID");
 
@@ -80,6 +84,7 @@ public class PhotoGalleryActivity extends AppCompatActivity {
     }
 
     private void initViewNavigation(){
+        Log.d(TAG, "initViewNavigation: Started");
         appBarLayout = (AppBarLayout) findViewById(R.id.appbar_in_activity_project_details);
 
         toolbar = (Toolbar) findViewById(R.id.toolbar_in_activity_project_details);
@@ -88,10 +93,10 @@ public class PhotoGalleryActivity extends AppCompatActivity {
     }
 
     private void initGridView(){
-
+        Log.d(TAG, "initGridView: Started");
         if(getImageCount(projectId)){
 
-            gridAdapter = new GalleryImageAdapter(this, R.layout.layout_grid_imageview, getImageFromProjectData(projectId));
+            gridAdapter = new GalleryImageAdapter(this, R.layout.layout_grid_imageview, mURLSyntex, getImageFromProjectData(projectId));
             gridView.setAdapter(gridAdapter);
             gridView.setVisibility(View.VISIBLE);
         }
@@ -99,13 +104,13 @@ public class PhotoGalleryActivity extends AppCompatActivity {
 
 
     private void setOnClickListeners(){
-
+        Log.d(TAG, "setOnClickListeners: Started");
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 ProjectImages item = (ProjectImages) parent.getItemAtPosition(position);
 
-                viewPhotoDialog(item.getProjectId(),imageHelper.convertToBitmap(item.getImage()), position);
+                viewPhotoDialog(item.getProjectId(),item.getImagePath(), position);
 
             }
         });
@@ -124,8 +129,10 @@ public class PhotoGalleryActivity extends AppCompatActivity {
 
     }
     private boolean getImageCount(Integer projectId){
+        Log.d(TAG, "getImageCount: Started");
         long count = 0;
         boolean results = false;
+        Log.d(TAG, "getImageCount: Connecting to db");
         ProjectDatabaseHandler projectDb = new ProjectDatabaseHandler(mContext);
         SQLiteDatabase db = projectDb.getReadableDatabase();
 
@@ -135,39 +142,49 @@ public class PhotoGalleryActivity extends AppCompatActivity {
             results = true;
         }
 
+        Log.d(TAG, "getImageCount: Closing Connection to db");
         db.close();
         return results;
     }
 
     private ArrayList<ProjectImages> getImageFromProjectData(Integer projectId){
 
+        Log.d(TAG, "getImageFromProjectData: Connecting to db");
         ProjectDatabaseHandler projectDb = new ProjectDatabaseHandler(mContext);
         SQLiteDatabase db = projectDb.getReadableDatabase();
 
         ArrayList<ProjectImages> projectImages = new ArrayList<ProjectImages>(projectDb.getProjectImagesbyProjectID(db,projectId));
 
+        Log.d(TAG, "getImageFromProjectData: Closing Connection to db");
+        db.close();
         return projectImages;
 
     }
 
-    private void viewPhotoDialog(Integer project_id, Bitmap bitmap, int position){
-            DialogFragment viewDialog = DialogProjectPhotoView.newInstance(project_id,bitmap);
-            viewDialog.show(getFragmentManager(),"dialog_view");
+    private void viewPhotoDialog(Integer project_id, String mImagePath, int position){
+        Log.d(TAG, "viewPhotoDialog: Started");
+        
+        DialogFragment viewDialog = DialogProjectPhotoView.newInstance(project_id,mURLSyntex,mImagePath);
+        viewDialog.show(getFragmentManager(),"dialog_view");
 
     }
 
     private void deletePhotoDialog(final Integer photo_id, int position) {
+        Log.d(TAG, "deletePhotoDialog: Started");
         new AlertDialog.Builder(mContext)
                 .setMessage(getString(R.string.dialog_delete_image))
                 .setPositiveButton(getString(R.string.general_yes), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 
+                        Log.d(TAG, "deletePhotoDialog: Connecting to DB");
                         ProjectDatabaseHandler projectDb = new ProjectDatabaseHandler(mContext);
                         SQLiteDatabase db = projectDb.getWritableDatabase();
 
                         projectDb.deleteProjectImageById(db,photo_id);
 
+                        Log.d(TAG, "deletePhotoDialog: Closing connection to db");
+                        db.close();
                         showToast("Deleting Photo", true);
                         refreshGridView();
 
@@ -181,10 +198,11 @@ public class PhotoGalleryActivity extends AppCompatActivity {
 
 
     private void refreshGridView() {
+        Log.d(TAG, "refreshGridView: Started");
         if(getImageCount(projectId)){
             gridAdapter.clear();
 
-            gridAdapter = new GalleryImageAdapter(this, R.layout.layout_grid_imageview, getImageFromProjectData(projectId));
+            gridAdapter = new GalleryImageAdapter(this, R.layout.layout_grid_imageview, mURLSyntex, getImageFromProjectData(projectId));
             gridView.setAdapter(gridAdapter);
             gridView.setVisibility(View.VISIBLE);
 

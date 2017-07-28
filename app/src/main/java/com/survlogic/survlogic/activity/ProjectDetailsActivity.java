@@ -81,8 +81,11 @@ import java.util.Date;
 public class ProjectDetailsActivity extends AppCompatActivity implements OnMapReadyCallback, AppBarLayout.OnOffsetChangedListener {
 
     private static final String TAG = "ProjectDetailsActivity";
-    private static final int REQUEST_TAKE_PHOTO= 2;
-    private static final int REQUEST_SELECT_PICTURE=3;
+    private static final int REQUEST_TAKE_PHOTO = 2;
+    private static final int REQUEST_SELECT_PICTURE = 3;
+
+    private static final int DELAY_TO_MAP = 1500;
+    private static final int DELAY_TO_GRID = 2000;
 
     private SwipeRefreshLayout swipeRefreshLayout;
     private CoordinatorLayout rootLayout;
@@ -99,7 +102,9 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
     private double locationLatitude, locationLongitude;
     private String mCurrentPhotoPath, projectDescription;
     private Bitmap mBitmap, mBitmapPolished, mBitmapRaw;
+
     private boolean mProgressBarShow = false;
+    private String mURLSyntex = "file://";
 
     private TextView tvProjectName, tvProjectCreated, tvUnits, tvLocationLat, tvLocationLong,
             tvProjection, tvZone, tvStorage;
@@ -122,7 +127,7 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
         mContext = ProjectDetailsActivity.this;
         imageHelper = new ImageHelper(mContext);
 
-        Log.e(TAG, "onCreate: Started");
+        Log.d(TAG, "onCreate: Started---------------------------->");
 
 
         initViewNavigation();
@@ -141,7 +146,7 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
     @Override
     protected void onPause() {
         super.onPause();
-
+        Log.d(TAG, "onPause: Started");
         appBarLayout.removeOnOffsetChangedListener(this);
 
     }
@@ -149,15 +154,17 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
     @Override
     protected void onResume() {
         super.onResume();
-
+        Log.d(TAG, "onResume: Started");
         appBarLayout.addOnOffsetChangedListener(this);
-
+        
         boolean results = initValuesFromObject();
 
         if (results){
-            Log.e(TAG, "initView: Populated fields OK");
+            Log.d(TAG, "initView: Populated fields OK");
             showMapView();
-            initGridView();
+            Log.d(TAG, "showMapView: Started");
+            showGridView();
+            Log.d(TAG, "initGridView: Started");
             showProgressBar();
 
         }else{
@@ -253,7 +260,7 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
 
     private void initView(){
 
-        Log.e(TAG, "initView: Started");
+        Log.d(TAG, "initView: Started");
 
         Bundle extras = getIntent().getExtras();
         projectID = extras.getInt("PROJECT_ID");
@@ -283,7 +290,7 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
     }
 
     private void setOnClickListeners(){
-
+        Log.d(TAG, "setOnClickListeners: Started");
         btTakePhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -317,7 +324,8 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 ProjectImages item = (ProjectImages) parent.getItemAtPosition(position);
 
-                viewPhotoDialog(item.getProjectId(),imageHelper.convertToBitmap(item.getImage()), position);
+                //viewPhotoDialog(item.getProjectId(),imageHelper.convertToBitmap(item.getImage()), position);
+                viewPhotoDialog(item.getProjectId(),item.getImagePath(), position);
 
             }
         });
@@ -336,9 +344,11 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
     }
 
     private boolean initValuesFromObject(){
+        Log.d(TAG, "initValuesFromObject: Started");
         boolean results = false;
 
         try{
+            Log.d(TAG, "initValuesFromObject: Connecting to db");
             ProjectDatabaseHandler projectDb = new ProjectDatabaseHandler(this);
             SQLiteDatabase db = projectDb.getReadableDatabase();
 
@@ -381,6 +391,9 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
             mProgressBarShow = true;
             results = mProgressBarShow;
 
+            Log.d(TAG, "initValuesFromObject: Database Retrieval Complete.  Closing DB Connection");
+            db.close();
+
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -397,6 +410,7 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
     }
 
     private void initViewNavigation(){
+        Log.d(TAG, "initViewNavigation: Started");
         appBarLayout = (AppBarLayout) findViewById(R.id.appbar_in_activity_project_details);
 
         toolbar = (Toolbar) findViewById(R.id.toolbar_in_activity_project_details);
@@ -412,19 +426,23 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
 
     //-------------------------------------------------------------------------------------------------------------------------//
     private ArrayList<ProjectImages> getImageFromProjectData(Integer projectId){
-
+        Log.d(TAG, "getImageFromProjectData: Connecting to db");
         ProjectDatabaseHandler projectDb = new ProjectDatabaseHandler(mContext);
         SQLiteDatabase db = projectDb.getReadableDatabase();
 
         ArrayList<ProjectImages> projectImages = new ArrayList<ProjectImages>(projectDb.getProjectImagesbyProjectID(db,projectId));
 
 
+        Log.d(TAG, "getImageFromProjectData: Closing DB Connection");
+        db.close();
 
         return projectImages;
 
     }
 
     private boolean getImageCount(Integer projectId){
+
+        Log.d(TAG, "getImageCount: Connecting to db");
         long count = 0;
         boolean results = false;
         ProjectDatabaseHandler projectDb = new ProjectDatabaseHandler(mContext);
@@ -436,6 +454,7 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
             results = true;
         }
 
+        Log.d(TAG, "getImageCount: Closing DB Connection");
         db.close();
         return results;
     }
@@ -453,14 +472,15 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
 
     }
 
-    private void viewPhotoDialog(Integer project_id, Bitmap bitmap, int position){
+    private void viewPhotoDialog(Integer project_id, String imagePath, int position){
         if(position == 3){
             Intent intent = new Intent(mContext, PhotoGalleryActivity.class);
             intent.putExtra("PROJECT_ID",projectID);
             startActivity(intent);
 
         }else{
-            DialogFragment viewDialog = DialogProjectPhotoView.newInstance(project_id,bitmap);
+
+            DialogFragment viewDialog = DialogProjectPhotoView.newInstance(project_id,mURLSyntex,imagePath);
             viewDialog.show(getFragmentManager(),"dialog_view");
         }
 
@@ -511,13 +531,14 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
                 public void run() {
                     initMapView();
                 }
-            },5000);
+            },DELAY_TO_MAP);
         }else{
             hideMapView();
         }
     }
 
     private void initMapView(){
+        Log.d(TAG, "initMapView: Started");
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map_container_in_project_details);
 
@@ -538,7 +559,7 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-
+        Log.d(TAG, "onMapReady: Started");
         mMap = googleMap;
         mMap.getUiSettings().setMapToolbarEnabled(false);
 
@@ -562,11 +583,20 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
      * Grid View (GV)
      */
 
+    private void showGridView(){
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    initGridView();
+                }
+            },DELAY_TO_GRID);
+    }
+
     private void initGridView(){
 
         if(getImageCount(projectID)){
 
-            gridAdapter = new GridImageAdapter(this, R.layout.layout_grid_imageview, getImageFromProjectData(projectID));
+            gridAdapter = new GridImageAdapter(this, R.layout.layout_grid_imageview, mURLSyntex, getImageFromProjectData(projectID));
             gridView.setAdapter(gridAdapter);
             gridView.setVisibility(View.VISIBLE);
         }
@@ -577,10 +607,9 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
 
             //Todo GridAdapter on 1st run does not exist.  Need to check and see if gridAdapter has been created, if not, create
 
-
             gridAdapter.clear();
 
-            gridAdapter = new GridImageAdapter(this, R.layout.layout_grid_imageview, getImageFromProjectData(projectID));
+            gridAdapter = new GridImageAdapter(this, R.layout.layout_grid_imageview, mURLSyntex, getImageFromProjectData(projectID));
             gridView.setAdapter(gridAdapter);
             gridView.setVisibility(View.VISIBLE);
 

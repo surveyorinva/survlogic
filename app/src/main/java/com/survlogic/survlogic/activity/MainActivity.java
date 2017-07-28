@@ -1,6 +1,7 @@
 package com.survlogic.survlogic.activity;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -24,11 +25,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.nostra13.universalimageloader.core.ImageLoader;
 import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.adapter.ActivityViewPagerAdapter;
 import com.survlogic.survlogic.background.BackgroundProjectList;
 import com.survlogic.survlogic.fragment.MainHomeFragment;
 import com.survlogic.survlogic.fragment.MainToolsFragment;
+import com.survlogic.survlogic.utils.UniversalImageLoader;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,7 +41,8 @@ import java.util.Map;
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
 
     private static final String TAG = "MainActivity";
-    
+
+    private Context mContext;
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle actionBarDrawerToggle;
@@ -50,36 +54,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private long previousTime;
 
 
-    private void initPermissions(){
-        // first check for permissions
-        if (ActivityCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
-            // Show an explanation
-
-            //no explanation needed
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,
-                                Manifest.permission.ACCESS_FINE_LOCATION,
-                                Manifest.permission.INTERNET}
-                        , 10);
-            }
-            return;
-        }
-    }
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mContext = MainActivity.this;
+        Log.d(TAG, "onCreate: Started---------------------------->");
 
         initView();
         initViewPager();
         initViewNavigation();
+        initImageLoader();
         //initPermissions();
 
     }
@@ -236,4 +222,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         }
     }
+
+    private void initImageLoader(){
+        Log.d(TAG, "initImageLoader: setting configuration");
+
+        UniversalImageLoader universalImageLoader = new UniversalImageLoader(mContext);
+        ImageLoader.getInstance().init(universalImageLoader.getConfig());
+    }
+
 }

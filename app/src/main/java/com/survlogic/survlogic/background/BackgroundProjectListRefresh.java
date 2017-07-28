@@ -24,7 +24,7 @@ import java.util.ArrayList;
 
 public class BackgroundProjectListRefresh extends AsyncTask <Project,Project,String> {
 
-    private String TAG = getClass().getSimpleName();
+    private static final String TAG = "BackgroundProjectListRe";
 
     private Context context;
     private Activity activity;
@@ -49,6 +49,7 @@ public class BackgroundProjectListRefresh extends AsyncTask <Project,Project,Str
     @Override
     protected String doInBackground(Project... params) {
         try{
+            Log.d(TAG, "doInBackground: Connecting to Db");
             ProjectDatabaseHandler projectDb = new ProjectDatabaseHandler(context);
             SQLiteDatabase db = projectDb.getReadableDatabase();
 
@@ -59,6 +60,8 @@ public class BackgroundProjectListRefresh extends AsyncTask <Project,Project,Str
             }
 
 
+            Log.d(TAG, "doInBackground: Closing Connection to db");
+            db.close();
             //
 
         }catch (Exception e){

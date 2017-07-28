@@ -38,11 +38,8 @@ public class WelcomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_welcome);
-
-
+        Log.d(TAG, "onCreate: Started---------------------------->");
         initView();
-        Log.d(TAG, "onCreate: Starting Permissions");
-        checkAndRequestPermissions();
 
 
 
@@ -53,7 +50,8 @@ public class WelcomeActivity extends AppCompatActivity {
         btNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                callMainActivity();
+                Log.d(TAG, "initView: Checking Permissions");
+                checkAndRequestPermissions();
             }
         });
 

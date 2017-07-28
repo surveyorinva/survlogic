@@ -168,23 +168,19 @@ public class DialogProjectPhotoAdd extends DialogFragment {
     }
     private void submitForm(View v) {
 
-        byte[] mImage;
         String mImagePath;
 
             if (mAddWatermark){
                 Uri uri = fileHelper.saveImageToExternal(mImageWatermark);
                 mImagePath = uriToString(uri);
 
-                mImage = imageHelper.convertImageToByte(mImageWatermark);
             }else{
-                Uri uri = fileHelper.saveImageToExternal(mImageWatermark);
+                Uri uri = fileHelper.saveImageToExternal(mImageLocal);
                 mImagePath = uriToString(uri);
 
-                mImage = imageHelper.convertImageToByte(mImageLocal);
             }
 
             // Create Project model
-        //ProjectImages projectImages = new ProjectImages(project_id,0,mImage,0,0,0);
         ProjectImages projectImages = new ProjectImages(project_id,0,mImagePath,0,0,0);
 
             // Setup Background Task

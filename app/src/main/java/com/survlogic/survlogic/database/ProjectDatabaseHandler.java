@@ -23,7 +23,7 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
 
 
     //  Debugging Static Constants
-    private String TAG = getClass().getSimpleName();
+    private static final String TAG = "ProjectDatabaseHandler";
 
     //  Database Constants
     private static final int DB_VERSION = 3;
@@ -63,7 +63,7 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
 
     public ProjectDatabaseHandler(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
-        Log.d(TAG,"Database created...");
+        Log.d(TAG,"Database connected " + DB_NAME );
 
     }
 
@@ -71,12 +71,13 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_TABLE_PROJECT);
         db.execSQL(CREATE_TABLE_PROJECT_IMAGES);
-        Log.d(TAG,"Table created...");
+        Log.d(TAG,"Tables created...");
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // Drop older table if existed
+        Log.d(TAG, "onUpgrade: Updating Tables to new Version...");
         db.execSQL("DROP IF TABLE EXISTS " + ProjectContract.ProjectEntry.TABLE_NAME);
         db.execSQL("DROP IF TABLE EXISTS " + ProjectContract.ProjectImageEntry.TABLE_NAME);
 
@@ -196,7 +197,8 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
 
 
     public List<Project> getProjectsAll(SQLiteDatabase db){
-
+        Log.d(TAG, "getProjectsAll: Starting");
+        
         List<Project> lstprojects = new ArrayList<Project>();
         String selectQuery = "SELECT * FROM " + ProjectContract.ProjectEntry.TABLE_NAME
                 + " ORDER BY " + ProjectContract.ProjectEntry.KEY_PROJECTNAME + " ASC";
@@ -259,6 +261,7 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
 //        Version 1 - Pull db in with method.  If possible, see if below will work w/o pull in.
 //        SQLiteDatabase db = this.getReadableDatabase();
 
+        Log.d(TAG, "getProjectById: Starting");
         String selectQuery = "SELECT  * FROM " + ProjectContract.ProjectEntry.TABLE_NAME + " WHERE "
                 + ProjectContract.ProjectEntry.KEY_ID + " = " + project_id;
 
@@ -399,7 +402,7 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
     }
 
     public List<ProjectImages> getProjectImagesbyProjectID(SQLiteDatabase db, long project_id){
-
+        Log.d(TAG, "getProjectImagesbyProjectID: Starting");
         List<ProjectImages> lstprojectImages = new ArrayList<ProjectImages>();
         String selectQuery = "SELECT * FROM " + ProjectContract.ProjectImageEntry.TABLE_NAME+  " WHERE "
                 + ProjectContract.ProjectImageEntry.KEY_PROJECT_ID + " = " + project_id;
@@ -436,6 +439,7 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
     }
 
     public static long getCountProjectImagesByProjectID(SQLiteDatabase db, long project_id){
+        Log.d(TAG, "getCountProjectImagesByProjectID: Starting");
         String countQuery = "SELECT * FROM " + ProjectContract.ProjectImageEntry.TABLE_NAME+  " WHERE "
                 + ProjectContract.ProjectImageEntry.KEY_PROJECT_ID + " = " + project_id;
 
@@ -470,6 +474,7 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
 
     //  Deleting
     public boolean deleteProjectImageById(SQLiteDatabase db, long project_image_id){
+        Log.d(TAG, "deleteProjectImageById: Starting");
         boolean results = false;
 
         db.delete(ProjectContract.ProjectImageEntry.TABLE_NAME, ProjectContract.ProjectImageEntry.KEY_ID + "= ?",

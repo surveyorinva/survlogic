@@ -46,10 +46,10 @@ public class MainHomeFragment extends Fragment implements OnMapReadyCallback{
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        Log.d(TAG, "onCreateView: Started--------------------->");
         v = inflater.inflate(R.layout.fragment_main_home,container,false);
 
         initView();
-        
         
         return v;
     }
