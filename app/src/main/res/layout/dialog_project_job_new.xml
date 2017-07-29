@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="250dp">
+
+
+    <LinearLayout
+        android:id="@+id/layout_area_1"
+        android:orientation="vertical"
+        android:weightSum="2"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="70dp">
+
+        <TextView
+            android:text="@string/job_new_header_1"
+            style="@style/Labels.EditBoxHeaders"
+            android:layout_weight="1"
+            android:gravity="bottom"
+            android:layout_marginBottom="2dp"
+            android:layout_width="match_parent"
+            android:layout_height="0dp" />
+
+
+        <EditText
+            android:id="@+id/job_name"
+            android:hint="@string/job_new_name_hint"
+            style="@style/InputField.ProjectNewActivity.ProjectName"
+            android:background="@drawable/editbox_dropdown_background"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="0dp" />
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/layout_area_2"
+        android:layout_below="@id/layout_area_1"
+        android:orientation="vertical"
+        android:weightSum="2"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="100dp">
+
+        <TextView
+            android:text="@string/job_new_header_2"
+            style="@style/Labels.EditBoxHeaders"
+            android:layout_weight=".5"
+            android:gravity="bottom"
+            android:layout_marginBottom="2dp"
+            android:layout_width="match_parent"
+            android:layout_height="0dp" />
+
+
+        <EditText
+            android:id="@+id/job_description"
+            android:hint="@string/job_new_description_hint"
+            style="@style/InputField.DetailText"
+            android:background="@drawable/editbox_dropdown_background"
+            android:inputType="textMultiLine|textAutoCorrect|textCapSentences"
+            android:lines="5"
+            android:minLines="4"
+            android:maxLines="6"
+            android:gravity="top|start"
+            android:layout_weight="1.5"
+            android:layout_width="match_parent"
+            android:layout_height="0dp" />
+
+    </LinearLayout>
+
+
+</LinearLayout>

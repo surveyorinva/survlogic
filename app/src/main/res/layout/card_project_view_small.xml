@@ -64,6 +64,16 @@
             android:layout_width="50dp"
             android:layout_height="50dp" />
 
+        <ProgressBar
+            android:id="@+id/card_project_view_project_progress"
+            android:layout_alignTop="@+id/card_project_view_project_image"
+            android:layout_alignStart="@+id/card_project_view_project_image"
+            android:indeterminate="true"
+            android:layout_width="50dp"
+            android:visibility="visible"
+            android:layout_height="50dp" />
+
+
         <TextView
             android:id="@+id/card_project_view_project_name"
             android:text="@string/general_loading_status"

@@ -59,7 +59,9 @@ import com.survlogic.survlogic.model.ProjectImages;
 import com.survlogic.survlogic.utils.ImageHelper;
 import com.survlogic.survlogic.utils.MathHelper;
 import com.survlogic.survlogic.utils.TimeHelper;
+import com.survlogic.survlogic.utils.UniversalImageLoader;
 import com.survlogic.survlogic.view.DialogProjectDescriptionAdd;
+import com.survlogic.survlogic.view.DialogProjectJobAdd;
 import com.survlogic.survlogic.view.DialogProjectPhotoAdd;
 import com.survlogic.survlogic.view.DialogProjectPhotoView;
 
@@ -100,14 +102,14 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
     private Project project;
     private int projectID;
     private double locationLatitude, locationLongitude;
-    private String mCurrentPhotoPath, projectDescription;
+    private String mCurrentPhotoPath, projectDescription, mProjectImagePath;
     private Bitmap mBitmap, mBitmapPolished, mBitmapRaw;
 
     private boolean mProgressBarShow = false;
     private String mURLSyntex = "file://";
 
     private TextView tvProjectName, tvProjectCreated, tvUnits, tvLocationLat, tvLocationLong,
-            tvProjection, tvZone, tvStorage;
+            tvProjection, tvZone, tvStorage, tvDescription;
     private ImageView ivProjectImage, ivGridImage;
     private Button btTakePhoto, btPostDescription;
     private ProgressBar pbLoading;
@@ -240,15 +242,18 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.toolbar_project_details_item1:
-                //some action here
+                //Create new job
+                    createProjectJobDialog(projectID);
+
                 break;
 
             case R.id.toolbar_project_details_item2:
-                //some action here
+                //Settings
                 break;
 
             case R.id.toolbar_project_details_item3:
-                //some action here
+                //Delete Project
+
                 break;
 
         }
@@ -275,6 +280,8 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
 
         tvLocationLat = (TextView) findViewById(R.id.map_item1_value_lat);
         tvLocationLong = (TextView) findViewById(R.id.map_item1_value_long);
+
+        tvDescription = (TextView) findViewById(R.id.card4_projectNotes);
 
         ivProjectImage = (ImageView) findViewById(R.id.header_image_in_activity_project_details);
 
@@ -357,7 +364,10 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
             locationLatitude = project.getmLocationLat();
             locationLongitude = project.getmLocationLong();
 
-            ivProjectImage.setImageBitmap(imageHelper.convertToBitmap(project.getmImage()));
+            mProjectImagePath = project.getmImagePath();
+
+            Log.d(TAG, "initValuesFromObject: Image Path: " + mProjectImagePath);
+            UniversalImageLoader.setImage(mProjectImagePath,ivProjectImage,null, mURLSyntex);
 
             tvProjectName.setText(project.getmProjectName());
 
@@ -385,8 +395,15 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
                     MathHelper.convertDECtoDMS(project.getmLocationLat(),3,true)));
             tvLocationLong.setText(this.getString(R.string.gps_status_long_value_string,
                     MathHelper.convertDECtoDMS(project.getmLocationLong(),3,true)));
-            
+
             projectDescription = project.getmProjectDescription();
+            if(!isStringEmpty(projectDescription)) {
+                tvDescription.setText(projectDescription);
+                tvDescription.setVisibility(View.VISIBLE);
+            }else{
+                tvDescription.setVisibility(View.GONE);
+            }
+
 
             mProgressBarShow = true;
             results = mProgressBarShow;
@@ -519,6 +536,14 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
         viewDialog.show(getFragmentManager(),"dialog");
     }
 
+
+
+    private void createProjectJobDialog(final Integer project_id){
+        DialogFragment viewDialog = DialogProjectJobAdd.newInstance(projectID);
+        viewDialog.show(getFragmentManager(),"dialog");
+
+
+    }
     //-------------------------------------------------------------------------------------------------------------------------//
 
     /**
@@ -867,6 +892,29 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
     private Uri stringToUri(String stringUri){
         Uri results = Uri.parse(stringUri);
         return results;
+    }
+
+    private boolean isStringNull(String string){
+        Log.d(TAG, "isStringNull: checking string is equal to null (User Input).");
+
+        if(string.equals("")){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+    private boolean isStringEmpty(String string){
+        Log.d(TAG, "isStringEmpty: checking string is null or empty (from DB)");
+
+        if (string !=null && !string.isEmpty()) {
+            return false;
+        }else {
+            return true;
+        }
+
+
     }
 
 }

@@ -6,7 +6,7 @@
 
     <item
         android:id="@+id/toolbar_project_details_item1"
-        android:title="@string/general_menu_settings"
+        android:title="@string/project_details_menu_item_new_job"
         android:orderInCategory="100"
         app:showAsAction="never">
 
@@ -14,7 +14,7 @@
 
     <item
         android:id="@+id/toolbar_project_details_item2"
-        android:title="@string/general_delete"
+        android:title="@string/general_menu_settings"
         android:orderInCategory="100"
         app:showAsAction="never">
 
@@ -22,7 +22,7 @@
 
     <item
         android:id="@+id/toolbar_project_details_item3"
-        android:title="@string/general_menu_about"
+        android:title="@string/general_delete"
         android:orderInCategory="100"
         app:showAsAction="never">
 

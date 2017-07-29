@@ -19,6 +19,9 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.ScaleAnimation;
 
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.FailReason;
+import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.activity.ProjectDetailsActivity;
 import com.survlogic.survlogic.interf.ProjectItemClickListener;
@@ -47,6 +50,8 @@ public class ProjectListAdaptor extends RecyclerView.Adapter<RecyclerView.ViewHo
     private final static int FADE_DURATION = 1000; // in milliseconds
 
     private static SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MMM-yyyy");
+    private String imgURL;
+    private String mURLSyntex = "file://";
 
     private Context mContext;
 
@@ -158,8 +163,42 @@ public class ProjectListAdaptor extends RecyclerView.Adapter<RecyclerView.ViewHo
                     MathHelper.convertDECtoDMS(project.getmLocationLong(),1,true)));
         }
 
-//        Image Blob
-        vh1.imgProjectImage.setImageBitmap(convertToBitmap(project.getmImage()));
+//        Image
+
+        ImageLoader imageLoader = ImageLoader.getInstance();
+        imgURL = project.getmImagePath();
+
+        imageLoader.displayImage(mURLSyntex + imgURL, vh1.imgProjectImage, new ImageLoadingListener() {
+                    @Override
+                    public void onLoadingStarted(String imageUri, View view) {
+                        if(vh1.progressBar != null){
+                            vh1.progressBar.setVisibility(View.VISIBLE);
+                        }
+                    }
+
+                    @Override
+                    public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
+                        if(vh1.progressBar != null){
+                            vh1.progressBar.setVisibility(View.GONE);
+                        }
+                    }
+
+                    @Override
+                    public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
+                        if(vh1.progressBar != null){
+                            vh1.progressBar.setVisibility(View.GONE);
+                        }
+
+                    }
+
+                    @Override
+                    public void onLoadingCancelled(String imageUri, View view) {
+                        if(vh1.progressBar != null){
+                            vh1.progressBar.setVisibility(View.GONE);
+                        }
+
+                    }
+                });
 
         ViewCompat.setTransitionName(vh1.imgProjectImage, project.getmProjectName());
         Pair<View,String> pair1 = Pair.create((View)vh1.imgProjectImage,vh1.imgProjectImage.getTransitionName());
@@ -211,12 +250,6 @@ public class ProjectListAdaptor extends RecyclerView.Adapter<RecyclerView.ViewHo
         this.projects = newData;
 
         notifyDataSetChanged();
-    }
-
-    private Bitmap convertToBitmap(byte[] b){
-
-        return BitmapFactory.decodeByteArray(b, 0, b.length);
-
     }
 
 

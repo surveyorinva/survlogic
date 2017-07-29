@@ -19,6 +19,7 @@
     <dimen name="text_margin_very_small">4dp</dimen>
 
     <dimen name="edit_text_padding_start">10dp</dimen>
+    <dimen name="edit_text_padding_end">10dp</dimen>
     <dimen name="edit_text_padding_top">4dp</dimen>
     <dimen name="edit_text_padding_bottom">5dp</dimen>
 

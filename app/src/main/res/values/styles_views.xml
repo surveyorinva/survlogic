@@ -3,12 +3,15 @@
 
 
     <!--Input Fields-->
-    <style name="InputField" parent="Widget.AppCompat.EditText"/>
-
-    <style name="InputField.ProjectNewActivity">
+    <style name="InputField" parent="Widget.AppCompat.EditText">
         <item name="android:paddingStart">@dimen/edit_text_padding_start</item>
+        <item name="android:paddingEnd">@dimen/edit_text_padding_end</item>
         <item name="android:paddingTop">@dimen/edit_text_padding_top</item>
         <item name="android:paddingBottom">@dimen/edit_text_padding_bottom</item>
+
+    </style>
+
+    <style name="InputField.ProjectNewActivity">
         <item name="android:inputType">textCapWords</item>
 
     </style>

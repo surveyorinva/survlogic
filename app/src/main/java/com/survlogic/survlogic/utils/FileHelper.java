@@ -77,5 +77,13 @@ public class FileHelper {
     }
 
 
+    public String uriToString(Uri uri){
+        return uri.toString();
+    }
+
+    public Uri stringToUri(String stringUri){
+        return Uri.parse(stringUri);
+    }
+
 
 }

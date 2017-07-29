@@ -3,6 +3,7 @@ package com.survlogic.survlogic.view;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.model.Circle;
@@ -20,6 +21,7 @@ public class Card_View_Holder_Project_Small extends RecyclerView.ViewHolder  {
 
     public TextView txtProjectName, txtLocation, txtLastModify, txtProjectDesc, txtProjectId;
     public CircleImageView imgProjectImage;
+    public ProgressBar progressBar;
     public View mCardView;
 
     public Card_View_Holder_Project_Small(View itemView) {
@@ -34,7 +36,7 @@ public class Card_View_Holder_Project_Small extends RecyclerView.ViewHolder  {
         txtProjectDesc  = (TextView) itemView.findViewById(R.id.card_project_view_project_details);
 
         imgProjectImage = (CircleImageView) itemView.findViewById(R.id.card_project_view_project_image);
-
+        progressBar = (ProgressBar) itemView.findViewById(R.id.card_project_view_project_progress);
     }
 
 }

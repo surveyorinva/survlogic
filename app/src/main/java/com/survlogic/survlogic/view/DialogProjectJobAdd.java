@@ -3,6 +3,7 @@ package com.survlogic.survlogic.view;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
@@ -13,8 +14,6 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.survlogic.survlogic.R;
-import com.survlogic.survlogic.activity.ProjectNewActivity;
-import com.survlogic.survlogic.background.BackgroundProjectNew;
 import com.survlogic.survlogic.background.BackgroundProjectUpdate;
 import com.survlogic.survlogic.database.ProjectDatabaseHandler;
 import com.survlogic.survlogic.model.Project;
@@ -23,25 +22,21 @@ import com.survlogic.survlogic.model.Project;
  * Created by chrisfillmore on 7/22/2017.
  */
 
-public class DialogProjectDescriptionAdd extends DialogFragment {
+public class DialogProjectJobAdd extends DialogFragment {
     private static final String TAG = "DialogProjectDescr";
     private Context mContext;
     private AlertDialog alertDialog;
 
     private int project_id;
 
-    private String mDescription;
-    private Project project;
+    private EditText etJobName, etDescription;
 
-    private EditText etDescription;
+    public static DialogProjectJobAdd newInstance(Integer mProjectId) {
 
-    public static DialogProjectDescriptionAdd newInstance(Integer mProjectId, String description) {
-
-        DialogProjectDescriptionAdd frag = new DialogProjectDescriptionAdd();
+        DialogProjectJobAdd frag = new DialogProjectJobAdd();
         Bundle args = new Bundle();
 
         args.putInt("project_id", mProjectId);
-        args.putString("description", description);
 
         frag.setArguments(args);
         return frag;
@@ -52,15 +47,21 @@ public class DialogProjectDescriptionAdd extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
         project_id = getArguments().getInt("project_id");
-        mDescription = getArguments().getString("description");
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(),R.style.DialogPopupStyle);
         LayoutInflater inflater = getActivity().getLayoutInflater();
 
-        View v = inflater.inflate(R.layout.dialog_project_note,null);
+        View v = inflater.inflate(R.layout.dialog_project_job_new,null);
         builder.setView(v);
 
-        builder.setPositiveButton(R.string.general_post,null);
+        builder.setPositiveButton(R.string.general_save,null);
+
+        builder.setNegativeButton(R.string.general_cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
 
         builder.create();
         return builder.show();
@@ -75,9 +76,8 @@ public class DialogProjectDescriptionAdd extends DialogFragment {
         mContext = getActivity();
         AlertDialog alertDialog = (AlertDialog) getDialog();
 
-        etDescription = (EditText) getDialog().findViewById(R.id.description);
-
-        initValuesFromObject();
+        etJobName = (EditText) getDialog().findViewById(R.id.job_name);
+        etDescription = (EditText) getDialog().findViewById(R.id.job_description);
 
         Button btnSave = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
         btnSave.setOnClickListener(new View.OnClickListener() {
@@ -93,8 +93,8 @@ public class DialogProjectDescriptionAdd extends DialogFragment {
         Log.d(TAG, "submitForm: Starting");
         String description = etDescription.getText().toString();
         if(!isStringNull(description)){
-            project.setmProjectDescription(description);
-            saveProjectInBackground();
+
+
             Log.d(TAG, "submitForm: Closing Dialog");
             dismiss();
         }else{
@@ -105,34 +105,13 @@ public class DialogProjectDescriptionAdd extends DialogFragment {
     }
 
 
-    private boolean initValuesFromObject(){
-        Log.d(TAG, "initValuesFromObject: Started");
-        boolean results = false;
-
-        ProjectDatabaseHandler projectDb = new ProjectDatabaseHandler(mContext);
-        SQLiteDatabase db = projectDb.getReadableDatabase();
-
-        try {
-            project = projectDb.getProjectById(db, project_id);
-
-            etDescription.setText(project.getmProjectDescription());
-            etDescription.setSelection(etDescription.getText().length());
-
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-
-        return results;
-
-    }
-
-    private void saveProjectInBackground(){
+    private void saveJobInBackground(){
         Log.d(TAG, "saveProjectInBackground: Starting");
         // Setup Background Task
-        BackgroundProjectUpdate backgroundProjectUpdate = new BackgroundProjectUpdate(mContext);
+        //BackgroundProjectUpdate backgroundProjectUpdate = new BackgroundProjectUpdate(mContext);
 
         // Execute background task
-        backgroundProjectUpdate.execute(project);
+        //backgroundProjectUpdate.execute(project);
 
     }
 

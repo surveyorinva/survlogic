@@ -7,7 +7,7 @@ package com.survlogic.survlogic.model;
 
 public class Project {
 
-    String mProjectName, mProjectDescription;
+    String mProjectName, mProjectDescription, mImagePath;
     int mId, mStorage, mUnits;
     int mProjection, mZone, mSystemImage;
     int mDateCreated, mDateAccessed, mDateModified;
@@ -33,6 +33,17 @@ public class Project {
         this.mLocationLat = mLocationLat;
         this.mLocationLong = mLocationLong;
         this.mImage = mImage;
+    }
+
+    public Project(String mProjectName, int mStorage, int mUnits, int mProjection, int mZone, double mLocationLat, double mLocationLong, int mSystemImage, String mImagePath) {
+        this.mProjectName = mProjectName;
+        this.mStorage = mStorage;
+        this.mUnits = mUnits;
+        this.mProjection = mProjection;
+        this.mZone = mZone;
+        this.mLocationLat = mLocationLat;
+        this.mLocationLong = mLocationLong;
+        this.mImagePath = mImagePath;
     }
 
     public Project(String mProjectName, int mStorage, int mUnits, int mProjection, int mZone, double mLocationLat, double mLocationLong, int mSystemImage, byte[] mImage, int mDateCreated) {
@@ -156,5 +167,13 @@ public class Project {
 
     public void setmProjectDescription(String mProjectDescription) {
         this.mProjectDescription = mProjectDescription;
+    }
+
+    public String getmImagePath() {
+        return mImagePath;
+    }
+
+    public void setmImagePath(String mImagePath) {
+        this.mImagePath = mImagePath;
     }
 }

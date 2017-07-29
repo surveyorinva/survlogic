@@ -28,7 +28,7 @@ public class ProjectContract {
         public static final String KEY_GEOLAT = "latitude";
         public static final String KEY_GEOLON = "longitude";
         public static final String KEY_IMAGE_SYSTEM = "systemImage";
-        public static final String KEY_IMAGE = "image";
+        public static final String KEY_IMAGE_PATH = "imagepath";
         public static final String KEY_DATE_CREATED = "created";
         public static final String KEY_DATE_ACCESSED = "accessed";
         public static final String KEY_DATE_MODIFIED = "modified";
@@ -47,6 +47,20 @@ public class ProjectContract {
         public static final String KEY_BEARING = "bearing";
         public static final String KEY_GEOLAT = "latitude";
         public static final String KEY_GEOLON = "longitude";
+
+    }
+
+    public static abstract class ProjectJobEntry{
+        public static final String TABLE_NAME = "project_job_table";
+
+        public static final String KEY_ID = "id";
+        public static final String KEY_PROJECT_ID = "projectid";
+        public static final String KEY_JOBNAME = "jobname";
+        public static final String KEY_JOBDBNAME = "jobdbname";
+        public static final String KEY_JOBDESC = "description";
+        public static final String KEY_DATE_CREATED = "created";
+        public static final String KEY_DATE_ACCESSED = "accessed";
+        public static final String KEY_DATE_MODIFIED = "modified";
 
     }
 

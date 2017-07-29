@@ -34,6 +34,7 @@ import com.survlogic.survlogic.BuildConfig;
 import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.background.BackgroundProjectNew;
 import com.survlogic.survlogic.model.Project;
+import com.survlogic.survlogic.utils.FileHelper;
 import com.survlogic.survlogic.utils.MathHelper;
 
 import java.io.ByteArrayOutputStream;
@@ -54,7 +55,7 @@ public class ProjectNewActivity extends AppCompatActivity {
     private static final int REQUEST_TAKE_PHOTO= 2;
     private static final int REQUEST_SELECT_PICTURE=3;
     private static Context mContext;
-
+    private FileHelper fileHelper;
 
     private EditText etProjectName;
     private TextView tvLocation_latitude, tvLocation_longitude, tvLocation_latitude_value,tvLocation_longitude_value ;
@@ -63,7 +64,7 @@ public class ProjectNewActivity extends AppCompatActivity {
     private Button btnPhoto_Camera_Get_Photo, btnSave, btnCancel;
     private ImageButton btnlocation_get_from_gps_survey;
 
-    private String mCurrentPhotoPath;
+    private String mCurrentPhotoPath, mImagePath;
     private Bitmap mBitmap, mBitmapPolished, mBitmapRaw;
 
     String mProjectName;
@@ -71,7 +72,6 @@ public class ProjectNewActivity extends AppCompatActivity {
     int mProjection, mZone;
     int mImageSystem = 0; //system generated value to determine if user took picture or use internal picture 0 = internal 1=user
     double mLocationLat = 0, mLocationLong = 0;
-    byte[] mImage;
 
 
     @Override
@@ -90,6 +90,8 @@ public class ProjectNewActivity extends AppCompatActivity {
     private void initView(){
 
         mContext = ProjectNewActivity.this;
+        fileHelper = new FileHelper(mContext);
+
 
         etProjectName = (EditText) findViewById(R.id.project_name_in_project_new);
 
@@ -154,7 +156,7 @@ public class ProjectNewActivity extends AppCompatActivity {
                     getValues();
 
                     // Create Project model
-                    Project project = new Project(mProjectName,mStorage,mUnits,mProjection,mZone,mLocationLat,mLocationLong,mImageSystem,mImage);
+                    Project project = new Project(mProjectName,mStorage,mUnits,mProjection,mZone,mLocationLat,mLocationLong,mImageSystem,mImagePath);
 
                     // Setup Background Task
                     BackgroundProjectNew backgroundProjectNew = new BackgroundProjectNew(ProjectNewActivity.this);
@@ -311,6 +313,10 @@ public class ProjectNewActivity extends AppCompatActivity {
                 mBitmapRaw=decodeUri(imageUri,400);
                 mBitmap = rotateImageIfRequired(mBitmapRaw,imageUri);
                 ivPreview.setImageBitmap(mBitmap);
+
+                Uri uri = fileHelper.saveImageToExternal(mBitmap);
+                mImagePath = fileHelper.uriToString(uri);
+
                 mImageSystem = 1;
 
             } catch (Exception e) {
@@ -332,6 +338,10 @@ public class ProjectNewActivity extends AppCompatActivity {
                         mBitmapRaw=decodeUri(imageUri,400);
                         mBitmap = rotateImageIfRequired(mBitmapRaw,imageUri);
                         ivPreview.setImageBitmap(mBitmap);
+
+                        Uri uri = fileHelper.saveImageToExternal(mBitmap);
+                        mImagePath = fileHelper.uriToString(uri);
+
                         mImageSystem = 1;
                     }
 
@@ -457,12 +467,7 @@ public class ProjectNewActivity extends AppCompatActivity {
                 break;
 
             //7-mBitmap
-            case 7:
-                if (mBitmap == null){
-                    results = false;
-                }else{
-                    results = true;
-                }
+
         }
 
         return results;
@@ -495,11 +500,13 @@ public class ProjectNewActivity extends AppCompatActivity {
 
         //6
         if (mImageSystem == 1){
-            mImage = convertImageToByte(mBitmap);
+
         }else{
             //convert system bitmap for project to bitmap/byte
             Bitmap icon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_project_icon_32);
-            mImage = convertImageToByte(icon);
+
+            mImagePath = null;
+
         }
 
         //7

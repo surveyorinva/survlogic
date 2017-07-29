@@ -10,6 +10,7 @@ import android.util.Log;
 
 import com.survlogic.survlogic.model.Project;
 import com.survlogic.survlogic.model.ProjectImages;
+import com.survlogic.survlogic.model.ProjectJobs;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -43,7 +44,7 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
             + ProjectContract.ProjectEntry.KEY_GEOLAT + " DOUBLE,"
             + ProjectContract.ProjectEntry.KEY_GEOLON + " DOUBLE,"
             + ProjectContract.ProjectEntry.KEY_IMAGE_SYSTEM + " INTEGER,"
-            + ProjectContract.ProjectEntry.KEY_IMAGE + " BLOB,"
+            + ProjectContract.ProjectEntry.KEY_IMAGE_PATH + " TEXT,"
             + ProjectContract.ProjectEntry.KEY_DATE_CREATED + " INTEGER,"
             + ProjectContract.ProjectEntry.KEY_DATE_MODIFIED + " INTEGER,"
             + ProjectContract.ProjectEntry.KEY_DATE_ACCESSED + " INTEGER);";
@@ -60,6 +61,17 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
             + ProjectContract.ProjectImageEntry.KEY_GEOLAT + " DOUBLE,"
             + ProjectContract.ProjectImageEntry.KEY_GEOLON + " DOUBLE);";
 
+    public static final String CREATE_TABLE_PROJECT_JOBS = "CREATE TABLE "
+            + ProjectContract.ProjectJobEntry.TABLE_NAME
+            + "("
+            + ProjectContract.ProjectJobEntry.KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+            + ProjectContract.ProjectJobEntry.KEY_PROJECT_ID + " INTEGER,"
+            + ProjectContract.ProjectJobEntry.KEY_JOBNAME + " TEXT,"
+            + ProjectContract.ProjectJobEntry.KEY_JOBDBNAME + " TEXT,"
+            + ProjectContract.ProjectJobEntry.KEY_JOBDESC + " TEXT,"
+            + ProjectContract.ProjectJobEntry.KEY_DATE_CREATED + " INTEGER,"
+            + ProjectContract.ProjectJobEntry.KEY_DATE_MODIFIED + " INTEGER,"
+            + ProjectContract.ProjectJobEntry.KEY_DATE_ACCESSED + " INTEGER);";
 
     public ProjectDatabaseHandler(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -71,6 +83,7 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_TABLE_PROJECT);
         db.execSQL(CREATE_TABLE_PROJECT_IMAGES);
+        db.execSQL(CREATE_TABLE_PROJECT_JOBS);
         Log.d(TAG,"Tables created...");
     }
 
@@ -80,6 +93,7 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
         Log.d(TAG, "onUpgrade: Updating Tables to new Version...");
         db.execSQL("DROP IF TABLE EXISTS " + ProjectContract.ProjectEntry.TABLE_NAME);
         db.execSQL("DROP IF TABLE EXISTS " + ProjectContract.ProjectImageEntry.TABLE_NAME);
+        db.execSQL("DROP IF TABLE EXISTS " + ProjectContract.ProjectJobEntry.TABLE_NAME);
 
         // Create tables again
         onCreate(db);
@@ -113,7 +127,7 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
         contentValues.put(ProjectContract.ProjectEntry.KEY_GEOLON,project.getmLocationLong());
 
         contentValues.put(ProjectContract.ProjectEntry.KEY_IMAGE_SYSTEM,project.getmSystemImage());
-        contentValues.put(ProjectContract.ProjectEntry.KEY_IMAGE,project.getmImage());
+        contentValues.put(ProjectContract.ProjectEntry.KEY_IMAGE_PATH,project.getmImagePath());
 
         contentValues.put(ProjectContract.ProjectEntry.KEY_PROJECTDESC,project.getmProjectDescription());
 
@@ -141,8 +155,6 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
      */
     public long addProjectImageToDB(SQLiteDatabase db, ProjectImages projectImages){
         Log.d(TAG, "addProjectImageToDB: Start");
-        //  ContentValues is a name value pair, used to get the values from database tables.  Content values object
-        //  returned from SQLiteDatabase objects query() function.
         ContentValues contentValues = new ContentValues();
 
         //  Required Fields
@@ -176,6 +188,43 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
     }
 
 
+    /**
+     *Adding Project Jobs to Database
+     */
+
+    public long addProjectJobToDB(SQLiteDatabase db, ProjectJobs projectJob){
+        Log.d(TAG, "addProjectJobToDB: Start");
+
+        ContentValues contentValues = new ContentValues();
+
+        //  Required Fields
+        contentValues.put(ProjectContract.ProjectJobEntry.KEY_PROJECT_ID, projectJob.getProjectId());
+        contentValues.put(ProjectContract.ProjectJobEntry.KEY_JOBNAME, projectJob.getmJobName());
+        contentValues.put(ProjectContract.ProjectJobEntry.KEY_JOBDBNAME, projectJob.getmJobDbName());
+
+
+        //  Optional Fields
+        contentValues.put(ProjectContract.ProjectJobEntry.KEY_JOBDESC, projectJob.getmJobDescription());
+
+        //  Metadata Fields
+        contentValues.put(ProjectContract.ProjectJobEntry.KEY_DATE_CREATED, projectJob.getmDateCreated());
+
+        Log.d(TAG, "addData: Adding Image to " + ProjectContract.ProjectJobEntry.TABLE_NAME);
+
+        //      Inserts new row
+        Long result = db.insert(ProjectContract.ProjectJobEntry.TABLE_NAME,null,contentValues);
+        db.close();
+
+        if (result==-1){
+            Log.d(TAG,"Error, Something went wrong...");
+            return -1;
+        } else {
+            Log.d(TAG,"Success, Row inserted into Table...");
+            return result;
+        }
+
+    }
+
     //  Reading---------------------------------------------------------------------------------------------------
         //  ALL Projects
 
@@ -205,8 +254,6 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
 
         Log.e(TAG, selectQuery);
 
-//        Version 1 - Pull db in with method.  If possible, see if below will work w/o pull in.
-//        SQLiteDatabase db = this.getReadableDatabase();
         Cursor c = db.rawQuery(selectQuery, null);
 
         // looping through all rows and adding to list
@@ -222,7 +269,8 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
                 project.setmLocationLat(c.getDouble(c.getColumnIndex(ProjectContract.ProjectEntry.KEY_GEOLAT)));
                 project.setmLocationLong(c.getDouble(c.getColumnIndex(ProjectContract.ProjectEntry.KEY_GEOLON)));
                 project.setmSystemImage(c.getInt(c.getColumnIndex(ProjectContract.ProjectEntry.KEY_IMAGE_SYSTEM)));
-                project.setmImage(c.getBlob(c.getColumnIndex(ProjectContract.ProjectEntry.KEY_IMAGE)));
+                project.setmImagePath((c.getString(c.getColumnIndex(ProjectContract.ProjectEntry.KEY_IMAGE_PATH))));
+
                 project.setmProjectDescription((c.getString(c.getColumnIndex(ProjectContract.ProjectEntry.KEY_PROJECTDESC))));
 
                 // Project MetaData
@@ -282,7 +330,7 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
             project.setmLocationLat(c.getDouble(c.getColumnIndex(ProjectContract.ProjectEntry.KEY_GEOLAT)));
             project.setmLocationLong(c.getDouble(c.getColumnIndex(ProjectContract.ProjectEntry.KEY_GEOLON)));
             project.setmSystemImage(c.getInt(c.getColumnIndex(ProjectContract.ProjectEntry.KEY_IMAGE_SYSTEM)));
-            project.setmImage(c.getBlob(c.getColumnIndex(ProjectContract.ProjectEntry.KEY_IMAGE)));
+            project.setmImagePath((c.getString(c.getColumnIndex(ProjectContract.ProjectEntry.KEY_IMAGE_PATH))));
             project.setmProjectDescription((c.getString(c.getColumnIndex(ProjectContract.ProjectEntry.KEY_PROJECTDESC))));
 
         // Project MetaData
@@ -306,7 +354,7 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
         values.put(ProjectContract.ProjectEntry.KEY_GEOLAT, project.getmLocationLat());
         values.put(ProjectContract.ProjectEntry.KEY_GEOLON, project.getmLocationLong());
         values.put(ProjectContract.ProjectEntry.KEY_IMAGE_SYSTEM, project.getmSystemImage());
-        values.put(ProjectContract.ProjectEntry.KEY_IMAGE, project.getmImage());
+        values.put(ProjectContract.ProjectEntry.KEY_IMAGE_PATH, project.getmImagePath());
         values.put(ProjectContract.ProjectEntry.KEY_PROJECTDESC, project.getmProjectDescription());
 
         Log.e(TAG,"Updating Project ID=" + project.getmId());
@@ -499,6 +547,107 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
 
     //--------------------------------------------------------------------------------------------------------------------------//
 
+    /**
+     * Project Jobs CRUD
+     */
+
+
+    public List<ProjectJobs> getProjectJobsByProjectID(SQLiteDatabase db, long project_id){
+        Log.d(TAG, "getProjectJobsbyProjectID: Starting");
+
+        List<ProjectJobs> lstprojectJobs = new ArrayList<ProjectJobs>();
+
+        String selectQuery = "SELECT * FROM " + ProjectContract.ProjectJobEntry.TABLE_NAME+  " WHERE "
+                + ProjectContract.ProjectJobEntry.KEY_PROJECT_ID + " = " + project_id;
+
+        Log.e(TAG, selectQuery);
+
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        // looping through all rows and adding to list
+        if (c.moveToFirst()) {
+            do {
+
+                ProjectJobs projectJobs = new ProjectJobs();
+
+                //Required
+                projectJobs.setId(c.getInt((c.getColumnIndex(ProjectContract.ProjectJobEntry.KEY_ID))));
+                projectJobs.setProjectId(c.getInt((c.getColumnIndex(ProjectContract.ProjectJobEntry.KEY_PROJECT_ID))));
+                projectJobs.setmJobName(c.getString((c.getColumnIndex(ProjectContract.ProjectJobEntry.KEY_JOBNAME))));
+                projectJobs.setmJobDbName(c.getString((c.getColumnIndex(ProjectContract.ProjectJobEntry.KEY_JOBDBNAME))));
+
+                //Optional
+                projectJobs.setmJobDescription(c.getString((c.getColumnIndex(ProjectContract.ProjectJobEntry.KEY_JOBDESC))));
+
+                // MetaData
+                projectJobs.setmDateCreated(c.getInt((c.getColumnIndex(ProjectContract.ProjectJobEntry.KEY_DATE_CREATED))));
+
+
+                lstprojectJobs.add(projectJobs);
+            } while (c.moveToNext());
+        }
+
+        return lstprojectJobs;
+    }
+
+
+    public static long getCountProjectJobsByProjectID(SQLiteDatabase db, long project_id){
+        Log.d(TAG, "getCountProjectJobsByProjectID: Starting");
+        String countQuery = "SELECT * FROM " + ProjectContract.ProjectJobEntry.TABLE_NAME+  " WHERE "
+                + ProjectContract.ProjectJobEntry.KEY_PROJECT_ID + " = " + project_id;
+
+        Cursor cursor = db.rawQuery(countQuery, null);
+        int cnt = cursor.getCount();
+        cursor.close();
+
+        return cnt;
+    }
+
+    //Updating
+    public int updateProjectJobs(SQLiteDatabase db, ProjectJobs projectJobs){
+
+        ContentValues values = new ContentValues();
+        values.put(ProjectContract.ProjectJobEntry.KEY_PROJECT_ID, projectJobs.getProjectId());
+        values.put(ProjectContract.ProjectJobEntry.KEY_JOBNAME, projectJobs.getmJobName());
+        values.put(ProjectContract.ProjectJobEntry.KEY_JOBDBNAME, projectJobs.getmJobDbName());
+        values.put(ProjectContract.ProjectJobEntry.KEY_JOBDESC, projectJobs.getmJobDescription());
+
+        values.put(ProjectContract.ProjectJobEntry.KEY_DATE_CREATED, projectJobs.getmDateCreated());
+
+        Log.e(TAG,"Updating Project ID=" + projectJobs.getId());
+
+        return db.update(ProjectContract.ProjectJobEntry.TABLE_NAME,values, ProjectContract.ProjectJobEntry.KEY_ID + " = ?",
+                new String[] {String.valueOf(projectJobs.getId())});
+
+    }
+
+
+    //  Deleting
+    public boolean deleteProjectJobById(SQLiteDatabase db, long project_job_id){
+        Log.d(TAG, "deleteProjectJobById: Starting");
+        boolean results = false;
+
+        db.delete(ProjectContract.ProjectJobEntry.TABLE_NAME, ProjectContract.ProjectJobEntry.KEY_ID + "= ?",
+                new String[] {String.valueOf(project_job_id)});
+
+        db.close();
+        results = true;
+        return results;
+    }
+
+    public boolean deleteProjectJobByProjectId(SQLiteDatabase db, long project_id){
+        boolean results = false;
+
+        db.delete(ProjectContract.ProjectJobEntry.TABLE_NAME, ProjectContract.ProjectJobEntry.KEY_PROJECT_ID + "= ?",
+                new String[] {String.valueOf(project_id)});
+
+        db.close();
+        results = true;
+        return results;
+    }
+
+
+    //--------------------------------------------------------------------------------------------------------------------------//
     public void closeProjectDB(){
         SQLiteDatabase db = this.getReadableDatabase();
         if (db != null && db.isOpen()){
