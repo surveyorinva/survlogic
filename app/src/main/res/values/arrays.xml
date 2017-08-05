@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- Let the user choose between map views -->
     <string-array name="map_type_entries">
         <item>Map View</item>
         <item>Hybrid View</item>
@@ -9,13 +8,35 @@
         <item>Terrain View</item>
     </string-array>
 
-    <!-- These contants above and below match those in GoogleMap object:
-        https://developers.google.com/maps/documentation/android/reference/com/google/android/gms/maps/GoogleMap -->
     <string-array name="map_type_values">
         <item>1</item>
         <item>4</item>
         <item>2</item>
         <item>3</item>
+    </string-array>
+
+
+    <string-array name="general_true_false_titles">
+        <item>False</item>
+        <item>True</item>
+    </string-array>
+
+    <string-array name="general_true_false_values">
+        <item>0</item>
+        <item>1</item>
+
+    </string-array>
+
+    <string-array name="general_yes_no_titles">
+        <item>No</item>
+        <item>Yes</item>
+
+    </string-array>
+
+    <string-array name="general_yes_no_values">
+        <item>0</item>
+        <item>1</item>
+
     </string-array>
 
     <string-array name="unit_measure_entries">
@@ -93,6 +114,111 @@
     <string-array name="project_projection_zones_values">
         <item>0</item>
     </string-array>
+
+    <string-array name="job_type_titles">
+        <item>2d Survey</item>
+        <item>3d Survey</item>
+
+    </string-array>
+
+    <string-array name="job_type_values">
+        <item>0</item>
+        <item>1</item>
+
+    </string-array>
+
+    <string-array name="job_distance_display_titles">
+        <item>Decimal Feet</item>
+    </string-array>
+
+    <string-array name="job_distance_display_values">
+        <item>0</item>
+    </string-array>
+
+    <string-array name="job_distance_precision_titles">
+        <item>0</item>
+        <item>0.x</item>
+        <item>0.xx</item>
+        <item>0.xxx</item>
+        <item>0.xxxx</item>
+    </string-array>
+
+    <string-array name="job_distance_precision_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+    </string-array>
+
+    <string-array name="job_angle_display_titles">
+        <item>Degrees, Minutes, Seconds (DDD.mmss)</item>
+        <item>Degrees, Minutes, Seconds (DDD.mmss.x)</item>
+        <item>Degrees, Minutes, Seconds (DDD.mmss.xx)</item>
+        <item>Decimal Degrees (DDD.ddddd)</item>
+    </string-array>
+
+    <string-array name="job_angle_display_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+
+    <string-array name="job_coordinate_entry_titles">
+        <item>Northing, Easting</item>
+        <item>Easting, Northing</item>
+    </string-array>
+
+    <string-array name="job_coordinate_entry_values">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+
+    <string-array name="job_angle_horizontal_display_titles">
+        <item>Bearing</item>
+        <item>Azimuth</item>
+    </string-array>
+
+    <string-array name="job_angle_horizontal_display_values">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+
+    <string-array name="job_angle_horizontal_observation_display_titles">
+        <item>Angle Right</item>
+        <item>Angle Left</item>
+    </string-array>
+
+    <string-array name="job_angle_horizontal_observation_display_values">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+
+    <string-array name="job_distance_horizontal_observation_display_titles">
+        <item>Horizontal</item>
+        <item>Slope</item>
+    </string-array>
+
+    <string-array name="job_distance_horizontal_observation_display_values">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+
+
+    <string-array name="job_angle_vertical_observation_display_titles">
+        <item>Zenith Angle</item>
+        <item>Vertical Angle</item>
+        <item>Elevation Difference</item>
+    </string-array>
+
+    <string-array name="job_angle_vertical_observation_display_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+
 
     <!--TO DELETE-->
     <string-array name="pref_sync_frequency_titles">

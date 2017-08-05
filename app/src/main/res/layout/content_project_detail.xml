@@ -7,21 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout
-        android:id="@+id/header_in_card_project_detail"
-        android:orientation="vertical"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true" >
 
-        <ProgressBar
-            android:id="@+id/progressBar_Loading"
-            android:visibility="gone"
-            android:indeterminate="true"
-            android:layout_width="50dp"
-            android:layout_height="50dp" />
-
-    </LinearLayout>
 
     <ScrollView
         android:id="@+id/scrollView_in_card_project_detail"
@@ -30,10 +16,19 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true">
 
+
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
+
+            <ProgressBar
+                android:id="@+id/progressBar_Loading"
+                android:visibility="gone"
+                android:layout_gravity="center"
+                android:indeterminate="true"
+                android:layout_width="50dp"
+                android:layout_height="50dp" />
 
             <android.support.v7.widget.CardView
                 android:id="@+id/card_general"
@@ -504,6 +499,7 @@
 
                     <TextView
                         android:id="@+id/card4_projectNotes"
+                        android:textColor="@color/black"
                         android:layout_marginStart="5dp"
                         android:layout_marginTop="5dp"
                         android:layout_marginBottom="10dp"
@@ -568,18 +564,18 @@
                     android:id="@+id/layout_internal_files"
                     android:orientation="vertical"
                     android:layout_width="match_parent"
-                    android:layout_height="200dp">
+                    android:layout_height="wrap_content">
 
-                    <android.support.v7.widget.RecyclerView
-                        android:id="@+id/recycler_view_in_card_project_detail"
-                        android:layout_marginStart="10dp"
-                        android:layout_marginEnd="10dp"
-                        android:layout_marginTop="5dp"
-                        android:layout_marginBottom="5dp"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:visibility="gone"
-                        android:background="@color/app_background" />
+                        <android.support.v7.widget.RecyclerView
+                            android:id="@+id/recycler_view_in_card_project_job_detail"
+                            android:layout_marginStart="10dp"
+                            android:layout_marginEnd="10dp"
+                            android:layout_marginTop="5dp"
+                            android:layout_marginBottom="5dp"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:visibility="gone"
+                            android:background="@color/app_background" />
 
 
                     </LinearLayout>

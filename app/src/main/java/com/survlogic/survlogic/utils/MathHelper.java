@@ -1,9 +1,11 @@
 package com.survlogic.survlogic.utils;
 
+import android.content.Context;
 import android.location.Location;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Created by chrisfillmore on 6/17/2017.
@@ -11,6 +13,18 @@ import java.util.List;
 
 public class MathHelper {
 
+    private Context mContext;
+    private static final String ALLOWED_CHARACTERS ="0123456789qwertyuiopasdfghjklzxcvbnm";
+
+    public MathHelper(Context mContext) {
+        this.mContext = mContext;
+    }
+
+    /**
+     * Creates an average value from an Array list of values
+     * @param arrayList
+     * @return
+     */
 
     public static double createAverageValueFromArray(List<Double> arrayList){
         double valueTotal = 0.00;
@@ -22,6 +36,16 @@ public class MathHelper {
         return avg;
 
     }
+
+
+    /**
+     * Covert decimal degrees to Degrees - Minutes - Seconds.
+     * If the entry requires the cardinal direction to be included, signCounts = true
+     * @param angle
+     * @param decimalPlace
+     * @param signCounts
+     * @return
+     */
 
 
     public static String convertDECtoDMS(double angle,int decimalPlace, boolean signCounts){
@@ -55,6 +79,22 @@ public class MathHelper {
         }
 
         return myAngleDMS;
+    }
+
+
+    /**
+     * A simple algorithm to generate a random generate of code based upon size entered
+     * @param sizeOfRandomString
+     * @return
+     */
+
+    public static String getRandomString(final int sizeOfRandomString)
+    {
+        final Random random=new Random();
+        final StringBuilder sb=new StringBuilder(sizeOfRandomString);
+        for(int i=0;i<sizeOfRandomString;++i)
+            sb.append(ALLOWED_CHARACTERS.charAt(random.nextInt(ALLOWED_CHARACTERS.length())));
+        return sb.toString();
     }
 
 }

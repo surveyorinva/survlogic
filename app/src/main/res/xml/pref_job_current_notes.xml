@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <PreferenceCategory
+    android:title="@string/pref_header_job_current_notes_category_general">
+
+        <EditTextPreference
+            android:key="@string/pref_key_current_job_attr_client"
+            android:title="@string/pref_current_job_client"
+            android:summary="@string/pref_current_job_client_summary"
+            android:capitalize="words"
+            android:inputType="textCapWords"
+            android:maxLines="1"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"/>
+
+        <EditTextPreference
+            android:key="@string/pref_key_current_job_attr_mission"
+            android:title="@string/pref_current_job_mission"
+            android:summary="@string/pref_current_job_mission_summary"
+            android:capitalize="words"
+            android:inputType="textCapWords"
+            android:maxLines="4"
+            android:selectAllOnFocus="true"
+            android:singleLine="false"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/pref_header_job_current_notes_category_weather">
+
+        <EditTextPreference
+            android:key="@string/pref_key_current_job_attr_weather_general"
+            android:title="@string/pref_current_job_weather_general"
+            android:summary="@string/pref_current_job_weather_general_summary"
+            android:capitalize="words"
+            android:inputType="textCapWords"
+            android:maxLines="4"
+            android:selectAllOnFocus="true"
+            android:singleLine="false"/>
+
+        <EditTextPreference
+            android:key="@string/pref_key_current_job_attr_weather_temp"
+            android:title="@string/pref_current_job_weather_temp"
+            android:capitalize="words"
+            android:inputType="textCapWords"
+            android:maxLines="1"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"/>
+
+
+        <EditTextPreference
+            android:capitalize="words"
+            android:inputType="textCapWords"
+            android:key="@string/pref_key_current_job_attr_weather_pres"
+            android:maxLines="1"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="@string/pref_current_job_weather_press" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/pref_header_job_current_notes_category_staff">
+
+        <EditTextPreference
+            android:key="@string/pref_key_current_job_attr_staff_chief"
+            android:title="@string/pref_current_job_staff_chief"
+            android:capitalize="words"
+            android:inputType="textCapWords"
+            android:maxLines="1"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"/>
+
+        <EditTextPreference
+            android:key="@string/pref_key_current_job_attr_staff_iman"
+            android:title="@string/pref_current_job_staff_iman"
+            android:capitalize="words"
+            android:inputType="textCapWords"
+            android:maxLines="1"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"/>
+
+        <EditTextPreference
+            android:key="@string/pref_key_current_job_attr_staff_rman"
+            android:title="@string/pref_current_job_staff_rman"
+            android:capitalize="words"
+            android:inputType="textCapWords"
+            android:maxLines="1"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"/>
+
+        <EditTextPreference
+            android:key="@string/pref_key_current_job_attr_staff_other"
+            android:title="@string/pref_current_job_staff_other"
+            android:capitalize="words"
+            android:inputType="textCapWords"
+            android:maxLines="4"
+            android:selectAllOnFocus="true"
+            android:singleLine="false"/>
+
+    </PreferenceCategory>
+
+
+</PreferenceScreen>

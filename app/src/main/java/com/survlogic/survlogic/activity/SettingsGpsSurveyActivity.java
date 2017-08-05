@@ -94,6 +94,8 @@ public class SettingsGpsSurveyActivity extends AppCompatPreferenceActivity {
             mAttachedFragment = false;
             super.onCreate(savedInstanceState);
 
+            setupActionBar();
+
         }
 
         /**

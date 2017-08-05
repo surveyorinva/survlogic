@@ -12,11 +12,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.survlogic.survlogic.R;
+import com.survlogic.survlogic.background.BackgroundProjectJobNew;
 import com.survlogic.survlogic.background.BackgroundProjectUpdate;
 import com.survlogic.survlogic.database.ProjectDatabaseHandler;
 import com.survlogic.survlogic.model.Project;
+import com.survlogic.survlogic.model.ProjectJobs;
+import com.survlogic.survlogic.utils.MathHelper;
 
 /**
  * Created by chrisfillmore on 7/22/2017.
@@ -28,6 +32,7 @@ public class DialogProjectJobAdd extends DialogFragment {
     private AlertDialog alertDialog;
 
     private int project_id;
+    private ProjectJobs projectJobs;
 
     private EditText etJobName, etDescription;
 
@@ -91,27 +96,43 @@ public class DialogProjectJobAdd extends DialogFragment {
 
     private void submitForm(View v) {
         Log.d(TAG, "submitForm: Starting");
-        String description = etDescription.getText().toString();
-        if(!isStringNull(description)){
 
+        String jobName = etJobName.getText().toString();
+        String description = etDescription.getText().toString();
+        String jobDatabaseName = MathHelper.getRandomString(8) + ".db";
+
+        if(!isStringNull(jobName)){
+            Log.d(TAG, "submitForm: Creating ProjectJobs with Description");
+            if(!isStringNull(description)){
+                projectJobs = new ProjectJobs(project_id,jobName,jobDatabaseName,description);
+
+            }else{
+                Log.d(TAG, "submitForm: Creating ProjectJobs without a Description");
+                projectJobs = new ProjectJobs(project_id,jobName,jobDatabaseName);
+
+            }
+
+            saveJobInBackground();
+
+            //Todo Send User to Job Activity from Here or refresh list on Project Detail Activity
 
             Log.d(TAG, "submitForm: Closing Dialog");
             dismiss();
         }else{
             Log.d(TAG, "submitForm: Closing Dialog");
-            dismiss();
+            String txtVerification = getString(R.string.job_new_validation_job_name_error);
+            showToast(txtVerification,true);
         }
 
     }
 
-
     private void saveJobInBackground(){
         Log.d(TAG, "saveProjectInBackground: Starting");
         // Setup Background Task
-        //BackgroundProjectUpdate backgroundProjectUpdate = new BackgroundProjectUpdate(mContext);
+        BackgroundProjectJobNew backgroundProjectJobsNew = new BackgroundProjectJobNew(mContext);
 
         // Execute background task
-        //backgroundProjectUpdate.execute(project);
+        backgroundProjectJobsNew.execute(projectJobs);
 
     }
 
@@ -126,5 +147,15 @@ public class DialogProjectJobAdd extends DialogFragment {
         }
     }
 
+    private void showToast(String data, boolean shortTime) {
+
+        if (shortTime) {
+            Toast.makeText(getActivity(), data, Toast.LENGTH_SHORT).show();
+
+        } else{
+            Toast.makeText(getActivity(), data, Toast.LENGTH_LONG).show();
+
+        }
+    }
 
 }

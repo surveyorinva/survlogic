@@ -160,6 +160,12 @@
 
     </style>
 
+    <style name="Button.Special.Card">
+        <item name="background">@drawable/button_ripple_transparent</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textSize">@dimen/text_size_header</item>
+    </style>
+
     <style name="Button.Cards" parent="Widget.AppCompat.Button.Borderless">
 
 

@@ -14,12 +14,18 @@ public class ProjectJobs {
 
     }
 
-    public ProjectJobs(int projectId, String mJobName, String mJobDbName, String mJobDescription, int mDateCreated) {
+
+    public ProjectJobs(int projectId, String mJobName, String mJobDbName) {
+        this.projectId = projectId;
+        this.mJobName = mJobName;
+        this.mJobDbName = mJobDbName;
+    }
+
+    public ProjectJobs(int projectId, String mJobName, String mJobDbName, String mJobDescription) {
         this.projectId = projectId;
         this.mJobName = mJobName;
         this.mJobDbName = mJobDbName;
         this.mJobDescription = mJobDescription;
-        this.mDateCreated = mDateCreated;
     }
 
     public ProjectJobs(int projectId, String mJobName, String mJobDbName, String mJobDescription, int mDateCreated, int mDateAccessed, int mDateModified) {

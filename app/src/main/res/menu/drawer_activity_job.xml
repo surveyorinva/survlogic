@@ -5,35 +5,35 @@
         <item
             android:id="@+id/menu_item1_id"
             android:icon="@drawable/ic_create_new_project"
-            android:title="@string/navigation_main_new_project">
+            android:title="@string/navigation_job_value_1">
 
         </item>
 
         <item
             android:id="@+id/menu_item2_id"
             android:icon="@drawable/ic_project_open"
-            android:title="@string/navigation_main_open_project">
+            android:title="@string/navigation_job_value_2">
             
         </item>
 
         <item
             android:id="@+id/menu_item3_id"
             android:icon="@drawable/ic_add_location"
-            android:title="@string/navigation_main_start_gps_survey">
+            android:title="@string/navigation_job_value_3">
 
         </item>
 
         <item
-            android:id="@+id/menu_item4_id"
-            android:icon="@drawable/ic_project_open"
-            android:title="@string/navigation_main_start_test_activity">
+        android:id="@+id/menu_item4_id"
+        android:icon="@drawable/ic_project_open"
+        android:title="@string/navigation_job_value_4">
 
-        </item>
+    </item>
 
         <item
             android:id="@+id/menu_item5_id"
             android:icon="@drawable/ic_project_open"
-            android:title="Current Job Settings">
+            android:title="@string/navigation_job_value_5">
 
         </item>
 

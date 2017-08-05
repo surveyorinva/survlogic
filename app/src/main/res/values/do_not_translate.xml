@@ -21,6 +21,47 @@
     <string name="pref_key_auto_stop_epoch">gps_auto_stop_measure</string>
     <string name="pref_key_epoch_max">gps_epoch_max_value</string>
 
+    <!-- Preference Keys for Current Job Settings -->
+    <string name="pref_key_current_job_name">pref_key_current_job_name</string>
+    <string name="pref_key_current_job_project_id">pref_key_current_job_project_id</string>
+    <string name="pref_key_current_project_id">pref_key_current_project_id</string>
+    <string name="pref_key_current_job_project_name">pref_key_current_project_name</string>
+    <string name="pref_key_current_job_database">pref_key_current_job_database</string>
+
+    <string name="pref_key_current_job_first_start">pref_key_current_job_first_start</string>
+    <string name="pref_key_current_job_drawer_open">pref_key_current_job_drawer_open</string>
+    <string name="pref_key_current_job_type">pref_key_current_job_type</string>
+
+    <string name="pref_key_current_job_over_projection">pref_key_current_job_over_projection</string>
+    <string name="pref_key_current_job_over_zone">pref_key_current_job_over_zone</string>
+    <string name="pref_key_current_job_over_units">pref_key_current_job_over_units</string>
+
+    <string name="pref_key_current_job_attr_client">pref_key_current_job_attr_client</string>
+    <string name="pref_key_current_job_attr_mission">pref_key_current_job_attr_mission</string>
+    <string name="pref_key_current_job_attr_weather_general">pref_key_current_job_attr_weather_general</string>
+    <string name="pref_key_current_job_attr_weather_temp">pref_key_current_job_attr_weather_temp</string>
+    <string name="pref_key_current_job_attr_weather_pres">pref_key_current_job_attr_weather_pres</string>
+    <string name="pref_key_current_job_attr_staff_chief">pref_key_current_job_attr_staff_chief</string>
+    <string name="pref_key_current_job_attr_staff_iman">pref_key_current_job_attr_staff_iman</string>
+    <string name="pref_key_current_job_attr_staff_rman">pref_key_current_job_attr_staff_rman</string>
+    <string name="pref_key_current_job_attr_staff_other">pref_key_current_job_attr_staff_other</string>
+
+    <string name="pref_key_current_job_system_distance_display">pref_key_current_job_system_distance_display</string>
+    <string name="pref_key_current_job_system_distance_precision_display">pref_key_current_job_system_distance_precision_display</string>
+    <string name="pref_key_current_job_system_angle_display">pref_key_current_job_system_angle_display</string>
+
+    <string name="pref_key_current_job_format_coord_entry">pref_key_current_job_format_coord_entry</string>
+    <string name="pref_key_current_job_format_angle_hz_display">pref_key_current_job_format_angle_hz_display</string>
+    <string name="pref_key_current_job_format_angle_hz_obsrv_entry">pref_key_current_job_format_angle_hz_obsrv_entry</string>
+    <string name="pref_key_current_job_format_angle_vz_obsrv_display">pref_key_current_job_format_angle_vz_obsrv_display</string>
+    <string name="pref_key_current_job_format_distance_hz_obsrv_display">pref_key_current_job_format_distance_hz_obsrv_display</string>
+
+    <string name="pref_key_current_job_options_raw_file">pref_key_current_job_options_raw_file</string>
+    <string name="pref_key_current_job_options_raw_time_stamp">pref_key_current_job_options_raw_time_stamp</string>
+    <string name="pref_key_current_job_options_gps_attribute">pref_key_current_job_options_gps_attribute</string>
+    <string name="pref_key_current_job_options_code_table">pref_key_current_job_options_code_table</string>
+
+
     <!-- Default preference values -->
     <string name="pref_gps_min_time_default_sec">1</string>
     <string name="pref_gps_unit_measurement_default">3</string>

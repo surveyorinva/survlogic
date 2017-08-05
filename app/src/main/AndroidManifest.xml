@@ -80,6 +80,16 @@
 
         </activity>
 
+        <activity android:name=".activity.SettingsJobCurrentActivity"
+            android:parentActivityName=".activity.MainActivity"
+            android:screenOrientation="portrait">
+
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.MainActivity" />
+
+        </activity>
+
         <activity android:name=".activity.ProjectNewActivity"
             android:screenOrientation="portrait"
             android:label="New Project"
@@ -103,6 +113,13 @@
         <activity android:name=".activity.WelcomeActivity"
             android:screenOrientation="portrait"
             android:label="Welcome"
+            android:theme="@style/SuperMaterialTheme">
+
+        </activity>
+
+
+        <activity android:name=".activity.JobActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/SuperMaterialTheme">
 
         </activity>

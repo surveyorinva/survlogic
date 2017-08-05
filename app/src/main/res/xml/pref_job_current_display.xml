@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <PreferenceCategory
+    android:title="@string/pref_header_job_current_display_category_display_units">
+
+        <ListPreference
+            android:key="@string/pref_key_current_job_system_distance_precision_display"
+            android:title="@string/pref_current_job_distance_precision"
+            android:dialogTitle="@string/pref_current_job_distance_precision"
+            android:entries="@array/job_distance_precision_titles"
+            android:entryValues="@array/job_distance_precision_values"
+            android:defaultValue="2"
+            android:negativeButtonText="@null"
+            android:positiveButtonText="@null"/>
+
+        <ListPreference
+            android:key="@string/pref_key_current_job_system_angle_display"
+            android:title="@string/pref_current_job_angle_precision"
+            android:dialogTitle="@string/pref_current_job_angle_precision"
+            android:entries="@array/job_angle_display_titles"
+            android:entryValues="@array/job_angle_display_values"
+            android:defaultValue="0"
+            android:negativeButtonText="@null"
+            android:positiveButtonText="@null"/>
+
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/pref_header_job_current_display_category_display_coordinates">
+
+        <ListPreference
+            android:key="@string/pref_key_current_job_format_coord_entry"
+            android:title="@string/pref_current_job_coordinate_display"
+            android:summary="@string/pref_current_job_coordinate_display_summary"
+            android:dialogTitle="@string/pref_current_job_coordinate_display"
+            android:entries="@array/job_coordinate_entry_titles"
+            android:entryValues="@array/job_coordinate_entry_values"
+            android:defaultValue="0"
+            android:negativeButtonText="@null"
+            android:positiveButtonText="@null"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/pref_header_job_current_display_category_display_angle">
+
+        <ListPreference
+            android:key="@string/pref_key_current_job_format_angle_hz_display"
+            android:title="@string/pref_current_job_angle_hz_display"
+            android:summary="@string/pref_current_job_angle_hz_display_summary"
+            android:dialogTitle="@string/pref_current_job_angle_hz_display"
+            android:entries="@array/job_angle_horizontal_display_titles"
+            android:entryValues="@array/job_angle_horizontal_display_values"
+            android:defaultValue="0"
+            android:negativeButtonText="@null"
+            android:positiveButtonText="@null"/>
+
+        <ListPreference
+            android:key="@string/pref_key_current_job_format_angle_hz_obsrv_entry"
+            android:title="@string/pref_current_job_angle_hz_observation_display"
+            android:summary="@string/pref_current_job_angle_hz_observation_display_summary"
+            android:dialogTitle="@string/pref_current_job_angle_hz_observation_display"
+            android:entries="@array/job_angle_horizontal_observation_display_titles"
+            android:entryValues="@array/job_angle_horizontal_observation_display_values"
+            android:defaultValue="0"
+            android:negativeButtonText="@null"
+            android:positiveButtonText="@null"/>
+
+        <ListPreference
+            android:key="@string/pref_key_current_job_format_angle_vz_obsrv_display"
+            android:title="@string/pref_current_job_angle_vz_observation_display"
+            android:summary="@string/pref_current_job_angle_vz_observation_display_summary"
+            android:dialogTitle="@string/pref_current_job_angle_vz_observation_display"
+            android:entries="@array/job_angle_vertical_observation_display_titles"
+            android:entryValues="@array/job_angle_vertical_observation_display_values"
+            android:defaultValue="0"
+            android:negativeButtonText="@null"
+            android:positiveButtonText="@null"/>
+
+
+    </PreferenceCategory>
+
+
+    <PreferenceCategory
+        android:title="@string/pref_header_job_current_display_category_display_distance">
+
+        <ListPreference
+            android:key="@string/pref_key_current_job_system_distance_display"
+            android:title="@string/pref_current_job_distance_display"
+            android:summary="@string/pref_current_job_distance_display_summary"
+            android:dialogTitle="@string/pref_current_job_distance_display"
+            android:entries="@array/job_distance_display_titles"
+            android:entryValues="@array/job_distance_display_values"
+            android:defaultValue="0"
+            android:negativeButtonText="@null"
+            android:positiveButtonText="@null"/>
+
+        <ListPreference
+            android:key="@string/pref_key_current_job_format_distance_hz_obsrv_display"
+            android:title="@string/pref_current_job_distance_observation_display"
+            android:summary="@string/pref_current_job_distance_observation_display_summary"
+            android:dialogTitle="@string/pref_current_job_distance_observation_display"
+            android:entries="@array/job_distance_horizontal_observation_display_titles"
+            android:entryValues="@array/job_distance_horizontal_observation_display_values"
+            android:defaultValue="0"
+            android:negativeButtonText="@null"
+            android:positiveButtonText="@null"/>
+
+
+
+
+
+    </PreferenceCategory>
+
+
+
+
+</PreferenceScreen>

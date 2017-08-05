@@ -207,7 +207,7 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
         contentValues.put(ProjectContract.ProjectJobEntry.KEY_JOBDESC, projectJob.getmJobDescription());
 
         //  Metadata Fields
-        contentValues.put(ProjectContract.ProjectJobEntry.KEY_DATE_CREATED, projectJob.getmDateCreated());
+        contentValues.put(ProjectContract.ProjectJobEntry.KEY_DATE_CREATED,(int) (new Date().getTime()/1000));
 
         Log.d(TAG, "addData: Adding Image to " + ProjectContract.ProjectJobEntry.TABLE_NAME);
 

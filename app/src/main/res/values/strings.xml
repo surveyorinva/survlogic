@@ -12,6 +12,9 @@
     <string name="general_post">Post</string>
     <string name="general_clear">Clear</string>
     <string name="general_delete">Delete</string>
+    <string name="general_open">Open</string>
+    <string name="general_close">Close</string>
+    <string name="general_share">Share</string>
     <string name="general_unit_meters">%1$.1f m</string>
     <string name="general_unit_feet">%1$.1f ft</string>
     <string name="general_exit_app">"Please click BACK again to exit"</string>
@@ -28,11 +31,18 @@
     <string name="navigation_main_open_project">Open Existing Project</string>
     <string name="navigation_main_start_gps_survey">Start GPS Survey</string>
     <string name="navigation_main_start_test_activity">Test Activity</string>
-
     <string name="navigation_main_settings">Settings</string>
     <!-- REQUIRED: NavigationActivity.java -->
     <string name="drawer_open">drawer open</string>
     <string name="drawer_close">drawer close</string>
+
+    <!--Navigation Menu at Job Main-->
+    <string name="navigation_job_header_value1">Job Menu</string>
+    <string name="navigation_job_value_1">Home</string>
+    <string name="navigation_job_value_2">Point Menu</string>
+    <string name="navigation_job_value_3">COGO Menu</string>
+    <string name="navigation_job_value_4">GPS Survey Menu</string>
+    <string name="navigation_job_value_5">Job Settings</string>
 
     <!--Action Bar tool item-->
     <string name="toolbar_main_menu_item1">About</string>
@@ -147,10 +157,16 @@
     <string name="project_new_validation_project_save_failed">Error Saving Project.  Please try again.</string>
 
     <!--New Job View-->
+    <string name="job_new_title">New Job Setup</string>
     <string name="job_new_header_1">Job Name</string>
     <string name="job_new_header_2">Description</string>
     <string name="job_new_name_hint">Enter the name of the Job</string>
     <string name="job_new_description_hint">Describe the intent of the job and the data contained in this file</string>
+    <string name="job_new_validation_job_name_error">Job Name is a required field.\nPlease complete prior to continuing</string>
+    <string name="job_new_validation_job_save_success">Job Saved!</string>
+    <string name="job_new_validation_job_update_success">Job Updated!</string>
+    <string name="job_new_validation_job_save_failed">Error Saving Job.  Please try again.</string>
+
     <!--Project Details View-->
     <string name="project_details_category_summary">Summary</string>
     <string name="project_details_category_map">Map</string>
@@ -170,6 +186,87 @@
     <string name="project_photo_new_validation_save_failed">Error Saving Project Photo.  Please try again.</string>
 
     <!-- ******************************Strings related to Settings****************************** -->
+
+    <!--**************************Current Job Preferences**************************-->
+    <!-- Headers -->
+    <string name="pref_header_job_current_general">General</string>
+    <string name="pref_header_job_current_notes">Job Notes</string>
+    <string name="pref_header_job_current_display">Display/Entry Defaults</string>
+    <string name="pref_header_job_current_raw_data">Raw Data</string>
+    <string name="pref_header_job_current_options">Options</string>
+
+    <!-- Categories -->
+    <string name="pref_header_job_current_general_category_Override">Override Project Settings</string>
+
+    <string name="pref_header_job_current_notes_category_general">General</string>
+    <string name="pref_header_job_current_notes_category_weather">Weather</string>
+    <string name="pref_header_job_current_notes_category_staff">Staffing</string>
+
+    <string name="pref_header_job_current_display_category_display_units">Precision</string>
+    <string name="pref_header_job_current_display_category_display_coordinates">Coordinates</string>
+    <string name="pref_header_job_current_display_category_display_distance">Distance Display</string>
+    <string name="pref_header_job_current_display_category_display_angle">Angle/Direction Display</string>
+
+    <!--General Tab -->
+    <string name="pref_current_job_name">Open Job Name</string>
+    <string name="pref_current_job_name_default">Job</string>
+    <string name="pref_current_job_name_summary">Changes the Current Job Name</string>
+
+    <string name="pref_current_job_projection">Projection</string>
+    <string name="pref_current_job_projection_summary">Choose the Projection to Apply to Geodetic Coordinates.</string>
+
+    <string name="pref_current_job_zone">Zone</string>
+    <string name="pref_current_job_zone_summary">Choose the Zone for the Projection.</string>
+
+    <string name="pref_current_job_units">Units</string>
+    <string name="pref_current_job_units_summary">Choose the measuring units to use for this job. \nCannot be changed once data is stored.</string>
+
+    <string name="pref_current_job_type">Job Type</string>
+    <string name="pref_current_job_type_summary">Select whether the default survey method will be a 2-dimensional survey or a 3-dimensional survey</string>
+
+    <!-- Notes -->
+    <string name="pref_current_job_client">Client Name</string>
+    <string name="pref_current_job_client_summary">Enter the name of the client the work is being performed.</string>
+
+    <string name="pref_current_job_mission">Mission</string>
+    <string name="pref_current_job_mission_summary">Describe the intent of the job.</string>
+
+    <string name="pref_current_job_weather_general">General Observations</string>
+    <string name="pref_current_job_weather_general_summary">Describe the conditions during the course of the survey</string>
+
+    <string name="pref_current_job_weather_temp">Temperature</string>
+
+    <string name="pref_current_job_weather_press">Pressure</string>
+
+    <string name="pref_current_job_staff_chief">Crew Chief</string>
+
+    <string name="pref_current_job_staff_iman">Instrument Operator</string>
+
+    <string name="pref_current_job_staff_rman">Field Surveyor</string>
+
+    <string name="pref_current_job_staff_other">Additional Comments</string>
+
+    <!-- Display -->
+    <string name="pref_current_job_distance_precision">Distance</string>
+    <string name="pref_current_job_angle_precision">Angular</string>
+
+    <string name="pref_current_job_coordinate_display">Coordinate Format</string>
+    <string name="pref_current_job_coordinate_display_summary">Display order of coordinates.</string>
+
+    <string name="pref_current_job_angle_hz_display">Angular Display</string>
+    <string name="pref_current_job_angle_hz_display_summary">Display angles as Bearings or Azimuths</string>
+
+    <string name="pref_current_job_angle_hz_observation_display">Horizontal Angles</string>
+    <string name="pref_current_job_angle_hz_observation_display_summary">Display horizontal as Angle Right or Angle Left</string>
+
+    <string name="pref_current_job_angle_vz_observation_display">Vertical Angles</string>
+    <string name="pref_current_job_angle_vz_observation_display_summary">Display vertical by Zenith, Vertical angles or Elev. Diff.</string>
+
+    <string name="pref_current_job_distance_display">Horizontal Display</string>
+    <string name="pref_current_job_distance_display_summary">Display Feet units in Decimal Feet or Feet-inches</string>
+
+    <string name="pref_current_job_distance_observation_display">Horizontal Distances</string>
+    <string name="pref_current_job_distance_observation_display_summary">Display distances as horizontal or slope distances</string>
 
     <!--**************************GPS Survey Preferences**************************-->
 

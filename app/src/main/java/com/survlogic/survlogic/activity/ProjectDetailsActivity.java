@@ -29,6 +29,7 @@ import android.support.v4.content.FileProvider;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Gravity;
@@ -52,10 +53,14 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.survlogic.survlogic.BuildConfig;
 import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.adapter.GridImageAdapter;
+import com.survlogic.survlogic.adapter.ProjectJobListAdaptor;
 import com.survlogic.survlogic.background.BackgroundProjectDetails;
+import com.survlogic.survlogic.background.BackgroundProjectJobList;
+import com.survlogic.survlogic.background.BackgroundProjectList;
 import com.survlogic.survlogic.database.ProjectDatabaseHandler;
 import com.survlogic.survlogic.model.Project;
 import com.survlogic.survlogic.model.ProjectImages;
+import com.survlogic.survlogic.model.ProjectJobs;
 import com.survlogic.survlogic.utils.ImageHelper;
 import com.survlogic.survlogic.utils.MathHelper;
 import com.survlogic.survlogic.utils.TimeHelper;
@@ -107,6 +112,8 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
 
     private boolean mProgressBarShow = false;
     private String mURLSyntex = "file://";
+
+    private ArrayList<ProjectJobs> arrayList = new ArrayList<ProjectJobs>();
 
     private TextView tvProjectName, tvProjectCreated, tvUnits, tvLocationLat, tvLocationLong,
             tvProjection, tvZone, tvStorage, tvDescription;
@@ -163,10 +170,12 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
 
         if (results){
             Log.d(TAG, "initView: Populated fields OK");
-            showMapView();
             Log.d(TAG, "showMapView: Started");
-            showGridView();
+            showMapView();
             Log.d(TAG, "initGridView: Started");
+            showGridView();
+            Log.d(TAG, "showRecyclerView: Started");
+            showRecyclerView();
             showProgressBar();
 
         }else{
@@ -664,6 +673,27 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
 
 
     }
+
+    //-------------------------------------------------------------------------------------------------------------------------//
+
+    /**
+     * Recycler View
+     */
+
+    private void showRecyclerView(){
+        BackgroundProjectJobList backgroundProjectJobList = new BackgroundProjectJobList(mContext, projectID);
+        backgroundProjectJobList.execute();
+    }
+
+    private void initRecyclerView(){
+
+    }
+
+
+    private void refreshRecyclerView(){
+
+    }
+
 
 
     //-------------------------------------------------------------------------------------------------------------------------//

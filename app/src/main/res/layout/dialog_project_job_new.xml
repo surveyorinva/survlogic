@@ -6,6 +6,32 @@
 
 
     <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:background="@color/colorPrimary"
+        android:layout_height="50dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:text="@string/job_new_title"
+                style="@style/Labels.Dialog"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+        </RelativeLayout>
+
+
+
+    </LinearLayout>
+
+
+
+    <LinearLayout
         android:id="@+id/layout_area_1"
         android:orientation="vertical"
         android:weightSum="2"
