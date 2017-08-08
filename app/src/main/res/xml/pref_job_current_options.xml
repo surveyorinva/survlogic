@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <PreferenceCategory
+    android:title="@string/pref_header_job_current_display_category_options_ui">
+
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="pref_key_current_job_options_ui_drawer_state"
+            android:title="@string/pref_current_job_options_drawer_state"
+            android:summary="@string/pref_current_job_options_drawer_state_summary"/>
+
+
+
+    </PreferenceCategory>
+
+
+
+</PreferenceScreen>

@@ -20,6 +20,7 @@
     <string name="general_exit_app">"Please click BACK again to exit"</string>
     <string name="general_loading_status">Loading…</string>
     <string name="general_blank"> </string>
+    <string name="general_default">default</string>
     <string name="general_menu_settings">Settings</string>
     <string name="general_menu_about">About</string>
 
@@ -207,6 +208,11 @@
     <string name="pref_header_job_current_display_category_display_distance">Distance Display</string>
     <string name="pref_header_job_current_display_category_display_angle">Angle/Direction Display</string>
 
+    <string name="pref_header_job_current_display_category_raw_data">Raw Data</string>
+    <string name="pref_header_job_current_display_category_code_list">Coding</string>
+
+    <string name="pref_header_job_current_display_category_options_ui">System</string>
+
     <!--General Tab -->
     <string name="pref_current_job_name">Open Job Name</string>
     <string name="pref_current_job_name_default">Job</string>
@@ -267,6 +273,18 @@
 
     <string name="pref_current_job_distance_observation_display">Horizontal Distances</string>
     <string name="pref_current_job_distance_observation_display_summary">Display distances as horizontal or slope distances</string>
+
+    <!-- Raw Data -->
+    <string name="pref_current_job_raw_data_file">Save Raw Data</string>
+    <string name="pref_current_job_raw_data_file_summary">Create a separate file that stores observation data and metadata</string>
+    <string name="pref_current_job_raw_data_time_stamp">Place Timestamp on Each Point</string>
+    <string name="pref_current_job_raw_data_gps_attributes">Place GPS metadata on Each Observation</string>
+    <string name="pref_current_job_raw_data_code_table">Use Code Table for Descriptions</string>
+    <string name="pref_current_job_raw_data_code_table_summary">Future</string>
+
+    <!-- Options -->
+    <string name="pref_current_job_options_drawer_state">Open Menu when Job Loads</string>
+    <string name="pref_current_job_options_drawer_state_summary">Show the menu when you first enter into the Job</string>
 
     <!--**************************GPS Survey Preferences**************************-->
 

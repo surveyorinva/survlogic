@@ -5,7 +5,6 @@
     <EditTextPreference
         android:key="@string/pref_key_current_job_name"
         android:title="@string/pref_current_job_name"
-        android:summary="@string/pref_current_job_name_summary"
         android:defaultValue="@string/pref_current_job_name_default"
         android:capitalize="words"
         android:inputType="textCapWords"
@@ -16,7 +15,6 @@
     <ListPreference
         android:key="@string/pref_key_current_job_type"
         android:title="@string/pref_current_job_type"
-        android:summary="@string/pref_current_job_type_summary"
         android:dialogTitle="@string/pref_current_job_type"
         android:entries="@array/job_type_titles"
         android:entryValues="@array/job_type_values"
@@ -31,7 +29,6 @@
         <ListPreference
             android:key="@string/pref_key_current_job_over_projection"
             android:title="@string/pref_current_job_projection"
-            android:summary="@string/pref_current_job_projection_summary"
             android:dialogTitle="@string/pref_current_job_projection"
             android:entries="@array/project_projection_titles"
             android:entryValues="@array/project_projection_values"
@@ -42,7 +39,7 @@
         <ListPreference
             android:key="@string/pref_key_current_job_over_zone"
             android:title="@string/pref_current_job_zone"
-            android:summary="@string/pref_current_job_zone_summary"
+
             android:dialogTitle="@string/pref_current_job_zone"
             android:entries="@array/project_projection_zones_titles"
             android:entryValues="@array/project_projection_zones_values"
@@ -53,7 +50,6 @@
         <ListPreference
             android:key="@string/pref_key_current_job_over_units"
             android:title="@string/pref_current_job_units"
-            android:summary="@string/pref_current_job_units_summary"
             android:dialogTitle="@string/pref_current_job_units"
             android:entries="@array/unit_measure_entries"
             android:entryValues="@array/unit_measure_values"

@@ -65,7 +65,7 @@ public class BackgroundProjectJobNew extends AsyncTask <ProjectJobs,ProjectJobs,
 
             //Get Model
             Log.d(TAG, "doInBackground: Fetching Job Settings Model");
-            ProjectJobSettings settings = new ProjectJobSettings(projectJob.getProjectId(), project_job_id,1,1,0,0,0,1,0,2,0,0,0,0,0,0,1,1,0,0);
+            ProjectJobSettings settings = new ProjectJobSettings(projectJob.getProjectId(), project_job_id, projectJob.getmJobName(),1,1,0,0,0,1,0,2,0,0,0,0,0,0,1,1,0,0);
             Log.d(TAG, "doInBackground: Complete fetching Job Setting Model");
 
             //Saving Job Settings
@@ -77,6 +77,10 @@ public class BackgroundProjectJobNew extends AsyncTask <ProjectJobs,ProjectJobs,
         }catch (Exception e){
             e.printStackTrace();
         }
+
+        Log.d(TAG, "doInBackground: Clean-up");
+        dbProject.close();
+        dbJob.close();
 
         if (project_job_id>0){
             return "One Row Inserted";

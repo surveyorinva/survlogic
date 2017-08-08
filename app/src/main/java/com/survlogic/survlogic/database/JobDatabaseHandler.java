@@ -2,6 +2,7 @@ package com.survlogic.survlogic.database;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Point;
@@ -31,6 +32,9 @@ public class JobDatabaseHandler extends SQLiteOpenHelper {
             + JobContract.JobSettingsEntry.TABLE_NAME
             + "("
             + JobContract.JobSettingsEntry.KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+            + JobContract.JobSettingsEntry.KEY_PROJECT_ID + " INTEGER,"
+            + JobContract.JobSettingsEntry.KEY_JOB_ID + " INTEGER,"
+            + JobContract.JobSettingsEntry.KEY_JOB_NAME + " TEXT,"
             + JobContract.JobSettingsEntry.KEY_UI_FIRST_START + " INTEGER,"
             + JobContract.JobSettingsEntry.KEY_DRAWER_STATE + " INTEGER,"
             + JobContract.JobSettingsEntry.KEY_DEFAULT_JOB_TYPE + " INTEGER,"
@@ -121,6 +125,10 @@ public class JobDatabaseHandler extends SQLiteOpenHelper {
 
 
         //Required
+        contentValues.put(JobContract.JobSettingsEntry.KEY_PROJECT_ID, settings.getProjectId());
+        contentValues.put(JobContract.JobSettingsEntry.KEY_JOB_ID, settings.getJob_id());
+        contentValues.put(JobContract.JobSettingsEntry.KEY_JOB_NAME, settings.getJobName());
+
         contentValues.put(JobContract.JobSettingsEntry.KEY_UI_FIRST_START, settings.getUiFirstStart());
         contentValues.put(JobContract.JobSettingsEntry.KEY_DRAWER_STATE,settings.getUiDrawerState());
         contentValues.put(JobContract.JobSettingsEntry.KEY_DEFAULT_JOB_TYPE, settings.getDefaultJobType());
@@ -239,7 +247,113 @@ public class JobDatabaseHandler extends SQLiteOpenHelper {
 
     }
 
+    //Reading---------------------------------------------------------------------------------------//
 
+
+    public ProjectJobSettings getJobSettingsById(SQLiteDatabase db, long job_settings_id){
+        Log.d(TAG, "getJobSettingsbyId: Starting");
+        String selectQuery = "SELECT  * FROM " + JobContract.JobSettingsEntry.TABLE_NAME + " WHERE "
+                + JobContract.JobSettingsEntry.KEY_ID + " = " + job_settings_id;
+
+        Log.e(TAG, selectQuery);
+
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        if (c != null)
+            c.moveToFirst();
+
+        ProjectJobSettings settings = new ProjectJobSettings();
+
+        //Required
+        settings.setProjectId(c.getInt((c.getColumnIndex(JobContract.JobSettingsEntry.KEY_PROJECT_ID))));
+        settings.setJob_id(c.getInt((c.getColumnIndex(JobContract.JobSettingsEntry.KEY_JOB_ID))));
+        settings.setJobName((c.getString(c.getColumnIndex(JobContract.JobSettingsEntry.KEY_JOB_NAME))));
+
+        settings.setUiFirstStart(c.getInt((c.getColumnIndex(JobContract.JobSettingsEntry.KEY_UI_FIRST_START))));
+        settings.setUiDrawerState(c.getInt((c.getColumnIndex(JobContract.JobSettingsEntry.KEY_DRAWER_STATE))));
+
+        settings.setDefaultJobType(c.getInt((c.getColumnIndex(JobContract.JobSettingsEntry.KEY_DEFAULT_JOB_TYPE))));
+        settings.setOverrideProjection(c.getInt((c.getColumnIndex(JobContract.JobSettingsEntry.KEY_OVER_PROJECTION))));
+        settings.setOverrideZone(c.getInt((c.getColumnIndex(JobContract.JobSettingsEntry.KEY_OVER_ZONE))));
+        settings.setOverrideUnits(c.getInt((c.getColumnIndex(JobContract.JobSettingsEntry.KEY_UNITS))));
+
+        settings.setAttClient((c.getString(c.getColumnIndex(JobContract.JobSettingsEntry.KEY_ATTR_CLIENT))));
+        settings.setAttMission((c.getString(c.getColumnIndex(JobContract.JobSettingsEntry.KEY_ATTR_MISSION))));
+
+        settings.setAttWeatherGeneral((c.getString(c.getColumnIndex(JobContract.JobSettingsEntry.KEY_ATTR_WEATHER_GENERAL))));
+        settings.setAttWeatherTemp((c.getString(c.getColumnIndex(JobContract.JobSettingsEntry.KEY_ATTR_WEATHER_TEMP))));
+        settings.setAttWeatherPress((c.getString(c.getColumnIndex(JobContract.JobSettingsEntry.KEY_ATTR_WEATHER_PRESS))));
+
+        settings.setAttStaffLeader((c.getString(c.getColumnIndex(JobContract.JobSettingsEntry.KEY_ATTR_STAFF_LEADER))));
+        settings.setAttStaff_1((c.getString(c.getColumnIndex(JobContract.JobSettingsEntry.KEY_ATTR_STAFF_STAFF1))));
+        settings.setAttStaff_2((c.getString(c.getColumnIndex(JobContract.JobSettingsEntry.KEY_ATTR_STAFF_STAFF2))));
+        settings.setAttStaffOther((c.getString(c.getColumnIndex(JobContract.JobSettingsEntry.KEY_ATTR_STAFF_OTHER))));
+
+        settings.setSystemDistanceDisplay(c.getInt((c.getColumnIndex(JobContract.JobSettingsEntry.KEY_SYSTEM_DIST_DISPLAY))));
+        settings.setSystemDistancePrecisionDisplay(c.getInt((c.getColumnIndex(JobContract.JobSettingsEntry.KEY_SYSTEM_DIST_PREC_DISPLAY))));
+        settings.setSystemAngleDisplay(c.getInt((c.getColumnIndex(JobContract.JobSettingsEntry.KEY_SYSTEM_ANGLE_DISPLAY))));
+
+        settings.setFormatCoordinatesEntry(c.getInt((c.getColumnIndex(JobContract.JobSettingsEntry.KEY_FORMAT_COORD_ENTRY))));
+        settings.setFormatAngleHorizontalDisplay(c.getInt((c.getColumnIndex(JobContract.JobSettingsEntry.KEY_FORMAT_ANGLE_HZ_DISPLAY))));
+        settings.setFormatAngleHorizontalObsEntry(c.getInt((c.getColumnIndex(JobContract.JobSettingsEntry.KEY_FORMAT_ANGLE_HZ_OBSERVATION_ENTRY))));
+        settings.setFormatAngleVerticalObsDisplay(c.getInt((c.getColumnIndex(JobContract.JobSettingsEntry.KEY_FORMAT_ANGLE_VZ_OBSERVATION_DISPLAY))));
+        settings.setFormatDistanceHorizontalObsDisplay(c.getInt((c.getColumnIndex(JobContract.JobSettingsEntry.KEY_FORMAT_DISTANCE_HZ_OBSERVATION_DISPLAY))));
+
+        settings.setOptionsRawFile(c.getInt((c.getColumnIndex(JobContract.JobSettingsEntry.KEY_OPTIONS_RAW_FILE))));
+        settings.setOptionsRawTimeStamp(c.getInt((c.getColumnIndex(JobContract.JobSettingsEntry.KEY_OPTIONS_RAW_TIME_STAMP))));
+        settings.setOptionsGpsAttribute(c.getInt((c.getColumnIndex(JobContract.JobSettingsEntry.KEY_OPTIONS_GPS_ATTRIBUTE))));
+        settings.setOptionsCodeTable(c.getInt((c.getColumnIndex(JobContract.JobSettingsEntry.KEY_OPTIONS_CODE_TABLE))));
+
+        return settings;
+    }
+
+    public int updateJobSettings(SQLiteDatabase db, ProjectJobSettings settings){
+        Log.d(TAG, "updateJobSettings: Starting...");
+        int settingsKey = 1;
+
+        ContentValues contentValues = new ContentValues();
+        
+        contentValues.put(JobContract.JobSettingsEntry.KEY_PROJECT_ID, settings.getProjectId());
+        contentValues.put(JobContract.JobSettingsEntry.KEY_JOB_ID, settings.getJob_id());
+        contentValues.put(JobContract.JobSettingsEntry.KEY_JOB_NAME, settings.getJobName());
+
+        contentValues.put(JobContract.JobSettingsEntry.KEY_UI_FIRST_START, settings.getUiFirstStart());
+        contentValues.put(JobContract.JobSettingsEntry.KEY_DRAWER_STATE,settings.getUiDrawerState());
+        contentValues.put(JobContract.JobSettingsEntry.KEY_DEFAULT_JOB_TYPE, settings.getDefaultJobType());
+
+        contentValues.put(JobContract.JobSettingsEntry.KEY_OVER_PROJECTION, settings.getOverrideProjection());
+        contentValues.put(JobContract.JobSettingsEntry.KEY_OVER_ZONE,settings.getOverrideZone());
+        contentValues.put(JobContract.JobSettingsEntry.KEY_UNITS,settings.getOverrideUnits());
+
+        contentValues.put(JobContract.JobSettingsEntry.KEY_SYSTEM_DIST_DISPLAY,settings.getSystemDistanceDisplay());
+        contentValues.put(JobContract.JobSettingsEntry.KEY_SYSTEM_DIST_PREC_DISPLAY,settings.getSystemDistancePrecisionDisplay());
+        contentValues.put(JobContract.JobSettingsEntry.KEY_SYSTEM_ANGLE_DISPLAY,settings.getSystemAngleDisplay());
+
+        contentValues.put(JobContract.JobSettingsEntry.KEY_FORMAT_COORD_ENTRY,settings.getFormatCoordinatesEntry());
+        contentValues.put(JobContract.JobSettingsEntry.KEY_FORMAT_ANGLE_HZ_DISPLAY,settings.getFormatAngleHorizontalDisplay());
+        contentValues.put(JobContract.JobSettingsEntry.KEY_FORMAT_ANGLE_HZ_OBSERVATION_ENTRY,settings.getFormatAngleHorizontalObsEntry());
+        contentValues.put(JobContract.JobSettingsEntry.KEY_FORMAT_ANGLE_VZ_OBSERVATION_DISPLAY,settings.getFormatAngleVerticalObsDisplay());
+        contentValues.put(JobContract.JobSettingsEntry.KEY_FORMAT_DISTANCE_HZ_OBSERVATION_DISPLAY,settings.getFormatDistanceHorizontalObsDisplay());
+
+        contentValues.put(JobContract.JobSettingsEntry.KEY_OPTIONS_RAW_FILE, settings.getOptionsRawFile());
+        contentValues.put(JobContract.JobSettingsEntry.KEY_OPTIONS_RAW_TIME_STAMP,settings.getOptionsRawTimeStamp());
+        contentValues.put(JobContract.JobSettingsEntry.KEY_OPTIONS_GPS_ATTRIBUTE, settings.getOptionsGpsAttribute());
+        contentValues.put(JobContract.JobSettingsEntry.KEY_OPTIONS_CODE_TABLE, settings.getOptionsCodeTable());
+        
+        contentValues.put(JobContract.JobSettingsEntry.KEY_ATTR_CLIENT,settings.getAttClient());
+        contentValues.put(JobContract.JobSettingsEntry.KEY_ATTR_MISSION,settings.getAttMission());
+        contentValues.put(JobContract.JobSettingsEntry.KEY_ATTR_WEATHER_GENERAL,settings.getAttWeatherGeneral());
+        contentValues.put(JobContract.JobSettingsEntry.KEY_ATTR_WEATHER_TEMP,settings.getAttWeatherTemp());
+
+        contentValues.put(JobContract.JobSettingsEntry.KEY_ATTR_STAFF_LEADER,settings.getAttStaffLeader());
+        contentValues.put(JobContract.JobSettingsEntry.KEY_ATTR_STAFF_STAFF1,settings.getAttStaff_1());
+        contentValues.put(JobContract.JobSettingsEntry.KEY_ATTR_STAFF_STAFF2,settings.getAttStaff_2());
+        contentValues.put(JobContract.JobSettingsEntry.KEY_ATTR_STAFF_OTHER,settings.getAttStaffOther());
+
+        return db.update(JobContract.JobSettingsEntry.TABLE_NAME, contentValues, JobContract.JobSettingsEntry.KEY_ID + " = ?",
+                new String[] {String.valueOf(settingsKey)});
+        
+    }
 
 
 }

@@ -34,6 +34,9 @@ public class JobContract {
         public static final String TABLE_NAME = "settings_table";
 
         public static final String KEY_ID = "id";
+        public static final String KEY_JOB_NAME = "job_name";
+        public static final String KEY_PROJECT_ID = "project_id";
+        public static final String KEY_JOB_ID = "job_id";
         public static final String KEY_UI_FIRST_START = "ui_first_start";
         public static final String KEY_DRAWER_STATE = "drawer_state";
         public static final String KEY_DEFAULT_JOB_TYPE = "default_job_type";

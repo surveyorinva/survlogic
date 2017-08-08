@@ -106,6 +106,8 @@ public class ProjectJobListAdaptor extends RecyclerView.Adapter<RecyclerView.Vie
         final int projectID = projectJob.getProjectId();
         final int projectJobID = projectJob.getId();
 
+        final String projectJobDatabaseName = projectJob.getmJobDbName();
+
 //        Job Name
         vh1.txtJobName.setText(projectJob.getmJobName());
 
@@ -125,7 +127,7 @@ public class ProjectJobListAdaptor extends RecyclerView.Adapter<RecyclerView.Vie
                 Intent intent = new Intent(mContext, JobActivity.class);
                 intent.putExtra("PROJECT_ID",projectID);
                 intent.putExtra("JOB_ID", projectJobID);
-
+                intent.putExtra("JOB_DB_NAME", projectJobDatabaseName);
                 mContext.startActivity(intent);
             }
         });

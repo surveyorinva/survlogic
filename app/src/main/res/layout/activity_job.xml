@@ -29,6 +29,23 @@
         <!--Container-->
         <RelativeLayout
             android:id="@+id/relLayout_2"
+            android:layout_below="@id/relLayout_1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+
+            <ProgressBar
+                android:id="@+id/progressStatus"
+                android:indeterminate="true"
+                android:layout_centerInParent="true"
+                android:visibility="visible"
+                android:layout_width="45dp"
+                android:layout_height="45dp" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/relLayout_3"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 

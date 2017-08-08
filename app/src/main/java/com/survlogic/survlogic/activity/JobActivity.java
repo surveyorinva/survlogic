@@ -3,10 +3,16 @@ package com.survlogic.survlogic.activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
@@ -15,9 +21,14 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.survlogic.survlogic.R;
+import com.survlogic.survlogic.database.JobDatabaseHandler;
+import com.survlogic.survlogic.model.ProjectJobSettings;
 import com.survlogic.survlogic.utils.BottomNavigationViewHelper;
 
 /**
@@ -33,18 +44,61 @@ public class JobActivity extends AppCompatActivity implements NavigationView.OnN
     private ActionBarDrawerToggle actionBarDrawerToggle;
     private NavigationView navigationView;
 
+    private static final int DELAY_TO_LOAD_SETTINGS = 1000;
+    private static final int DELAY_TO_SAVE_SETTINGS = 1000;
+
+    private static final int DELAY_TO_SHOW_DRAWER_LAYOUT = 1500;
+    private final int MESSAGE_SHOW_DRAWER_LAYOUT = 0x001;
+
+    private final int MESSAGE_SHOW_START_PAGE = 0x002;
+
+    private SharedPreferences sharedPreferences;
+    private SharedPreferences.Editor editor;
+
+    private ProjectJobSettings jobSettings;
+    private int project_id, job_id, job_settings_id = 1;
+    private String jobDatabaseName;
+
+    private RelativeLayout rlLayout2;
+    private ProgressBar progressBar;
+
+    public Handler mHandler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what){
+                case MESSAGE_SHOW_DRAWER_LAYOUT:
+                    drawerLayout.openDrawer(GravityCompat.START);
+                    break;
+            }
+        }
+    };
+
 
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(TAG, "onCreate: Starting................>");
         setContentView(R.layout.activity_job);
         mContext = JobActivity.this;
 
         initViewToolbar();
         initViewNavigation();
+        initViewWidgets();
         initBottomNavigationView();
 
+        loadPreferences();
+        checkPreferences();
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.d(TAG, "onResume: Starting..............>");
+
+        Log.d(TAG, "onResume: Saving Preferences...");
+        savePreferences();
     }
 
     @Override
@@ -55,6 +109,10 @@ public class JobActivity extends AppCompatActivity implements NavigationView.OnN
 
 
     //---------------------------------------------------------------------------------------------//
+
+    /**
+     * Toolbar and UI Methods
+     */
 
     private void initViewToolbar(){
         toolbar = (Toolbar) findViewById(R.id.toolbar_in_job_view);
@@ -76,19 +134,6 @@ public class JobActivity extends AppCompatActivity implements NavigationView.OnN
 
     }
 
-    /**
-     * Bottom Navigation View
-     */
-    private void initBottomNavigationView(){
-        Log.d(TAG, "initBottomNavigationView: Started");
-
-        BottomNavigationViewEx bottomNavigationViewEx = (BottomNavigationViewEx) findViewById(R.id.bottomNavViewBar);
-        BottomNavigationViewHelper.setupBottomNavigationView(bottomNavigationViewEx);
-        BottomNavigationViewHelper.enableNavigationHome(mContext, bottomNavigationViewEx);
-        Menu menu = bottomNavigationViewEx.getMenu();
-
-
-    }
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -112,12 +157,291 @@ public class JobActivity extends AppCompatActivity implements NavigationView.OnN
                 //Action here
                 break;
 
+            case R.id.menu_item5_id:
+                intent.setClass(this, SettingsCurrentJobActivity.class);
+                startActivity(intent);
+
+                break;
+
         }
 
         drawerLayout.closeDrawers();
         return false;
 
     }
+
+    private void initViewWidgets(){
+        Log.d(TAG, "initViewWidgets: Starting...");
+
+        Log.d(TAG, "initView: Started");
+
+        Bundle extras = getIntent().getExtras();
+        project_id = extras.getInt("PROJECT_ID");
+        job_id = extras.getInt("JOB_ID");
+        jobDatabaseName = extras.getString("JOB_DB_NAME");
+
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        rlLayout2 = (RelativeLayout) findViewById(R.id.relLayout_2) ;
+        progressBar = (ProgressBar) findViewById(R.id.progressStatus);
+
+    }
+
+
+    //----------------------------------------------------------------------------------------------//
+
+    private void loadPreferences(){
+
+        rlLayout2.setVisibility(View.VISIBLE);
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                initJobSettingsFromDb();
+                rlLayout2.setVisibility(View.GONE);
+            }
+        },DELAY_TO_LOAD_SETTINGS);
+    }
+
+
+    private void savePreferences(){
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                initJobSettingsToDb();
+
+            }
+        }, DELAY_TO_SAVE_SETTINGS);
+    }
+
+
+    /**
+     * Take preferences from database and populate current job preferences with the dataset.
+     */
+
+
+    private boolean initJobSettingsFromDb(){
+        Log.d(TAG, "initJobSettingsFromObject: Started...");
+        boolean results = false;
+
+        Log.d(TAG, "initJobSettingsFromObject: Connecting to db");
+        JobDatabaseHandler jobDb = new JobDatabaseHandler(this,jobDatabaseName);
+        SQLiteDatabase db = jobDb.getReadableDatabase();
+
+
+        try {
+            Log.d(TAG, "initJobSettingsFromDb: Trying to get Job Settings from DB");
+            jobSettings = jobDb.getJobSettingsById(db,job_settings_id);
+
+
+            editor = sharedPreferences.edit();
+
+            Log.d(TAG, "initJobSettingsFromDb: Job Settings Loading, Populating General Preferences");
+            //General
+            editor.putString(getString(R.string.pref_key_current_job_name),jobSettings.getJobName());
+            editor.putString(getString(R.string.pref_key_current_job_type), String.valueOf(jobSettings.getDefaultJobType()));
+            editor.putString(getString(R.string.pref_key_current_job_over_projection), String.valueOf(jobSettings.getOverrideProjection()));
+            editor.putString(getString(R.string.pref_key_current_job_over_zone), String.valueOf(jobSettings.getOverrideZone()));
+            editor.putString(getString(R.string.pref_key_current_job_over_units), String.valueOf(jobSettings.getOverrideUnits()));
+
+            Log.d(TAG, "initJobSettingsFromDb: Loading Notes Preferences");
+            //Notes
+            editor.putString(getString(R.string.pref_key_current_job_attr_client),jobSettings.getAttClient());
+            editor.putString(getString(R.string.pref_key_current_job_attr_mission),jobSettings.getAttMission());
+            editor.putString(getString(R.string.pref_key_current_job_attr_weather_general),jobSettings.getAttWeatherGeneral());
+            editor.putString(getString(R.string.pref_key_current_job_attr_weather_temp),jobSettings.getAttWeatherTemp());
+            editor.putString(getString(R.string.pref_key_current_job_attr_weather_pres),jobSettings.getAttWeatherPress());
+            editor.putString(getString(R.string.pref_key_current_job_attr_staff_chief),jobSettings.getAttStaffLeader());
+            editor.putString(getString(R.string.pref_key_current_job_attr_staff_iman),jobSettings.getAttStaff_1());
+            editor.putString(getString(R.string.pref_key_current_job_attr_staff_rman),jobSettings.getAttStaff_2());
+            editor.putString(getString(R.string.pref_key_current_job_attr_staff_other),jobSettings.getAttStaffOther());
+
+            Log.d(TAG, "initJobSettingsFromDb: Loading Display Preferences");
+            //Display
+            editor.putString(getString(R.string.pref_key_current_job_system_distance_display), String.valueOf(jobSettings.getSystemDistanceDisplay()));
+            editor.putString(getString(R.string.pref_key_current_job_system_distance_precision_display), String.valueOf(jobSettings.getSystemDistancePrecisionDisplay()));
+            editor.putString(getString(R.string.pref_key_current_job_system_angle_display), String.valueOf(jobSettings.getSystemAngleDisplay()));
+
+            editor.putString(getString(R.string.pref_key_current_job_format_coord_entry), String.valueOf(jobSettings.getFormatCoordinatesEntry()));
+            editor.putString(getString(R.string.pref_key_current_job_format_angle_hz_display), String.valueOf(jobSettings.getFormatAngleHorizontalDisplay()));
+            editor.putString(getString(R.string.pref_key_current_job_format_angle_hz_obsrv_entry), String.valueOf(jobSettings.getFormatDistanceHorizontalObsDisplay()));
+            editor.putString(getString(R.string.pref_key_current_job_format_angle_vz_obsrv_display), String.valueOf(jobSettings.getFormatAngleVerticalObsDisplay()));
+            editor.putString(getString(R.string.pref_key_current_job_format_distance_hz_obsrv_display), String.valueOf(jobSettings.getFormatDistanceHorizontalObsDisplay()));
+
+            Log.d(TAG, "initJobSettingsFromDb: Loading Raw Data Preferences");
+            //Raw Data
+            if(jobSettings.getOptionsRawFile() == 0){
+                editor.putBoolean(getString(R.string.pref_key_current_job_options_raw_file), false);
+            }else{
+                editor.putBoolean(getString(R.string.pref_key_current_job_options_raw_file), true);
+            }
+
+            if( jobSettings.getOptionsRawTimeStamp() == 0){
+                editor.putBoolean(getString(R.string.pref_key_current_job_options_raw_time_stamp),false);
+            }else{
+                editor.putBoolean(getString(R.string.pref_key_current_job_options_raw_time_stamp),true);
+            }
+
+            if(jobSettings.getOptionsGpsAttribute() == 0){
+                editor.putBoolean(getString(R.string.pref_key_current_job_options_gps_attribute),false);
+            }else{
+                editor.putBoolean(getString(R.string.pref_key_current_job_options_gps_attribute),true);
+            }
+
+            if(jobSettings.getOptionsCodeTable() == 0){
+                editor.putBoolean(getString(R.string.pref_key_current_job_options_code_table),false);
+            }else{
+                editor.putBoolean(getString(R.string.pref_key_current_job_options_code_table),true);
+            }
+
+            Log.d(TAG, "initJobSettingsFromDb: Loading Options Preferences");
+            //Options
+
+            if(jobSettings.getUiDrawerState() == 0){
+                editor.putBoolean(getString(R.string.pref_key_current_job_options_ui_drawer_state), false);
+            }else{
+                editor.putBoolean(getString(R.string.pref_key_current_job_options_ui_drawer_state), true);
+            }
+
+            //editor.putInt(getString(R.string.pref_key_current_job_first_start), jobSettings.getUiFirstStart());//
+
+            Log.d(TAG, "initJobSettingsFromDb: Applying Preferences");
+            editor.apply();
+
+            results = true;
+            Log.d(TAG, "initJobSettingsFromObject: Database Retrieval Complete.  Closing DB Connection");
+            db.close();
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+        return results;
+
+        }
+
+
+        private boolean initJobSettingsToDb(){
+            Log.d(TAG, "initJobSettingsToDb: Starting...");
+            boolean results = false;
+
+            Log.d(TAG, "initJobSettingsToDb: Saving General Data...");
+            //General
+            String general_name = sharedPreferences.getString(getString(R.string.pref_key_current_job_name),getString(R.string.general_default));
+            int general_type = Integer.parseInt(sharedPreferences.getString(getString(R.string.pref_key_current_job_type),"0"));
+            int general_over_projection = Integer.parseInt(sharedPreferences.getString(getString(R.string.pref_key_current_job_over_projection),"0"));
+            int general_over_zone = Integer.parseInt(sharedPreferences.getString(getString(R.string.pref_key_current_job_over_zone),"0"));
+            int general_over_units = Integer.parseInt(sharedPreferences.getString(getString(R.string.pref_key_current_job_over_units),"0"));
+
+            Log.d(TAG, "initJobSettingsToDb: Saving Notes Data...");
+            //Notes
+            String attr_client = sharedPreferences.getString(getString(R.string.pref_key_current_job_attr_client),getString(R.string.general_blank));
+            String attr_mission = sharedPreferences.getString(getString(R.string.pref_key_current_job_attr_mission),getString(R.string.general_blank));
+            String attr_weather_general = sharedPreferences.getString(getString(R.string.pref_key_current_job_attr_weather_general),getString(R.string.general_blank));
+            String attr_weather_temp = sharedPreferences.getString(getString(R.string.pref_key_current_job_attr_weather_temp),getString(R.string.general_blank));
+            String attr_weather_pres = sharedPreferences.getString(getString(R.string.pref_key_current_job_attr_weather_pres),getString(R.string.general_blank));
+            String attr_staff_chief = sharedPreferences.getString(getString(R.string.pref_key_current_job_attr_staff_chief),getString(R.string.general_blank));
+            String attr_staff_iman = sharedPreferences.getString(getString(R.string.pref_key_current_job_attr_staff_iman),getString(R.string.general_blank));
+            String attr_staff_rman = sharedPreferences.getString(getString(R.string.pref_key_current_job_attr_staff_rman),getString(R.string.general_blank));
+            String attr_staff_other = sharedPreferences.getString(getString(R.string.pref_key_current_job_attr_staff_other),getString(R.string.general_blank));
+
+            Log.d(TAG, "initJobSettingsToDb: Save Display Data...");
+            //Display
+            int system_distance_display = Integer.parseInt(sharedPreferences.getString(getString(R.string.pref_key_current_job_system_distance_display),"0"));
+            int system_distance_precision_display = Integer.parseInt(sharedPreferences.getString(getString(R.string.pref_key_current_job_system_distance_precision_display),"0"));
+            int system_angle_display = Integer.parseInt(sharedPreferences.getString(getString(R.string.pref_key_current_job_system_angle_display),"0"));
+
+            int format_coord_entry = Integer.parseInt(sharedPreferences.getString(getString(R.string.pref_key_current_job_format_coord_entry),"0"));
+            int format_angle_hz_display = Integer.parseInt(sharedPreferences.getString(getString(R.string.pref_key_current_job_format_angle_hz_display),"0"));
+            int format_angle_hz_obsrv_entry = Integer.parseInt(sharedPreferences.getString(getString(R.string.pref_key_current_job_format_angle_hz_obsrv_entry),"0"));
+            int format_angle_vz_obsrv_display = Integer.parseInt(sharedPreferences.getString(getString(R.string.pref_key_current_job_format_angle_vz_obsrv_display),"0"));
+            int format_distance_hz_obsrv_display = Integer.parseInt(sharedPreferences.getString(getString(R.string.pref_key_current_job_format_distance_hz_obsrv_display),"0"));
+
+            Log.d(TAG, "initJobSettingsToDb: Save Raw Data...");
+            //Raw Data
+            int raw_file = 0;
+            if(sharedPreferences.getBoolean(getString(R.string.pref_key_current_job_options_raw_file),true)){
+                raw_file = 1;
+            }
+
+            int raw_file_timestamp = 0;
+            if(sharedPreferences.getBoolean(getString(R.string.pref_key_current_job_options_raw_time_stamp),true)){
+                raw_file_timestamp = 1;
+            }
+
+            int raw_gps_attribute = 0;
+            if(sharedPreferences.getBoolean(getString(R.string.pref_key_current_job_options_gps_attribute),true)){
+                raw_gps_attribute = 1;
+            }
+
+            int raw_desc_code_list = 0;
+            if(sharedPreferences.getBoolean(getString(R.string.pref_key_current_job_options_code_table),true)){
+                raw_desc_code_list = 1;
+            }
+
+            Log.d(TAG, "initJobSettingsToDb: Save Options...");
+            //Options
+            int options_drawer_state = 0;
+            if(sharedPreferences.getBoolean(getString(R.string.pref_key_current_job_options_ui_drawer_state),true)){
+                options_drawer_state = 1;
+            }
+
+            int options_first_start = 0;
+
+            Log.d(TAG, "initJobSettingsToDb: Creating Settings model...");
+            ProjectJobSettings settings = new ProjectJobSettings(project_id, job_id, general_name,
+                    options_first_start, options_drawer_state,
+                    general_type, general_over_projection, general_over_zone, general_over_units,
+                    system_distance_display, system_distance_precision_display, system_angle_display,
+                    format_angle_hz_display, format_angle_vz_obsrv_display, format_distance_hz_obsrv_display, format_coord_entry, format_angle_hz_obsrv_entry,
+                    raw_file, raw_file_timestamp, raw_gps_attribute, raw_desc_code_list,attr_client, attr_mission, attr_weather_general, attr_weather_temp, attr_weather_pres,
+                    attr_staff_chief, attr_staff_iman, attr_staff_rman, attr_staff_other);
+
+
+            Log.d(TAG, "initJobSettingsToDb: Options_Drawer_State: " + options_drawer_state);
+            Log.d(TAG, "initJobSettingsToDb: Starting Database Exchange");
+            JobDatabaseHandler jobDb  = new JobDatabaseHandler(mContext,jobDatabaseName);
+            SQLiteDatabase dbJob = jobDb.getWritableDatabase();
+
+            int row = 0;
+            try{
+                Log.d(TAG, "initJobSettingsToDb: Trying to Save Row...");
+                row = jobDb.updateJobSettings(dbJob, settings);
+
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+
+            Log.d(TAG, "initJobSettingsToDb: Closing DB Connection...");
+            dbJob.close();
+
+            if (row>0){
+                Log.d(TAG, "initJobSettingsToDb: Successful in Updating Settings...");
+                return true;
+            }else {
+                Log.d(TAG, "initJobSettingsToDb: Something Went Wrong...");
+                return false;
+            }
+
+        }
+
+
+        private void checkPreferences(){
+            Log.d(TAG, "checkPreferences: Started...");
+            if (sharedPreferences.getBoolean(getString(R.string.pref_key_current_job_options_ui_drawer_state),false)){
+                Log.d(TAG, "checkPreferences: Drawer State = True");
+                mHandler.sendEmptyMessageDelayed(MESSAGE_SHOW_DRAWER_LAYOUT, DELAY_TO_SHOW_DRAWER_LAYOUT);
+            }
+
+
+        }
+
+    //---------------------------------------------------------------------------------------------//
+
+    /**
+     *Creates a Dialog Box to Confirm user to leave the Job Activity
+     */
 
     private AlertDialog DialogCloseActivity(){
 
@@ -127,6 +451,7 @@ public class JobActivity extends AppCompatActivity implements NavigationView.OnN
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        savePreferences();
                         finish();
                     }
                 })
@@ -142,6 +467,20 @@ public class JobActivity extends AppCompatActivity implements NavigationView.OnN
         return myDialogBox;
     }
 
+
+    /**
+     * Bottom Navigation View
+     */
+    private void initBottomNavigationView(){
+        Log.d(TAG, "initBottomNavigationView: Started");
+
+        BottomNavigationViewEx bottomNavigationViewEx = (BottomNavigationViewEx) findViewById(R.id.bottomNavViewBar);
+        BottomNavigationViewHelper.setupBottomNavigationView(bottomNavigationViewEx);
+        BottomNavigationViewHelper.enableNavigationHome(mContext, bottomNavigationViewEx);
+        Menu menu = bottomNavigationViewEx.getMenu();
+
+
+    }
 
 
 }

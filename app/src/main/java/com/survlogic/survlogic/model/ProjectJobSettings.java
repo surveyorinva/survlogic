@@ -26,6 +26,7 @@ public class ProjectJobSettings {
     private int optionsRawFile, optionsRawTimeStamp, optionsGpsAttribute, optionsCodeTable;
 
     //Attributes for Job
+    private String jobName;
     private String attClient, attMission, attWeatherGeneral, attWeatherTemp, attWeatherPress;
     private String attStaffLeader, attStaff_1, attStaff_2, attStaffOther;
 
@@ -33,7 +34,7 @@ public class ProjectJobSettings {
 
     }
 
-    public ProjectJobSettings(long projectId, long job_id, int uiFirstStart, int uiDrawerState, int defaultJobType,
+    public ProjectJobSettings(long projectId, long job_id, String jobName, int uiFirstStart, int uiDrawerState, int defaultJobType,
                               int overrideProjection, int overrideZone, int overrideUnits, int systemDistanceDisplay,
                               int systemDistancePrecisionDisplay, int systemAngleDisplay, int formatAngleHorizontalDisplay,
                               int formatAngleVerticalObsDisplay, int formatDistanceHorizontalObsDisplay,
@@ -41,6 +42,7 @@ public class ProjectJobSettings {
                               int optionsRawTimeStamp, int optionsGpsAttribute, int optionsCodeTable) {
         this.projectId = projectId;
         this.job_id = job_id;
+        this.jobName = jobName;
         this.uiFirstStart = uiFirstStart;
         this.uiDrawerState = uiDrawerState;
         this.defaultJobType = defaultJobType;
@@ -62,7 +64,7 @@ public class ProjectJobSettings {
     }
 
 
-    public ProjectJobSettings(long projectId, long job_id, int uiFirstStart, int uiDrawerState, int defaultJobType,
+    public ProjectJobSettings(long projectId, long job_id, String jobName, int uiFirstStart, int uiDrawerState, int defaultJobType,
                               int overrideProjection, int overrideZone, int overrideUnits, int systemDistanceDisplay,
                               int systemDistancePrecisionDisplay, int systemAngleDisplay, int formatAngleHorizontalDisplay,
                               int formatAngleVerticalObsDisplay, int formatDistanceHorizontalObsDisplay,
@@ -72,6 +74,7 @@ public class ProjectJobSettings {
                               String attStaffLeader, String attStaff_1, String attStaff_2, String attStaffOther) {
         this.projectId = projectId;
         this.job_id = job_id;
+        this.jobName = jobName;
         this.uiFirstStart = uiFirstStart;
         this.uiDrawerState = uiDrawerState;
         this.defaultJobType = defaultJobType;
@@ -115,6 +118,14 @@ public class ProjectJobSettings {
 
     public void setJob_id(long job_id) {
         this.job_id = job_id;
+    }
+
+    public String getJobName() {
+        return jobName;
+    }
+
+    public void setJobName(String jobName) {
+        this.jobName = jobName;
     }
 
     public int getUiFirstStart() {

@@ -46,12 +46,11 @@
         </activity>
 
 
-        <activity android:name=".activity.MainActivity"
+        <activity
+            android:name=".activity.MainActivity"
             android:screenOrientation="portrait"
             android:label="Project View"
-            android:theme="@style/SuperMaterialTheme">
-        </activity>
-
+            android:theme="@style/SuperMaterialTheme"/>
 
         <activity
             android:name=".activity.GpsSurveyActivity"
@@ -65,64 +64,50 @@
         <activity
             android:name=".activity.SettingsActivity"
             android:screenOrientation="portrait"
-            android:label="@string/title_activity_settings">
+            android:label="@string/title_activity_settings"/>
 
-        </activity>
 
-        <activity android:name=".activity.SettingsGpsSurveyActivity"
+        <activity
+            android:name=".activity.SettingsGpsSurveyActivity"
             android:parentActivityName=".activity.GpsSurveyActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/SuperMaterialTheme" >
+            android:theme="@style/SuperMaterialTheme"/>
 
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activity.GpsSurveyActivity" />
-
-        </activity>
-
-        <activity android:name=".activity.SettingsJobCurrentActivity"
-            android:parentActivityName=".activity.MainActivity"
-            android:screenOrientation="portrait">
-
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activity.MainActivity" />
-
-        </activity>
-
-        <activity android:name=".activity.ProjectNewActivity"
+        <activity
+            android:name=".activity.ProjectNewActivity"
             android:screenOrientation="portrait"
             android:label="New Project"
-            android:theme="@style/SuperMaterialTheme">
-        </activity>
+            android:theme="@style/SuperMaterialTheme"/>
 
-        <activity android:name=".activity.ProjectDetailsActivity"
+        <activity
+            android:name=".activity.ProjectDetailsActivity"
             android:screenOrientation="portrait"
             android:label="Project View"
-            android:theme="@style/SuperMaterialTheme">
-        </activity>
+            android:theme="@style/SuperMaterialTheme"/>
 
-        <activity android:name=".activity.PhotoGalleryActivity"
+        <activity
+            android:name=".activity.PhotoGalleryActivity"
             android:screenOrientation="portrait"
             android:label="Photo Gallery"
             android:excludeFromRecents="true"
-            android:theme="@style/SuperMaterialTheme">
+            android:theme="@style/SuperMaterialTheme"/>
 
-        </activity>
-
-        <activity android:name=".activity.WelcomeActivity"
+        <activity
+            android:name=".activity.WelcomeActivity"
             android:screenOrientation="portrait"
             android:label="Welcome"
-            android:theme="@style/SuperMaterialTheme">
+            android:theme="@style/SuperMaterialTheme"/>
 
-        </activity>
-
-
-        <activity android:name=".activity.JobActivity"
+        <activity
+            android:name=".activity.JobActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/SuperMaterialTheme">
+            android:theme="@style/SuperMaterialTheme"/>
 
-        </activity>
+        <activity
+            android:name=".activity.SettingsCurrentJobActivity"
+            android:parentActivityName=".activity.JobActivity" />
+
+
 
     </application>
 

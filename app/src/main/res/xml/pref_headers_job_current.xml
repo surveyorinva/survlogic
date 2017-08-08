@@ -9,22 +9,22 @@
 
     <header
         android:fragment="com.survlogic.survlogic.activity.SettingsCurrentJobActivity$NotesPreferenceFragment"
-        android:icon="@drawable/ic_notifications_black_24dp"
+        android:icon="@drawable/ic_info_black_24dp"
         android:title="@string/pref_header_job_current_notes" />
 
     <header
         android:fragment="com.survlogic.survlogic.activity.SettingsCurrentJobActivity$DisplayPreferenceFragment"
-        android:icon="@drawable/ic_sync_black_24dp"
+        android:icon="@drawable/ic_info_black_24dp"
         android:title="@string/pref_header_job_current_display" />
 
     <header
         android:fragment="com.survlogic.survlogic.activity.SettingsCurrentJobActivity$RawDataPreferenceFragment"
-        android:icon="@drawable/ic_sync_black_24dp"
+        android:icon="@drawable/ic_info_black_24dp"
         android:title="@string/pref_header_job_current_raw_data" />
 
     <header
         android:fragment="com.survlogic.survlogic.activity.SettingsCurrentJobActivity$OptionsPreferenceFragment"
-        android:icon="@drawable/ic_sync_black_24dp"
-        android:title="@string/pref_header_job_current_raw_data" />
+        android:icon="@drawable/ic_info_black_24dp"
+        android:title="@string/pref_header_job_current_options" />
 
 </preference-headers>

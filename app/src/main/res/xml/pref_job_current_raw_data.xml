@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <PreferenceCategory
+    android:title="@string/pref_header_job_current_display_category_raw_data">
+
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="pref_key_current_job_options_raw_file"
+            android:title="@string/pref_current_job_raw_data_file"
+            android:summary="@string/pref_current_job_raw_data_file_summary"/>
+
+
+        <SwitchPreference
+            android:defaultValue="false"
+            android:dependency="pref_key_current_job_options_raw_file"
+            android:key="pref_key_current_job_options_raw_time_stamp"
+            android:title="@string/pref_current_job_raw_data_time_stamp" />
+
+        <SwitchPreference
+            android:defaultValue="false"
+            android:dependency="pref_key_current_job_options_raw_file"
+            android:key="pref_key_current_job_options_gps_attribute"
+            android:title="@string/pref_current_job_raw_data_gps_attributes" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/pref_header_job_current_display_category_code_list">
+
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="pref_key_current_job_options_code_table"
+            android:title="@string/pref_current_job_raw_data_code_table"
+            android:summary="@string/pref_current_job_raw_data_code_table_summary"/>
+
+
+    </PreferenceCategory>
+
+
+
+
+
+
+</PreferenceScreen>

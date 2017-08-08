@@ -152,8 +152,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
 
             case R.id.menu_item5_id:
-                intent.setClass(this, SettingsJobCurrentActivity.class);
-                startActivity(intent);
+
         }
 
         drawerLayout.closeDrawers();
