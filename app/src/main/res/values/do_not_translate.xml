@@ -61,8 +61,6 @@
     <string name="pref_key_current_job_options_gps_attribute">pref_key_current_job_options_gps_attribute</string>
     <string name="pref_key_current_job_options_code_table">pref_key_current_job_options_code_table</string>
 
-    <string name="pref_key_current_job_options_ui_drawer_state">pref_key_options_ui_drawer_state</string>
-
 
     <!-- Default preference values -->
     <string name="pref_gps_min_time_default_sec">1</string>

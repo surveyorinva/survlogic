@@ -25,6 +25,7 @@ public class JobContract {
         public static final String KEY_DESCRIPTION = "description";
         public static final String KEY_DATE_CREATED = "created";
         public static final String KEY_DATE_MODIFIED = "modified";
+        public static final String KEY_POINT_TYPE = "pointType";
 
 
     }

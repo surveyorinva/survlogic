@@ -5,15 +5,15 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.graphics.Point;
 import android.util.Log;
 
 import com.survlogic.survlogic.model.PointGeodetic;
 import com.survlogic.survlogic.model.PointSurvey;
 import com.survlogic.survlogic.model.ProjectJobSettings;
-import com.survlogic.survlogic.view.DialogProjectDescriptionAdd;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by chrisfillmore on 8/4/2017.
@@ -77,9 +77,9 @@ public class JobDatabaseHandler extends SQLiteOpenHelper {
             + JobContract.PointEntry.KEY_GEOELLIPS + " DOUBLE,"
             + JobContract.PointEntry.KEY_GEOACCURACY + " DOUBLE,"
             + JobContract.PointEntry.KEY_DESCRIPTION + " TEXT,"
+            + JobContract.PointEntry.KEY_POINT_TYPE + " INTEGER,"
             + JobContract.PointEntry.KEY_DATE_CREATED + " INTEGER,"
             + JobContract.PointEntry.KEY_DATE_MODIFIED + " INTEGER);";
-
 
 
     public JobDatabaseHandler(Context context, String DB_NAME) {
@@ -195,6 +195,7 @@ public class JobDatabaseHandler extends SQLiteOpenHelper {
         contentValues.put(JobContract.PointEntry.KEY_EASTING, pointSurvey.getEasting());
         contentValues.put(JobContract.PointEntry.KEY_ELEVATION, pointSurvey.getElevation());
         contentValues.put(JobContract.PointEntry.KEY_DESCRIPTION, pointSurvey.getDescription());
+        contentValues.put(JobContract.PointEntry.KEY_POINT_TYPE, pointSurvey.getPointType());
 
         contentValues.put(JobContract.PointEntry.KEY_DATE_CREATED,(int) (new Date().getTime()/1000));
 
@@ -223,6 +224,7 @@ public class JobDatabaseHandler extends SQLiteOpenHelper {
         contentValues.put(JobContract.PointEntry.KEY_EASTING, pointGeodetic.getEasting());
         contentValues.put(JobContract.PointEntry.KEY_ELEVATION, pointGeodetic.getElevation());
         contentValues.put(JobContract.PointEntry.KEY_DESCRIPTION, pointGeodetic.getDescription());
+        contentValues.put(JobContract.PointEntry.KEY_POINT_TYPE, pointGeodetic.getPointType());
 
         //Required - From PointGeodetic
         contentValues.put(JobContract.PointEntry.KEY_GEOLAT, pointGeodetic.getLatitude());
@@ -344,6 +346,7 @@ public class JobDatabaseHandler extends SQLiteOpenHelper {
         contentValues.put(JobContract.JobSettingsEntry.KEY_ATTR_MISSION,settings.getAttMission());
         contentValues.put(JobContract.JobSettingsEntry.KEY_ATTR_WEATHER_GENERAL,settings.getAttWeatherGeneral());
         contentValues.put(JobContract.JobSettingsEntry.KEY_ATTR_WEATHER_TEMP,settings.getAttWeatherTemp());
+        contentValues.put(JobContract.JobSettingsEntry.KEY_ATTR_WEATHER_PRESS,settings.getAttWeatherPress());
 
         contentValues.put(JobContract.JobSettingsEntry.KEY_ATTR_STAFF_LEADER,settings.getAttStaffLeader());
         contentValues.put(JobContract.JobSettingsEntry.KEY_ATTR_STAFF_STAFF1,settings.getAttStaff_1());
@@ -355,5 +358,61 @@ public class JobDatabaseHandler extends SQLiteOpenHelper {
         
     }
 
+
+    public List<PointSurvey> getPointSurveysAll(SQLiteDatabase db){
+        Log.d(TAG, "getPointSurveysAll: Starting");
+
+        List<PointSurvey> lstPoints = new ArrayList<PointSurvey>();
+        String selectQuery = "SELECT * FROM " + JobContract.PointEntry.TABLE_NAME
+                + " ORDER BY " + JobContract.PointEntry.KEY_POINT_NO + " ASC";
+
+        Log.e(TAG, selectQuery);
+
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        // looping through all rows and adding to list
+        if (c.moveToFirst()) {
+            do {
+                PointSurvey pointSurvey = new PointSurvey();
+                pointSurvey.setId(c.getInt((c.getColumnIndex(JobContract.PointEntry.KEY_ID))));
+                pointSurvey.setPoint_no(c.getInt((c.getColumnIndex(JobContract.PointEntry.KEY_POINT_NO))));
+                pointSurvey.setNorthing(c.getDouble(c.getColumnIndex(JobContract.PointEntry.KEY_NORTHING)));
+                pointSurvey.setEasting(c.getDouble(c.getColumnIndex(JobContract.PointEntry.KEY_EASTING)));
+                pointSurvey.setElevation(c.getDouble(c.getColumnIndex(JobContract.PointEntry.KEY_ELEVATION)));
+                pointSurvey.setDescription((c.getString(c.getColumnIndex(JobContract.PointEntry.KEY_DESCRIPTION))));
+                pointSurvey.setPointType(c.getInt((c.getColumnIndex(JobContract.PointEntry.KEY_POINT_TYPE))));
+
+                // Project MetaData
+                pointSurvey.setDateCreated(c.getInt(c.getColumnIndex(JobContract.PointEntry.KEY_DATE_CREATED)));
+
+
+                lstPoints.add(pointSurvey);
+            } while (c.moveToNext());
+        }
+
+        return lstPoints;
+    }
+
+    public boolean checkPointNumberExists(SQLiteDatabase db, int point_no){
+        Log.d(TAG, "checkPointNumberExists: Starting");
+        String selectQuery = "SELECT  * FROM " + JobContract.PointEntry.TABLE_NAME + " WHERE "
+                + JobContract.PointEntry.KEY_POINT_NO + " = " + point_no;
+
+        Log.e(TAG, selectQuery);
+
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        boolean results = false;
+        if (c.moveToFirst()){
+            Log.d(TAG, "checkPointNumberExists: Point Found...");
+            results = true;
+        }
+
+        c.close();
+        db.close();
+
+        return results;
+
+    }
 
 }

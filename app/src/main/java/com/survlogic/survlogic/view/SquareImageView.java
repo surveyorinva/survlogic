@@ -1,4 +1,4 @@
-package com.survlogic.survlogic.utils;
+package com.survlogic.survlogic.view;
 
 import android.content.Context;
 import android.support.v7.widget.AppCompatImageView;

@@ -1,33 +1,19 @@
-package com.survlogic.survlogic.view;
+package com.survlogic.survlogic.dialog;
 
-import android.annotation.TargetApi;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Rect;
-import android.graphics.RectF;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.MediaStore;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.activity.ProjectDetailsActivity;
@@ -35,13 +21,6 @@ import com.survlogic.survlogic.background.BackgroundProjectImagesSetup;
 import com.survlogic.survlogic.model.ProjectImages;
 import com.survlogic.survlogic.utils.FileHelper;
 import com.survlogic.survlogic.utils.ImageHelper;
-
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 /**
  * Created by chrisfillmore on 7/12/2017.

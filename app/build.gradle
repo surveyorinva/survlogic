@@ -46,6 +46,10 @@ dependencies {
     //Bottom Navigation ViewEX
     compile 'com.github.ittianyu:BottomNavigationViewEx:1.2.2'
 
+    //SortableTable View
+    compile 'de.codecrafters.tableview:tableview:2.6.0'
+
+
     testCompile 'junit:junit:4.12'
 
     annotationProcessor 'com.github.bumptech.glide:compiler:4.0.0-RC0'

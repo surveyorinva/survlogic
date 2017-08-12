@@ -1,32 +1,16 @@
 package com.survlogic.survlogic.adapter;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v4.util.Pair;
-import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.view.animation.ScaleAnimation;
 
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.assist.FailReason;
-import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 import com.survlogic.survlogic.R;
-import com.survlogic.survlogic.activity.JobActivity;
-import com.survlogic.survlogic.activity.ProjectDetailsActivity;
-import com.survlogic.survlogic.model.Project;
+import com.survlogic.survlogic.activity.JobHomeActivity;
 import com.survlogic.survlogic.model.ProjectJobs;
 import com.survlogic.survlogic.utils.AnimateHelper;
-import com.survlogic.survlogic.utils.MathHelper;
 import com.survlogic.survlogic.utils.TimeHelper;
 import com.survlogic.survlogic.view.Card_View_Holder_Project_Job_Small;
 
@@ -124,7 +108,7 @@ public class ProjectJobListAdaptor extends RecyclerView.Adapter<RecyclerView.Vie
         vh1.btOpen.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(mContext, JobActivity.class);
+                Intent intent = new Intent(mContext, JobHomeActivity.class);
                 intent.putExtra("PROJECT_ID",projectID);
                 intent.putExtra("JOB_ID", projectJobID);
                 intent.putExtra("JOB_DB_NAME", projectJobDatabaseName);

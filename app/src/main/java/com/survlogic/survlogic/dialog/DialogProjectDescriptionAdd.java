@@ -1,4 +1,4 @@
-package com.survlogic.survlogic.view;
+package com.survlogic.survlogic.dialog;
 
 import android.app.Dialog;
 import android.app.DialogFragment;
@@ -13,8 +13,6 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.survlogic.survlogic.R;
-import com.survlogic.survlogic.activity.ProjectNewActivity;
-import com.survlogic.survlogic.background.BackgroundProjectNew;
 import com.survlogic.survlogic.background.BackgroundProjectUpdate;
 import com.survlogic.survlogic.database.ProjectDatabaseHandler;
 import com.survlogic.survlogic.model.Project;

@@ -13,6 +13,11 @@
     <color name="icons">#FFFFFF</color>
     <color name="divider">#BDBDBD</color>
 
+    <color name="tableHeaderBackground">#3F51B5</color>
+    <color name="tableHeaderText">#FFFFFF</color>
+    <color name="tableDataRowEven">#FFFFFF</color>
+    <color name="tableDataRowOdd">#838493</color>
+
     <color name="app_background">#FFFFFF</color>
     <color name="main_background">#eeeeee</color>
     <color name="overflowMenuBg">#FFFFFF</color>

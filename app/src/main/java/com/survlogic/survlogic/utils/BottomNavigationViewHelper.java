@@ -25,32 +25,6 @@ public class BottomNavigationViewHelper {
         bottomNavigationViewEx.setTextVisibility(false);
     }
 
-    public static void enableNavigationHome(final Context mContext, BottomNavigationViewEx view){
-        view.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                switch (item.getItemId()){
-
-                    case R.id.navigation_item_1:
-
-                        break;
-
-                    case R.id.navigation_item_2:
-                        break;
-
-                    case R.id.navigation_item_3:
-                        break;
-
-                    case R.id.navigation_item_4:
-                        break;
-                }
-
-
-                return false;
-            }
-        });
-    }
-
 
 
 

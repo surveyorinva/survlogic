@@ -99,13 +99,18 @@
             android:theme="@style/SuperMaterialTheme"/>
 
         <activity
-            android:name=".activity.JobActivity"
+            android:name=".activity.JobHomeActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/SuperMaterialTheme"/>
+
+        <activity
+            android:name=".activity.JobPointsActivity"
             android:screenOrientation="portrait"
             android:theme="@style/SuperMaterialTheme"/>
 
         <activity
             android:name=".activity.SettingsCurrentJobActivity"
-            android:parentActivityName=".activity.JobActivity" />
+            android:parentActivityName=".activity.JobHomeActivity" />
 
 
 

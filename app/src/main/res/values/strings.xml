@@ -157,17 +157,6 @@
     <string name="project_new_validation_project_update_success">Project Updated!</string>
     <string name="project_new_validation_project_save_failed">Error Saving Project.  Please try again.</string>
 
-    <!--New Job View-->
-    <string name="job_new_title">New Job Setup</string>
-    <string name="job_new_header_1">Job Name</string>
-    <string name="job_new_header_2">Description</string>
-    <string name="job_new_name_hint">Enter the name of the Job</string>
-    <string name="job_new_description_hint">Describe the intent of the job and the data contained in this file</string>
-    <string name="job_new_validation_job_name_error">Job Name is a required field.\nPlease complete prior to continuing</string>
-    <string name="job_new_validation_job_save_success">Job Saved!</string>
-    <string name="job_new_validation_job_update_success">Job Updated!</string>
-    <string name="job_new_validation_job_save_failed">Error Saving Job.  Please try again.</string>
-
     <!--Project Details View-->
     <string name="project_details_category_summary">Summary</string>
     <string name="project_details_category_map">Map</string>
@@ -185,6 +174,49 @@
     <string name="dialog_photo_description">Enter in Photo Description"</string>
     <string name="project_photo_new_validation_save_success">Project Photo Saved!</string>
     <string name="project_photo_new_validation_save_failed">Error Saving Project Photo.  Please try again.</string>
+
+    <!--New Job View-->
+    <string name="job_new_title">New Job Setup</string>
+    <string name="job_new_header_1">Job Name</string>
+    <string name="job_new_header_2">Description</string>
+    <string name="job_new_name_hint">Enter the name of the Job</string>
+    <string name="job_new_description_hint">Describe the intent of the job and the data contained in this file</string>
+    <string name="job_new_validation_job_name_error">Job Name is a required field.\nPlease complete prior to continuing</string>
+    <string name="job_new_validation_job_save_success">Job Saved!</string>
+    <string name="job_new_validation_job_update_success">Job Updated!</string>
+    <string name="job_new_validation_job_save_failed">Error Saving Job.  Please try again.</string>
+
+    <!--Point List Table-->
+    <string name="job_point_list_header_pntNo">No.</string>
+    <string name="job_point_list_header_northing">Northing</string>
+    <string name="job_point_list_header_easting">Easting</string>
+    <string name="job_point_list_header_elevation">Elev.</string>
+    <string name="job_point_list_header_description">Desc.</string>
+    <string name="job_point_list_header_tag">Tag</string>
+
+    <!--Add New Point-->
+    <string name="dialog_job_point_name">Add New Point</string>
+    <string name="dialog_job_point_item_pointNo">Point No.</string>
+    <string name="dialog_job_point_item_northing">Northing</string>
+    <string name="dialog_job_point_item_easting">Easting</string>
+    <string name="dialog_job_point_item_elevation">Elevation</string>
+    <string name="dialog_job_point_item_description">Description</string>
+    <string name="dialog_job_point_item_header_pointno">POINT NO.</string>
+    <string name="dialog_job_point_item_header_northing">NORTHING</string>
+    <string name="dialog_job_point_item_header_easting">EASTING</string>
+    <string name="dialog_job_point_item_header_elevation">ELEVATION</string>
+    <string name="dialog_job_point_item_header_description">DESCRIPTION</string>
+    <string name="dialog_job_point_button_advanced_settings">Advanced Settings</string>
+
+    <string name="dialog_job_point_item_error_pointNo">Enter a numeric point number</string>
+    <string name="dialog_job_point_item_error_pointNoExists">Point Number Exists in File</string>
+    <string name="dialog_job_point_item_error_pointNorthing">Enter a numeric point number</string>
+    <string name="dialog_job_point_item_error_pointEasting">Enter a numeric point number</string>
+    <string name="dialog_job_point_item_error_pointElevation">Enter a numeric point number</string>
+    <string name="dialog_job_point_item_error_pointDescription">Enter a numeric point number</string>
+
+    <string name="job_new_validation_point_save_success">Point Saved!</string>
+    <string name="job_new_validation_point_save_failed">Error Saving Point.  Please try again.</string>
 
     <!-- ******************************Strings related to Settings****************************** -->
 

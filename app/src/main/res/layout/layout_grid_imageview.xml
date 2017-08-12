@@ -4,7 +4,7 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
-    <com.survlogic.survlogic.utils.SquareImageView
+    <com.survlogic.survlogic.view.SquareImageView
         android:id="@+id/gridImageView"
         android:scaleType="centerCrop"
         android:background="@drawable/grid_view_highlight_transparent"

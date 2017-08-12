@@ -53,7 +53,7 @@
 
         <!--Bottom Toolbar-->
         <include
-            layout="@layout/app_bar_job_bottom"/>
+            layout="@layout/app_bar_job_bottom_home"/>
 
 
     </RelativeLayout>

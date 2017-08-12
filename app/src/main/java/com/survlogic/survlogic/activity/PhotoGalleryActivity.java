@@ -3,15 +3,10 @@ package com.survlogic.survlogic.activity;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -19,16 +14,14 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.adapter.GalleryImageAdapter;
-import com.survlogic.survlogic.adapter.GridImageAdapter;
 import com.survlogic.survlogic.database.ProjectDatabaseHandler;
 import com.survlogic.survlogic.model.ProjectImages;
 import com.survlogic.survlogic.utils.ImageHelper;
-import com.survlogic.survlogic.view.DialogProjectPhotoView;
+import com.survlogic.survlogic.dialog.DialogProjectPhotoView;
 
 import java.util.ArrayList;
 

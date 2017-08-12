@@ -7,7 +7,7 @@ package com.survlogic.survlogic.model;
 public class PointSurvey {
 
     private long id, projectId, job_Id;
-    private int point_no, dateCreated, dateModified;
+    private int point_no, dateCreated, dateModified, pointType;
     private double northing, easting, elevation;
     private String description;
 
@@ -15,15 +15,16 @@ public class PointSurvey {
 
     }
 
-    public PointSurvey(int point_no, double northing, double easting, double elevation, String description) {
+    public PointSurvey(int point_no, double northing, double easting, double elevation, String description, int pointType) {
         this.point_no = point_no;
         this.northing = northing;
         this.easting = easting;
         this.elevation = elevation;
         this.description = description;
+        this.pointType = pointType;
     }
 
-    public PointSurvey(long projectId, long job_Id, int point_no, double northing, double easting, double elevation, String description) {
+    public PointSurvey(long projectId, long job_Id, int point_no, double northing, double easting, double elevation, String description, int pointType) {
         this.projectId = projectId;
         this.job_Id = job_Id;
         this.point_no = point_no;
@@ -31,9 +32,10 @@ public class PointSurvey {
         this.easting = easting;
         this.elevation = elevation;
         this.description = description;
+        this.pointType = pointType;
     }
 
-    public PointSurvey(long id, long projectId, long job_Id, int point_no, double northing, double easting, double elevation, String description) {
+    public PointSurvey(long id, long projectId, long job_Id, int point_no, double northing, double easting, double elevation, String description, int pointType) {
         this.id = id;
         this.projectId = projectId;
         this.job_Id = job_Id;
@@ -42,6 +44,7 @@ public class PointSurvey {
         this.easting = easting;
         this.elevation = elevation;
         this.description = description;
+        this.pointType = pointType;
     }
 
     public long getId() {
@@ -122,5 +125,13 @@ public class PointSurvey {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public int getPointType() {
+        return pointType;
+    }
+
+    public void setPointType(int pointType) {
+        this.pointType = pointType;
     }
 }

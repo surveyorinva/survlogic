@@ -1,6 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <string-array name="point_type_entries">
+        <item>Computed</item>
+        <item>Control</item>
+        <item>Measured</item>
+        <item>Averaged</item>
+    </string-array>
+
+    <string-array name="point_type_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+
+
     <string-array name="map_type_entries">
         <item>Map View</item>
         <item>Hybrid View</item>

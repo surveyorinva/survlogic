@@ -7,7 +7,7 @@
 
         <SwitchPreference
             android:defaultValue="true"
-            android:key="pref_key_current_job_options_ui_drawer_state"
+            android:key="pref_key_current_job_drawer_open"
             android:title="@string/pref_current_job_options_drawer_state"
             android:summary="@string/pref_current_job_options_drawer_state_summary"/>
 

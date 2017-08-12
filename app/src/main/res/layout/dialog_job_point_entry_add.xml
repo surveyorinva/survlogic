@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/white"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+
+        <ImageView
+            android:src="@drawable/ic_add_location"
+            android:layout_gravity="center"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="1dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp" />
+
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/dialog_item_header_pointno"
+            app:hintTextAppearance="@style/DialogHintStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <EditText
+                android:id="@+id/dialog_item_pointNo"
+                android:hint="@string/dialog_job_point_item_pointNo"
+                android:textSize="20sp"
+                android:inputType="number"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="1dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+        </android.support.design.widget.TextInputLayout>
+
+
+
+    </LinearLayout>
+
+
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/dialog_item_header_northing"
+        app:hintTextAppearance="@style/DialogHintStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:id="@+id/dialog_item_northing"
+            android:hint="@string/dialog_job_point_item_northing"
+            android:textSize="20sp"
+            android:inputType="numberDecimal"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="1dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+    </android.support.design.widget.TextInputLayout>
+
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/dialog_item_header_easting"
+        app:hintTextAppearance="@style/DialogHintStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:id="@+id/dialog_item_easting"
+            android:hint="@string/dialog_job_point_item_easting"
+            android:textSize="20sp"
+            android:inputType="numberDecimal"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="1dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+    </android.support.design.widget.TextInputLayout>
+
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/dialog_item_header_elevation"
+        app:hintTextAppearance="@style/DialogHintStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:id="@+id/dialog_item_elevation"
+            android:hint="@string/dialog_job_point_item_elevation"
+            android:textSize="20sp"
+            android:inputType="numberDecimal"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="1dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+    </android.support.design.widget.TextInputLayout>
+
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/dialog_item_header_description"
+        app:hintTextAppearance="@style/DialogHintStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:id="@+id/dialog_item_description"
+            android:hint="@string/dialog_job_point_item_description"
+            android:textSize="20sp"
+            android:inputType="text"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="1dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+    </android.support.design.widget.TextInputLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:weightSum="100"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+
+        <Button
+            android:id="@+id/btnAdvancedSettings"
+            android:text="@string/dialog_job_point_button_advanced_settings"
+            android:textColor="@color/contextualText"
+            android:layout_weight="40"
+            style="@style/Button.Flat.Primary.BlueButton"
+            android:layout_marginStart="2dp"
+            android:layout_width="0dp"
+            android:layout_height="75dp" />
+
+
+    </LinearLayout>
+
+
+</LinearLayout>

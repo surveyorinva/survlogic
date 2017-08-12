@@ -1,10 +1,9 @@
-package com.survlogic.survlogic.view;
+package com.survlogic.survlogic.dialog;
 
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
@@ -16,9 +15,6 @@ import android.widget.Toast;
 
 import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.background.BackgroundProjectJobNew;
-import com.survlogic.survlogic.background.BackgroundProjectUpdate;
-import com.survlogic.survlogic.database.ProjectDatabaseHandler;
-import com.survlogic.survlogic.model.Project;
 import com.survlogic.survlogic.model.ProjectJobs;
 import com.survlogic.survlogic.utils.MathHelper;
 

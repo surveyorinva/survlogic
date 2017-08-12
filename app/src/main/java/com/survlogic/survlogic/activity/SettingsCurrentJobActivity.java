@@ -263,6 +263,8 @@ public class SettingsCurrentJobActivity extends AppCompatPreferenceActivity {
             addPreferencesFromResource(R.xml.pref_job_current_options);
             setHasOptionsMenu(true);
 
+
+
         }
 
         @Override

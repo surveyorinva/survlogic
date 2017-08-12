@@ -41,7 +41,6 @@
     <dimen name="card_header_text">10sp</dimen>
     <dimen name="card_margin_between_headers">10dp</dimen>
 
-
     <dimen name="text_size_larger">25sp</dimen>
     <dimen name="text_size_medium">20sp</dimen>
     <dimen name="text_size_header">15sp</dimen>

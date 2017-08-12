@@ -11,6 +11,7 @@ import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -24,10 +25,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.database.JobDatabaseHandler;
+import com.survlogic.survlogic.fragment.JobPointsListFragment;
 import com.survlogic.survlogic.model.ProjectJobSettings;
 import com.survlogic.survlogic.utils.BottomNavigationViewHelper;
 
@@ -35,14 +38,16 @@ import com.survlogic.survlogic.utils.BottomNavigationViewHelper;
  * Created by chrisfillmore on 8/2/2017.
  */
 
-public class JobActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
-    private static final String TAG = "JobActivity";
+public class JobHomeActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+    private static final String TAG = "JobHomeActivity";
 
-    Context mContext;
+    private Context mContext;
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle actionBarDrawerToggle;
     private NavigationView navigationView;
+
+    private static final int ACTIVITY_NUM = 0;
 
     private static final int DELAY_TO_LOAD_SETTINGS = 1000;
     private static final int DELAY_TO_SAVE_SETTINGS = 1000;
@@ -56,7 +61,7 @@ public class JobActivity extends AppCompatActivity implements NavigationView.OnN
     private SharedPreferences.Editor editor;
 
     private ProjectJobSettings jobSettings;
-    private int project_id, job_id, job_settings_id = 1;
+    private static int project_id, job_id, job_settings_id = 1;
     private String jobDatabaseName;
 
     private RelativeLayout rlLayout2;
@@ -79,8 +84,8 @@ public class JobActivity extends AppCompatActivity implements NavigationView.OnN
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate: Starting................>");
-        setContentView(R.layout.activity_job);
-        mContext = JobActivity.this;
+        setContentView(R.layout.activity_job_home);
+        mContext = JobHomeActivity.this;
 
         initViewToolbar();
         initViewNavigation();
@@ -126,7 +131,7 @@ public class JobActivity extends AppCompatActivity implements NavigationView.OnN
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_in_job);
 
         navigationView = (NavigationView) findViewById(R.id.navigation_view);
-        navigationView.setNavigationItemSelectedListener(JobActivity.this);
+        navigationView.setNavigationItemSelectedListener(JobHomeActivity.this);
 
         actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close);
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
@@ -145,7 +150,14 @@ public class JobActivity extends AppCompatActivity implements NavigationView.OnN
                 break;
 
             case R.id.menu_item2_id:
-                //Action Here
+                //Go To Points Menu
+                Intent i = new Intent(this, JobPointsActivity.class);
+                i.putExtra("PROJECT_ID",project_id);
+                i.putExtra("JOB_ID", job_id);
+                i.putExtra("JOB_DB_NAME", jobDatabaseName);
+
+                startActivity(i);
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
 
                 break;
 
@@ -179,6 +191,7 @@ public class JobActivity extends AppCompatActivity implements NavigationView.OnN
         project_id = extras.getInt("PROJECT_ID");
         job_id = extras.getInt("JOB_ID");
         jobDatabaseName = extras.getString("JOB_DB_NAME");
+        Log.d(TAG, "||Database|| : " + jobDatabaseName);
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -299,9 +312,9 @@ public class JobActivity extends AppCompatActivity implements NavigationView.OnN
             //Options
 
             if(jobSettings.getUiDrawerState() == 0){
-                editor.putBoolean(getString(R.string.pref_key_current_job_options_ui_drawer_state), false);
+                editor.putBoolean(getString(R.string.pref_key_current_job_drawer_open), false);
             }else{
-                editor.putBoolean(getString(R.string.pref_key_current_job_options_ui_drawer_state), true);
+                editor.putBoolean(getString(R.string.pref_key_current_job_drawer_open), true);
             }
 
             //editor.putInt(getString(R.string.pref_key_current_job_first_start), jobSettings.getUiFirstStart());//
@@ -360,6 +373,7 @@ public class JobActivity extends AppCompatActivity implements NavigationView.OnN
 
             Log.d(TAG, "initJobSettingsToDb: Save Raw Data...");
             //Raw Data
+
             int raw_file = 0;
             if(sharedPreferences.getBoolean(getString(R.string.pref_key_current_job_options_raw_file),true)){
                 raw_file = 1;
@@ -383,7 +397,7 @@ public class JobActivity extends AppCompatActivity implements NavigationView.OnN
             Log.d(TAG, "initJobSettingsToDb: Save Options...");
             //Options
             int options_drawer_state = 0;
-            if(sharedPreferences.getBoolean(getString(R.string.pref_key_current_job_options_ui_drawer_state),true)){
+            if(sharedPreferences.getBoolean(getString(R.string.pref_key_current_job_drawer_open),true)){
                 options_drawer_state = 1;
             }
 
@@ -429,7 +443,7 @@ public class JobActivity extends AppCompatActivity implements NavigationView.OnN
 
         private void checkPreferences(){
             Log.d(TAG, "checkPreferences: Started...");
-            if (sharedPreferences.getBoolean(getString(R.string.pref_key_current_job_options_ui_drawer_state),false)){
+            if (sharedPreferences.getBoolean(getString(R.string.pref_key_current_job_drawer_open),false)){
                 Log.d(TAG, "checkPreferences: Drawer State = True");
                 mHandler.sendEmptyMessageDelayed(MESSAGE_SHOW_DRAWER_LAYOUT, DELAY_TO_SHOW_DRAWER_LAYOUT);
             }
@@ -467,7 +481,7 @@ public class JobActivity extends AppCompatActivity implements NavigationView.OnN
         return myDialogBox;
     }
 
-
+//---------------------------------------------------------------------------------------------//
     /**
      * Bottom Navigation View
      */
@@ -476,10 +490,56 @@ public class JobActivity extends AppCompatActivity implements NavigationView.OnN
 
         BottomNavigationViewEx bottomNavigationViewEx = (BottomNavigationViewEx) findViewById(R.id.bottomNavViewBar);
         BottomNavigationViewHelper.setupBottomNavigationView(bottomNavigationViewEx);
-        BottomNavigationViewHelper.enableNavigationHome(mContext, bottomNavigationViewEx);
+        enableNavigationHome(mContext, bottomNavigationViewEx);
         Menu menu = bottomNavigationViewEx.getMenu();
+        MenuItem menuItem = menu.getItem(ACTIVITY_NUM);
+        menuItem.setChecked(false);
 
 
+    }
+
+    public void enableNavigationHome(final Context mContext, BottomNavigationViewEx view) {
+        view.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch (item.getItemId()) {
+
+                    case R.id.navigation_item_1:
+
+                        break;
+
+                    case R.id.navigation_item_2:
+                        break;
+
+                    case R.id.navigation_item_3:
+                        break;
+
+                    case R.id.navigation_item_4:
+                        break;
+                }
+
+
+                return false;
+            }
+        });
+    }
+
+    //-------------------------------------------------------------------------------------------------------------------------//
+
+    /**
+     * Method Helpers
+     */
+
+
+    private void showToast(String data, boolean shortTime) {
+
+        if (shortTime) {
+            Toast.makeText(this, data, Toast.LENGTH_SHORT).show();
+
+        } else{
+            Toast.makeText(this, data, Toast.LENGTH_LONG).show();
+
+        }
     }
 
 

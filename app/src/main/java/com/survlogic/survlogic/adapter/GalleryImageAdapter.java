@@ -16,7 +16,7 @@ import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.model.ProjectImages;
 import com.survlogic.survlogic.utils.ImageHelper;
-import com.survlogic.survlogic.utils.SquareImageView;
+import com.survlogic.survlogic.view.SquareImageView;
 
 import java.util.ArrayList;
 
