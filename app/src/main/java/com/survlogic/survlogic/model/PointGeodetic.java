@@ -5,7 +5,7 @@ package com.survlogic.survlogic.model;
  */
 
 public class PointGeodetic extends PointSurvey{
-    private double latitude, longitude, ellipsoid, accuracy;
+    private double latitude, longitude, ellipsoid, ortho, accuracy;
 
     public PointGeodetic(double latitude, double longitude, double ellipsoid) {
         this.latitude = latitude;
@@ -13,12 +13,21 @@ public class PointGeodetic extends PointSurvey{
         this.ellipsoid = ellipsoid;
     }
 
-    public PointGeodetic(double latitude, double logitude, double ellipsoid, double accuracy){
+
+    public PointGeodetic(double latitude, double longitude, double ellipsoid, double accuracy){
         this.latitude = latitude;
         this.longitude = longitude;
         this.ellipsoid = ellipsoid;
         this.accuracy = accuracy;
 
+    }
+
+    public PointGeodetic(double latitude, double longitude, double ellipsoid, double ortho, double accuracy){
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.ellipsoid = ellipsoid;
+        this.ortho = ortho;
+        this.accuracy = accuracy;
     }
 
     public double getLatitude() {
@@ -45,6 +54,15 @@ public class PointGeodetic extends PointSurvey{
         this.ellipsoid = ellipsoid;
     }
 
+
+    public double getOrtho() {
+        return ortho;
+    }
+
+    public void setOrtho(double ortho) {
+        this.ortho = ortho;
+    }
+
     public double getAccuracy() {
         return accuracy;
     }
@@ -52,4 +70,7 @@ public class PointGeodetic extends PointSurvey{
     public void setAccuracy(double accuracy) {
         this.accuracy = accuracy;
     }
+
+
+
 }

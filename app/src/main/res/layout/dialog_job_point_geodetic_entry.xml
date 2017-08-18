@@ -1,0 +1,446 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/white"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/layout_area_Lat_1"
+        android:orientation="horizontal"
+        android:layout_marginTop="5dp"
+        android:weightSum="100"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+
+        <TextView
+            android:text="Latitude"
+            style="@style/Labels.Card.ProjectCategory"
+            android:layout_marginStart="10dp"
+            android:layout_weight="25"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+
+        </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/layout_area_Lat_2"
+        android:orientation="horizontal"
+        android:weightSum="100"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Space
+            android:layout_weight="10"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:text="Degrees"
+            android:gravity="center"
+            android:textSize="@dimen/text_size_normal"
+            android:layout_weight="15"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+
+        <Space
+            android:layout_weight="5"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:text="Minutes"
+            android:gravity="center"
+            android:textSize="@dimen/text_size_normal"
+            android:layout_weight="15"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+
+        <Space
+            android:layout_weight="5"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:text="Seconds"
+            android:gravity="center"
+            android:textSize="@dimen/text_size_normal"
+            android:layout_weight="15"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+
+        <Space
+            android:layout_weight="5"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layout_area_Lat_3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="100">
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="10" />
+
+        <EditText
+            android:id="@+id/lat_degree"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="4dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="1dp"
+            android:layout_weight="15"
+            android:gravity="center"
+            android:hint="DD"
+            android:inputType="number|numberSigned"
+            android:nextFocusDown="@+id/lat_min"
+            android:textColor="@color/black"
+            android:textSize="14sp" />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="5" />
+
+        <EditText
+            android:id="@+id/lat_min"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="4dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="1dp"
+            android:layout_weight="15"
+            android:gravity="center"
+            android:hint="MM"
+            android:inputType="number"
+            android:nextFocusDown="@+id/lat_sec"
+            android:textColor="@color/black"
+            android:textSize="14sp" />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="5" />
+
+        <EditText
+            android:id="@+id/lat_sec"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="4dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="1dp"
+            android:layout_weight="15"
+            android:hint="ss.ssss"
+            android:inputType="numberDecimal"
+            android:nextFocusDown="@+id/long_degree"
+            android:textColor="@color/black"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layout_area_Lat_4"
+        android:orientation="horizontal"
+        android:weightSum="100"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Space
+            android:layout_weight="10"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:text="@string/dialog_job_point_geodetic_item_latitude_note"
+            android:textSize="@dimen/text_size_normal"
+            android:layout_weight="80"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layout_area_long_1"
+        android:orientation="horizontal"
+        android:layout_marginTop="15dp"
+        android:weightSum="100"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+
+        <TextView
+            android:text="Longitude"
+            style="@style/Labels.Card.ProjectCategory"
+            android:layout_marginStart="10dp"
+            android:layout_weight="25"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/layout_area_long_2"
+        android:orientation="horizontal"
+        android:weightSum="100"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Space
+            android:layout_weight="10"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:text="Degrees"
+            android:gravity="center"
+            android:textSize="@dimen/text_size_normal"
+            android:layout_weight="15"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+
+        <Space
+            android:layout_weight="5"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:text="Minutes"
+            android:gravity="center"
+            android:textSize="@dimen/text_size_normal"
+            android:layout_weight="15"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+
+        <Space
+            android:layout_weight="5"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:text="Seconds"
+            android:gravity="center"
+            android:textSize="@dimen/text_size_normal"
+            android:layout_weight="15"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layout_area_6"
+        android:orientation="horizontal"
+        android:weightSum="100"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Space
+            android:layout_weight="10"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+
+        <EditText
+            android:id="@+id/long_degree"
+            android:hint="DDD"
+            android:textColor="@color/black"
+            android:textSize="14sp"
+            android:inputType="number|numberSigned"
+            android:gravity="center"
+            android:nextFocusDown="@+id/long_minute"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="1dp"
+            android:layout_marginEnd="4dp"
+            android:layout_weight="15"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"/>
+
+        <Space
+            android:layout_weight="5"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+
+        <EditText
+            android:id="@+id/long_minute"
+            android:hint="MM"
+            android:textColor="@color/black"
+            android:gravity="center"
+            android:textSize="14sp"
+            android:inputType="number"
+            android:nextFocusDown="@+id/long_second"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="1dp"
+            android:layout_marginEnd="4dp"
+            android:layout_weight="15"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"/>
+
+        <Space
+            android:layout_weight="5"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+
+        <EditText
+            android:id="@+id/long_second"
+            android:hint="ss.ssss"
+            android:textColor="@color/black"
+            android:textSize="14sp"
+            android:inputType="numberDecimal"
+            android:nextFocusDown="@+id/height_ellipsoid"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="1dp"
+            android:layout_marginEnd="4dp"
+            android:layout_weight="15"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"/>
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layout_area_Long_4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="100">
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="10" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="80"
+            android:text="@string/dialog_job_point_geodetic_item_longitude_note"
+            android:textSize="@dimen/text_size_normal" />
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/layout_area_height_1"
+        android:orientation="horizontal"
+        android:weightSum="100"
+        android:layout_marginTop="15dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:text="Height"
+            style="@style/Labels.Card.ProjectCategory"
+            android:layout_marginStart="10dp"
+            android:layout_weight="25"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layout_area_height_2"
+        android:orientation="horizontal"
+        android:weightSum="100"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Space
+            android:layout_weight="10"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:text="Ellipsoid"
+            android:gravity="center"
+            android:textSize="@dimen/text_size_normal"
+            android:layout_weight="25"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+
+
+        <Space
+            android:layout_weight="5"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:text="Ortho Height"
+            android:gravity="center"
+            android:textSize="@dimen/text_size_normal"
+            android:layout_weight="25"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+
+        <Space
+            android:layout_weight="5"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layout_area_height_3"
+        android:orientation="horizontal"
+        android:weightSum="100"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Space
+            android:layout_weight="10"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+
+        <EditText
+            android:id="@+id/height_ellipsoid"
+            android:hint=""
+            android:textSize="14sp"
+            android:inputType="numberDecimal|numberSigned"
+            android:gravity="center"
+            android:nextFocusDown="@+id/height_geoid"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="1dp"
+            android:layout_marginEnd="4dp"
+            android:layout_weight="25"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"/>
+
+        <Space
+            android:layout_weight="5"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+
+        <EditText
+            android:id="@+id/height_ortho"
+            android:gravity="center"
+            android:textSize="14sp"
+            android:inputType="numberDecimal|numberSigned"
+            android:nextFocusDown="@+id/height_ortho"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="1dp"
+            android:layout_marginEnd="4dp"
+            android:layout_weight="25"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"/>
+
+
+
+        <Space
+            android:layout_weight="5"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+
+
+    </LinearLayout>
+
+
+
+</LinearLayout>

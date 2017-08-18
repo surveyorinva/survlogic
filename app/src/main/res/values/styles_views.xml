@@ -35,7 +35,7 @@
     </style>
 
     <style name="Labels.EditBoxHeaders">
-        <item name="android:fontFamily">sans-serif-smallcaps</item>
+        <item name="android:fontFamily">sans-serif</item>
         <item name="android:textColor">@color/header_text</item>
         <item name="android:textSize">@dimen/text_size_header</item>
     </style>
@@ -156,6 +156,12 @@
 
     <style name="Button.Special.GpsSurvey">
         <item name="android:background">@drawable/button_ripple_orange</item>
+        <item name="android:textColor">@color/icons</item>
+
+    </style>
+
+    <style name="Button.Special.BlueButton">
+        <item name="android:background">@drawable/button_ripple_blue</item>
         <item name="android:textColor">@color/icons</item>
 
     </style>

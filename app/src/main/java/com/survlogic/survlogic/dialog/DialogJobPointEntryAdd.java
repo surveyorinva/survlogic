@@ -4,11 +4,13 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.DialogFragment;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,6 +20,8 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.survlogic.survlogic.R;
+import com.survlogic.survlogic.activity.JobPointsActivity;
+import com.survlogic.survlogic.activity.JobPointsAddAdvancedActivity;
 import com.survlogic.survlogic.background.BackgroundPointSurveyNew;
 import com.survlogic.survlogic.background.BackgroundProjectJobNew;
 import com.survlogic.survlogic.database.JobDatabaseHandler;
@@ -40,6 +44,8 @@ public class DialogJobPointEntryAdd extends DialogFragment {
 
     private EditText etPointNumber, etPointNorthing, etPointEasting, etPointElevation, etPointDescription;
 
+    private Button btAdvancedOptions;
+
     private int pointNumber, pointType;
     private double pointNorthing,pointEasting,pointElevation;
     private String pointDescription;
@@ -61,6 +67,7 @@ public class DialogJobPointEntryAdd extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         Log.d(TAG, "onCreateDialog: Starting...>");
+
         int title = getArguments().getInt("title");
         project_id = getArguments().getInt("project_id");
         job_id = getArguments().getInt("job_id");
@@ -89,7 +96,7 @@ public class DialogJobPointEntryAdd extends DialogFragment {
     @Override
     public void onResume() {
         super.onResume();
-
+        Log.d(TAG, "onResume: Started...");
         mContext = getActivity();
 
         AlertDialog alertDialog = (AlertDialog) getDialog();
@@ -101,11 +108,15 @@ public class DialogJobPointEntryAdd extends DialogFragment {
             }
         });
 
+        initViewWidgets();
 
 
     }
 
-    private void submitForm(View v){
+
+    private void initViewWidgets(){
+        Log.d(TAG, "initViewWidgets: Started...");
+
         inputLayoutPointNumber = (TextInputLayout) getDialog().findViewById(R.id.dialog_item_header_pointno);
         inputLayoutPointNorthing = (TextInputLayout) getDialog().findViewById(R.id.dialog_item_header_northing);
         inputLayoutPointEasting = (TextInputLayout) getDialog().findViewById(R.id.dialog_item_header_easting);
@@ -120,23 +131,20 @@ public class DialogJobPointEntryAdd extends DialogFragment {
 
         etPointNumber.addTextChangedListener(new MyTextWatcher(etPointNumber));
 
-
-        if (validateEntry()){
-            Log.d(TAG, "submitForm: Validation Approved, Saving...");
-        // Setup Background Task
-            BackgroundPointSurveyNew backgroundPointSurveyNew = new BackgroundPointSurveyNew(mContext, databaseName);
-
-            // Execute background task
-            backgroundPointSurveyNew.execute(populateValues());
-
-
-            getDialog().dismiss();
-        }
+        btAdvancedOptions = (Button) getDialog().findViewById(R.id.btnAdvancedSettings);
+        btAdvancedOptions.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goToPointAddNew();
+            }
+        });
 
 
     }
 
+
     private PointSurvey populateValues(){
+        Log.d(TAG, "populateValues: Started...");
 
         PointSurvey pointSurvey = new PointSurvey();
 
@@ -155,6 +163,48 @@ public class DialogJobPointEntryAdd extends DialogFragment {
 
         pointDescription = etPointDescription.getText().toString();
         pointSurvey.setDescription(pointDescription);
+
+        pointSurvey.setPointType(0);
+
+        return pointSurvey;
+    }
+
+    private PointSurvey populateValuesNull(){
+        Log.d(TAG, "populateValuesNull: Started...");
+
+        PointSurvey pointSurvey = new PointSurvey();
+
+        Log.d(TAG, "populateValuesNull: Point number");
+
+        if(!etPointNumber.getText().toString().matches("")) {
+            pointNumber = Integer.parseInt(etPointNumber.getText().toString());
+            pointSurvey.setPoint_no(pointNumber);
+        }
+
+        Log.d(TAG, "populateValuesNull: Point Northing");
+
+        if(!etPointNorthing.getText().toString().matches("")) {
+            pointNorthing = Double.parseDouble(etPointNorthing.getText().toString());
+            pointSurvey.setNorthing(pointNorthing);
+        }
+
+        Log.d(TAG, "populateValuesNull: Point Easting");
+        if(!etPointEasting.getText().toString().matches("")) {
+            pointEasting = Double.parseDouble(etPointEasting.getText().toString());
+            pointSurvey.setEasting(pointEasting);
+        }
+
+        Log.d(TAG, "populateValuesNull: Point Elevation");
+        if(!etPointElevation.getText().toString().matches("")) {
+            pointElevation = Double.parseDouble(etPointElevation.getText().toString());
+            pointSurvey.setElevation(pointElevation);
+        }
+
+        Log.d(TAG, "populateValuesNull: Point Description");
+        if(!etPointDescription.getText().toString().matches("")) {
+            pointDescription = etPointDescription.getText().toString();
+            pointSurvey.setDescription(pointDescription);
+        }
 
         pointSurvey.setPointType(0);
 
@@ -232,6 +282,54 @@ public class DialogJobPointEntryAdd extends DialogFragment {
 
     }
 
+    private void submitForm(View v){
+
+        if (validateEntry()){
+            Log.d(TAG, "submitForm: Validation Approved, Saving...");
+            // Setup Background Task
+            BackgroundPointSurveyNew backgroundPointSurveyNew = new BackgroundPointSurveyNew(mContext, databaseName);
+
+            // Execute background task
+            backgroundPointSurveyNew.execute(populateValues());
+
+            getDialog().dismiss();
+        }
+
+
+    }
+
+    private void goToPointAddNew(){
+        Log.d(TAG, "goToPointAddNew: Starting...");
+
+        Intent i = new Intent(mContext, JobPointsAddAdvancedActivity.class);
+        i.putExtra("PROJECT_ID",project_id);
+        i.putExtra("JOB_ID", job_id);
+        i.putExtra("JOB_DB_NAME", databaseName);
+
+        Bundle b = new Bundle();
+        PointSurvey pointSurvey = populateValuesNull();
+        b.putParcelable("POINT_ENTRY", pointSurvey);
+        i.putExtras(b);
+
+        startActivity(i);
+        dismiss();
+
+
+    }
+
+    private void showToast(String data, boolean shortTime) {
+        Log.d(TAG, "showToast: Started...");
+        if (shortTime) {
+            Toast.makeText(getActivity(), data, Toast.LENGTH_SHORT).show();
+
+        } else{
+            Toast.makeText(getActivity(), data, Toast.LENGTH_LONG).show();
+
+        }
+    }
+
+
+
     private class MyTextWatcher implements TextWatcher {
 
         private View view;
@@ -264,19 +362,6 @@ public class DialogJobPointEntryAdd extends DialogFragment {
             }
         }
     }
-
-
-    private void showToast(String data, boolean shortTime) {
-
-        if (shortTime) {
-            Toast.makeText(getActivity(), data, Toast.LENGTH_SHORT).show();
-
-        } else{
-            Toast.makeText(getActivity(), data, Toast.LENGTH_LONG).show();
-
-        }
-    }
-
 
 
 }

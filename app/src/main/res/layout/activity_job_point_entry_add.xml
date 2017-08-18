@@ -1,0 +1,360 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/white"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/header_in_job_point_entry"
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+
+        <ImageView
+            android:src="@drawable/ic_add_location"
+            android:layout_gravity="center"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="1dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp" />
+
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/dialog_item_header_pointno"
+            app:hintTextAppearance="@style/DialogHintStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <EditText
+                android:id="@+id/dialog_item_pointNo"
+                android:hint="@string/dialog_job_point_item_pointNo"
+                android:textSize="20sp"
+                android:inputType="number"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="1dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+        </android.support.design.widget.TextInputLayout>
+
+    </LinearLayout>
+
+    <android.support.v4.widget.NestedScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/header_in_job_point_entry"
+        android:layout_alignParentStart="true"
+        android:layout_above="@+id/layout_area_footer">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/dialog_item_header_northing"
+                app:hintTextAppearance="@style/DialogHintStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/dialog_item_northing"
+                    android:hint="@string/dialog_job_point_item_northing"
+                    android:textSize="20sp"
+                    android:inputType="numberDecimal"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginTop="1dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/dialog_item_header_easting"
+                app:hintTextAppearance="@style/DialogHintStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/dialog_item_easting"
+                    android:hint="@string/dialog_job_point_item_easting"
+                    android:textSize="20sp"
+                    android:inputType="numberDecimal"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginTop="1dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/dialog_item_header_elevation"
+                app:hintTextAppearance="@style/DialogHintStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/dialog_item_elevation"
+                    android:hint="@string/dialog_job_point_item_elevation"
+                    android:textSize="20sp"
+                    android:inputType="numberDecimal"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginTop="1dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/dialog_item_header_description"
+                app:hintTextAppearance="@style/DialogHintStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/dialog_item_description"
+                    android:hint="@string/dialog_job_point_item_description"
+                    android:textSize="20sp"
+                    android:inputType="text"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginTop="1dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+            <LinearLayout
+                android:id="@+id/layout_area_3"
+                android:orientation="vertical"
+                android:weightSum="2"
+                android:layout_marginTop="5dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="150dp">
+
+                <TextView
+                    android:text="@string/project_new_header_4"
+                    style="@style/Labels.Card.ProjectCategory"
+                    android:layout_weight=".5"
+                    android:gravity="bottom"
+                    android:layout_marginBottom="2dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp" />
+
+
+                <RelativeLayout
+                    android:background="@drawable/editbox_dropdown_background"
+                    android:layout_weight="1.5"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp">
+
+                    <TextView
+                        android:id="@+id/location_latitude"
+                        android:text="@string/project_new_location_latitude_default"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:id="@+id/location_latitude_value"
+                        android:visibility="invisible"
+                        style="@style/Labels.NamedValues"
+                        android:layout_toRightOf="@id/location_latitude"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:id="@+id/location_longitude"
+                        android:text="@string/project_new_location_longitude_default"
+                        android:layout_below="@id/location_latitude"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:id="@+id/location_longitude_value"
+                        style="@style/Labels.NamedValues"
+                        android:visibility="invisible"
+                        android:layout_below="@id/location_latitude"
+                        android:layout_toRightOf="@id/location_longitude"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:id="@+id/location_height"
+                        android:text="@string/project_new_location_height_default"
+                        android:layout_below="@id/location_longitude"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:id="@+id/location_height_value"
+                        style="@style/Labels.NamedValues"
+                        android:visibility="invisible"
+                        android:layout_below="@id/location_longitude"
+                        android:layout_toRightOf="@id/location_height"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:id="@+id/location_ortho"
+                        android:text="@string/project_new_location_ortho_default"
+                        android:layout_below="@id/location_height"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:id="@+id/location_ortho_value"
+                        style="@style/Labels.NamedValues"
+                        android:visibility="invisible"
+                        android:layout_below="@id/location_height"
+                        android:layout_toRightOf="@id/location_ortho"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+
+                    <ImageButton
+                        android:id="@+id/location_get_from_user_input"
+                        style="@style/Button.Special.BlueButton"
+                        android:src="@drawable/ic_general_edit"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_alignParentTop="true"
+                        android:layout_alignParentEnd="true"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginBottom="30dp"
+                        android:layout_marginEnd="65dp"/>
+
+
+                    <ImageButton
+                        android:id="@+id/location_get_from_gps_survey"
+                        style="@style/Button.Special.GpsSurvey"
+                        android:src="@drawable/ic_add_location"
+                        android:layout_width="50dp"
+                        android:layout_margin="5dp"
+                        android:layout_height="50dp"
+                        android:layout_alignParentTop="true"
+                        android:layout_alignParentEnd="true" />
+
+                </RelativeLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/layout_area_4"
+                android:orientation="vertical"
+                android:weightSum="2"
+                android:layout_marginTop="10dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="80dp">
+
+                <TextView
+                    android:text="@string/job_point_header_add_photos"
+                    style="@style/Labels.Card.ProjectCategory"
+                    android:layout_weight=".5"
+                    android:gravity="bottom"
+                    android:layout_marginBottom="2dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp" />
+
+
+                <RelativeLayout
+                    android:background="@drawable/editbox_dropdown_background"
+                    android:layout_weight="1.5"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp">
+
+                    <Button
+                        android:id="@+id/photo_camera_get_photo"
+                        android:text="@string/project_new_photo_button_label"
+                        style="@style/Button.Flat.Primary.BlueButton"
+                        android:layout_centerVertical="true"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginBottom="5dp"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginEnd="5dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <GridView
+                        android:id="@+id/photo_grid_view"
+                        android:numColumns="4"
+                        android:verticalSpacing="1dp"
+                        android:horizontalSpacing="1dp"
+                        android:stretchMode="columnWidth"
+                        android:gravity="center"
+                        android:drawSelectorOnTop="true"
+                        android:listSelector="@drawable/grid_view_highlight_transparent"
+                        android:visibility="gone"
+                        android:layout_toEndOf="@+id/photo_camera_get_photo"
+                        android:layout_width="match_parent"
+                        android:layout_height="100dp"/>
+
+                </RelativeLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </android.support.v4.widget.NestedScrollView>
+
+    <LinearLayout
+        android:id="@+id/layout_area_footer"
+        android:orientation="horizontal"
+        android:weightSum="2.1"
+        android:layout_alignParentBottom="true"
+        android:padding="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="70dp">
+
+        <Button
+            android:id="@+id/Save_button"
+            android:text="@string/general_save"
+            style="@style/Button.Flat.Primary.Save"
+            android:layout_margin="1dp"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent" />
+
+        <Space
+            android:layout_weight=".1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent" />
+
+        <Button
+            android:id="@+id/Cancel_button"
+            style="@style/Button.Flat.Primary.Cancel"
+            android:text="@string/general_cancel"
+            android:layout_margin="1dp"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent" />
+
+    </LinearLayout>
+
+
+</RelativeLayout>

@@ -52,6 +52,7 @@ public class JobDatabaseHandler extends SQLiteOpenHelper {
             + JobContract.JobSettingsEntry.KEY_ATTR_STAFF_OTHER + " TEXT,"
             + JobContract.JobSettingsEntry.KEY_SYSTEM_DIST_DISPLAY + " INTEGER,"
             + JobContract.JobSettingsEntry.KEY_SYSTEM_DIST_PREC_DISPLAY + " INTEGER,"
+            + JobContract.JobSettingsEntry.KEY_SYSTEM_COORD_PREC_DISPLAY + " INTEGER,"
             + JobContract.JobSettingsEntry.KEY_SYSTEM_ANGLE_DISPLAY + " INTEGER,"
             + JobContract.JobSettingsEntry.KEY_FORMAT_COORD_ENTRY + " INTEGER,"
             + JobContract.JobSettingsEntry.KEY_FORMAT_ANGLE_HZ_DISPLAY + " INTEGER,"
@@ -139,6 +140,7 @@ public class JobDatabaseHandler extends SQLiteOpenHelper {
 
         contentValues.put(JobContract.JobSettingsEntry.KEY_SYSTEM_DIST_DISPLAY,settings.getSystemDistanceDisplay());
         contentValues.put(JobContract.JobSettingsEntry.KEY_SYSTEM_DIST_PREC_DISPLAY,settings.getSystemDistancePrecisionDisplay());
+        contentValues.put(JobContract.JobSettingsEntry.KEY_SYSTEM_COORD_PREC_DISPLAY,settings.getSystemCoordinatesPrecisionDisplay());
         contentValues.put(JobContract.JobSettingsEntry.KEY_SYSTEM_ANGLE_DISPLAY,settings.getSystemAngleDisplay());
 
         contentValues.put(JobContract.JobSettingsEntry.KEY_FORMAT_COORD_ENTRY,settings.getFormatCoordinatesEntry());
@@ -293,6 +295,7 @@ public class JobDatabaseHandler extends SQLiteOpenHelper {
 
         settings.setSystemDistanceDisplay(c.getInt((c.getColumnIndex(JobContract.JobSettingsEntry.KEY_SYSTEM_DIST_DISPLAY))));
         settings.setSystemDistancePrecisionDisplay(c.getInt((c.getColumnIndex(JobContract.JobSettingsEntry.KEY_SYSTEM_DIST_PREC_DISPLAY))));
+        settings.setSystemCoordinatesPrecisionDisplay(c.getInt((c.getColumnIndex(JobContract.JobSettingsEntry.KEY_SYSTEM_COORD_PREC_DISPLAY))));
         settings.setSystemAngleDisplay(c.getInt((c.getColumnIndex(JobContract.JobSettingsEntry.KEY_SYSTEM_ANGLE_DISPLAY))));
 
         settings.setFormatCoordinatesEntry(c.getInt((c.getColumnIndex(JobContract.JobSettingsEntry.KEY_FORMAT_COORD_ENTRY))));
@@ -329,6 +332,7 @@ public class JobDatabaseHandler extends SQLiteOpenHelper {
 
         contentValues.put(JobContract.JobSettingsEntry.KEY_SYSTEM_DIST_DISPLAY,settings.getSystemDistanceDisplay());
         contentValues.put(JobContract.JobSettingsEntry.KEY_SYSTEM_DIST_PREC_DISPLAY,settings.getSystemDistancePrecisionDisplay());
+        contentValues.put(JobContract.JobSettingsEntry.KEY_SYSTEM_COORD_PREC_DISPLAY,settings.getSystemDistancePrecisionDisplay());
         contentValues.put(JobContract.JobSettingsEntry.KEY_SYSTEM_ANGLE_DISPLAY,settings.getSystemAngleDisplay());
 
         contentValues.put(JobContract.JobSettingsEntry.KEY_FORMAT_COORD_ENTRY,settings.getFormatCoordinatesEntry());

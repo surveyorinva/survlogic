@@ -21,7 +21,7 @@ public class PreferenceLoaderHelper {
     private String general_name, attr_client, attr_mission, attr_weather_general,attr_weather_temp,attr_weather_pres,
             attr_staff_chief, attr_staff_iman, attr_staff_rman, attr_staff_other;
     private int general_type, general_over_projection, general_over_zone, general_over_units,
-            system_distance_display, system_distance_precision_display, system_angle_display,
+            system_distance_display, system_distance_precision_display, system_coordinates_precision_display, system_angle_display,
             format_coord_entry, format_angle_hz_display, format_angle_hz_obsrv_entry, format_angle_vz_obsrv_display, format_distance_hz_obsrv_display,
             raw_file, raw_file_timestamp, raw_gps_attribute, raw_desc_code_list,
             options_drawer_state, options_first_start;
@@ -61,6 +61,8 @@ public class PreferenceLoaderHelper {
         //Display
         system_distance_display = Integer.parseInt(sharedPreferences.getString(mContext.getString(R.string.pref_key_current_job_system_distance_display),"0"));
         system_distance_precision_display = Integer.parseInt(sharedPreferences.getString(mContext.getString(R.string.pref_key_current_job_system_distance_precision_display),"0"));
+        system_coordinates_precision_display = Integer.parseInt(sharedPreferences.getString(mContext.getString(R.string.pref_key_current_job_system_coordinates_precision_display),"0"));
+
         system_angle_display = Integer.parseInt(sharedPreferences.getString(mContext.getString(R.string.pref_key_current_job_system_angle_display),"0"));
 
         format_coord_entry = Integer.parseInt(sharedPreferences.getString(mContext.getString(R.string.pref_key_current_job_format_coord_entry),"0"));
@@ -135,6 +137,41 @@ public class PreferenceLoaderHelper {
 
         return results;
     }
+
+
+    public String getValueSystemCoordinatesPrecisionDisplay() {
+        String results;
+        switch (system_coordinates_precision_display){
+
+            case 0:
+                results = "0";
+                break;
+
+            case 1:
+                results = "0.0";
+                break;
+
+            case 2:
+                results = "0.00";
+                break;
+
+            case 3:
+                results = "0.000";
+                break;
+
+            case 4:
+                results = "0.0000";
+                break;
+
+            default:
+                results = "0.00";
+                break;
+
+        }
+
+        return results;
+    }
+
 
     /**
      * Returns if Coordinate Format is in pattern Northing - Easting

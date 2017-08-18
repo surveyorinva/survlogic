@@ -13,6 +13,7 @@
     <string name="pref_key_gps_min_time">gps_min_time</string>
     <string name="pref_key_gps_min_distance">gps_min_distance</string>
     <string name="pref_key_gps_unit_measurement">gps_unit_measurement</string>
+    <string name="pref_key_gps_rod_height">pref_key_gps_rod_height</string>
 
     <string name="pref_key_display_category">display_category</string>
     <string name="pref_key_keep_screen_on">keep_screen_on</string>
@@ -48,6 +49,7 @@
 
     <string name="pref_key_current_job_system_distance_display">pref_key_current_job_system_distance_display</string>
     <string name="pref_key_current_job_system_distance_precision_display">pref_key_current_job_system_distance_precision_display</string>
+    <string name="pref_key_current_job_system_coordinates_precision_display">pref_key_current_job_system_coordinates_precision_display</string>
     <string name="pref_key_current_job_system_angle_display">pref_key_current_job_system_angle_display</string>
 
     <string name="pref_key_current_job_format_coord_entry">pref_key_current_job_format_coord_entry</string>
@@ -67,6 +69,7 @@
     <string name="pref_gps_unit_measurement_default">3</string>
     <string name="pref_gps_map_type_default">1</string>
     <string name="pref_gps_epoch_default">3</string>
+    <string name="pref_gps_height_default">3.00</string>
 
     <!--Intent Keys-->
     <string name="KEY_Intent_FROM">KEY_Intent_FROM</string>

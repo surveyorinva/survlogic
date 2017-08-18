@@ -216,6 +216,7 @@ public class JobPointsActivity extends AppCompatActivity implements NavigationVi
 
             FragmentManager fm = getSupportFragmentManager();
             FragmentTransaction ft = fm.beginTransaction();
+            ft.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
             ft.add(R.id.container_in_job_points, containerFragment, "HOME");
             ft.commit();
 

@@ -3,7 +3,9 @@ package com.survlogic.survlogic.fragment;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -23,12 +25,15 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.TextViewCompat;
+import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -80,23 +85,24 @@ public class GpsSurveyMapFragment extends Fragment implements GpsSurveyListener,
             mFixTimeView, mTTFFView,
             mAccuracyView, mAccuracyStatus,
             mNumSats, mNumSatsLocked,
-            mPdopView, mHdopView, mVdopView,
+            mPdopView, mHdopView, mVdopView, mHeightView,
             mEpochView, mEpochCount,
             mGpsLogValue;
 
     private ImageView mAccuracyStatusImage;
 
-    private Button mbtnStartGPSLog, mbtnSaveGPSLog;
+    private Button mbtnStartGPSLog, mbtnSaveGPSLog, mbtnSaveHeight;
 
     private ProgressBar progressBarRecording;
 
     //Array data
-    private List<Double> mArrayLat, mArrayLong, mArrayEllipsoid;
+    private List<Double> mArrayLat, mArrayLong, mArrayEllipsoid, mArrayOrtho, mArrayAccuracy;
 
 
     //    Satellite Metadata
     private int mSvCount, mPrns[], mConstellationType[], mUsedInFixCount;
     private float mSnrCn0s[], mSvElevations[], mSvAzimuths[];
+    private double mOrtho;
     private String mSnrCn0Title;
     private boolean mHasEphemeris[], mHasAlmanac[], mUsedInFix[];
 
@@ -130,6 +136,7 @@ public class GpsSurveyMapFragment extends Fragment implements GpsSurveyListener,
     //Map
     private int displayUnits = 3;
     private int mapType = 1;
+    private double mHeightRod;
     //Logging
     private boolean bolGPSRecording = false;
     private int intEpochCount = 0;
@@ -202,6 +209,7 @@ public class GpsSurveyMapFragment extends Fragment implements GpsSurveyListener,
         mHdopView = (TextView) v.findViewById(R.id.HDOP_value);
         mVdopView = (TextView) v.findViewById(R.id.VDOP_value);
         mTTFFView = (TextView) v.findViewById(R.id.ttff_value);
+        mHeightView = (TextView) v.findViewById(R.id.height_gps_value);
 
         mEpochView = (TextView) v.findViewById(R.id.gps_epoch_count_lbl);
         mEpochCount = (TextView) v.findViewById(R.id.gps_epoch_count_value);
@@ -215,6 +223,8 @@ public class GpsSurveyMapFragment extends Fragment implements GpsSurveyListener,
         mbtnStartGPSLog = (Button) v.findViewById(R.id.btnStartGPSLog);
 
         mbtnSaveGPSLog = (Button) v.findViewById(R.id.btnSaveGPSLog);
+
+        mbtnSaveHeight = (Button) v.findViewById(R.id.height_gps_button);
 
         initViewSettings();
 
@@ -249,6 +259,12 @@ public class GpsSurveyMapFragment extends Fragment implements GpsSurveyListener,
             }
         });
 
+        mbtnSaveHeight.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onSaveRodHeight();
+            }
+        });
 
     }
 
@@ -289,6 +305,8 @@ public class GpsSurveyMapFragment extends Fragment implements GpsSurveyListener,
         mArrayLat = new ArrayList<>();
         mArrayLong = new ArrayList<>();
         mArrayEllipsoid = new ArrayList<>();
+        mArrayOrtho = new ArrayList<>();
+        mArrayAccuracy = new ArrayList<>();
 
         bolGPSRecording = true;
     }
@@ -311,12 +329,62 @@ public class GpsSurveyMapFragment extends Fragment implements GpsSurveyListener,
         double averageLat = MathHelper.createAverageValueFromArray(mArrayLat);
         double averageLong = MathHelper.createAverageValueFromArray(mArrayLong);
         double averageEllipsoid = MathHelper.createAverageValueFromArray(mArrayEllipsoid);
+        double averageOrtho = MathHelper.createAverageValueFromArray(mArrayOrtho);
+        double averageAccuracy = MathHelper.createAverageValueFromArray(mArrayAccuracy);
 
-        pointGeodetic = new PointGeodetic(averageLat,averageLong,averageEllipsoid);
+        pointGeodetic = new PointGeodetic(averageLat,averageLong,averageEllipsoid, averageOrtho, averageAccuracy);
 
         intEpochCount = 0;
 
         returnResults(pointGeodetic);
+    }
+
+    private void onSaveRodHeight(){
+
+        AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
+        dialog.setTitle(getString(R.string.dialog_gps_rod_height_hand_held_title));
+        dialog.setMessage(getString(R.string.dialog_gps_rod_height_hand_held_message));
+
+
+        final LinearLayout layout = new LinearLayout(getActivity());
+        layout.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+
+        params.setMargins(150,0,150,0);
+
+        final EditText etRodHeight = new EditText(getActivity());
+        etRodHeight.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        etRodHeight.setText(String.valueOf(mHeightRod));
+        etRodHeight.setSelection(etRodHeight.getText().length());
+
+        layout.addView(etRodHeight, params);
+
+        dialog.setView(layout);
+
+
+        dialog.setPositiveButton("Add", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        double rodHeightValue;
+
+                        String rodHeightSummary = etRodHeight.getText().toString();
+                        if(!rodHeightSummary.isEmpty()){
+                            try{
+                                rodHeightValue = Double.parseDouble(rodHeightSummary);
+                                setPreferenceRodHeight(rodHeightValue);
+
+                            }catch (Exception e){
+                                e.printStackTrace();
+                            }
+                        }
+
+                    }
+                });
+        dialog.setNegativeButton("Cancel", null);
+        dialog.create();
+        dialog.show();
+
     }
 
     private boolean incrementEpoch(){
@@ -335,12 +403,46 @@ public class GpsSurveyMapFragment extends Fragment implements GpsSurveyListener,
         return checkValue;
     }
 
-    private void logRawDataGPS(double myLat, double myLon, double myEllipsoid){
+    private void logRawDataGPS(double myLat, double myLon, double myEllipsoid, double myOrtho, double myAccuracy){
+        Log.d(TAG, "logRawDataGPS: Ellipsoid IN: " + myEllipsoid);
+        Log.d(TAG, "logRawDataGPS: Ortho IN: " + myOrtho);
+
+        double myCorrectedEllipsoid, myCorrectedOrtho;
+
+
+        switch (displayUnits) {
+            case 1:
+                myCorrectedEllipsoid = convertMetersToValue(myEllipsoid, 1)- mHeightRod;
+
+                break;
+
+            case 2:
+                myCorrectedEllipsoid = convertMetersToValue(myEllipsoid, 2)- mHeightRod;
+
+                break;
+
+            case 3:
+                myCorrectedEllipsoid =(myEllipsoid - mHeightRod);
+
+                break;
+
+            default:
+                myCorrectedEllipsoid =(myEllipsoid - mHeightRod);
+
+                break;
+        }
+
+        myCorrectedOrtho = myOrtho - mHeightRod;
+        Log.d(TAG, "logRawDataGPS: Rod Height: " + mHeightRod);
+        Log.d(TAG, "logRawDataGPS: Ellipsoid OUT: " + myCorrectedEllipsoid);
+        Log.d(TAG, "logRawDataGPS: Ortho OUT: " + myCorrectedOrtho);
+
 
         mArrayLat.add(myLat);
         mArrayLong.add(myLon);
-        mArrayEllipsoid.add(myEllipsoid);
-
+        mArrayEllipsoid.add(myCorrectedEllipsoid);
+        mArrayOrtho.add(myCorrectedOrtho);
+        mArrayAccuracy.add(myAccuracy);
         mGpsLogValue.append("\n " +String.format(this.getString(R.string.gps_log_raw_value), String.valueOf(myLat),String.valueOf(myLon),String.valueOf(myEllipsoid)));
 
     }
@@ -352,6 +454,7 @@ public class GpsSurveyMapFragment extends Fragment implements GpsSurveyListener,
         returnIntent.putExtra(getString(R.string.KEY_POSITION_LATITUDE),mPointGeodetic.getLatitude());
         returnIntent.putExtra(getString(R.string.KEY_POSITION_LONGITUDE),mPointGeodetic.getLongitude());
         returnIntent.putExtra(getString(R.string.KEY_POSITION_ELLIPSOID),mPointGeodetic.getEllipsoid());
+        returnIntent.putExtra(getString(R.string.KEY_POSITION_ORTHO),mPointGeodetic.getOrtho());
         getActivity().setResult(Activity.RESULT_OK,returnIntent);
         getActivity().finish();
 
@@ -401,11 +504,17 @@ public class GpsSurveyMapFragment extends Fragment implements GpsSurveyListener,
     }
 
     private void checkPreferencesSurveySettings(SharedPreferences settings){
+        Log.d(TAG, "checkPreferencesSurveySettings: Started...");
         mAutoEpochCount = sharedPreferences.getBoolean(getString(R.string.pref_key_auto_stop_epoch), true);
 
         mEpochMaxCount = Integer.valueOf(
                 sharedPreferences.getString(getString(R.string.pref_key_epoch_max), getString(R.string.pref_gps_epoch_default)));
 
+        Log.d(TAG, "checkPreferencesSurveySettings: Checking Rod Height from Preferences");
+        mHeightRod = Double.valueOf(sharedPreferences.getString(getString(R.string.pref_key_gps_rod_height), getString(R.string.pref_gps_height_default)));
+
+        Log.d(TAG, "checkPreferencesSurveySettings: Found Rod Height, Setting Value: " + mHeightRod);
+        mHeightView.setText(getString(R.string.gps_height_value, mHeightRod));
     }
 
     private void checkPreferenceUnits(SharedPreferences settings){
@@ -440,6 +549,17 @@ public class GpsSurveyMapFragment extends Fragment implements GpsSurveyListener,
 
             }
         }
+    }
+
+    private void setPreferenceRodHeight(double rodHeight){
+        editor = sharedPreferences.edit();
+
+        editor.putString(getString(R.string.pref_key_gps_rod_height), String.valueOf(rodHeight));
+
+        editor.commit();
+
+        checkPreferencesSurveySettings(sharedPreferences);
+
     }
 
     @Override
@@ -531,13 +651,13 @@ public class GpsSurveyMapFragment extends Fragment implements GpsSurveyListener,
             if (mAutoEpochCount){
                 if (!bolEpoch){
                     // Count has not reached max Epoch level on AutoSave
-                    logRawDataGPS(location.getLatitude(),location.getLongitude(),location.getAltitude());
+                    logRawDataGPS(location.getLatitude(),location.getLongitude(),location.getAltitude(), mOrtho, location.getAccuracy());
                 }else{
                     // Count has reached the max Epoch level.  Shut off
                     onStopGpsSurvey();
                 }
             }else{
-                logRawDataGPS(location.getLatitude(),location.getLongitude(),location.getAltitude());
+                logRawDataGPS(location.getLatitude(),location.getLongitude(),location.getAltitude(),mOrtho, location.getAccuracy());
             }
         }
 
@@ -637,18 +757,22 @@ public class GpsSurveyMapFragment extends Fragment implements GpsSurveyListener,
 
                 switch (displayUnits) {
                     case 1:
+                        mOrtho = convertMetersToValue(altitudeMsl,1);
                         mOrthoHeightView.setText(getString(R.string.gps_msl_value_feet, convertMetersToValue(altitudeMsl,1)));
                         break;
 
                     case 2:
+                        mOrtho = convertMetersToValue(altitudeMsl,2);
                         mOrthoHeightView.setText(getString(R.string.gps_msl_value_feet, convertMetersToValue(altitudeMsl,2)));
                         break;
 
                     case 3:
+                        mOrtho = altitudeMsl;
                         mOrthoHeightView.setText(getString(R.string.gps_msl_value_metric, altitudeMsl));
                         break;
 
                     default:
+                        mOrtho = altitudeMsl;
                         mOrthoHeightView.setText(getString(R.string.gps_msl_value_metric, altitudeMsl));
                         break;
                 }

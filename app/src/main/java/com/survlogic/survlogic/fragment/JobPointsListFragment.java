@@ -94,7 +94,6 @@ public class JobPointsListFragment extends Fragment {
                 pointSurveyTableView.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        refreshSurveyPointListView();
                         refreshIndicator.hide();
 
                     }
@@ -132,11 +131,6 @@ public class JobPointsListFragment extends Fragment {
 
     }
 
-
-    private void refreshSurveyPointListView(){
-
-
-    }
 
 
 }

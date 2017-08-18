@@ -274,6 +274,7 @@ public class JobHomeActivity extends AppCompatActivity implements NavigationView
             //Display
             editor.putString(getString(R.string.pref_key_current_job_system_distance_display), String.valueOf(jobSettings.getSystemDistanceDisplay()));
             editor.putString(getString(R.string.pref_key_current_job_system_distance_precision_display), String.valueOf(jobSettings.getSystemDistancePrecisionDisplay()));
+            editor.putString(getString(R.string.pref_key_current_job_system_coordinates_precision_display), String.valueOf(jobSettings.getSystemCoordinatesPrecisionDisplay()));
             editor.putString(getString(R.string.pref_key_current_job_system_angle_display), String.valueOf(jobSettings.getSystemAngleDisplay()));
 
             editor.putString(getString(R.string.pref_key_current_job_format_coord_entry), String.valueOf(jobSettings.getFormatCoordinatesEntry()));
@@ -363,6 +364,7 @@ public class JobHomeActivity extends AppCompatActivity implements NavigationView
             //Display
             int system_distance_display = Integer.parseInt(sharedPreferences.getString(getString(R.string.pref_key_current_job_system_distance_display),"0"));
             int system_distance_precision_display = Integer.parseInt(sharedPreferences.getString(getString(R.string.pref_key_current_job_system_distance_precision_display),"0"));
+            int system_coordinate_precision_display = Integer.parseInt(sharedPreferences.getString(getString(R.string.pref_key_current_job_system_coordinates_precision_display),"0"));
             int system_angle_display = Integer.parseInt(sharedPreferences.getString(getString(R.string.pref_key_current_job_system_angle_display),"0"));
 
             int format_coord_entry = Integer.parseInt(sharedPreferences.getString(getString(R.string.pref_key_current_job_format_coord_entry),"0"));
@@ -407,7 +409,7 @@ public class JobHomeActivity extends AppCompatActivity implements NavigationView
             ProjectJobSettings settings = new ProjectJobSettings(project_id, job_id, general_name,
                     options_first_start, options_drawer_state,
                     general_type, general_over_projection, general_over_zone, general_over_units,
-                    system_distance_display, system_distance_precision_display, system_angle_display,
+                    system_distance_display, system_distance_precision_display, system_coordinate_precision_display, system_angle_display,
                     format_angle_hz_display, format_angle_vz_obsrv_display, format_distance_hz_obsrv_display, format_coord_entry, format_angle_hz_obsrv_entry,
                     raw_file, raw_file_timestamp, raw_gps_attribute, raw_desc_code_list,attr_client, attr_mission, attr_weather_general, attr_weather_temp, attr_weather_pres,
                     attr_staff_chief, attr_staff_iman, attr_staff_rman, attr_staff_other);

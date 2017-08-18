@@ -55,6 +55,7 @@ public class JobContract {
         public static final String KEY_ATTR_STAFF_OTHER = "attr_staff_other";
         public static final String KEY_SYSTEM_DIST_DISPLAY = "system_dist_display";
         public static final String KEY_SYSTEM_DIST_PREC_DISPLAY = "system_dist_prec_display";
+        public static final String KEY_SYSTEM_COORD_PREC_DISPLAY = "system_coord_prec_display";
         public static final String KEY_SYSTEM_ANGLE_DISPLAY = "system_angle_display";
         public static final String KEY_FORMAT_COORD_ENTRY = "format_coord_entry";
         public static final String KEY_FORMAT_ANGLE_HZ_DISPLAY = "format_angle_hz_display";

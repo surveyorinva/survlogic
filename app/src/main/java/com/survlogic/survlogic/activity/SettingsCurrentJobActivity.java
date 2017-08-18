@@ -214,6 +214,7 @@ public class SettingsCurrentJobActivity extends AppCompatPreferenceActivity {
             // guidelines.
             bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_key_current_job_system_distance_display)));
             bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_key_current_job_system_distance_precision_display)));
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_key_current_job_system_coordinates_precision_display)));
             bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_key_current_job_system_angle_display)));
             bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_key_current_job_format_coord_entry)));
             bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_key_current_job_format_angle_hz_display)));

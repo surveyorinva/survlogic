@@ -76,9 +76,11 @@
     <string name="gps_pdop_default">PDOP:</string>
     <string name="gps_hdop_default">HDOP:</string>
     <string name="gps_vdop_default">VDOP:</string>
+    <string name="gps_height_default">HI:</string>
     <string name="gps_pdop_value">PDOP: %1$.1f</string>
     <string name="gps_hdop_value">HDOP: %1$.1f</string>
     <string name="gps_vdop_value">VDOP: %1$.1f</string>
+    <string name="gps_height_value">HI: %1$.1f</string>
     <string name="gps_ttff_default">TTFF:</string>
     <string name="gps_ttff_value">TTFF:</string>
     <string name="header_epoch_lbl">Epoch:</string>
@@ -148,6 +150,16 @@
     <string name="project_new_location_longitude_title">Longitude: </string>
     <string name="project_new_location_longitude_default">Longitude:  (Not Defined)</string>
     <string name="project_new_location_longitude_value">Longitude:  %1$s</string>
+
+    <string name="project_new_location_height_title">Ellipsoid: </string>
+    <string name="project_new_location_height_default">Ellipsoid:  (Not Defined)</string>
+    <string name="project_new_location_height_value">Ellipsoid:  %1$s</string>
+
+    <string name="project_new_location_ortho_title">Ortho Height: </string>
+    <string name="project_new_location_ortho_default">Ortho Height:  (Not Defined)</string>
+    <string name="project_new_location_ortho_value">Ortho Height:  %1$s</string>
+
+
     <string name="project_new_photo_button_label">Choose Picture</string>
     <string name="project_new_dialog_title">Get Project Site Photo</string>
     <string name="project_new_dialog_takePhoto">Take Photo</string>
@@ -170,6 +182,7 @@
     <string name="project_details_menu_item_new_job">Create New Job</string>
     <!--Project Details - Add New Photo-->
     <string name="photo_dialog_title">Add Photo to Project</string>
+    <string name="photo_dialog_title_point">Add Photo to Point</string>
     <string name="dialog_photo_header_1">ADD WATERMARK TO IMAGE</string>
     <string name="dialog_photo_description">Enter in Photo Description"</string>
     <string name="project_photo_new_validation_save_success">Project Photo Saved!</string>
@@ -207,6 +220,7 @@
     <string name="dialog_job_point_item_header_elevation">ELEVATION</string>
     <string name="dialog_job_point_item_header_description">DESCRIPTION</string>
     <string name="dialog_job_point_button_advanced_settings">Advanced Settings</string>
+    <string name="job_point_header_add_photos">Add Photos for this Point</string>
 
     <string name="dialog_job_point_item_error_pointNo">Enter a numeric point number</string>
     <string name="dialog_job_point_item_error_pointNoExists">Point Number Exists in File</string>
@@ -217,6 +231,15 @@
 
     <string name="job_new_validation_point_save_success">Point Saved!</string>
     <string name="job_new_validation_point_save_failed">Error Saving Point.  Please try again.</string>
+
+    <string name="dialog_job_point_geodetic_item_latitude">Latitude</string>
+    <string name="dialog_job_point_geodetic_item_longitude">Longitude</string>
+    <string name="dialog_job_point_geodetic_item_latitude_note">*Use - in Degrees for Southern Latitude</string>
+    <string name="dialog_job_point_geodetic_item_longitude_note">*Use - in Degrees for western Longitudes</string>
+
+    <string name="dialog_gps_rod_height_hand_held_title">Enter Rod Height</string>
+    <string name="dialog_gps_rod_height_hand_held_message">Height of Hand-held above ground</string>
+
 
     <!-- ******************************Strings related to Settings****************************** -->
 
@@ -287,6 +310,7 @@
     <!-- Display -->
     <string name="pref_current_job_distance_precision">Distance</string>
     <string name="pref_current_job_angle_precision">Angular</string>
+    <string name="pref_current_job_coordinates_precision">Coordinates</string>
 
     <string name="pref_current_job_coordinate_display">Coordinate Format</string>
     <string name="pref_current_job_coordinate_display_summary">Display order of coordinates.</string>
@@ -348,6 +372,7 @@
     <string name="pref_value_measurement_dialog_title">Choose Unit Type</string>
 
     <!--Survey-->
+    <string name="pref_gps_height">Rod Height</string>
     <string name="pref_gps_auto_stop_category_title">Store Point</string>
     <string name="pref_gps_auto_stop_gps_title">Auto-Stop Survey </string>
     <string name="pref_gps_auto_stop_gps_summary">Stops the observations after a defined number of Epochs</string>

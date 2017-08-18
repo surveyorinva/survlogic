@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
+
+    <EditTextPreference
+        android:key="@string/pref_key_gps_rod_height"
+        android:title="@string/pref_gps_height"
+        android:inputType="numberDecimal"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"/>
+
     <PreferenceCategory
         android:title="@string/pref_gps_auto_stop_category_title"
         android:key="@string/pref_key_epoch_category">
@@ -19,6 +28,7 @@
             android:entries="@array/pref_gps_epoch_max_titles"
             android:entryValues="@array/pref_gps_epoch_max_values"
             android:defaultValue="3"/>
+
 
     </PreferenceCategory>
 

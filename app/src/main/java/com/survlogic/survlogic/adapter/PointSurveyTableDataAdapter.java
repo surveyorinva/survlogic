@@ -153,8 +153,7 @@ public class PointSurveyTableDataAdapter extends LongPressAwareTableDataAdapter<
         Log.d(TAG, "loadPreferences: Started...");
 
 
-
-        COORDINATE_FORMATTER = new DecimalFormat(preferenceLoaderHelper.getValueSystemDistancePrecisionDisplay());
+        COORDINATE_FORMATTER = new DecimalFormat(preferenceLoaderHelper.getValueSystemCoordinatesPrecisionDisplay());
 
 
     }

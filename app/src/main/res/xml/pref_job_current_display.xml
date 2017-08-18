@@ -16,6 +16,16 @@
             android:positiveButtonText="@null"/>
 
         <ListPreference
+            android:key="@string/pref_key_current_job_system_coordinates_precision_display"
+            android:title="@string/pref_current_job_coordinates_precision"
+            android:dialogTitle="@string/pref_current_job_coordinates_precision"
+            android:entries="@array/job_distance_precision_titles"
+            android:entryValues="@array/job_distance_precision_values"
+            android:defaultValue="2"
+            android:negativeButtonText="@null"
+            android:positiveButtonText="@null"/>
+
+        <ListPreference
             android:key="@string/pref_key_current_job_system_angle_display"
             android:title="@string/pref_current_job_angle_precision"
             android:dialogTitle="@string/pref_current_job_angle_precision"

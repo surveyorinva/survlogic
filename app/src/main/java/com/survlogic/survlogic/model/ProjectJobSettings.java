@@ -16,7 +16,7 @@ public class ProjectJobSettings {
     private int overrideProjection, overrideZone, overrideUnits;
 
     //System defaults for Data being displayed on screen
-    private int systemDistanceDisplay, systemDistancePrecisionDisplay, systemAngleDisplay,
+    private int systemDistanceDisplay, systemDistancePrecisionDisplay, systemCoordinatesPrecisionDisplay, systemAngleDisplay,
             formatAngleHorizontalDisplay, formatAngleVerticalObsDisplay, formatDistanceHorizontalObsDisplay;
 
     //Format for Data entry by user in UI
@@ -36,7 +36,7 @@ public class ProjectJobSettings {
 
     public ProjectJobSettings(long projectId, long job_id, String jobName, int uiFirstStart, int uiDrawerState, int defaultJobType,
                               int overrideProjection, int overrideZone, int overrideUnits, int systemDistanceDisplay,
-                              int systemDistancePrecisionDisplay, int systemAngleDisplay, int formatAngleHorizontalDisplay,
+                              int systemDistancePrecisionDisplay, int systemCoordinatesPrecisionDisplay, int systemAngleDisplay, int formatAngleHorizontalDisplay,
                               int formatAngleVerticalObsDisplay, int formatDistanceHorizontalObsDisplay,
                               int formatCoordinatesEntry, int formatAngleHorizontalObsEntry, int optionsRawFile,
                               int optionsRawTimeStamp, int optionsGpsAttribute, int optionsCodeTable) {
@@ -51,6 +51,7 @@ public class ProjectJobSettings {
         this.overrideUnits = overrideUnits;
         this.systemDistanceDisplay = systemDistanceDisplay;
         this.systemDistancePrecisionDisplay = systemDistancePrecisionDisplay;
+        this.systemCoordinatesPrecisionDisplay = systemCoordinatesPrecisionDisplay;
         this.systemAngleDisplay = systemAngleDisplay;
         this.formatAngleHorizontalDisplay = formatAngleHorizontalDisplay;
         this.formatAngleVerticalObsDisplay = formatAngleVerticalObsDisplay;
@@ -66,7 +67,7 @@ public class ProjectJobSettings {
 
     public ProjectJobSettings(long projectId, long job_id, String jobName, int uiFirstStart, int uiDrawerState, int defaultJobType,
                               int overrideProjection, int overrideZone, int overrideUnits, int systemDistanceDisplay,
-                              int systemDistancePrecisionDisplay, int systemAngleDisplay, int formatAngleHorizontalDisplay,
+                              int systemDistancePrecisionDisplay, int systemCoordinatesPrecisionDisplay, int systemAngleDisplay, int formatAngleHorizontalDisplay,
                               int formatAngleVerticalObsDisplay, int formatDistanceHorizontalObsDisplay,
                               int formatCoordinatesEntry, int formatAngleHorizontalObsEntry, int optionsRawFile,
                               int optionsRawTimeStamp, int optionsGpsAttribute, int optionsCodeTable, String attClient,
@@ -83,6 +84,7 @@ public class ProjectJobSettings {
         this.overrideUnits = overrideUnits;
         this.systemDistanceDisplay = systemDistanceDisplay;
         this.systemDistancePrecisionDisplay = systemDistancePrecisionDisplay;
+        this.systemCoordinatesPrecisionDisplay = systemCoordinatesPrecisionDisplay;
         this.systemAngleDisplay = systemAngleDisplay;
         this.formatAngleHorizontalDisplay = formatAngleHorizontalDisplay;
         this.formatAngleVerticalObsDisplay = formatAngleVerticalObsDisplay;
@@ -190,6 +192,14 @@ public class ProjectJobSettings {
 
     public void setSystemDistancePrecisionDisplay(int systemDistancePrecisionDisplay) {
         this.systemDistancePrecisionDisplay = systemDistancePrecisionDisplay;
+    }
+
+    public int getSystemCoordinatesPrecisionDisplay() {
+        return systemCoordinatesPrecisionDisplay;
+    }
+
+    public void setSystemCoordinatesPrecisionDisplay(int systemCoordinatesPrecisionDisplay) {
+        this.systemCoordinatesPrecisionDisplay = systemCoordinatesPrecisionDisplay;
     }
 
     public int getSystemAngleDisplay() {
