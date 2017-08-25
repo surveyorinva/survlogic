@@ -97,6 +97,8 @@ public class DialogProjectJobAdd extends DialogFragment {
         String description = etDescription.getText().toString();
         String jobDatabaseName = MathHelper.getRandomString(8) + ".db";
 
+
+        //Todo convert the isStringNull to the StringUtilityHelper class for more control
         if(!isStringNull(jobName)){
             Log.d(TAG, "submitForm: Creating ProjectJobs with Description");
             if(!isStringNull(description)){

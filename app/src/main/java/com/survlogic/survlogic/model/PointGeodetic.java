@@ -7,6 +7,12 @@ package com.survlogic.survlogic.model;
 public class PointGeodetic extends PointSurvey{
     private double latitude, longitude, ellipsoid, ortho, accuracy;
 
+
+    public PointGeodetic(){
+
+    }
+
+
     public PointGeodetic(double latitude, double longitude, double ellipsoid) {
         this.latitude = latitude;
         this.longitude = longitude;

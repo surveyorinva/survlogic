@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -21,7 +22,12 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.survlogic.survlogic.R;
+import com.survlogic.survlogic.background.BackgroundPointGeodeticNew;
+import com.survlogic.survlogic.database.JobDatabaseHandler;
 import com.survlogic.survlogic.dialog.DialogJobPointGeodeticEntryAdd;
+import com.survlogic.survlogic.dialog.DialogProjectDescriptionAdd;
+import com.survlogic.survlogic.interf.PointGeodeticEntryListener;
+import com.survlogic.survlogic.model.PointGeodetic;
 import com.survlogic.survlogic.model.PointSurvey;
 import com.survlogic.survlogic.utils.MathHelper;
 import com.survlogic.survlogic.utils.PreferenceLoaderHelper;
@@ -34,7 +40,7 @@ import java.text.DecimalFormat;
  * Created by chrisfillmore on 8/13/2017.
  */
 
-public class JobPointsAddAdvancedActivity extends AppCompatActivity {
+public class JobPointsAddAdvancedActivity extends AppCompatActivity implements PointGeodeticEntryListener {
     private static final String TAG = "JobPointsAddAdvancedAct";
 
     private static final int REQUEST_GET_GPS = 1;
@@ -55,14 +61,13 @@ public class JobPointsAddAdvancedActivity extends AppCompatActivity {
     private TextView tvLocation_latitude, tvLocation_longitude, tvLocation_latitude_value,tvLocation_longitude_value,
             tvLocation_height, tvLocation_height_value, tvLocation_ortho, tvLocation_ortho_value;
     private EditText etPointNumber, etPointNorthing, etPointEasting, etPointElevation, etPointDescription;
-    private Button btCancel, btSave, btTakePhoto;
+    private Button btCancel, btSave;
     private ImageButton btGPSAdd, btGPSEntryAdd;
 
-    private int pointNumber, pointType;
+    private int pointNumber, pointType, projectId, jobId;
     private double pointNorthing,pointEasting,pointElevation;
-    private String pointDescription;
+    private String pointDescription, jobDbName;
     double mLocationLat = 0, mLocationLong = 0, mLocationEllipsoid = 0, mLocationOrtho = 0, mLocationAccuracy = 0;
-
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -77,8 +82,6 @@ public class JobPointsAddAdvancedActivity extends AppCompatActivity {
         initViewWidgets();
         setOnClickListeners();
         populateValues();
-
-
 
     }
 
@@ -110,8 +113,8 @@ public class JobPointsAddAdvancedActivity extends AppCompatActivity {
         tvLocation_ortho = (TextView) findViewById(R.id.location_ortho);
         tvLocation_ortho_value = (TextView) findViewById(R.id.location_ortho_value);
 
+        btSave = (Button) findViewById(R.id.Save_button);
         btCancel = (Button) findViewById(R.id.Cancel_button);
-        btTakePhoto = (Button) findViewById(R.id.photo_camera_get_photo);
 
         btGPSAdd = (ImageButton) findViewById(R.id.location_get_from_gps_survey);
         btGPSEntryAdd = (ImageButton) findViewById(R.id.location_get_from_user_input);
@@ -119,6 +122,14 @@ public class JobPointsAddAdvancedActivity extends AppCompatActivity {
 
     private void setOnClickListeners(){
         Log.d(TAG, "setOnClickListeners: Started...");
+
+        btSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                submitForm(v);
+            }
+        });
+
         btCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -140,20 +151,19 @@ public class JobPointsAddAdvancedActivity extends AppCompatActivity {
             }
         });
 
-        btTakePhoto.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                callImageSelectionDialog();
-            }
-        });
-
 
     }
     private void populateValues(){
         Log.d(TAG, "populateValues: Started...");
 
-        pointSurvey = getIntent().getParcelableExtra("POINT_ENTRY");
+        Bundle extras = getIntent().getExtras();
+        projectId = extras.getInt("PROJECT_ID");
+        jobId = extras.getInt("JOB_ID");
+        jobDbName = extras.getString("JOB_DB_NAME");
 
+        Log.d(TAG, "populateValues: Database Name:" + jobDbName + " Loaded...");
+
+        pointSurvey = getIntent().getParcelableExtra("POINT_ENTRY");
         pointNumber = pointSurvey.getPoint_no();
         pointNorthing = pointSurvey.getNorthing();
         pointEasting = pointSurvey.getEasting();
@@ -196,48 +206,6 @@ public class JobPointsAddAdvancedActivity extends AppCompatActivity {
         viewDialog.show(getFragmentManager(),"dialog");
     }
 
-    private void callImageSelectionDialog(){
-        Log.d(TAG, "callImageSelectionDialog: Started...");
-        final CharSequence[] items = { getString(R.string.project_new_dialog_takePhoto), getString(R.string.project_new_dialog_getImage),
-                getString(R.string.general_cancel) };
-
-        TextView title = new TextView(this);  //was context not this
-
-        title.setText(getString(R.string.photo_dialog_title_point));
-        title.setBackgroundColor(Color.WHITE);
-        title.setPadding(10, 15, 15, 10);
-        title.setGravity(Gravity.CENTER);
-        title.setTextColor(Color.BLACK);
-        title.setTextSize(22);
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(JobPointsAddAdvancedActivity.this);
-
-        builder.setCustomTitle(title);
-
-        builder.setItems(items, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int arg) {
-
-                switch (arg) {
-
-                    case 0: //Camera
-                        //startCamera();
-                        break;
-
-                    case 1: //Photo
-                        //startPhotoGallery();
-                        break;
-
-                    case 2: //Cancel
-
-                        dialog.dismiss();
-                        break;
-                }
-
-            }
-        });
-        builder.show();
-    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -247,22 +215,22 @@ public class JobPointsAddAdvancedActivity extends AppCompatActivity {
         if (this.REQUEST_GET_GPS == requestCode && resultCode == RESULT_OK) {
             Log.d(TAG, "onActivityResult: Starting...");
 
-            mLocationLat = data.getDoubleExtra(getString(R.string.KEY_POSITION_LATITUDE),0);
-            mLocationLong = data.getDoubleExtra(getString(R.string.KEY_POSITION_LONGITUDE),0);
+            mLocationLat = data.getDoubleExtra(getString(R.string.KEY_POSITION_LATITUDE), 0);
+            mLocationLong = data.getDoubleExtra(getString(R.string.KEY_POSITION_LONGITUDE), 0);
 
-            mLocationEllipsoid = data.getDoubleExtra(getString(R.string.KEY_POSITION_ELLIPSOID),0);
+            mLocationEllipsoid = data.getDoubleExtra(getString(R.string.KEY_POSITION_ELLIPSOID), 0);
             String heightEllipsoid = DISTANCE_PRECISION_FORMATTER.format(mLocationEllipsoid);
 
-            mLocationOrtho = data.getDoubleExtra(getString(R.string.KEY_POSITION_ORTHO),0);
+            mLocationOrtho = data.getDoubleExtra(getString(R.string.KEY_POSITION_ORTHO), 0);
             String heightOrtho = DISTANCE_PRECISION_FORMATTER.format(mLocationOrtho);
 
-            String strLatitude = MathHelper.convertDECtoDMS(mLocationLat,3,false);
+            String strLatitude = MathHelper.convertDECtoDMS(mLocationLat, 3, false);
 
             tvLocation_latitude.setText(getString(R.string.project_new_location_latitude_title));
             tvLocation_latitude_value.setText(strLatitude);
             tvLocation_latitude_value.setVisibility(View.VISIBLE);
 
-            String strLongitude = MathHelper.convertDECtoDMS(mLocationLong,3,true);
+            String strLongitude = MathHelper.convertDECtoDMS(mLocationLong, 3, true);
 
             tvLocation_longitude.setText(getString(R.string.project_new_location_longitude_title));
             tvLocation_longitude_value.setText(strLongitude);
@@ -277,14 +245,6 @@ public class JobPointsAddAdvancedActivity extends AppCompatActivity {
             tvLocation_ortho_value.setText(heightOrtho);
             tvLocation_ortho_value.setVisibility(View.VISIBLE);
 
-
-        }else if(this.REQUEST_TAKE_PHOTO == requestCode && resultCode == RESULT_OK){
-
-
-
-        }else if(this.REQUEST_SELECT_PICTURE == requestCode && resultCode == RESULT_OK){
-
-
         }
 
     }
@@ -296,6 +256,186 @@ public class JobPointsAddAdvancedActivity extends AppCompatActivity {
         COORDINATE_FORMATTER = new DecimalFormat(preferenceLoaderHelper.getValueSystemCoordinatesPrecisionDisplay());
         DISTANCE_PRECISION_FORMATTER = new DecimalFormat(preferenceLoaderHelper.getValueSystemDistancePrecisionDisplay());
 
+    }
+
+    @Override
+    public void onReturnValues(double latOut, double longOut, double heightEllipsOut, double heightOrthoOut) {
+        Log.d(TAG, "onReturnValues: Starting...");
+        if (latOut != 0) {
+            mLocationLat = latOut;
+            String strLatitude = MathHelper.convertDECtoDMS(latOut, 3, false);
+
+            tvLocation_latitude.setText(getString(R.string.project_new_location_latitude_title));
+            tvLocation_latitude_value.setText(strLatitude);
+            tvLocation_latitude_value.setVisibility(View.VISIBLE);
+
+        }
+
+        if (longOut !=0){
+            mLocationLong = longOut;
+            String strLongitude = MathHelper.convertDECtoDMS(longOut,3,true);
+
+            tvLocation_longitude.setText(getString(R.string.project_new_location_longitude_title));
+            tvLocation_longitude_value.setText(strLongitude);
+            tvLocation_longitude_value.setVisibility(View.VISIBLE);
+
+        }
+
+
+        if (heightEllipsOut != 0){
+            mLocationEllipsoid = heightEllipsOut;
+            String heightEllipsoid = DISTANCE_PRECISION_FORMATTER.format(heightEllipsOut);
+
+            tvLocation_height.setText(getString(R.string.project_new_location_height_title));
+            tvLocation_height_value.setText(heightEllipsoid);
+            tvLocation_height_value.setVisibility(View.VISIBLE);
+
+        }
+
+        if(heightOrthoOut !=0){
+            mLocationOrtho = heightOrthoOut;
+            String heightOrtho = DISTANCE_PRECISION_FORMATTER.format(heightOrthoOut);
+
+            tvLocation_ortho.setText(getString(R.string.project_new_location_ortho_title));
+            tvLocation_ortho_value.setText(heightOrtho);
+            tvLocation_ortho_value.setVisibility(View.VISIBLE);
+
+        }
+
+    }
+
+
+    private void submitForm(View v){
+
+        if (validateEntry()){
+            Log.d(TAG, "submitForm: Validation Approved, Saving...");
+            // Setup Background Task
+            BackgroundPointGeodeticNew backgroundPointGeodeticNew = new BackgroundPointGeodeticNew(mContext, jobDbName);
+
+            // Execute background task
+            backgroundPointGeodeticNew.execute(createPointGeodetic());
+
+            finish();
+        }
+    }
+
+
+    private boolean validateEntry(){
+        Log.d(TAG, "validateEntry: Starting...");
+        boolean results;
+
+
+        results =  true;
+        if (etPointNumber.getText().toString().isEmpty()){
+            Log.d(TAG, "validateEntry: No Point Number");
+            inputLayoutPointNumber.setError(getString(R.string.dialog_job_point_item_error_pointNo));
+            return false;
+
+        }else {
+            inputLayoutPointNumber.setError(null);
+
+        }
+
+
+        int point_No = Integer.parseInt(etPointNumber.getText().toString());
+
+        Log.d(TAG, "validateEntry: Checking Database: " + jobDbName + " for " + point_No);
+
+        JobDatabaseHandler jobDb  = new JobDatabaseHandler(mContext, jobDbName);
+        SQLiteDatabase dbJob = jobDb.getReadableDatabase();
+
+        if(jobDb.checkPointNumberExists(dbJob,point_No)){
+            Log.d(TAG, "validateEntry: Point Found, prompting...");
+            inputLayoutPointNumber.setError(getString(R.string.dialog_job_point_item_error_pointNoExists));
+            jobDb.close();
+            return false;
+
+        }else{
+            Log.d(TAG, "validateEntry: Point not found, continuing...");
+            inputLayoutPointNumber.setError(null);
+
+
+        }
+
+
+        if (etPointNorthing.getText().toString().isEmpty()){
+            Log.d(TAG, "validateEntry: Point Northing not found");
+            inputLayoutPointNorthing.setError(getString(R.string.dialog_job_point_item_error_pointNorthing));
+            return false;
+
+        }else {
+            inputLayoutPointNorthing.setError(null);
+
+        }
+
+        if (etPointEasting.getText().toString().isEmpty()){
+            Log.d(TAG, "validateEntry: Point Easting not found");
+            inputLayoutPointEasting.setError(getString(R.string.dialog_job_point_item_error_pointEasting));
+            return false;
+
+        }else {
+            inputLayoutPointEasting.setError(null);
+
+        }
+
+        if (etPointElevation.getText().toString().isEmpty()){
+            Log.d(TAG, "validateEntry: Point Elevation not found");
+            inputLayoutPointElevation.setError(getString(R.string.dialog_job_point_item_error_pointElevation));
+            return false;
+
+        }else {
+            inputLayoutPointElevation.setError(null);
+
+        }
+
+        if (etPointDescription.getText().toString().isEmpty()){
+            Log.d(TAG, "validateEntry: Point Description not found");
+            inputLayoutPointDescription.setError(getString(R.string.dialog_job_point_item_error_pointDescription));
+            return false;
+
+        }else {
+            inputLayoutPointDescription.setError(null);
+
+        }
+
+        Log.d(TAG, "validateEntry: Cleaning up, closing Database: " + jobDbName);
+        jobDb.close();
+
+        Log.d(TAG, "validateEntry: Results: " + results);
+        return results;
+
+    }
+
+    private PointGeodetic createPointGeodetic(){
+        Log.d(TAG, "createPointGeodetic: Started...");
+
+        PointGeodetic pointGeodetic = new PointGeodetic();
+
+        pointNumber = Integer.parseInt(etPointNumber.getText().toString());
+        pointGeodetic.setPoint_no(pointNumber);
+
+        pointNorthing = Double.parseDouble(etPointNorthing.getText().toString());
+        pointGeodetic.setNorthing(pointNorthing);
+
+        pointEasting = Double.parseDouble(etPointEasting.getText().toString());
+        pointGeodetic.setEasting(pointEasting);
+
+        pointElevation = Double.parseDouble(etPointElevation.getText().toString());
+        pointGeodetic.setElevation(pointElevation);
+        Log.d(TAG, "createPointGeodetic: Point Elevation: " + pointElevation);
+
+        pointDescription = etPointDescription.getText().toString();
+        pointGeodetic.setDescription(pointDescription);
+
+        pointGeodetic.setPointType(0);
+
+        pointGeodetic.setLatitude(mLocationLat);
+        pointGeodetic.setLongitude(mLocationLong);
+        pointGeodetic.setEllipsoid(mLocationEllipsoid);
+        pointGeodetic.setOrtho(mLocationOrtho);
+
+        Log.d(TAG, "createPointGeodetic: Finished creating pointGeodetic");
+        return pointGeodetic;
     }
 
 

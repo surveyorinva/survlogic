@@ -19,6 +19,8 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.survlogic.survlogic.R;
+import com.survlogic.survlogic.interf.PointGeodeticEntryListener;
+import com.survlogic.survlogic.utils.MathHelper;
 import com.survlogic.survlogic.utils.PreferenceLoaderHelper;
 import com.survlogic.survlogic.utils.StringUtilityHelper;
 
@@ -36,7 +38,9 @@ public class DialogJobPointGeodeticEntryAdd extends DialogFragment {
 
     private Context mContext;
     private SharedPreferences sharedPreferences;
-    PreferenceLoaderHelper preferenceLoaderHelper;
+    private PreferenceLoaderHelper preferenceLoaderHelper;
+
+
 
     private EditText etLatDegree, etLatMinute, etLatSecond,
             etLongDegree, etLongMinute, etLongSecond,
@@ -98,6 +102,11 @@ public class DialogJobPointGeodeticEntryAdd extends DialogFragment {
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                boolean results = checkFormPosition(v);
+
+                if(results){
+                    submitForm(v);
+                }
 
             }
         });
@@ -115,7 +124,7 @@ public class DialogJobPointGeodeticEntryAdd extends DialogFragment {
     private void loadPreferences(){
         Log.d(TAG, "loadPreferences: Started...");
 
-        COORDINATE_FORMATTER = new DecimalFormat(preferenceLoaderHelper.getValueSystemDistancePrecisionDisplay());
+        COORDINATE_FORMATTER = new DecimalFormat(preferenceLoaderHelper.getValueSystemCoordinatesPrecisionDisplay());
 
 
     }
@@ -253,31 +262,40 @@ public class DialogJobPointGeodeticEntryAdd extends DialogFragment {
     private void populateItems(){
         Log.d(TAG, "populateItems: Starting...");
 
+
         if(latitudeValue !=0){
             Log.d(TAG, "Latitude Values: Started: " + latitudeValue);
-            String degValue = Location.convert(latitudeValue,Location.FORMAT_DEGREES);
-            String minuteValue = Location.convert(latitudeValue,Location.FORMAT_MINUTES);
-            String secondValue = Location.convert(latitudeValue,Location.FORMAT_SECONDS);
+            String degValue = String.valueOf(MathHelper.convertDECToDegree(latitudeValue));
+            String minuteValue = String.valueOf(MathHelper.convertDECToMinute(latitudeValue));
+            String secondValue = String.valueOf(COORDINATE_FORMATTER.format(MathHelper.convertDECToSeconds(latitudeValue)));
 
             etLatDegree.setText(degValue);
             etLatMinute.setText(minuteValue);
             etLatSecond.setText(secondValue);
 
+
         }
 
         if(longitudeValue !=0){
             Log.d(TAG, "Longitude Values: Started:  " + longitudeValue);
+            String degValue = String.valueOf(MathHelper.convertDECToDegree(longitudeValue));
+            String minuteValue = String.valueOf(MathHelper.convertDECToMinute(longitudeValue));
+            String secondValue = String.valueOf(COORDINATE_FORMATTER.format(MathHelper.convertDECToSeconds(longitudeValue)));
+
+            etLongDegree.setText(degValue);
+            etLongMinute.setText(minuteValue);
+            etLongSecond.setText(secondValue);
         }
 
         if(heightEllipsoidValue !=0){
             Log.d(TAG, "Ellipsoid Values: Started:  " + heightEllipsoidValue);
-            etHeightEllipse.setText(String.valueOf(heightEllipsoidValue));
+            etHeightEllipse.setText(String.valueOf(COORDINATE_FORMATTER.format(heightEllipsoidValue)));
 
         }
 
         if(heightOrthoValue !=0){
             Log.d(TAG, "Ortho Values: Started:  " + heightOrthoValue);
-            etHeightOrtho.setText(String.valueOf(heightOrthoValue));
+            etHeightOrtho.setText(String.valueOf(COORDINATE_FORMATTER.format(heightOrthoValue)));
 
 
         }
@@ -285,6 +303,101 @@ public class DialogJobPointGeodeticEntryAdd extends DialogFragment {
 
     }
 
+
+    private boolean checkFormPosition(View v) {
+        Log.d(TAG, "submitForm: Starting");
+        boolean results = false;
+
+        String latDegree = etLatDegree.getText().toString();
+        String latMinute = etLatMinute.getText().toString();
+        String latSecond = etLatSecond.getText().toString();
+
+        String longDegree = etLongDegree.getText().toString();
+        String longMinute = etLongMinute.getText().toString();
+        String longSecond = etLongSecond.getText().toString();
+
+        if(!StringUtilityHelper.isStringNull(latDegree)) {
+            Log.d(TAG, "submitForm: Latitude has been entered correctly, checking Longitude");
+            if (StringUtilityHelper.isStringNull(longDegree)) {
+                showToast(getString(R.string.dialog_job_point_geodetic_lat_missing_long),true);
+                return false;
+            }
+            results = true;
+        }
+
+        if(!StringUtilityHelper.isStringNull(longDegree)) {
+            Log.d(TAG, "submitForm: Longitude has been entered correctly, checking Latitude");
+            if (StringUtilityHelper.isStringNull(latDegree)) {
+                showToast(getString(R.string.dialog_job_point_geodetic_long_missing_lat),true);
+                return false;
+            }
+            results = true;
+        }
+
+        if(!StringUtilityHelper.isStringNull(latDegree)) {
+            Log.d(TAG, "submitForm: Latitude has been entered correctly, checking Min/Sec");
+            if (StringUtilityHelper.isStringNull(latMinute) || StringUtilityHelper.isStringNull(latSecond)) {
+                showToast(getString(R.string.dialog_job_point_geodetic_lat_missing_min_sec),true);
+                return false;
+            }
+            results = true;
+        }
+
+        if(!StringUtilityHelper.isStringNull(longDegree)) {
+            Log.d(TAG, "submitForm: Longitude has been entered correctly, checking Min/Sec");
+            if (StringUtilityHelper.isStringNull(longMinute) || StringUtilityHelper.isStringNull(longSecond)) {
+                showToast(getString(R.string.dialog_job_point_geodetic_long_missing_min_sec),true);
+                return false;
+            }
+            results = true;
+        }
+        return results;
+    }
+
+
+    private void submitForm(View v){
+        Log.d(TAG, "submitForm: Started...");
+
+        boolean results = false;
+        double latitudeDEC = 0, longitudeDEC = 0, heightEllipsoid = 0, heightOrtho = 0;
+
+        String latDegreeIn = etLatDegree.getText().toString();
+        String latMinuteIn = etLatMinute.getText().toString();
+        String latSecondIn = etLatSecond.getText().toString();
+
+        String longDegreeIn = etLongDegree.getText().toString();
+        String longMinuteIn = etLongMinute.getText().toString();
+        String longSecondIn = etLongSecond.getText().toString();
+
+        String heightEllipsoidIn = etHeightEllipse.getText().toString();
+        String heightOrthoIn = etHeightOrtho.getText().toString();
+
+
+        if(!StringUtilityHelper.isStringNull(latDegreeIn)) {
+            latitudeDEC = MathHelper.convertPartsToDEC(latDegreeIn, latMinuteIn, latSecondIn);
+            Log.d(TAG, "Latitude to DEC: " + latitudeDEC);
+
+            longitudeDEC = MathHelper.convertPartsToDEC(longDegreeIn, longMinuteIn, longSecondIn);
+            Log.d(TAG, "Longitude D-M-S: " + longDegreeIn + ":" + longMinuteIn + ":" + longSecondIn );
+            Log.d(TAG, "Longitude to DEC: " + longitudeDEC);
+
+        }
+
+        if(!StringUtilityHelper.isStringNull(heightEllipsoidIn)){
+            heightEllipsoid = Double.parseDouble(heightEllipsoidIn);
+
+        }
+
+        if(!StringUtilityHelper.isStringNull(heightOrthoIn)){
+            //Ask if user wants to use heightOrtho as Point Elevation
+            heightOrtho = Double.parseDouble(heightOrthoIn);
+        }
+
+        PointGeodeticEntryListener listener = (PointGeodeticEntryListener) getActivity();
+        listener.onReturnValues(latitudeDEC, longitudeDEC, heightEllipsoid, heightOrtho);
+        dismiss();
+
+    }
 
     private void showToast(String data, boolean shortTime) {
         Log.d(TAG, "showToast: Started...");

@@ -42,7 +42,9 @@ public class JobPointsActivity extends AppCompatActivity implements NavigationVi
     private ActionBarDrawerToggle actionBarDrawerToggle;
     private NavigationView navigationView;
 
-    private static final int ACTIVITY_NUM = 0;
+    private int ACTIVITY_NUM = 0;
+
+    private BottomNavigationViewEx bottomNavigationViewEx;
 
     private ProjectJobSettings jobSettings;
     private int project_id, job_id, job_settings_id = 1;
@@ -154,7 +156,7 @@ public class JobPointsActivity extends AppCompatActivity implements NavigationVi
     private void initBottomNavigationView(){
         Log.d(TAG, "initBottomNavigationView: Started");
 
-        BottomNavigationViewEx bottomNavigationViewEx = (BottomNavigationViewEx) findViewById(R.id.bottomNavViewBar);
+        bottomNavigationViewEx = (BottomNavigationViewEx) findViewById(R.id.bottomNavViewBar);
         BottomNavigationViewHelper.setupBottomNavigationView(bottomNavigationViewEx);
         enableNavigationHome(mContext, bottomNavigationViewEx);
         Menu menu = bottomNavigationViewEx.getMenu();
@@ -169,10 +171,18 @@ public class JobPointsActivity extends AppCompatActivity implements NavigationVi
         view.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+
+                Menu menu = bottomNavigationViewEx.getMenu();
+                MenuItem menuItem;
+
                 switch (item.getItemId()) {
 
                     case R.id.navigation_item_1:
                         Log.d(TAG, "onNavigationItemSelected: Nav Item 1 - Start");
+                        ACTIVITY_NUM = 0;
+                        menuItem = menu.getItem(ACTIVITY_NUM);
+                        menuItem.setChecked(false);
+
                         JobPointsHomeFragment containerFragment1 = new JobPointsHomeFragment();
                         containerFragment1.setArguments(getIntent().getExtras());
 
@@ -182,16 +192,29 @@ public class JobPointsActivity extends AppCompatActivity implements NavigationVi
 
                     case R.id.navigation_item_2:
                         Log.d(TAG, "onNavigationItemSelected: Nav Item 2 - Start");
+                        ACTIVITY_NUM = 1;
+                        menuItem = menu.getItem(ACTIVITY_NUM);
+                        menuItem.setChecked(false);
+
                         JobPointsListFragment containerFragment2 = new JobPointsListFragment();
                         containerFragment2.setArguments(getIntent().getExtras());
 
                         swapFragment(containerFragment2,false,"LIST");
+
                         break;
 
                     case R.id.navigation_item_3:
+                        ACTIVITY_NUM = 2;
+                        menuItem = menu.getItem(ACTIVITY_NUM);
+                        menuItem.setChecked(false);
+
                         break;
 
                     case R.id.navigation_item_4:
+                        ACTIVITY_NUM = 3;
+                        menuItem = menu.getItem(ACTIVITY_NUM);
+                        menuItem.setChecked(false);
+
                         break;
                 }
 

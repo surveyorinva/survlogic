@@ -903,27 +903,6 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
     }
 
 
-    private String uriToString(Uri uri){
-        String results = uri.toString();
-        return results;
-    }
-
-    private Uri stringToUri(String stringUri){
-        Uri results = Uri.parse(stringUri);
-        return results;
-    }
-
-    private boolean isStringNull(String string){
-        Log.d(TAG, "isStringNull: checking string is equal to null (User Input).");
-
-        if(string.equals("")){
-            return true;
-        }
-        else{
-            return false;
-        }
-    }
-
     private boolean isStringEmpty(String string){
         Log.d(TAG, "isStringEmpty: checking string is null or empty (from DB)");
 

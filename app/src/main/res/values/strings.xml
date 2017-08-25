@@ -232,14 +232,42 @@
     <string name="job_new_validation_point_save_success">Point Saved!</string>
     <string name="job_new_validation_point_save_failed">Error Saving Point.  Please try again.</string>
 
+
+    <!--Geodetic Point Add/Edit-->
     <string name="dialog_job_point_geodetic_item_latitude">Latitude</string>
     <string name="dialog_job_point_geodetic_item_longitude">Longitude</string>
     <string name="dialog_job_point_geodetic_item_latitude_note">*Use - in Degrees for Southern Latitude</string>
     <string name="dialog_job_point_geodetic_item_longitude_note">*Use - in Degrees for western Longitudes</string>
+    <string name="dialog_job_point_geodetic_lat_missing_long">You have entered a Latitude, but not a Longitude.  Please enter the missing data</string>
+    <string name="dialog_job_point_geodetic_long_missing_lat">You have entered a Longitude, but not a Latitude.  Please enter the missing data</string>
+    <string name="dialog_job_point_geodetic_lat_missing_min_sec">Missing minute or seconds for the Latitude.  Please enter the missing data.</string>
+    <string name="dialog_job_point_geodetic_long_missing_min_sec">Missing minute or seconds for the Longitude.  Please enter the missing data.</string>
 
+    <!--Rod Height in GPS-->
     <string name="dialog_gps_rod_height_hand_held_title">Enter Rod Height</string>
     <string name="dialog_gps_rod_height_hand_held_message">Height of Hand-held above ground</string>
 
+    <!--Point View-->
+    <string name="dialog_point_view_category_planar">Planar Coordinates</string>
+    <string name="dialog_point_view_category_geographic">Geographic Coordinates</string>
+    <string name="dialog_point_view_category_photo">Photographs</string>
+
+    <string name="dialog_point_view_pointNo_header">POINT NO.</string>
+    <string name="dialog_point_view_pointDescription_header">DESCRIPTION</string>
+    <string name="dialog_point_view_pointClass_header">Point Class:</string>
+    <string name="dialog_point_view_pointNorthing_header">Northing:</string>
+    <string name="dialog_point_view_pointEasting_header">Easting:</string>
+    <string name="dialog_point_view_pointElevation_header">Elevation:</string>
+    <string name="dialog_point_view_pointLatitude_header">Latitude:</string>
+    <string name="dialog_point_view_pointLongitude_header">Longitude:</string>
+    <string name="dialog_point_view_pointEllipsoid_header">Ellipsoid:</string>
+    <string name="dialog_point_view_pointOrtho_header">Ortho:</string>
+
+    <string name="dialog_point_view_pointLatitude_default">Latitude:  (Not Defined)</string>
+    <string name="dialog_point_view_pointLongitude_default">Longitude:  (Not Defined)</string>
+    <string name="dialog_point_view_pointEllipsoid_default">Ellipsoid:  (Not Defined)</string>
+    <string name="dialog_point_view_pointOrtho_default">Ortho.:  (Not Defined)</string>
+    <string name="dialog_point_view_add_photos">Add Photos</string>
 
     <!-- ******************************Strings related to Settings****************************** -->
 

@@ -21,6 +21,7 @@ public class JobContract {
         public static final String KEY_GEOLAT = "latitude";
         public static final String KEY_GEOLON = "longitude";
         public static final String KEY_GEOELLIPS = "ellipsoid";
+        public static final String KEY_GEOORTHO = "ortho";
         public static final String KEY_GEOACCURACY = "accuracy";
         public static final String KEY_DESCRIPTION = "description";
         public static final String KEY_DATE_CREATED = "created";

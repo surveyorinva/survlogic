@@ -38,5 +38,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
+    <ProgressBar
+        android:id="@+id/progressBar_Loading_gps"
+        android:layout_gravity="center"
+        android:indeterminate="true"
+        android:layout_width="100dp"
+        android:layout_height="100dp" />
+
 
 </android.support.design.widget.CoordinatorLayout>

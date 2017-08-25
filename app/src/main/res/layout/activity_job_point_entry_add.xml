@@ -262,62 +262,6 @@
 
             </LinearLayout>
 
-            <LinearLayout
-                android:id="@+id/layout_area_4"
-                android:orientation="vertical"
-                android:weightSum="2"
-                android:layout_marginTop="10dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="10dp"
-                android:layout_width="match_parent"
-                android:layout_height="80dp">
-
-                <TextView
-                    android:text="@string/job_point_header_add_photos"
-                    style="@style/Labels.Card.ProjectCategory"
-                    android:layout_weight=".5"
-                    android:gravity="bottom"
-                    android:layout_marginBottom="2dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp" />
-
-
-                <RelativeLayout
-                    android:background="@drawable/editbox_dropdown_background"
-                    android:layout_weight="1.5"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp">
-
-                    <Button
-                        android:id="@+id/photo_camera_get_photo"
-                        android:text="@string/project_new_photo_button_label"
-                        style="@style/Button.Flat.Primary.BlueButton"
-                        android:layout_centerVertical="true"
-                        android:layout_marginTop="5dp"
-                        android:layout_marginBottom="5dp"
-                        android:layout_marginStart="10dp"
-                        android:layout_marginEnd="5dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
-
-                    <GridView
-                        android:id="@+id/photo_grid_view"
-                        android:numColumns="4"
-                        android:verticalSpacing="1dp"
-                        android:horizontalSpacing="1dp"
-                        android:stretchMode="columnWidth"
-                        android:gravity="center"
-                        android:drawSelectorOnTop="true"
-                        android:listSelector="@drawable/grid_view_highlight_transparent"
-                        android:visibility="gone"
-                        android:layout_toEndOf="@+id/photo_camera_get_photo"
-                        android:layout_width="match_parent"
-                        android:layout_height="100dp"/>
-
-                </RelativeLayout>
-
-            </LinearLayout>
-
         </LinearLayout>
 
     </android.support.v4.widget.NestedScrollView>

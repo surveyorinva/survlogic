@@ -1,0 +1,517 @@
+package com.survlogic.survlogic.dialog;
+
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Environment;
+import android.os.Handler;
+import android.provider.MediaStore;
+import android.support.annotation.Nullable;
+import android.support.v4.app.DialogFragment;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.content.FileProvider;
+import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.survlogic.survlogic.BuildConfig;
+import com.survlogic.survlogic.R;
+import com.survlogic.survlogic.activity.ProjectDetailsActivity;
+import com.survlogic.survlogic.database.JobDatabaseHandler;
+import com.survlogic.survlogic.model.PointGeodetic;
+import com.survlogic.survlogic.utils.MathHelper;
+import com.survlogic.survlogic.utils.PreferenceLoaderHelper;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+/**
+ * Created by chrisfillmore on 8/21/2017.
+ */
+
+public class DialogJobPointView extends DialogFragment {
+    private static final String TAG = "DialogJobPointView";
+
+    private Context mContext;
+
+    private static final int REQUEST_TAKE_PHOTO = 2;
+    private static final int REQUEST_SELECT_PICTURE = 3;
+
+    private static final int DELAY_TO_SHOW_DATA = 1500;
+    private static final int DELAY_TO_MAP = 1500;
+    private static final int DELAY_TO_GRID = 2000;
+
+    private int pointNo, projectID;
+    private String databaseName, mCurrentPhotoPath;
+    private Bitmap mBitmap, mBitmapRaw;
+
+    private TextView tvPointNo, tvPointDesc, tvPointClass, tvPointNorth, tvPointEast, tvPointElev,
+            tvPointLat, tvPointLong, tvPointEllipsoid, tvPointOrtho,
+            tvPointLatHeader, tvPointLongHeader, tvPointEllipsoidHeader;
+
+    private ProgressBar pbProgressCircle;
+
+    private Button btTakePhoto;
+
+    private SharedPreferences sharedPreferences;
+    private PreferenceLoaderHelper preferenceLoaderHelper;
+
+    private static DecimalFormat COORDINATE_FORMATTER, DISTANCE_PRECISION_FORMATTER;
+
+
+    public static DialogJobPointView newInstance(int pointNo, String databaseName) {
+        Log.d(TAG, "newInstance: Starting...");
+        DialogJobPointView frag = new DialogJobPointView();
+        Bundle args = new Bundle();
+        args.putInt("pointNo", pointNo);
+        args.putString("databaseName", databaseName);
+        frag.setArguments(args);
+        return frag;
+
+    }
+
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        Log.d(TAG, "onCreateDialog: Starting...>");
+
+        pointNo = getArguments().getInt("pointNo");
+        databaseName = getArguments().getString("databaseName");
+
+        Log.d(TAG, "onCreateDialog: Database Name:" + databaseName + " Loaded...");
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.DialogGalleryStyle);
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+
+        View v = inflater.inflate(R.layout.dialog_job_point_view,null);
+        builder.setView(v);
+
+        builder.create();
+        return builder.show();
+    }
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d(TAG, "onResume: Started...");
+        mContext = getActivity();
+
+        preferenceLoaderHelper = new PreferenceLoaderHelper(mContext);
+        loadPreferences();
+
+        initViewWidgets();
+        setOnClickListeners();
+        showPointData();
+
+
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (this.REQUEST_TAKE_PHOTO == requestCode && resultCode == Activity.RESULT_OK) {
+            Uri imageUri = Uri.parse(mCurrentPhotoPath);
+            File file = new File(imageUri.getPath());
+
+            try {
+                mBitmapRaw=decodeUri(imageUri,400);
+                mBitmap = rotateImageIfRequired(mBitmapRaw,imageUri);
+
+                createPhotoDialog(mBitmap);
+
+            } catch (Exception e) {
+                showToast("Caught Error: Could not set Photo to Image from Camera",true);
+
+            }
+        } else if (this.REQUEST_SELECT_PICTURE == requestCode && resultCode == Activity.RESULT_OK) {
+            if (data != null) {
+
+
+                try {
+                    final Uri imageUri = data.getData();
+                    File file = new File(imageUri.getPath());
+
+                    if (imageUri !=null){
+                        mBitmapRaw=decodeUri(imageUri,400);
+                        mBitmap = rotateImageIfRequired(mBitmapRaw,imageUri);
+                        createPhotoDialog(mBitmap);
+
+                    }
+
+
+                } catch (Exception e) {
+                    showToast("Caught Error: Could not set Photo to Image from Gallery",true);
+
+                }
+            }
+        }
+
+
+    }
+
+    //-------------------------------------------------------------------------------------------------------------------------//
+
+    /**
+     * JAVA Methods
+     */
+    private void showPointData(){
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                boolean loadSuccess = initValuesFromObject();
+
+                if(loadSuccess){
+                    pbProgressCircle.setVisibility(View.GONE);
+                }
+            }
+        },DELAY_TO_SHOW_DATA);
+    }
+
+    private void initViewWidgets(){
+        Log.d(TAG, "initViewWidgets: Started...");
+
+        tvPointNo = (TextView) getDialog().findViewById(R.id.pointNoValue);
+        tvPointDesc = (TextView) getDialog().findViewById(R.id.pointDescValue);
+        tvPointClass = (TextView) getDialog().findViewById(R.id.pointClassValue);
+
+        tvPointNorth = (TextView) getDialog().findViewById(R.id.northingValue);
+        tvPointEast = (TextView) getDialog().findViewById(R.id.eastingValue);
+        tvPointElev = (TextView) getDialog().findViewById(R.id.elevationValue);
+
+        tvPointLatHeader = (TextView) getDialog().findViewById(R.id.latitudeTitle);
+        tvPointLongHeader = (TextView) getDialog().findViewById(R.id.longitudeTitle);
+        tvPointEllipsoidHeader = (TextView) getDialog().findViewById(R.id.ellipsoidHeightTitle);
+
+        tvPointLat  = (TextView) getDialog().findViewById(R.id.latitudeValue);
+        tvPointLong = (TextView) getDialog().findViewById(R.id.longitudeValue);
+        tvPointEllipsoid = (TextView) getDialog().findViewById(R.id.ellipsoidHeightValue);
+        tvPointOrtho = (TextView) getDialog().findViewById(R.id.orthoHeightValue);
+
+        pbProgressCircle = (ProgressBar) getDialog().findViewById(R.id.progressBar_Loading_point);
+
+        btTakePhoto = (Button) getDialog().findViewById(R.id.card3_take_photo);
+
+    }
+
+    private void setOnClickListeners(){
+        btTakePhoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                callImageSelectionDialog();
+            }
+        });
+    }
+
+    private boolean initValuesFromObject() {
+        Log.d(TAG, "initValuesFromObject: Started");
+        boolean results = false;
+
+        try {
+            Log.d(TAG, "initValuesFromObject: Connecting to db...");
+
+            JobDatabaseHandler jobDb = new JobDatabaseHandler(mContext, databaseName);
+            SQLiteDatabase db = jobDb.getReadableDatabase();
+
+            PointGeodetic pointGeodetic = jobDb.getPointByPointNo(db,pointNo);
+
+            double pointNorthing = pointGeodetic.getNorthing();
+            String pointNorthingValue = COORDINATE_FORMATTER.format(pointNorthing);
+
+            double pointEasting = pointGeodetic.getEasting();
+            String pointEastingValue = COORDINATE_FORMATTER.format(pointEasting);
+
+            double pointElevation = pointGeodetic.getElevation();
+            String pointElevationValue = COORDINATE_FORMATTER.format(pointElevation);
+
+            String pointDescription = pointGeodetic.getDescription();
+
+            double pointLatitude = pointGeodetic.getLatitude();
+            double pointLongitude = pointGeodetic.getLongitude();
+
+            double pointEllipsoid = pointGeodetic.getEllipsoid();
+            String pointEllipsoidValue = COORDINATE_FORMATTER.format(pointEllipsoid);
+
+            tvPointNo.setText(String.valueOf(pointNo));
+            tvPointDesc.setText(pointDescription);
+
+            tvPointNorth.setText(pointNorthingValue);
+            tvPointEast.setText(pointEastingValue);
+            tvPointElev.setText(pointElevationValue);
+
+            tvPointNorth.setVisibility(View.VISIBLE);
+            tvPointEast.setVisibility(View.VISIBLE);
+            tvPointElev.setVisibility(View.VISIBLE);
+
+            if(pointLatitude !=0){
+                tvPointLatHeader.setText(getString(R.string.dialog_point_view_pointLatitude_header));
+                tvPointLongHeader.setText(getString(R.string.dialog_point_view_pointLongitude_header));
+
+                tvPointLat.setText(MathHelper.convertDECtoDMS(pointLatitude,3,true));
+                tvPointLong.setText(MathHelper.convertDECtoDMS(pointLongitude,3,true));
+
+                tvPointLat.setVisibility(View.VISIBLE);
+                tvPointLong.setVisibility(View.VISIBLE);
+            }
+
+            if(pointEllipsoid !=0){
+                tvPointEllipsoidHeader.setText(getString(R.string.dialog_point_view_pointEllipsoid_header));
+
+                tvPointEllipsoid.setText(pointEllipsoidValue);
+                tvPointEllipsoid.setVisibility(View.VISIBLE);
+            }
+
+            Log.d(TAG, "initValuesFromObject: Success, Closing Db");
+            db.close();
+            results = true;
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+
+
+        return results;
+    }
+
+    private void createPhotoDialog(Bitmap bitmap){
+        FragmentManager fm = getActivity().getSupportFragmentManager();
+        DialogPointPhotoAdd photoDialog = DialogPointPhotoAdd.newInstance(projectID, bitmap);
+        photoDialog.show(fm,"dialog");
+
+    }
+
+    private void loadPreferences(){
+        Log.d(TAG, "loadPreferences: Started...");
+
+        COORDINATE_FORMATTER = new DecimalFormat(preferenceLoaderHelper.getValueSystemCoordinatesPrecisionDisplay());
+        DISTANCE_PRECISION_FORMATTER = new DecimalFormat(preferenceLoaderHelper.getValueSystemDistancePrecisionDisplay());
+
+    }
+
+
+
+    //-------------------------------------------------------------------------------------------------------------------------//
+
+    /**
+     * Image Objects
+     */
+
+    private void callImageSelectionDialog(){
+        final CharSequence[] items = { getString(R.string.project_new_dialog_takePhoto), getString(R.string.project_new_dialog_getImage),
+                getString(R.string.general_cancel) };
+
+        TextView title = new TextView(getActivity());  //was context not this
+
+        title.setText(getString(R.string.photo_dialog_title));
+        title.setBackgroundColor(Color.WHITE);
+        title.setPadding(10, 15, 15, 10);
+        title.setGravity(Gravity.CENTER);
+        title.setTextColor(Color.BLACK);
+        title.setTextSize(22);
+
+        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(getActivity());
+
+        builder.setCustomTitle(title);
+
+        builder.setItems(items, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int arg) {
+
+                switch (arg) {
+
+                    case 0: //Camera
+                        startCamera();
+                        break;
+
+                    case 1: //Photo
+                        startPhotoGallery();
+                        break;
+
+                    case 2: //Cancel
+
+                        dialog.dismiss();
+                        break;
+                }
+
+            }
+        });
+        builder.show();
+    }
+
+    private void startCamera() {
+        try {
+            dispatchTakePictureIntent();
+
+        } catch (IOException e) {
+            showToast("Caught Error: Accessing Camera Exception",true);
+        }
+    }
+
+    private void startPhotoGallery(){
+
+        try{
+            dispatchPhotoFromGalleryIntent();
+
+        } catch (IOException e){
+            showToast("caught Error: Accessing Gallery Exception",true);
+        }
+
+    }
+
+    private void dispatchTakePictureIntent() throws IOException {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        // Ensure that there's a camera activity to handle the intent
+        if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
+            // Create the File where the photo should go
+            File photoFile = null;
+            try {
+                photoFile = createImageFile();
+            } catch (IOException ex) {
+                // Error occurred while creating the File
+                showToast("Caught Error: Could not create file",true);
+                return;
+            }
+            // Continue only if the File was successfully created
+            if (photoFile != null) {
+                Uri photoURI = FileProvider.getUriForFile(getActivity(),
+                        BuildConfig.APPLICATION_ID + ".provider", createImageFile());
+
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+            }
+        }
+    }
+
+    private void dispatchPhotoFromGalleryIntent() throws IOException{
+        Intent intent = new Intent(Intent.ACTION_PICK,android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        intent.setType("image/*");
+        startActivityForResult(Intent.createChooser(intent, "Select Picture"),REQUEST_SELECT_PICTURE);
+
+    }
+
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        // Save a file: path for use with ACTION_VIEW intents
+        mCurrentPhotoPath = "file:" + image.getAbsolutePath();
+        return image;
+    }
+
+    protected Bitmap decodeUri(Uri selectedImage, int REQUIRED_SIZE) {
+
+        try {
+
+            // Decode image size
+            BitmapFactory.Options o = new BitmapFactory.Options();
+            o.inJustDecodeBounds = true;
+            BitmapFactory.decodeStream(mContext.getContentResolver().openInputStream(selectedImage), null, o);
+
+            // The new size we want to scale to
+            // final int REQUIRED_SIZE =  size;
+
+            // Find the correct scale value. It should be the power of 2.
+            int width_tmp = o.outWidth, height_tmp = o.outHeight;
+            int scale = 1;
+            while (true) {
+                if (width_tmp / 2 < REQUIRED_SIZE
+                        || height_tmp / 2 < REQUIRED_SIZE) {
+                    break;
+                }
+                width_tmp /= 2;
+                height_tmp /= 2;
+                scale *= 2;
+            }
+
+            // Decode with inSampleSize
+            BitmapFactory.Options o2 = new BitmapFactory.Options();
+            o2.inSampleSize = scale;
+            return BitmapFactory.decodeStream(getActivity().getContentResolver().openInputStream(selectedImage), null, o2);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private Bitmap rotateImageIfRequired(Bitmap img, Uri selectedImage) throws IOException {
+
+        InputStream input = mContext.getContentResolver().openInputStream(selectedImage);
+        ExifInterface ei;
+        if (Build.VERSION.SDK_INT > 23)
+            ei = new ExifInterface(input);
+        else
+            ei = new ExifInterface(selectedImage.getPath());
+
+        int orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+
+        switch (orientation) {
+            case ExifInterface.ORIENTATION_ROTATE_90:
+                return rotateImage(img, 90);
+            case ExifInterface.ORIENTATION_ROTATE_180:
+                return rotateImage(img, 180);
+            case ExifInterface.ORIENTATION_ROTATE_270:
+                return rotateImage(img, 270);
+            default:
+                return img;
+        }
+    }
+
+    private static Bitmap rotateImage(Bitmap img, int degree) {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(degree);
+        Bitmap rotatedImg = Bitmap.createBitmap(img, 0, 0, img.getWidth(), img.getHeight(), matrix, true);
+        img.recycle();
+        return rotatedImg;
+    }
+
+
+    //-------------------------------------------------------------------------------------------------------------------------//
+
+    /**
+     * Method Helpers
+     */
+
+
+    private void showToast(String data, boolean shortTime) {
+
+        if (shortTime) {
+            Toast.makeText(getActivity(), data, Toast.LENGTH_SHORT).show();
+
+        } else{
+            Toast.makeText(getActivity(), data, Toast.LENGTH_LONG).show();
+
+        }
+    }
+}

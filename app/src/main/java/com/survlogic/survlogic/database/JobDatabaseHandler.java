@@ -76,6 +76,7 @@ public class JobDatabaseHandler extends SQLiteOpenHelper {
             + JobContract.PointEntry.KEY_GEOLAT + " DOUBLE,"
             + JobContract.PointEntry.KEY_GEOLON + " DOUBLE,"
             + JobContract.PointEntry.KEY_GEOELLIPS + " DOUBLE,"
+            + JobContract.PointEntry.KEY_GEOORTHO + " DOUBLE,"
             + JobContract.PointEntry.KEY_GEOACCURACY + " DOUBLE,"
             + JobContract.PointEntry.KEY_DESCRIPTION + " TEXT,"
             + JobContract.PointEntry.KEY_POINT_TYPE + " INTEGER,"
@@ -215,6 +216,7 @@ public class JobDatabaseHandler extends SQLiteOpenHelper {
         }
     }
 
+
     public long addPointGeodeticToDB(SQLiteDatabase db, PointGeodetic pointGeodetic){
         Log.d(TAG, "addPointGeodeticToDB: Starting...");
 
@@ -232,6 +234,7 @@ public class JobDatabaseHandler extends SQLiteOpenHelper {
         contentValues.put(JobContract.PointEntry.KEY_GEOLAT, pointGeodetic.getLatitude());
         contentValues.put(JobContract.PointEntry.KEY_GEOLON, pointGeodetic.getLongitude());
         contentValues.put(JobContract.PointEntry.KEY_GEOELLIPS, pointGeodetic.getEllipsoid());
+        contentValues.put(JobContract.PointEntry.KEY_GEOORTHO, pointGeodetic.getOrtho());
         contentValues.put(JobContract.PointEntry.KEY_GEOACCURACY, pointGeodetic.getAccuracy());
 
         contentValues.put(JobContract.PointEntry.KEY_DATE_CREATED,(int) (new Date().getTime()/1000));
@@ -395,6 +398,43 @@ public class JobDatabaseHandler extends SQLiteOpenHelper {
         }
 
         return lstPoints;
+    }
+
+
+    public PointGeodetic getPointByPointNo(SQLiteDatabase db, int point_no){
+        Log.d(TAG, "getPointByPointNo: Started...");
+
+        String selectQuery = "SELECT  * FROM " + JobContract.PointEntry.TABLE_NAME + " WHERE "
+                + JobContract.PointEntry.KEY_POINT_NO + " = " + point_no;
+
+        Log.e(TAG, selectQuery);
+
+
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        if (c != null)
+            c.moveToFirst();
+
+        PointGeodetic pointGeodetic = new PointGeodetic();
+
+        pointGeodetic.setId(c.getInt((c.getColumnIndex(JobContract.PointEntry.KEY_ID))));
+        pointGeodetic.setPoint_no(c.getInt((c.getColumnIndex(JobContract.PointEntry.KEY_POINT_NO))));
+        pointGeodetic.setNorthing(c.getDouble(c.getColumnIndex(JobContract.PointEntry.KEY_NORTHING)));
+        pointGeodetic.setEasting(c.getDouble(c.getColumnIndex(JobContract.PointEntry.KEY_EASTING)));
+        pointGeodetic.setElevation(c.getDouble(c.getColumnIndex(JobContract.PointEntry.KEY_ELEVATION)));
+        pointGeodetic.setDescription((c.getString(c.getColumnIndex(JobContract.PointEntry.KEY_DESCRIPTION))));
+        pointGeodetic.setPointType(c.getInt((c.getColumnIndex(JobContract.PointEntry.KEY_POINT_TYPE))));
+
+        pointGeodetic.setLatitude(c.getDouble(c.getColumnIndex(JobContract.PointEntry.KEY_GEOLAT)));
+        pointGeodetic.setLongitude(c.getDouble(c.getColumnIndex(JobContract.PointEntry.KEY_GEOLON)));
+        pointGeodetic.setEllipsoid(c.getDouble(c.getColumnIndex(JobContract.PointEntry.KEY_GEOELLIPS)));
+        pointGeodetic.setOrtho(c.getDouble(c.getColumnIndex(JobContract.PointEntry.KEY_GEOORTHO)));
+
+        // Project MetaData
+        pointGeodetic.setDateCreated(c.getInt(c.getColumnIndex(JobContract.PointEntry.KEY_DATE_CREATED)));
+
+        return pointGeodetic;
+
     }
 
     public boolean checkPointNumberExists(SQLiteDatabase db, int point_no){

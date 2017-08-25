@@ -47,7 +47,7 @@ public class JobHomeActivity extends AppCompatActivity implements NavigationView
     private ActionBarDrawerToggle actionBarDrawerToggle;
     private NavigationView navigationView;
 
-    private static final int ACTIVITY_NUM = 0;
+    private int ACTIVITY_NUM = 0;
 
     private static final int DELAY_TO_LOAD_SETTINGS = 1000;
     private static final int DELAY_TO_SAVE_SETTINGS = 1000;
@@ -59,6 +59,8 @@ public class JobHomeActivity extends AppCompatActivity implements NavigationView
 
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
+
+    private BottomNavigationViewEx bottomNavigationViewEx;
 
     private ProjectJobSettings jobSettings;
     private static int project_id, job_id, job_settings_id = 1;
@@ -490,7 +492,7 @@ public class JobHomeActivity extends AppCompatActivity implements NavigationView
     private void initBottomNavigationView(){
         Log.d(TAG, "initBottomNavigationView: Started");
 
-        BottomNavigationViewEx bottomNavigationViewEx = (BottomNavigationViewEx) findViewById(R.id.bottomNavViewBar);
+        bottomNavigationViewEx = (BottomNavigationViewEx) findViewById(R.id.bottomNavViewBar);
         BottomNavigationViewHelper.setupBottomNavigationView(bottomNavigationViewEx);
         enableNavigationHome(mContext, bottomNavigationViewEx);
         Menu menu = bottomNavigationViewEx.getMenu();
@@ -504,19 +506,46 @@ public class JobHomeActivity extends AppCompatActivity implements NavigationView
         view.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+
+                Menu menu = bottomNavigationViewEx.getMenu();
+                MenuItem menuItem;
+
                 switch (item.getItemId()) {
 
                     case R.id.navigation_item_1:
+                        Log.d(TAG, "onNavigationItemSelected: At 1");
+                        ACTIVITY_NUM = 0;
+
+                        menuItem = menu.getItem(ACTIVITY_NUM);
+                        menuItem.setChecked(false);
 
                         break;
 
                     case R.id.navigation_item_2:
+                        Log.d(TAG, "onNavigationItemSelected: At 2");
+                        ACTIVITY_NUM = 1;
+
+                        menuItem = menu.getItem(ACTIVITY_NUM);
+                        menuItem.setChecked(false);
+
                         break;
 
                     case R.id.navigation_item_3:
+                        Log.d(TAG, "onNavigationItemSelected: At 3");
+                        ACTIVITY_NUM = 2;
+
+                        menuItem = menu.getItem(ACTIVITY_NUM);
+                        menuItem.setChecked(false);
+
                         break;
 
                     case R.id.navigation_item_4:
+                        Log.d(TAG, "onNavigationItemSelected: At 4");
+                        ACTIVITY_NUM = 3;
+
+                        menuItem = menu.getItem(ACTIVITY_NUM);
+                        menuItem.setChecked(false);
+
                         break;
                 }
 

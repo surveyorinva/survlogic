@@ -15,9 +15,12 @@ import android.view.ViewGroup;
 import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.background.BackgroundSurveyPointList;
 import com.survlogic.survlogic.dialog.DialogJobPointEntryAdd;
+import com.survlogic.survlogic.dialog.DialogJobPointView;
+import com.survlogic.survlogic.model.PointSurvey;
 import com.survlogic.survlogic.view.SortablePointSurveyTableView;
 
 import de.codecrafters.tableview.listeners.SwipeToRefreshListener;
+import de.codecrafters.tableview.listeners.TableDataClickListener;
 
 /**
  * Created by chrisfillmore on 5/2/2017.
@@ -101,6 +104,7 @@ public class JobPointsListFragment extends Fragment {
             }
         });
 
+        pointSurveyTableView.addDataClickListener(new PointClickListener());
 
 
     }
@@ -131,6 +135,18 @@ public class JobPointsListFragment extends Fragment {
 
     }
 
+    private class PointClickListener implements TableDataClickListener<PointSurvey>{
+        @Override
+        public void onDataClicked(int rowIndex, PointSurvey clickedData) {
+            Log.d(TAG, "onDataClicked: Started...");
+            int pointNo = clickedData.getPoint_no();
+
+
+
+            android.support.v4.app.DialogFragment pointDialog = DialogJobPointView.newInstance(pointNo, jobDatabaseName);
+            pointDialog.show(getFragmentManager(),"dialog");
+        }
+    }
 
 
 }

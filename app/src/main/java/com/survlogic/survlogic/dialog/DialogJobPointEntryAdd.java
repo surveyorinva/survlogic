@@ -73,6 +73,8 @@ public class DialogJobPointEntryAdd extends DialogFragment {
         job_id = getArguments().getInt("job_id");
         databaseName = getArguments().getString("databaseName");
 
+        Log.d(TAG, "onCreateDialog: Database Name:" + databaseName + " Loaded...");
+
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.DialogPopupStyle);
         LayoutInflater inflater = getActivity().getLayoutInflater();
 
@@ -212,13 +214,15 @@ public class DialogJobPointEntryAdd extends DialogFragment {
     }
 
     private boolean validateEntry(){
+        Log.d(TAG, "validateEntry: Starting...");
         boolean results;
 
 
         results =  true;
         if (etPointNumber.getText().toString().isEmpty()){
+            Log.d(TAG, "validateEntry: No Point No.");
             inputLayoutPointNumber.setError(getString(R.string.dialog_job_point_item_error_pointNo));
-            results =  false;
+            return false;
 
         }else {
             inputLayoutPointNumber.setError(null);
@@ -228,12 +232,16 @@ public class DialogJobPointEntryAdd extends DialogFragment {
 
         int point_No = Integer.parseInt(etPointNumber.getText().toString());
 
+        Log.d(TAG, "validateEntry: Checking Database: " + databaseName + " for " + point_No);
+
         JobDatabaseHandler jobDb  = new JobDatabaseHandler(mContext, databaseName);
         SQLiteDatabase dbJob = jobDb.getReadableDatabase();
 
         if(jobDb.checkPointNumberExists(dbJob,point_No)){
+            Log.d(TAG, "validateEntry: Existing Point Number");
             inputLayoutPointNumber.setError(getString(R.string.dialog_job_point_item_error_pointNoExists));
-            results =  false;
+            jobDb.close();
+            return false;
 
         }else{
             inputLayoutPointNumber.setError(null);
@@ -243,8 +251,9 @@ public class DialogJobPointEntryAdd extends DialogFragment {
 
 
         if (etPointNorthing.getText().toString().isEmpty()){
+            Log.d(TAG, "validateEntry: No Northing");
             inputLayoutPointNorthing.setError(getString(R.string.dialog_job_point_item_error_pointNorthing));
-            results =  false;
+            return false;
 
         }else {
             inputLayoutPointNorthing.setError(null);
@@ -252,8 +261,9 @@ public class DialogJobPointEntryAdd extends DialogFragment {
         }
 
         if (etPointEasting.getText().toString().isEmpty()){
+            Log.d(TAG, "validateEntry: No Easting");
             inputLayoutPointEasting.setError(getString(R.string.dialog_job_point_item_error_pointEasting));
-            results =  false;
+            return false;
 
         }else {
             inputLayoutPointEasting.setError(null);
@@ -261,8 +271,9 @@ public class DialogJobPointEntryAdd extends DialogFragment {
         }
 
         if (etPointElevation.getText().toString().isEmpty()){
+            Log.d(TAG, "validateEntry: No Elevation");
             inputLayoutPointElevation.setError(getString(R.string.dialog_job_point_item_error_pointElevation));
-            results =  false;
+            return false;
 
         }else {
             inputLayoutPointElevation.setError(null);
@@ -270,15 +281,18 @@ public class DialogJobPointEntryAdd extends DialogFragment {
         }
 
         if (etPointDescription.getText().toString().isEmpty()){
+            Log.d(TAG, "validateEntry: No Point Description");
             inputLayoutPointDescription.setError(getString(R.string.dialog_job_point_item_error_pointDescription));
-            results =  false;
+            return false;
 
         }else {
             inputLayoutPointDescription.setError(null);
 
         }
 
-        return results;
+        jobDb.close();
+        Log.d(TAG, "validateEntry: Returning: " + results);
+        return true;
 
     }
 
@@ -312,6 +326,8 @@ public class DialogJobPointEntryAdd extends DialogFragment {
         i.putExtras(b);
 
         startActivity(i);
+        getActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+
         dismiss();
 
 

@@ -32,6 +32,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -51,10 +52,11 @@ import java.util.ArrayList;
 public class GpsSurveyActivity extends AppCompatActivity implements LocationListener {
 
     //    UI View Tools
-    Toolbar toolbar;
-    TabLayout tabLayout;
-    ViewPager viewPager;
-    ActivityViewPagerAdapter viewPagerAdapter;
+    private Toolbar toolbar;
+    private TabLayout tabLayout;
+    private ViewPager viewPager;
+    private ActivityViewPagerAdapter viewPagerAdapter;
+    private ProgressBar progressBar;
 
     //    Fragment Elements
     private static GpsSurveyActivity sInstance;
@@ -194,6 +196,8 @@ public class GpsSurveyActivity extends AppCompatActivity implements LocationList
         toolbar.setTitle("GPS Survey");
         setSupportActionBar(toolbar);
 
+        progressBar = (ProgressBar) findViewById(R.id.progressBar_Loading_gps);
+
             Log.e(TAG, "Complete: initView");
     }
 
@@ -249,6 +253,7 @@ public class GpsSurveyActivity extends AppCompatActivity implements LocationList
             Log.e(TAG, "Unable to get GPS_Provider");
 
             Toast.makeText(this, getString(R.string.debug_error_gps_not_found), Toast.LENGTH_SHORT).show();
+
             finish();
         }
     }
@@ -457,7 +462,7 @@ public class GpsSurveyActivity extends AppCompatActivity implements LocationList
             }
         };
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
+
             promptEnableGps();
             return;
         }
@@ -673,6 +678,10 @@ public class GpsSurveyActivity extends AppCompatActivity implements LocationList
 
         for (GpsSurveyListener listener : mGpsSurveyListener){
             listener.onLocationChanged(location);
+        }
+
+        if(progressBar.isShown()){
+            progressBar.setVisibility(View.GONE);
         }
 
     }
