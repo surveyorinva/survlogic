@@ -139,11 +139,12 @@ public class JobPointsListFragment extends Fragment {
         @Override
         public void onDataClicked(int rowIndex, PointSurvey clickedData) {
             Log.d(TAG, "onDataClicked: Started...");
+            long point_id = clickedData.getId();
             int pointNo = clickedData.getPoint_no();
 
+            Log.d(TAG, "onDataClicked: Point_id: " + point_id);
 
-
-            android.support.v4.app.DialogFragment pointDialog = DialogJobPointView.newInstance(pointNo, jobDatabaseName);
+            android.support.v4.app.DialogFragment pointDialog = DialogJobPointView.newInstance(project_id, job_id, point_id, pointNo, jobDatabaseName);
             pointDialog.show(getFragmentManager(),"dialog");
         }
     }

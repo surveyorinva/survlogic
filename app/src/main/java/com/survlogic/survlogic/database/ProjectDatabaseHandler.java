@@ -54,6 +54,7 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
             + "("
             + ProjectContract.ProjectImageEntry.KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
             + ProjectContract.ProjectImageEntry.KEY_PROJECT_ID + " INTEGER,"
+            + ProjectContract.ProjectImageEntry.KEY_JOB_ID + " INTEGER,"
             + ProjectContract.ProjectImageEntry.KEY_POINT_ID + " INTEGER,"
             + ProjectContract.ProjectImageEntry.KEY_IMAGE_PATH + " TEXT,"
             + ProjectContract.ProjectImageEntry.KEY_IMAGE + " BLOB,"
@@ -159,6 +160,7 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
 
         //  Required Fields
         contentValues.put(ProjectContract.ProjectImageEntry.KEY_PROJECT_ID, projectImages.getProjectId());
+        contentValues.put(ProjectContract.ProjectImageEntry.KEY_JOB_ID, projectImages.getJobId());
         contentValues.put(ProjectContract.ProjectImageEntry.KEY_POINT_ID, projectImages.getPointId());
         contentValues.put(ProjectContract.ProjectImageEntry.KEY_IMAGE_PATH, projectImages.getImagePath());
         contentValues.put(ProjectContract.ProjectImageEntry.KEY_IMAGE, projectImages.getImage());
@@ -400,6 +402,7 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
                 //Required
                 projectImages.setId(c.getInt((c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_ID))));
                 projectImages.setProjectId(c.getInt((c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_PROJECT_ID))));
+                projectImages.setJobId(c.getInt((c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_JOB_ID))));
                 projectImages.setPointId(c.getInt((c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_POINT_ID))));
                 projectImages.setImagePath(c.getString((c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_IMAGE_PATH))));
                 projectImages.setImage(c.getBlob(c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_IMAGE)));
@@ -434,6 +437,7 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
         //Required
         projectImages.setId(c.getInt((c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_ID))));
         projectImages.setProjectId(c.getInt((c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_PROJECT_ID))));
+        projectImages.setJobId(c.getInt((c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_JOB_ID))));
         projectImages.setPointId(c.getInt((c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_POINT_ID))));
         projectImages.setImagePath(c.getString((c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_IMAGE_PATH))));
         projectImages.setImage(c.getBlob(c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_IMAGE)));
@@ -468,6 +472,7 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
                 //Required
                 projectImages.setId(c.getInt((c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_ID))));
                 projectImages.setProjectId(c.getInt((c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_PROJECT_ID))));
+                projectImages.setJobId(c.getInt((c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_JOB_ID))));
                 projectImages.setPointId(c.getInt((c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_POINT_ID))));
                 projectImages.setImagePath(c.getString((c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_IMAGE_PATH))));
                 projectImages.setImage(c.getBlob(c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_IMAGE)));
@@ -486,10 +491,65 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
         return lstprojectImages;
     }
 
+    public List<ProjectImages> getProjectImagesbyPointID(SQLiteDatabase db, int project_id, int job_id, int point_id){
+        Log.d(TAG, "getProjectImagesbyPointID: Starting");
+        List<ProjectImages> lstprojectImages = new ArrayList<ProjectImages>();
+        String selectQuery = "SELECT * FROM " + ProjectContract.ProjectImageEntry.TABLE_NAME+  " WHERE "
+                + ProjectContract.ProjectImageEntry.KEY_PROJECT_ID + " = " + project_id
+                + " AND " + ProjectContract.ProjectImageEntry.KEY_JOB_ID + " = " + job_id
+                + " AND " + ProjectContract.ProjectImageEntry.KEY_POINT_ID;
+
+        Log.d(TAG, "ImagebyPointID: " + selectQuery);
+
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        // looping through all rows and adding to list
+        if (c.moveToFirst()) {
+            do {
+
+                ProjectImages projectImages = new ProjectImages();
+
+                //Required
+                projectImages.setId(c.getInt((c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_ID))));
+                projectImages.setProjectId(c.getInt((c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_PROJECT_ID))));
+                projectImages.setJobId(c.getInt((c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_JOB_ID))));
+                projectImages.setPointId(c.getInt((c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_POINT_ID))));
+                projectImages.setImagePath(c.getString((c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_IMAGE_PATH))));
+                projectImages.setImage(c.getBlob(c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_IMAGE)));
+
+                //Optional
+                projectImages.setBearingAngle(c.getFloat(c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_BEARING)));
+                projectImages.setLocationLat(c.getDouble(c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_GEOLAT)));
+                projectImages.setLocationLong(c.getDouble(c.getColumnIndex(ProjectContract.ProjectImageEntry.KEY_GEOLON)));
+
+                // MetaData
+
+                lstprojectImages.add(projectImages);
+            } while (c.moveToNext());
+        }
+
+        Log.d(TAG, "getProjectImagesbyPointID: Success");
+        return lstprojectImages;
+    }
+
     public static long getCountProjectImagesByProjectID(SQLiteDatabase db, long project_id){
         Log.d(TAG, "getCountProjectImagesByProjectID: Starting");
         String countQuery = "SELECT * FROM " + ProjectContract.ProjectImageEntry.TABLE_NAME+  " WHERE "
                 + ProjectContract.ProjectImageEntry.KEY_PROJECT_ID + " = " + project_id;
+
+        Cursor cursor = db.rawQuery(countQuery, null);
+        int cnt = cursor.getCount();
+        cursor.close();
+
+        return cnt;
+    }
+
+    public static long getCountProjectImagesByPointID(SQLiteDatabase db, int project_id, int job_id, int point_id){
+        Log.d(TAG, "getCountProjectImagesByPointID: Starting");
+        String countQuery = "SELECT * FROM " + ProjectContract.ProjectImageEntry.TABLE_NAME+  " WHERE "
+                + ProjectContract.ProjectImageEntry.KEY_PROJECT_ID + " = " + project_id
+                + " AND " + ProjectContract.ProjectImageEntry.KEY_JOB_ID + " = " + job_id
+                + " AND " + ProjectContract.ProjectImageEntry.KEY_POINT_ID;
 
         Cursor cursor = db.rawQuery(countQuery, null);
         int cnt = cursor.getCount();
@@ -504,6 +564,7 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
 
         ContentValues values = new ContentValues();
         values.put(ProjectContract.ProjectImageEntry.KEY_PROJECT_ID, projectImages.getProjectId());
+        values.put(ProjectContract.ProjectImageEntry.KEY_JOB_ID, projectImages.getJobId());
         values.put(ProjectContract.ProjectImageEntry.KEY_POINT_ID, projectImages.getPointId());
         values.put(ProjectContract.ProjectImageEntry.KEY_IMAGE_PATH, projectImages.getImagePath());
         values.put(ProjectContract.ProjectImageEntry.KEY_IMAGE, projectImages.getImage());

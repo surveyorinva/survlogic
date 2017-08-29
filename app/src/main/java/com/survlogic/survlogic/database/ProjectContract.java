@@ -41,6 +41,7 @@ public class ProjectContract {
 
         public static final String KEY_ID = "id";
         public static final String KEY_PROJECT_ID = "projectid";
+        public static final String KEY_JOB_ID = "jobid";
         public static final String KEY_POINT_ID = "pointid";
         public static final String KEY_IMAGE_PATH = "imagepath";
         public static final String KEY_IMAGE = "image";

@@ -28,16 +28,22 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.GridView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.survlogic.survlogic.BuildConfig;
 import com.survlogic.survlogic.R;
-import com.survlogic.survlogic.activity.ProjectDetailsActivity;
+import com.survlogic.survlogic.activity.PhotoGalleryActivity;
+import com.survlogic.survlogic.adapter.PointGridImageAdapter;
+import com.survlogic.survlogic.adapter.ProjectGridImageAdapter;
 import com.survlogic.survlogic.database.JobDatabaseHandler;
+import com.survlogic.survlogic.database.ProjectDatabaseHandler;
 import com.survlogic.survlogic.model.PointGeodetic;
+import com.survlogic.survlogic.model.ProjectImages;
 import com.survlogic.survlogic.utils.MathHelper;
 import com.survlogic.survlogic.utils.PreferenceLoaderHelper;
 
@@ -46,6 +52,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 /**
@@ -56,15 +63,19 @@ public class DialogJobPointView extends DialogFragment {
     private static final String TAG = "DialogJobPointView";
 
     private Context mContext;
+    private GridView gridView;
+    private PointGridImageAdapter gridAdapter;
 
     private static final int REQUEST_TAKE_PHOTO = 2;
     private static final int REQUEST_SELECT_PICTURE = 3;
 
     private static final int DELAY_TO_SHOW_DATA = 1500;
-    private static final int DELAY_TO_MAP = 1500;
-    private static final int DELAY_TO_GRID = 2000;
+    private static final int DELAY_TO_DIALOG = 1500;
+    private static final int DELAY_TO_GRID = 1000;
 
-    private int pointNo, projectID;
+    private String mURLSyntex = "file://";
+
+    private int pointNo, projectID, jobId, pointId;
     private String databaseName, mCurrentPhotoPath;
     private Bitmap mBitmap, mBitmapRaw;
 
@@ -82,10 +93,13 @@ public class DialogJobPointView extends DialogFragment {
     private static DecimalFormat COORDINATE_FORMATTER, DISTANCE_PRECISION_FORMATTER;
 
 
-    public static DialogJobPointView newInstance(int pointNo, String databaseName) {
+    public static DialogJobPointView newInstance(int projectId, int jobId, long pointId, int pointNo, String databaseName) {
         Log.d(TAG, "newInstance: Starting...");
         DialogJobPointView frag = new DialogJobPointView();
         Bundle args = new Bundle();
+        args.putInt("project_id", projectId);
+        args.putInt("job_id", jobId);
+        args.putLong("point_id", pointId);
         args.putInt("pointNo", pointNo);
         args.putString("databaseName", databaseName);
         frag.setArguments(args);
@@ -97,8 +111,16 @@ public class DialogJobPointView extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         Log.d(TAG, "onCreateDialog: Starting...>");
 
+        projectID = getArguments().getInt("project_id");
+        jobId = getArguments().getInt("job_id");
+        pointId = (int) getArguments().getLong("point_id");
+
         pointNo = getArguments().getInt("pointNo");
         databaseName = getArguments().getString("databaseName");
+
+        Log.d(TAG, "onCreateDialog: PointID: " + pointId );
+        Log.d(TAG, "onCreateDialog: Point No: " + pointNo );
+
 
         Log.d(TAG, "onCreateDialog: Database Name:" + databaseName + " Loaded...");
 
@@ -119,13 +141,17 @@ public class DialogJobPointView extends DialogFragment {
         Log.d(TAG, "onResume: Started...");
         mContext = getActivity();
 
+
+
         preferenceLoaderHelper = new PreferenceLoaderHelper(mContext);
         loadPreferences();
 
         initViewWidgets();
         setOnClickListeners();
         showPointData();
+        showGridView();
 
+        showDialogAnimation();
 
     }
 
@@ -194,6 +220,8 @@ public class DialogJobPointView extends DialogFragment {
     private void initViewWidgets(){
         Log.d(TAG, "initViewWidgets: Started...");
 
+        gridView = (GridView) getDialog().findViewById(R.id.photo_grid_view);
+
         tvPointNo = (TextView) getDialog().findViewById(R.id.pointNoValue);
         tvPointDesc = (TextView) getDialog().findViewById(R.id.pointDescValue);
         tvPointClass = (TextView) getDialog().findViewById(R.id.pointClassValue);
@@ -215,6 +243,8 @@ public class DialogJobPointView extends DialogFragment {
 
         btTakePhoto = (Button) getDialog().findViewById(R.id.card3_take_photo);
 
+
+
     }
 
     private void setOnClickListeners(){
@@ -224,6 +254,22 @@ public class DialogJobPointView extends DialogFragment {
                 callImageSelectionDialog();
             }
         });
+
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                ProjectImages item = (ProjectImages) parent.getItemAtPosition(position);
+
+                //viewPhotoDialog(item.getProjectId(),imageHelper.convertToBitmap(item.getImage()), position);
+                viewPhotoDialog(item.getProjectId(),item.getImagePath(), position);
+
+            }
+        });
+
+
+
+
+
     }
 
     private boolean initValuesFromObject() {
@@ -298,7 +344,7 @@ public class DialogJobPointView extends DialogFragment {
 
     private void createPhotoDialog(Bitmap bitmap){
         FragmentManager fm = getActivity().getSupportFragmentManager();
-        DialogPointPhotoAdd photoDialog = DialogPointPhotoAdd.newInstance(projectID, bitmap);
+        DialogPointPhotoAdd photoDialog = DialogPointPhotoAdd.newInstance(projectID, jobId, pointId, pointNo, bitmap);
         photoDialog.show(fm,"dialog");
 
     }
@@ -311,6 +357,21 @@ public class DialogJobPointView extends DialogFragment {
 
     }
 
+    private void showDialogAnimation(){
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                int width = getResources().getDisplayMetrics().widthPixels;
+                int height = getResources().getDisplayMetrics().heightPixels;
+
+                width = width - 100;
+                height = height - 100;
+
+                getDialog().getWindow().setLayout(width,height);
+            }
+        },DELAY_TO_DIALOG);
+
+    }
 
 
     //-------------------------------------------------------------------------------------------------------------------------//
@@ -320,6 +381,7 @@ public class DialogJobPointView extends DialogFragment {
      */
 
     private void callImageSelectionDialog(){
+        Log.d(TAG, "callImageSelectionDialog: Started...");
         final CharSequence[] items = { getString(R.string.project_new_dialog_takePhoto), getString(R.string.project_new_dialog_getImage),
                 getString(R.string.general_cancel) };
 
@@ -371,7 +433,7 @@ public class DialogJobPointView extends DialogFragment {
     }
 
     private void startPhotoGallery(){
-
+        Log.d(TAG, "startPhotoGallery: Started...");
         try{
             dispatchPhotoFromGalleryIntent();
 
@@ -382,6 +444,7 @@ public class DialogJobPointView extends DialogFragment {
     }
 
     private void dispatchTakePictureIntent() throws IOException {
+        Log.d(TAG, "dispatchTakePictureIntent: Started...");
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         // Ensure that there's a camera activity to handle the intent
         if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
@@ -406,6 +469,7 @@ public class DialogJobPointView extends DialogFragment {
     }
 
     private void dispatchPhotoFromGalleryIntent() throws IOException{
+        Log.d(TAG, "dispatchPhotoFromGalleryIntent: Started...");
         Intent intent = new Intent(Intent.ACTION_PICK,android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         intent.setType("image/*");
         startActivityForResult(Intent.createChooser(intent, "Select Picture"),REQUEST_SELECT_PICTURE);
@@ -413,6 +477,7 @@ public class DialogJobPointView extends DialogFragment {
     }
 
     private File createImageFile() throws IOException {
+        Log.d(TAG, "createImageFile: Started...");
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
@@ -494,6 +559,106 @@ public class DialogJobPointView extends DialogFragment {
         Bitmap rotatedImg = Bitmap.createBitmap(img, 0, 0, img.getWidth(), img.getHeight(), matrix, true);
         img.recycle();
         return rotatedImg;
+    }
+
+    //-------------------------------------------------------------------------------------------------------------------------//
+
+    /**
+     * Grid View (GV)
+     */
+
+    private void showGridView(){
+        Log.d(TAG, "showGridView: Started...");
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                initGridView();
+            }
+        },DELAY_TO_GRID);
+    }
+
+    private void initGridView(){
+        Log.d(TAG, "initGridView: Started");
+
+        Log.d(TAG, "Data: ProjectID: " + projectID);
+        Log.d(TAG, "Data: JobID: " + jobId);
+        Log.d(TAG, "Data: pointID: " + pointId);
+
+
+        if(getImageCount(projectID, jobId, pointId)){
+            Log.d(TAG, "initGridView: getImageCount = True");
+            gridAdapter = new PointGridImageAdapter(mContext, R.layout.layout_grid_imageview, mURLSyntex, getImageFromPointData(projectID, jobId, pointId));
+            gridView.setAdapter(gridAdapter);
+            gridView.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void refreshGridView() {
+        if(getImageCount(projectID, jobId, pointId)){
+
+            //Todo GridAdapter on 1st run does not exist.  Need to check and see if gridAdapter has been created, if not, create
+
+            gridAdapter.clear();
+
+            gridAdapter = new PointGridImageAdapter(mContext, R.layout.layout_grid_imageview, mURLSyntex, getImageFromPointData(projectID, jobId, pointId));
+            gridView.setAdapter(gridAdapter);
+            gridView.setVisibility(View.VISIBLE);
+
+
+        }
+    }
+
+
+    private ArrayList<ProjectImages> getImageFromPointData(int projectId, int jobId, int pointId){
+        Log.d(TAG, "getImageFromProjectData: Connecting to db");
+        ProjectDatabaseHandler projectDb = new ProjectDatabaseHandler(mContext);
+        SQLiteDatabase db = projectDb.getReadableDatabase();
+
+        ArrayList<ProjectImages> projectImages = new ArrayList<ProjectImages>(projectDb.getProjectImagesbyPointID(db,projectId, jobId, pointId));
+
+
+        Log.d(TAG, "getImageFromProjectData: Closing DB Connection");
+        db.close();
+
+        return projectImages;
+
+    }
+
+    private boolean getImageCount(int projectId, int jobId, int pointId){
+        Log.d(TAG, "getImageCount: Connecting to db");
+        long count = 0;
+        boolean results = false;
+        ProjectDatabaseHandler projectDb = new ProjectDatabaseHandler(mContext);
+        SQLiteDatabase db = projectDb.getReadableDatabase();
+
+        count = ProjectDatabaseHandler.getCountProjectImagesByPointID(db,projectId, jobId, pointId);
+        Log.d(TAG, "getImageCount: Count = " + count);
+
+        if (count !=0){
+            results = true;
+        }
+
+        Log.d(TAG, "getImageCount: Closing DB Connection");
+        db.close();
+        Log.d(TAG, "getImageCount: Results: " + results);
+        return results;
+    }
+
+    private void viewPhotoDialog(Integer project_id, String imagePath, int position){
+        if(position == 3){
+            Intent intent = new Intent(mContext, PhotoGalleryActivity.class);
+            intent.putExtra("PROJECT_ID",projectID);
+            startActivity(intent);
+
+        }else{
+
+
+            FragmentManager fm = getActivity().getSupportFragmentManager();
+            DialogFragment viewDialog = DialogJobPointPhotoView.newInstance(projectID, jobId, pointId,mURLSyntex,imagePath);
+            viewDialog.show(getFragmentManager(),"dialog_view");
+
+        }
+
     }
 
 

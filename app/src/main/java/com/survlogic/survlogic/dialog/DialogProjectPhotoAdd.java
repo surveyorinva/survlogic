@@ -122,7 +122,7 @@ public class DialogProjectPhotoAdd extends DialogFragment {
                 if(!isStringNull(description)){
                     mAddWatermark = true;
 
-                    mImageWatermark = imageHelper.setWatermark(mImageLocal, description, true);
+                    mImageWatermark = imageHelper.setWatermarkAtBottom(mImageLocal, description, true);
 
                     ivPhoto.setImageBitmap(mImageWatermark);
 
@@ -160,7 +160,7 @@ public class DialogProjectPhotoAdd extends DialogFragment {
             }
 
             // Create Project model
-        ProjectImages projectImages = new ProjectImages(project_id,0,mImagePath,0,0,0);
+        ProjectImages projectImages = new ProjectImages(project_id,0,0,mImagePath,0,0,0);
 
             // Setup Background Task
         BackgroundProjectImagesSetup backgroundProjectImagesSetup = new BackgroundProjectImagesSetup(getActivity());

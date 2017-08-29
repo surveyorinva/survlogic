@@ -25,9 +25,9 @@ import java.util.ArrayList;
  * Created by chrisfillmore on 7/13/2017.
  */
 
-public class GridImageAdapter extends ArrayAdapter {
+public class PointGridImageAdapter extends ArrayAdapter {
 
-    private static final String TAG = "GridImageAdapter";
+    private static final String TAG = "PointGridImageAdapter";
     private Context mContext;
     private LayoutInflater mInflater;
     private int layoutResource;
@@ -41,7 +41,7 @@ public class GridImageAdapter extends ArrayAdapter {
     private static final int limitCount = 4, limitArrayCount = 3;
     private boolean overLimit = false;
 
-    public GridImageAdapter(Context context, int layoutResource, String append, ArrayList<ProjectImages> images) {
+    public PointGridImageAdapter(Context context, int layoutResource, String append, ArrayList<ProjectImages> images) {
         super(context, layoutResource, images);
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mContext = context;

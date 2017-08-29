@@ -47,7 +47,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.survlogic.survlogic.BuildConfig;
 import com.survlogic.survlogic.R;
-import com.survlogic.survlogic.adapter.GridImageAdapter;
+import com.survlogic.survlogic.adapter.ProjectGridImageAdapter;
 import com.survlogic.survlogic.background.BackgroundProjectDetails;
 import com.survlogic.survlogic.background.BackgroundProjectJobList;
 import com.survlogic.survlogic.database.ProjectDatabaseHandler;
@@ -111,7 +111,7 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
     private ProgressBar pbLoading;
 
     private GridView gridView;
-    private GridImageAdapter gridAdapter;
+    private ProjectGridImageAdapter gridAdapter;
 
     private ProgressDialog progressDialog;
 
@@ -440,39 +440,7 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
     }
 
     //-------------------------------------------------------------------------------------------------------------------------//
-    private ArrayList<ProjectImages> getImageFromProjectData(Integer projectId){
-        Log.d(TAG, "getImageFromProjectData: Connecting to db");
-        ProjectDatabaseHandler projectDb = new ProjectDatabaseHandler(mContext);
-        SQLiteDatabase db = projectDb.getReadableDatabase();
 
-        ArrayList<ProjectImages> projectImages = new ArrayList<ProjectImages>(projectDb.getProjectImagesbyProjectID(db,projectId));
-
-
-        Log.d(TAG, "getImageFromProjectData: Closing DB Connection");
-        db.close();
-
-        return projectImages;
-
-    }
-
-    private boolean getImageCount(Integer projectId){
-
-        Log.d(TAG, "getImageCount: Connecting to db");
-        long count = 0;
-        boolean results = false;
-        ProjectDatabaseHandler projectDb = new ProjectDatabaseHandler(mContext);
-        SQLiteDatabase db = projectDb.getReadableDatabase();
-
-        count = ProjectDatabaseHandler.getCountProjectImagesByProjectID(db,projectId);
-
-        if (count !=0){
-            results = true;
-        }
-
-        Log.d(TAG, "getImageCount: Closing DB Connection");
-        db.close();
-        return results;
-    }
 
 
     //-------------------------------------------------------------------------------------------------------------------------//
@@ -619,7 +587,7 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
 
         if(getImageCount(projectID)){
 
-            gridAdapter = new GridImageAdapter(this, R.layout.layout_grid_imageview, mURLSyntex, getImageFromProjectData(projectID));
+            gridAdapter = new ProjectGridImageAdapter(this, R.layout.layout_grid_imageview, mURLSyntex, getImageFromProjectData(projectID));
             gridView.setAdapter(gridAdapter);
             gridView.setVisibility(View.VISIBLE);
         }
@@ -632,13 +600,53 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
 
             gridAdapter.clear();
 
-            gridAdapter = new GridImageAdapter(this, R.layout.layout_grid_imageview, mURLSyntex, getImageFromProjectData(projectID));
+            gridAdapter = new ProjectGridImageAdapter(this, R.layout.layout_grid_imageview, mURLSyntex, getImageFromProjectData(projectID));
             gridView.setAdapter(gridAdapter);
             gridView.setVisibility(View.VISIBLE);
 
 
         }
     }
+
+    private ArrayList<ProjectImages> getImageFromProjectData(Integer projectId){
+        Log.d(TAG, "getImageFromProjectData: Connecting to db");
+        ProjectDatabaseHandler projectDb = new ProjectDatabaseHandler(mContext);
+        SQLiteDatabase db = projectDb.getReadableDatabase();
+
+        ArrayList<ProjectImages> projectImages = new ArrayList<ProjectImages>(projectDb.getProjectImagesbyProjectID(db,projectId));
+
+
+        Log.d(TAG, "getImageFromProjectData: Closing DB Connection");
+        db.close();
+
+        return projectImages;
+
+    }
+
+    private boolean getImageCount(Integer projectId){
+
+        Log.d(TAG, "getImageCount: Connecting to db");
+        long count = 0;
+        boolean results = false;
+        ProjectDatabaseHandler projectDb = new ProjectDatabaseHandler(mContext);
+        SQLiteDatabase db = projectDb.getReadableDatabase();
+
+        count = ProjectDatabaseHandler.getCountProjectImagesByProjectID(db,projectId);
+
+        if (count !=0){
+            results = true;
+        }
+
+        Log.d(TAG, "getImageCount: Closing DB Connection");
+        db.close();
+        return results;
+    }
+
+    //-------------------------------------------------------------------------------------------------------------------------//
+
+    /**
+     * Refreshing Views
+     */
 
     private void showProjectsDetailsLocalRefresh(){
         refreshGridView();

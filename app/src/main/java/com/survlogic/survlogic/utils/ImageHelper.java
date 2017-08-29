@@ -66,6 +66,106 @@ public class ImageHelper {
     }
 
     /**
+     * Creates a smaller overlay box at top of image and single row of text for detailing.
+     * @param src
+     * @param watermark
+     * @param createOverlay
+     * @return
+     */
+
+
+    public Bitmap setWatermarkAtTop(Bitmap src, String watermark, Boolean createOverlay){
+        Log.d(TAG, "setWatermarkAtBottom: Starting method");
+
+        Paint rectBlackStroke,rectBlackFill;
+        Rect rectWatermarkBounds = new Rect(), rectTitleBounds = new Rect();
+        RectF rectOverlay;
+
+        int mTextSize = 40,  mTextAlpha = 255;
+        int mTextHeaderSize = 20, mTextHeaderAlpha = 230;
+
+        int topMargin = 30;
+        int topPadding = 30, leftPadding = 20;
+        float mLineWidth = 3;
+
+        int w = src.getWidth();
+        int h = src.getHeight();
+
+        int hOverlay = 10;
+
+        Bitmap result = Bitmap.createBitmap(w,h,src.getConfig());
+
+        Canvas canvas = new Canvas(result);
+        canvas.drawBitmap(src,0,0,null);
+
+
+//        Text
+
+        //Point Title
+        String titlePoint = "Point ";
+        Paint paintTitle = new Paint();
+        paintTitle.setColor(Color.WHITE);
+        paintTitle.setAlpha(mTextHeaderAlpha);
+        paintTitle.setTextSize(mTextHeaderSize);
+        paintTitle.setStyle(Paint.Style.FILL);
+        paintTitle.setAntiAlias(true);
+
+        paintTitle.getTextBounds(titlePoint,0, titlePoint.length(), rectTitleBounds);
+        int titleHeight = rectTitleBounds.height();
+        int titleWidth = rectTitleBounds.width();
+
+        int startTitleTextX = 1 + leftPadding;
+        int startTitleTextY = topPadding;
+
+        // Point No
+        Paint paint = new Paint();
+        paint.setColor(Color.WHITE);
+        paint.setAlpha(mTextAlpha);
+        paint.setTextSize(mTextSize);
+        paint.setStyle(Paint.Style.FILL);
+        paint.setAntiAlias(true);
+
+        paint.getTextBounds(watermark,0, watermark.length(),rectWatermarkBounds);
+        int headerHeight = rectWatermarkBounds.height();
+        int headerWidth = rectWatermarkBounds.width();
+
+        int intStartTextX = 1 + leftPadding;
+        int intStartTextY = headerHeight + topMargin + topPadding;
+
+//        Overlay
+        if (createOverlay) {
+            rectBlackFill = new Paint();
+            rectBlackFill.setStyle(Paint.Style.FILL);
+            rectBlackFill.setColor(Color.BLACK);
+            rectBlackFill.setAlpha(180);
+
+            rectBlackStroke = new Paint();
+            rectBlackStroke.setStyle(Paint.Style.STROKE);
+            rectBlackStroke.setColor(Color.BLACK);
+            rectBlackStroke.setStrokeWidth(mLineWidth);
+            rectBlackStroke.setAntiAlias(true);
+
+            int intStartBoxX = 0;
+            int StartBoxY = 0;
+            int EndBoxY = intStartTextY + headerHeight + hOverlay;
+
+            rectOverlay = new RectF(intStartBoxX, StartBoxY, w, EndBoxY);
+            canvas.drawRect(rectOverlay, rectBlackFill);
+
+        }
+
+        // Draw after overlay
+        canvas.drawText(titlePoint,startTitleTextX,startTitleTextY,paintTitle);
+        canvas.drawText(watermark, intStartTextX, intStartTextY, paint);
+
+        canvas.save(Canvas.ALL_SAVE_FLAG);
+        Log.d(TAG, "setWatermarkAtBottom: finish creating watermark");
+
+        return result;
+    }
+
+
+    /**
      * Creates a smaller overlay box at bottom of image and single row of text for detailing.
      * @param src
      * @param watermark
@@ -73,8 +173,8 @@ public class ImageHelper {
      * @return
      */
 
-    public Bitmap setWatermark(Bitmap src, String watermark, Boolean createOverlay){
-        Log.d(TAG, "setWatermark: Starting method");
+    public Bitmap setWatermarkAtBottom(Bitmap src, String watermark, Boolean createOverlay){
+        Log.d(TAG, "setWatermarkAtBottom: Starting method");
 
         Paint rectBlackStroke,rectBlackFill;
         Rect rectWatermarkBounds = new Rect();
@@ -132,7 +232,7 @@ public class ImageHelper {
         canvas.drawText(watermark, intStartTextX, intStartTextY, paint);
 
         canvas.save(Canvas.ALL_SAVE_FLAG);
-        Log.d(TAG, "setWatermark: finish creating watermark");
+        Log.d(TAG, "setWatermarkAtBottom: finish creating watermark");
 
         return result;
     }
@@ -145,7 +245,7 @@ public class ImageHelper {
      * @return
      */
     public Bitmap setHeaderFullScreen(Bitmap src, String watermark, Boolean createOverlay){
-        Log.d(TAG, "setWatermark: Starting method");
+        Log.d(TAG, "setWatermarkAtBottom: Starting method");
 
         Paint rectBlackStroke,rectBlackFill;
         Rect rectWatermarkBounds = new Rect();
@@ -202,7 +302,7 @@ public class ImageHelper {
         canvas.drawText(watermark, w/2 - headerWidth/2, h/2 + headerHeight/2, paint);
 
         canvas.save(Canvas.ALL_SAVE_FLAG);
-        Log.d(TAG, "setWatermark: finish creating watermark");
+        Log.d(TAG, "setWatermarkAtBottom: finish creating watermark");
 
         return result;
     }

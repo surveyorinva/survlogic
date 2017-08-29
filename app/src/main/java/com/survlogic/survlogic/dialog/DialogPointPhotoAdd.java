@@ -35,19 +35,22 @@ public class DialogPointPhotoAdd extends DialogFragment {
     private Bitmap mImageLocal, mImageWatermark;
     private String mCurrentPhotoPath;
 
-    private int project_id;
+    private int project_id, job_id, point_id, point_no;
 
     private boolean mAddWatermark = false;
 
     private EditText etDescription;
     private Button btnAddWatermark, btnRemoveWatermark;
 
-    public static DialogPointPhotoAdd newInstance(Integer mProjectId, Bitmap mBitmap) {
+    public static DialogPointPhotoAdd newInstance(int mProjectId, int mJobId, int mPointId, int mPointNo, Bitmap mBitmap) {
 
         DialogPointPhotoAdd frag = new DialogPointPhotoAdd();
         Bundle args = new Bundle();
 
         args.putInt("project_id", mProjectId);
+        args.putInt("job_id", mJobId);
+        args.putInt("point_id", mPointId);
+        args.putInt("point_no", mPointNo);
         args.putParcelable("image", mBitmap);
 
         frag.setArguments(args);
@@ -59,6 +62,9 @@ public class DialogPointPhotoAdd extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
         project_id = getArguments().getInt("project_id");
+        job_id = getArguments().getInt("job_id");
+        point_id = getArguments().getInt("point_id");
+        point_no = getArguments().getInt("point_no");
         mImageLocal = getArguments().getParcelable("image");
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(),R.style.DialogPopupStyle);
@@ -103,6 +109,11 @@ public class DialogPointPhotoAdd extends DialogFragment {
         etDescription = (EditText) getDialog().findViewById(R.id.photo_description);
 
         final ImageView ivPhoto = (ImageView) getDialog().findViewById(R.id.photo_in_dialog_project_picture);
+        Log.d(TAG, "initView: Starting Top View Add");
+
+        String pointNo = String.valueOf(point_no);
+
+        mImageLocal = imageHelper.setWatermarkAtTop(mImageLocal, pointNo, true);
         ivPhoto.setImageBitmap(mImageLocal);
 
         Button btnSave = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
@@ -121,7 +132,7 @@ public class DialogPointPhotoAdd extends DialogFragment {
                 if(!isStringNull(description)){
                     mAddWatermark = true;
 
-                    mImageWatermark = imageHelper.setWatermark(mImageLocal, description, true);
+                    mImageWatermark = imageHelper.setWatermarkAtBottom(mImageLocal, description, true);
 
                     ivPhoto.setImageBitmap(mImageWatermark);
 
@@ -159,7 +170,7 @@ public class DialogPointPhotoAdd extends DialogFragment {
             }
 
             // Create Project model
-        ProjectImages projectImages = new ProjectImages(project_id,0,mImagePath,0,0,0);
+        ProjectImages projectImages = new ProjectImages(project_id,job_id,point_id,mImagePath,0,0,0);
 
             // Setup Background Task
         BackgroundProjectImagesSetup backgroundProjectImagesSetup = new BackgroundProjectImagesSetup(getActivity());
@@ -168,7 +179,8 @@ public class DialogPointPhotoAdd extends DialogFragment {
         backgroundProjectImagesSetup.execute(projectImages);
         Log.d(TAG, "submitForm: Complete.  Photo with ProjectID: " + project_id + " Saved");
 
-        ((ProjectDetailsActivity) getActivity()).showProjectDetailsDialogRefresh();
+
+        //Todo refresh gridview for DialogJobPointView
 
         getDialog().dismiss();
 

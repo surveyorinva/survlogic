@@ -6,7 +6,7 @@ package com.survlogic.survlogic.model;
  */
 public class ProjectImages {
 
-    int id, projectId, pointId;
+    int id, projectId, jobId, pointId;
     byte[] image;
     String imagePath;
     float bearingAngle;
@@ -17,34 +17,39 @@ public class ProjectImages {
 
     }
 
-    public ProjectImages(int projectId, int pointId, byte[] image) {
+    public ProjectImages(int projectId, int jobId, int pointId, byte[] image) {
         this.projectId = projectId;
+        this.jobId = jobId;
         this.pointId = pointId;
         this.image = image;
     }
 
-    public ProjectImages(int projectId, int pointId, String imagePath) {
+    public ProjectImages(int projectId, int jobId, int pointId, String imagePath) {
         this.projectId = projectId;
+        this.jobId = jobId;
         this.pointId = pointId;
         this.imagePath = imagePath;
     }
 
-    public ProjectImages(int id, int projectId, int pointId, byte[] image) {
+    public ProjectImages(int id, int projectId, int jobId, int pointId, byte[] image) {
         this.id = id;
         this.projectId = projectId;
+        this.jobId = jobId;
         this.pointId = pointId;
         this.image = image;
     }
 
-    public ProjectImages(int id, int projectId, int pointId, String imagePath) {
+    public ProjectImages(int id, int projectId, int jobId, int pointId, String imagePath) {
         this.id = id;
         this.projectId = projectId;
+        this.jobId = jobId;
         this.pointId = pointId;
         this.imagePath = imagePath;
     }
 
-    public ProjectImages(int projectId, int pointId, byte[] image, float bearingAngle, double locationLat, double locationLong) {
+    public ProjectImages(int projectId, int jobId, int pointId, byte[] image, float bearingAngle, double locationLat, double locationLong) {
         this.projectId = projectId;
+        this.jobId = jobId;
         this.pointId = pointId;
         this.image = image;
         this.bearingAngle = bearingAngle;
@@ -52,8 +57,9 @@ public class ProjectImages {
         LocationLong = locationLong;
     }
 
-    public ProjectImages(int projectId, int pointId, String imagePath, float bearingAngle, double locationLat, double locationLong) {
+    public ProjectImages(int projectId, int jobId, int pointId, String imagePath, float bearingAngle, double locationLat, double locationLong) {
         this.projectId = projectId;
+        this.jobId = jobId;
         this.pointId = pointId;
         this.imagePath = imagePath;
         this.bearingAngle = bearingAngle;
@@ -75,6 +81,14 @@ public class ProjectImages {
 
     public void setProjectId(int projectId) {
         this.projectId = projectId;
+    }
+
+    public int getJobId() {
+        return jobId;
+    }
+
+    public void setJobId(int jobId) {
+        this.jobId = jobId;
     }
 
     public int getPointId() {
