@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/content_sketch_settings_pen"
+    android:orientation="vertical"
+    android:background="@color/white"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:visibility="visible">
+
+    <RelativeLayout
+        android:id="@+id/rl_brush_size"
+        android:background="@color/white"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/canvas_brush_size"
+            android:layout_marginTop="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="50dp" />
+
+        <SeekBar
+            android:id="@+id/seek_bar_brush_size"
+            android:layout_below="@id/canvas_brush_size"
+            android:layout_centerHorizontal="true"
+            android:max="@integer/brush_size_max"
+            android:progress="2"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content" />
+
+
+    </RelativeLayout>
+
+
+    <RelativeLayout
+        android:id="@+id/rl_brush_style"
+        android:background="@color/white"
+        android:layout_below="@id/rl_brush_size"
+        android:layout_marginTop="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:weightSum="100"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <android.support.v4.widget.Space
+                android:layout_weight="34"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content" />
+            
+            <ImageButton
+                android:id="@+id/sketch_pen"
+                android:background="@drawable/circle_image_sketch_pen"
+                android:layout_weight="15"
+                android:layout_width="0dp"
+                android:layout_height="50dp" />
+
+            <ImageButton
+                android:id="@+id/sketch_erxaser"
+                android:background="@drawable/circle_image_sketch_eraser"
+                android:layout_toEndOf="@id/sketch_pen"
+                android:layout_marginStart="15dp"
+                android:layout_weight="15"
+                android:layout_width="0dp"
+                android:layout_height="50dp" />
+            
+            
+            
+        </LinearLayout>
+        
+        
+        
+
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/rl_brush_color"
+        android:background="@color/white"
+        android:layout_marginTop="20dp"
+        android:layout_below="@id/rl_brush_style"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:background="@drawable/box_accent_border_ltgrey"
+            android:layout_width="match_parent"
+            android:layout_height="1dp" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:weightSum="100"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <android.support.v4.widget.Space
+                android:layout_weight="26"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content" />
+
+            <ImageButton
+                android:id="@+id/sketch_color_blue"
+                android:background="@drawable/vc_circle_blue"
+                android:layout_marginTop="10dp"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
+                android:layout_weight="12"
+                android:layout_width="0dp"
+                android:layout_height="40dp" />
+
+            <ImageButton
+                android:id="@+id/sketch_color_green"
+                android:background="@drawable/vc_circle_green"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="5dp"
+                android:layout_weight="12"
+                android:layout_width="0dp"
+                android:layout_height="40dp" />
+
+            <ImageButton
+                android:id="@+id/sketch_color_red"
+                android:background="@drawable/vc_circle_red"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="5dp"
+                android:layout_weight="12"
+                android:layout_width="0dp"
+                android:layout_height="40dp" />
+
+            <ImageButton
+                android:id="@+id/sketch_color_black"
+                android:background="@drawable/vc_circle_black"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="5dp"
+                android:layout_weight="12"
+                android:layout_width="0dp"
+                android:layout_height="40dp" />
+
+
+        </LinearLayout>
+
+
+    </RelativeLayout>
+
+
+</RelativeLayout>

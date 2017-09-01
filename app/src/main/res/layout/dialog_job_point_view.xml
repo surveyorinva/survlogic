@@ -398,6 +398,84 @@
 
             </android.support.v7.widget.CardView>
 
+            <TextView
+                android:id="@+id/card_label_sketch"
+                android:text="@string/dialog_point_view_category_sketch"
+                style="@style/Labels.Card.ProjectCategory"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="@dimen/card_margin_between_headers"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <android.support.v7.widget.CardView
+                card_view:elevation="10dp"
+                card_view:cardCornerRadius="4dp"
+                android:layout_margin="5dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <android.support.v4.widget.Space
+                        android:layout_width="match_parent"
+                        android:layout_height="5dp" />
+
+                    <GridView
+                        android:id="@+id/sketch_grid_view"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginEnd="5dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginBottom="10dp"
+                        android:numColumns="4"
+                        android:verticalSpacing="1dp"
+                        android:horizontalSpacing="1dp"
+                        android:stretchMode="columnWidth"
+                        android:gravity="center"
+                        android:drawSelectorOnTop="true"
+                        android:listSelector="@drawable/grid_view_highlight_transparent"
+                        android:visibility="gone"
+                        android:layout_width="match_parent"
+                        android:layout_height="75dp" />
+
+                    <RelativeLayout
+                        android:background="@drawable/box_accent_border_ltgrey"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp" >
+
+                        <Button
+                            android:id="@+id/card4_add_sketch"
+                            android:background="@drawable/button_ripple_transparent"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent" />
+
+                        <ImageView
+                            android:id="@+id/card4_add_sketch_img"
+                            android:layout_marginStart="10dp"
+                            android:layout_marginTop="5dp"
+                            android:background="@drawable/vc_circle_blue"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp" />
+
+                        <TextView
+                            android:text="@string/dialog_point_view_add_sketch"
+                            android:gravity="center_vertical"
+                            android:layout_toEndOf="@id/card4_add_sketch_img"
+                            android:layout_marginStart="10dp"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent" />
+
+                    </RelativeLayout>
+
+                </LinearLayout>
+
+
+            </android.support.v7.widget.CardView>
+
+
         </LinearLayout>
 
        </android.support.v4.widget.NestedScrollView>

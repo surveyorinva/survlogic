@@ -37,6 +37,8 @@ import android.widget.Toast;
 
 import com.survlogic.survlogic.BuildConfig;
 import com.survlogic.survlogic.R;
+import com.survlogic.survlogic.activity.JobPointAddSketchActivity;
+import com.survlogic.survlogic.activity.JobPointsActivity;
 import com.survlogic.survlogic.activity.PhotoGalleryActivity;
 import com.survlogic.survlogic.adapter.PointGridImageAdapter;
 import com.survlogic.survlogic.adapter.ProjectGridImageAdapter;
@@ -85,7 +87,7 @@ public class DialogJobPointView extends DialogFragment {
 
     private ProgressBar pbProgressCircle;
 
-    private Button btTakePhoto;
+    private Button btTakePhoto, btAddSketch;
 
     private SharedPreferences sharedPreferences;
     private PreferenceLoaderHelper preferenceLoaderHelper;
@@ -242,6 +244,7 @@ public class DialogJobPointView extends DialogFragment {
         pbProgressCircle = (ProgressBar) getDialog().findViewById(R.id.progressBar_Loading_point);
 
         btTakePhoto = (Button) getDialog().findViewById(R.id.card3_take_photo);
+        btAddSketch = (Button) getDialog().findViewById(R.id.card4_add_sketch);
 
 
 
@@ -252,6 +255,13 @@ public class DialogJobPointView extends DialogFragment {
             @Override
             public void onClick(View v) {
                 callImageSelectionDialog();
+            }
+        });
+
+        btAddSketch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                callAddNewSketch();
             }
         });
 
@@ -373,6 +383,19 @@ public class DialogJobPointView extends DialogFragment {
 
     }
 
+    private void callAddNewSketch(){
+        //Go To Points Menu
+        Intent i = new Intent(getActivity(), JobPointAddSketchActivity.class);
+//        i.putExtra("PROJECT_ID",project_id);
+//        i.putExtra("JOB_ID", job_id);
+//        i.putExtra("JOB_DB_NAME", jobDatabaseName);
+
+        startActivity(i);
+        getActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+
+
+
+    }
 
     //-------------------------------------------------------------------------------------------------------------------------//
 

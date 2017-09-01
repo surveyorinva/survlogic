@@ -200,11 +200,11 @@
     <string name="job_new_validation_job_save_failed">Error Saving Job.  Please try again.</string>
 
     <!--Point List Table-->
-    <string name="job_point_list_header_pntNo">No.</string>
-    <string name="job_point_list_header_northing">Northing</string>
-    <string name="job_point_list_header_easting">Easting</string>
-    <string name="job_point_list_header_elevation">Elev.</string>
-    <string name="job_point_list_header_description">Desc.</string>
+    <string name="job_point_list_header_pntNo">No</string>
+    <string name="job_point_list_header_northing">N</string>
+    <string name="job_point_list_header_easting">E</string>
+    <string name="job_point_list_header_elevation">El</string>
+    <string name="job_point_list_header_description">Desc</string>
     <string name="job_point_list_header_tag">Tag</string>
 
     <!--Add New Point-->
@@ -251,6 +251,8 @@
     <string name="dialog_point_view_category_planar">Planar Coordinates</string>
     <string name="dialog_point_view_category_geographic">Geographic Coordinates</string>
     <string name="dialog_point_view_category_photo">Photographs</string>
+    <string name="dialog_point_view_category_sketch">Field Sketchs</string>
+
 
     <string name="dialog_point_view_pointNo_header">POINT NO.</string>
     <string name="dialog_point_view_pointDescription_header">DESCRIPTION</string>
@@ -268,6 +270,12 @@
     <string name="dialog_point_view_pointEllipsoid_default">Ellipsoid:  (Not Defined)</string>
     <string name="dialog_point_view_pointOrtho_default">Ortho.:  (Not Defined)</string>
     <string name="dialog_point_view_add_photos">Add Photos</string>
+    <string name="dialog_point_view_add_sketch">Add Sketch</string>
+
+    <!--Sketch View-->
+    <string name="sketch_menu_clear_canvas">Clear Canvas</string>
+    <string name="sketch_dialog_delete_title"> Clear Canvas?</string>
+    <string name="sketch_dialog_delete_summary">Your current drawing will be completely erased, do you want to proceed?</string>
 
     <!-- ******************************Strings related to Settings****************************** -->
 

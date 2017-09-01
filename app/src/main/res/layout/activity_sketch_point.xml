@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:fitsSystemWindows="true"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Top Toolbar -->
+    <RelativeLayout
+        android:id="@+id/relLayout_1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true">
+
+        <include
+            layout="@layout/app_bar_job_top_sketch"/>
+
+
+    </RelativeLayout>
+
+    <!--Hidden Layout Top-->
+    <RelativeLayout
+        android:id="@+id/toolbar_settings"
+        android:background="@color/semi_transparent"
+        android:elevation="10dp"
+        android:layout_below="@id/relLayout_1"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:visibility="gone">
+
+        <include
+            layout="@layout/content_sketch_settings_pen"/>
+
+
+    </RelativeLayout>
+
+    <!--Container-->
+    <com.survlogic.survlogic.view.SketchPointView
+        android:id="@+id/sketch_canvas"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/include"
+        android:layout_below="@+id/relLayout_1">
+
+    </com.survlogic.survlogic.view.SketchPointView>
+
+    <!--Bottom Toolbar-->
+    <include
+        layout="@layout/app_bar_job_bottom_points_sketch"
+        android:id="@+id/include" />
+
+
+
+
+</RelativeLayout>

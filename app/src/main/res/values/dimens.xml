@@ -13,7 +13,6 @@
     <dimen name="tab_height">48dp</dimen>
     <dimen name="tab_indicator">4dp</dimen>
 
-
     <dimen name="text_margin">16dp</dimen>
     <dimen name="text_margin_small">8dp</dimen>
     <dimen name="text_margin_very_small">4dp</dimen>
@@ -50,5 +49,16 @@
     <dimen name="text_size_detail_value">15sp</dimen>
     <dimen name="text_size_location_value">13sp</dimen>
 
+
+    <!--Sketch Sizes and Dimensions-->
+    <dimen name="small_brush">10dp</dimen>
+    <integer name="small_size">10</integer>
+    <dimen name="medium_brush">20dp</dimen>
+    <integer name="medium_size">20</integer>
+    <dimen name="large_brush">30dp</dimen>
+    <integer name="large_size">30</integer>
+
+    <integer name="brush_size_min">1</integer>
+    <integer name="brush_size_max">50</integer>
 
 </resources>

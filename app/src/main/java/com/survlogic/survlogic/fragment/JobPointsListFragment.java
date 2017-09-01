@@ -29,7 +29,7 @@ import de.codecrafters.tableview.listeners.TableDataClickListener;
 public class JobPointsListFragment extends Fragment {
 
     private static final String TAG = "JobPointsListFragment";
-    private static final int DELAY_TO_LIST = 500;
+    private static final int DELAY_TO_LIST = 300;
     private static final int DELAY_TO_REFRESH = 2000;
 
     View v;

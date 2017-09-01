@@ -85,7 +85,7 @@ public class ImageHelper {
         int mTextHeaderSize = 20, mTextHeaderAlpha = 230;
 
         int topMargin = 30;
-        int topPadding = 30, leftPadding = 20;
+        int topPadding = 10, leftPadding = 20;
         float mLineWidth = 3;
 
         int w = src.getWidth();
