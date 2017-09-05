@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/content_sketch_settings_canvas"
+    android:orientation="vertical"
+    android:background="@color/white"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:visibility="visible">
+
+    <RelativeLayout
+        android:id="@+id/rl_canvas_background"
+        android:background="@color/white"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:weightSum="100"
+            android:layout_marginStart="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageButton
+                android:background="@drawable/table_background_white"
+                android:layout_margin="10dp"
+                android:padding="10dp"
+                android:layout_weight="25"
+                android:layout_width="0dp"
+                android:layout_height="100dp" />
+
+            <ImageButton
+                android:id="@+id/sketch_canvas_photo"
+                android:src="@drawable/sketch_canvas_camera"
+                android:background="@drawable/table_background_white"
+                android:layout_margin="10dp"
+                android:padding="10dp"
+                android:layout_weight="25"
+                android:layout_width="0dp"
+                android:layout_height="100dp" />
+
+
+        </LinearLayout>
+
+
+    </RelativeLayout>
+
+
+
+</RelativeLayout>

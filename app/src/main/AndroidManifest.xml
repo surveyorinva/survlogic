@@ -116,6 +116,10 @@
             android:screenOrientation="portrait"
             android:theme="@style/SuperMaterialTheme"/>
 
+        <activity android:name=".activity.SketchBackgroundGalleryActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/SuperMaterialTheme"/>
+
         <activity
             android:name=".activity.SettingsCurrentJobActivity"
             android:parentActivityName=".activity.JobHomeActivity" />

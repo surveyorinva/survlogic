@@ -72,12 +72,23 @@
     <string name="pref_gps_height_default">3.00</string>
 
     <!--Intent Keys-->
+    <string name="KEY_PROJECT_ID">KEY_PROJECT_ID</string>
+    <string name="KEY_JOB_ID">KEY_JOB_ID</string>
+    <string name="KEY_JOB_DATABASE">KEY_JOB_DATABASE</string>
+    <string name="KEY_POINT_ID">KEY_POINT_ID</string>
+    <string name="KEY_POINT_NO">KEY_POINT_NO</string>
+
     <string name="KEY_Intent_FROM">KEY_Intent_FROM</string>
     <string name="KEY_POSITION_LATITUDE">KEY_LATITUDE</string>
     <string name="KEY_POSITION_LONGITUDE">KEY_LONGITUDE</string>
     <string name="KEY_POSITION_ELLIPSOID">KEY_ELLIPSOID</string>
     <string name="KEY_POSITION_ORTHO">KEY_ORTHO</string>
     <string name="KEY_POSITION">KEY_POSITION</string>
+
+    <string name="KEY_GALLERY_IMAGE_PATH">KEY_GALLERY_IMAGE_PATH</string>
+
+
+
 
     <!--Intent Answers-->
     <string name="ANSWER_Project_New">ANSWER_project_new</string>

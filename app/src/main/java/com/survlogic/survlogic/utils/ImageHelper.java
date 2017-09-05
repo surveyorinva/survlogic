@@ -115,7 +115,7 @@ public class ImageHelper {
         int titleWidth = rectTitleBounds.width();
 
         int startTitleTextX = 1 + leftPadding;
-        int startTitleTextY = topPadding;
+        int startTitleTextY = topMargin;
 
         // Point No
         Paint paint = new Paint();

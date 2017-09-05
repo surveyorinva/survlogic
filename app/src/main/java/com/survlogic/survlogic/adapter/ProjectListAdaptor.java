@@ -1,11 +1,9 @@
 package com.survlogic.survlogic.adapter;
 
 import android.app.Activity;
-import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.util.Pair;
 import android.support.v4.view.ViewCompat;
@@ -24,7 +22,6 @@ import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.activity.ProjectDetailsActivity;
-import com.survlogic.survlogic.interf.ProjectItemClickListener;
 import com.survlogic.survlogic.model.Project;
 import com.survlogic.survlogic.utils.AnimateHelper;
 import com.survlogic.survlogic.utils.MathHelper;
@@ -33,7 +30,6 @@ import com.survlogic.survlogic.view.Card_View_Holder_Project_Small;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 
 /**
  * Created by chrisfillmore on 6/30/2017.

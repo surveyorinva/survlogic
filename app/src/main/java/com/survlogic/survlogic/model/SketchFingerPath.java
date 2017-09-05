@@ -11,11 +11,11 @@ public class SketchFingerPath {
     public int color;
     public boolean emboss;
     public boolean blur;
-    public int strokeWidth;
+    public float strokeWidth;
     public Path path;
 
 
-    public SketchFingerPath(int color, boolean emboss, boolean blur, int strokeWidth, Path path) {
+    public SketchFingerPath(int color, boolean emboss, boolean blur, float strokeWidth, Path path) {
         this.color = color;
         this.emboss = emboss;
         this.blur = blur;

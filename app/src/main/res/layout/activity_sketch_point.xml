@@ -34,23 +34,35 @@
         <include
             layout="@layout/content_sketch_settings_pen"/>
 
+        <include
+            layout="@layout/content_sketch_settings_canvas"/>
+
 
     </RelativeLayout>
 
     <!--Container-->
-    <com.survlogic.survlogic.view.SketchPointView
-        android:id="@+id/sketch_canvas"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@+id/include"
-        android:layout_below="@+id/relLayout_1">
 
-    </com.survlogic.survlogic.view.SketchPointView>
+    <com.survlogic.survlogic.view.ZoomableViewGroup
+        android:layout_above="@+id/include"
+        android:layout_below="@+id/relLayout_1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.survlogic.survlogic.view.SketchPointView
+            android:id="@+id/sketch_canvas"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+
+    </com.survlogic.survlogic.view.ZoomableViewGroup>
+
 
     <!--Bottom Toolbar-->
     <include
         layout="@layout/app_bar_job_bottom_points_sketch"
         android:id="@+id/include" />
+
+
 
 
 

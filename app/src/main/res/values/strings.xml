@@ -164,6 +164,7 @@
     <string name="project_new_dialog_title">Get Project Site Photo</string>
     <string name="project_new_dialog_takePhoto">Take Photo</string>
     <string name="project_new_dialog_getImage">Choose from Library</string>
+    <string name="project_new_dialog_getPointImage">Choose from Point Gallery</string>
     <string name="project_new_validation_project_name_error">Project Name is a required field.\nPlease complete prior to continuing</string>
     <string name="project_new_validation_project_save_success">Project Saved!</string>
     <string name="project_new_validation_project_update_success">Project Updated!</string>
@@ -183,6 +184,7 @@
     <!--Project Details - Add New Photo-->
     <string name="photo_dialog_title">Add Photo to Project</string>
     <string name="photo_dialog_title_point">Add Photo to Point</string>
+    <string name="photo_dialog_title_sketch">Add Photo to Background</string>
     <string name="dialog_photo_header_1">ADD WATERMARK TO IMAGE</string>
     <string name="dialog_photo_description">Enter in Photo Description"</string>
     <string name="project_photo_new_validation_save_success">Project Photo Saved!</string>

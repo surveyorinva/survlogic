@@ -120,6 +120,10 @@ public class DialogJobPointView extends DialogFragment {
         pointNo = getArguments().getInt("pointNo");
         databaseName = getArguments().getString("databaseName");
 
+
+        Log.d(TAG, "onCreateDialog: Project Id: " + projectID );
+        Log.d(TAG, "onCreateDialog: Job Id: " + jobId );
+
         Log.d(TAG, "onCreateDialog: PointID: " + pointId );
         Log.d(TAG, "onCreateDialog: Point No: " + pointNo );
 
@@ -292,6 +296,7 @@ public class DialogJobPointView extends DialogFragment {
             JobDatabaseHandler jobDb = new JobDatabaseHandler(mContext, databaseName);
             SQLiteDatabase db = jobDb.getReadableDatabase();
 
+            Log.d(TAG, "initValuesFromObject: Point No: " + pointNo);
             PointGeodetic pointGeodetic = jobDb.getPointByPointNo(db,pointNo);
 
             double pointNorthing = pointGeodetic.getNorthing();
@@ -384,11 +389,18 @@ public class DialogJobPointView extends DialogFragment {
     }
 
     private void callAddNewSketch(){
-        //Go To Points Menu
+        //Senting to JobPointAddSketchActivity
+
+
+        Log.d(TAG, "Checking: ProjectID " + projectID);
+
         Intent i = new Intent(getActivity(), JobPointAddSketchActivity.class);
-//        i.putExtra("PROJECT_ID",project_id);
-//        i.putExtra("JOB_ID", job_id);
-//        i.putExtra("JOB_DB_NAME", jobDatabaseName);
+        i.putExtra("KEY_PROJECT_ID",projectID);
+        i.putExtra(getString(R.string.KEY_JOB_ID), jobId);
+        i.putExtra(getString(R.string.KEY_POINT_ID), pointId);
+        i.putExtra(getString(R.string.KEY_POINT_NO), pointNo);
+        i.putExtra(getString(R.string.KEY_JOB_DATABASE), databaseName);
+
 
         startActivity(i);
         getActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);

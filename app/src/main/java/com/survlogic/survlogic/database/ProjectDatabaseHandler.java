@@ -497,7 +497,7 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
         String selectQuery = "SELECT * FROM " + ProjectContract.ProjectImageEntry.TABLE_NAME+  " WHERE "
                 + ProjectContract.ProjectImageEntry.KEY_PROJECT_ID + " = " + project_id
                 + " AND " + ProjectContract.ProjectImageEntry.KEY_JOB_ID + " = " + job_id
-                + " AND " + ProjectContract.ProjectImageEntry.KEY_POINT_ID;
+                + " AND " + ProjectContract.ProjectImageEntry.KEY_POINT_ID + " = " + point_id;
 
         Log.d(TAG, "ImagebyPointID: " + selectQuery);
 
@@ -549,7 +549,7 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
         String countQuery = "SELECT * FROM " + ProjectContract.ProjectImageEntry.TABLE_NAME+  " WHERE "
                 + ProjectContract.ProjectImageEntry.KEY_PROJECT_ID + " = " + project_id
                 + " AND " + ProjectContract.ProjectImageEntry.KEY_JOB_ID + " = " + job_id
-                + " AND " + ProjectContract.ProjectImageEntry.KEY_POINT_ID;
+                + " AND " + ProjectContract.ProjectImageEntry.KEY_POINT_ID + " = " + point_id;
 
         Cursor cursor = db.rawQuery(countQuery, null);
         int cnt = cursor.getCount();

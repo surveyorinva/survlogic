@@ -52,6 +52,10 @@ dependencies {
     //Photoview
     compile 'com.github.chrisbanes:PhotoView:2.1.3'
 
+    //Vector Master (https://github.com/harjot-oberai/VectorMaster)
+    compile 'com.sdsmdg.harjot:vectormaster:1.0.9'
+
+
     testCompile 'junit:junit:4.12'
 
     annotationProcessor 'com.github.bumptech.glide:compiler:4.0.0-RC0'

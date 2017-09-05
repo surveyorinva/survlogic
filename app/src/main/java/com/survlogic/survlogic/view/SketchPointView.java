@@ -16,10 +16,13 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 import android.view.View;
 
 import com.survlogic.survlogic.R;
+import com.survlogic.survlogic.interf.SketchInterfaceListener;
 import com.survlogic.survlogic.model.SketchFingerPath;
+import com.survlogic.survlogic.utils.ImageHelper;
 
 import java.util.ArrayList;
 
@@ -31,14 +34,13 @@ public class SketchPointView extends View {
 
     private static final String TAG = "SketchPointView";
     private Context mContext;
+    private ImageHelper imageHelper;
 
-    private ArrayList<Path> paths = new ArrayList<>();
-    private ArrayList<Path> undoPaths = new ArrayList<>();
+    private ArrayList<SketchFingerPath> paths = new ArrayList<>();
+    private ArrayList<SketchFingerPath> undoPaths = new ArrayList<>();
 
-    private SketchFingerPath fp;
-
-    private Canvas drawCanvas;
-    private Bitmap canvasBitmap;
+    private Canvas drawCanvas, backgroundCanvas;
+    private Bitmap canvasBitmap, backgroundImage;
     private Paint canvasPaint, drawPaint;
     private Path drawPath;
 
@@ -49,13 +51,21 @@ public class SketchPointView extends View {
     private float currentBrushSize, lastBrushSize;
     private boolean emboss, blur;
     private MaskFilter mEmboss, mBlur;
+    private boolean isTouchable = true;
+
+    private int screenWidth, screenHeight;
 
     private float mX, mY;
     private static final float TOUCH_TOLERANCE = 4;
 
+
+
+
+
     public SketchPointView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
 
+        imageHelper = new ImageHelper(context);
         initPaint();
 
     }
@@ -66,6 +76,8 @@ public class SketchPointView extends View {
 
         currentBrushSize = getResources().getInteger(R.integer.small_size);
         lastBrushSize = currentBrushSize;
+
+        paintColor = DEFAULT_COLOR;
 
         drawPaint = new Paint();
 
@@ -85,13 +97,7 @@ public class SketchPointView extends View {
 
     }
 
-    private void initView(DisplayMetrics metrics){
-        int h = metrics.heightPixels;
-        int w = metrics.widthPixels;
 
-        canvasBitmap = Bitmap.createBitmap(w,h,Bitmap.Config.ARGB_8888);
-        drawCanvas = new Canvas(canvasBitmap);
-    }
 
     private void pen_normal(){
         emboss = false;
@@ -117,55 +123,113 @@ public class SketchPointView extends View {
     }
 
     @Override
-    protected void onDraw(Canvas canvas) {
-        canvas.save();
-        drawCanvas.drawColor(backgroundColor);
-
-        for (Path p:paths){
-            canvas.drawPath(p,drawPaint);
-        }
-        canvas.drawPath(drawPath,drawPaint);
-    }
-
-    @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
 
+        initView(w,h);
+
+    }
+
+    private void initView(int w, int h){
+        Log.d(TAG, "Width Display: " + w);
+        Log.d(TAG, "Height Display: " + h);
+
+        screenWidth = w;
+        screenHeight = h;
 
         canvasBitmap = Bitmap.createBitmap(w,h,Bitmap.Config.ARGB_8888);
         drawCanvas = new Canvas(canvasBitmap);
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        Log.d(TAG, "onDraw: Started....>");
+        
+        canvas.save();
+        if (backgroundCanvas != null){
+            Log.d(TAG, "BackgroundCanvas is not null ");
+            drawCanvas.drawBitmap(backgroundImage,0,0,null);
+
+            Log.d(TAG, "Background canvas drawn");
+        }else{
+            drawCanvas.drawColor(backgroundColor);
+        }
+
+
+        for (SketchFingerPath fp : paths){
+            drawPaint.setColor(fp.color);
+            drawPaint.setStrokeWidth(fp.strokeWidth);
+            drawPaint.setMaskFilter(null);
+
+            if (fp.emboss){
+                drawPaint.setMaskFilter(mEmboss);
+            }else if(fp.blur){
+                drawPaint.setMaskFilter(mBlur);
+
+            }
+
+            drawCanvas.drawPath(fp.path,drawPaint);
+        }
+
+        canvas.drawBitmap(canvasBitmap, 0, 0, canvasPaint);
+
+        canvas.restore();
 
     }
+
+
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         float touchX = event.getX();
         float touchY = event.getY();
 
-        switch (event.getAction()){
+        if (isTouchable) {
+            int action = event.getActionMasked();
 
-            case MotionEvent.ACTION_DOWN:
-                free_touch_start(touchX,touchY);
-                invalidate();
-                break;
+            switch (event.getAction()) {
 
-            case MotionEvent.ACTION_MOVE:
-                free_touch_move(touchX, touchY);
-                invalidate();
-                break;
-            case MotionEvent.ACTION_UP:
-                free_touch_up();
-                invalidate();
-                break;
-            default:
-                return false;
+                case MotionEvent.ACTION_DOWN:
+                    free_touch_start(touchX, touchY);
+                    invalidate();
+                    break;
+
+                case MotionEvent.ACTION_POINTER_DOWN:
+                    Log.d(TAG, "onTouchEvent: Pointer Down");
+
+                    break;
+
+                case MotionEvent.ACTION_POINTER_UP:
+                    Log.d(TAG, "onTouchEvent: Pointer Up");
+
+                    break;
+
+                case MotionEvent.ACTION_MOVE:
+                    free_touch_move(touchX, touchY);
+                    invalidate();
+                    break;
+                case MotionEvent.ACTION_UP:
+                    free_touch_up();
+                    invalidate();
+                    break;
+                default:
+                    return false;
+            }
+
+            return true;
+        }else{
+            return false;
         }
 
-        return true;
     }
 
     private void free_touch_start(float x, float y){
         undoPaths.clear();
+
+        drawPath = new Path();
+        SketchFingerPath fp = new SketchFingerPath(paintColor, emboss, blur, currentBrushSize, drawPath);
+        paths.add(fp);
+
         drawPath.reset();
         drawPath.moveTo(x,y);
         mX = x;
@@ -185,9 +249,6 @@ public class SketchPointView extends View {
 
     private void free_touch_up(){
         drawPath.lineTo(mX,mY);
-        drawCanvas.drawPath(drawPath,drawPaint);
-        paths.add(drawPath);
-        drawPath = new Path();
     }
 
 
@@ -218,7 +279,7 @@ public class SketchPointView extends View {
 
         invalidate();
 
-        currentBrushSize = pixelAmount;
+        currentBrushSize = newSize;
         drawPaint.setStrokeWidth(newSize);
 
         Log.d(TAG, "setBrushSize: Canvas Paint updated");
@@ -229,8 +290,48 @@ public class SketchPointView extends View {
 
     }
 
-    public float getLastBurshSize(){
+    public int getCurrentBrushSize(){
+        return (int) currentBrushSize;
+    }
+
+    public float getLastBrushSize(){
         return lastBrushSize;
+    }
+
+    public int getCurrentBrushColor(){
+        return paintColor;
+    }
+
+    public void setCurrentBrushColor(int paintColor){
+        this.paintColor = paintColor;
+    }
+
+
+    public boolean isTouchable(){
+        return isTouchable;
+    }
+
+    public void setTouchable(boolean isTouchable){
+        this.isTouchable = isTouchable;
+
+    }
+
+    public void setBackgroundImage(String imagePath){
+        Log.d(TAG, "setBackgroundImage: Started");
+
+        Bitmap originalImage = imageHelper.convertFileURLToBitmap(imagePath);
+
+        int w = originalImage.getWidth();
+        int h = originalImage.getHeight();
+
+        Log.d(TAG, "Width Background:" + w);
+        Log.d(TAG, "Height Background: " + h);
+
+        backgroundImage = Bitmap.createScaledBitmap(originalImage,screenWidth,screenHeight,false);
+
+        backgroundCanvas= new Canvas(backgroundImage.copy(Bitmap.Config.ARGB_8888, true));
+        invalidate();
+
     }
 
 }
