@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="96.000000dp"
+    android:height="96.000000dp"
+    android:viewportWidth="96.000000"
+    android:viewportHeight="96.000000">
+
+    <group
+        android:translateY="96.000000"
+        android:scaleX="0.100000"
+        android:scaleY="-0.100000">
+        <path
+            android:name="outer_box"
+            android:fillColor="#000000"
+            android:strokeWidth="1"
+            android:pathData="M10 480 l0 -480 470 0 470 0 0 480 0 480 -470 0 -470 0 0 -480z m920 0 l0 -460
+-450 0 -450 0 0 460 0 460 450 0 450 0 0 -460z" />
+        <path
+            android:name="pen_eraser"
+            android:fillColor="#000000"
+            android:strokeWidth="1"
+            android:pathData="M655 799 l-46 -42 73 -74 72 -73 34 33 c59 56 59 61 0 123 -77 81 -80 82 -133 33z" />
+        <path
+            android:name="pen_body"
+            android:fillColor="#000000"
+            android:strokeWidth="1"
+            android:pathData="M337 482 l-217 -217 0 -73 0 -72 73 0 72 0 220 220 220 220 -70 70 c-38 38 -72 70
+-75 70 -3 0 -103 -98 -223 -218z" />
+    </group>
+</vector>

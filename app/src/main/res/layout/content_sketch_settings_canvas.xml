@@ -16,19 +16,75 @@
         android:layout_height="wrap_content">
 
         <LinearLayout
+            android:id="@+id/linear_layout_1"
             android:orientation="horizontal"
             android:weightSum="100"
             android:layout_marginStart="10dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="70dp">
+
+            <android.support.v4.widget.Space
+                android:layout_weight="5"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content" />
 
             <ImageButton
+                android:id="@+id/sketch_canvas_color"
                 android:background="@drawable/table_background_white"
                 android:layout_margin="10dp"
                 android:padding="10dp"
-                android:layout_weight="25"
+                android:layout_weight="17"
                 android:layout_width="0dp"
-                android:layout_height="100dp" />
+                android:layout_height="match_parent" />
+
+            <ImageButton
+                android:id="@+id/sketch_canvas_grid"
+                android:src="@drawable/ic_sketch_grid"
+                android:scaleType="centerCrop"
+                android:background="@drawable/table_background_white"
+                android:layout_margin="10dp"
+                android:padding="10dp"
+                android:layout_weight="17"
+                android:layout_width="0dp"
+                android:layout_height="match_parent" />
+
+            <ImageButton
+                android:id="@+id/sketch_canvas_triangle"
+                android:background="@drawable/table_background_white"
+                android:src="@drawable/ic_symbol_triangle"
+                android:layout_margin="10dp"
+                android:padding="10dp"
+                android:layout_weight="17"
+                android:layout_width="0dp"
+                android:layout_height="match_parent" />
+
+            <ImageButton
+                android:id="@+id/sketch_canvas_circle"
+                android:background="@drawable/table_background_white"
+                android:src="@drawable/ic_symbol_circle"
+                android:layout_margin="10dp"
+                android:padding="10dp"
+                android:layout_weight="17"
+                android:layout_width="0dp"
+                android:layout_height="match_parent" />
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/linear_layout_2"
+            android:orientation="horizontal"
+            android:weightSum="100"
+            android:layout_marginStart="10dp"
+            android:layout_below="@id/linear_layout_1"
+            android:layout_width="match_parent"
+            android:layout_height="70dp">
+
+            <android.support.v4.widget.Space
+                android:layout_weight="5"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content" />
+
 
             <ImageButton
                 android:id="@+id/sketch_canvas_photo"
@@ -36,13 +92,22 @@
                 android:background="@drawable/table_background_white"
                 android:layout_margin="10dp"
                 android:padding="10dp"
-                android:layout_weight="25"
+                android:layout_weight="17"
                 android:layout_width="0dp"
-                android:layout_height="100dp" />
+                android:layout_height="match_parent" />
 
+
+            <SeekBar
+                android:id="@+id/seek_bar_background_alpha"
+                android:max="@integer/alpha_value_max"
+                android:layout_gravity="center"
+                android:progress="5"
+                android:padding="5dp"
+                android:layout_weight="60"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content" />
 
         </LinearLayout>
-
 
     </RelativeLayout>
 

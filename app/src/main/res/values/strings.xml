@@ -279,6 +279,14 @@
     <string name="sketch_dialog_delete_title"> Clear Canvas?</string>
     <string name="sketch_dialog_delete_summary">Your current drawing will be completely erased, do you want to proceed?</string>
 
+    <string name="sketch_menu_save">Save Sketch</string>
+    <string name="sketch_dialog_save_title"> Ready to Save?</string>
+    <string name="sketch_dialog_save_summary">Are you ready to save the drawing, do you want to proceed?</string>
+
+    <string name="sketch_new_validation_save_success">Sketch Saved!</string>
+    <string name="sketch_new_validation_save_failed">Error Saving Sketch.  Please try again.</string>
+
+
     <!-- ******************************Strings related to Settings****************************** -->
 
     <!--**************************Current Job Preferences**************************-->

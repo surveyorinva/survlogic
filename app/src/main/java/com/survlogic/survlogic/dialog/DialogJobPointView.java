@@ -25,6 +25,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.content.FileProvider;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,9 +42,11 @@ import com.survlogic.survlogic.activity.JobPointAddSketchActivity;
 import com.survlogic.survlogic.activity.JobPointsActivity;
 import com.survlogic.survlogic.activity.PhotoGalleryActivity;
 import com.survlogic.survlogic.adapter.PointGridImageAdapter;
+import com.survlogic.survlogic.adapter.PointGridSketchAdapter;
 import com.survlogic.survlogic.adapter.ProjectGridImageAdapter;
 import com.survlogic.survlogic.database.JobDatabaseHandler;
 import com.survlogic.survlogic.database.ProjectDatabaseHandler;
+import com.survlogic.survlogic.model.JobSketch;
 import com.survlogic.survlogic.model.PointGeodetic;
 import com.survlogic.survlogic.model.ProjectImages;
 import com.survlogic.survlogic.utils.MathHelper;
@@ -65,8 +68,9 @@ public class DialogJobPointView extends DialogFragment {
     private static final String TAG = "DialogJobPointView";
 
     private Context mContext;
-    private GridView gridView;
+    private GridView gridView, sketchGridView;
     private PointGridImageAdapter gridAdapter;
+    private PointGridSketchAdapter gridSketchAdapter;
 
     private static final int REQUEST_TAKE_PHOTO = 2;
     private static final int REQUEST_SELECT_PICTURE = 3;
@@ -75,6 +79,8 @@ public class DialogJobPointView extends DialogFragment {
     private static final int DELAY_TO_DIALOG = 1500;
     private static final int DELAY_TO_GRID = 1000;
 
+    private Handler showDataHandler, dialogHandler, gridHandler, sketchHandler;
+    private boolean isLoading = false, tryingToExit = false;
     private String mURLSyntex = "file://";
 
     private int pointNo, projectID, jobId, pointId;
@@ -146,8 +152,22 @@ public class DialogJobPointView extends DialogFragment {
         super.onResume();
         Log.d(TAG, "onResume: Started...");
         mContext = getActivity();
+        AlertDialog alertDialog = (AlertDialog) getDialog();
 
+        alertDialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
+            @Override
+            public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
+                if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP){
+                    Log.d(TAG, "onKey: Canceling All Handlers");
+                    showDataHandler.removeCallbacksAndMessages(null);
+                    dialogHandler.removeCallbacksAndMessages(null);
+                    gridHandler.removeCallbacksAndMessages(null);
 
+                    return false;
+                }
+                return false;
+            }
+        });
 
         preferenceLoaderHelper = new PreferenceLoaderHelper(mContext);
         loadPreferences();
@@ -156,6 +176,7 @@ public class DialogJobPointView extends DialogFragment {
         setOnClickListeners();
         showPointData();
         showGridView();
+        showSketchGridView();
 
         showDialogAnimation();
 
@@ -211,7 +232,11 @@ public class DialogJobPointView extends DialogFragment {
      * JAVA Methods
      */
     private void showPointData(){
-        new Handler().postDelayed(new Runnable() {
+
+        isLoading = true;
+        showDataHandler = new Handler();
+
+        showDataHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 boolean loadSuccess = initValuesFromObject();
@@ -219,6 +244,7 @@ public class DialogJobPointView extends DialogFragment {
                 if(loadSuccess){
                     pbProgressCircle.setVisibility(View.GONE);
                 }
+                isLoading = false;
             }
         },DELAY_TO_SHOW_DATA);
     }
@@ -227,6 +253,7 @@ public class DialogJobPointView extends DialogFragment {
         Log.d(TAG, "initViewWidgets: Started...");
 
         gridView = (GridView) getDialog().findViewById(R.id.photo_grid_view);
+        sketchGridView = (GridView) getDialog().findViewById(R.id.sketch_grid_view);
 
         tvPointNo = (TextView) getDialog().findViewById(R.id.pointNoValue);
         tvPointDesc = (TextView) getDialog().findViewById(R.id.pointDescValue);
@@ -255,6 +282,8 @@ public class DialogJobPointView extends DialogFragment {
     }
 
     private void setOnClickListeners(){
+        Log.d(TAG, "setOnClickListeners: Started...");
+
         btTakePhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -276,6 +305,17 @@ public class DialogJobPointView extends DialogFragment {
 
                 //viewPhotoDialog(item.getProjectId(),imageHelper.convertToBitmap(item.getImage()), position);
                 viewPhotoDialog(item.getProjectId(),item.getImagePath(), position);
+
+            }
+        });
+
+        sketchGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                JobSketch item = (JobSketch) parent.getItemAtPosition(position);
+
+                viewSketchDialog(item.getImagePath(),position,pointId);
+
 
             }
         });
@@ -373,16 +413,20 @@ public class DialogJobPointView extends DialogFragment {
     }
 
     private void showDialogAnimation(){
-        new Handler().postDelayed(new Runnable() {
+        isLoading = true;
+        dialogHandler = new Handler();
+
+        dialogHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 int width = getResources().getDisplayMetrics().widthPixels;
                 int height = getResources().getDisplayMetrics().heightPixels;
 
-                width = width - 100;
+                width = width - 20;
                 height = height - 100;
 
                 getDialog().getWindow().setLayout(width,height);
+                isLoading = false;
             }
         },DELAY_TO_DIALOG);
 
@@ -604,10 +648,28 @@ public class DialogJobPointView extends DialogFragment {
 
     private void showGridView(){
         Log.d(TAG, "showGridView: Started...");
-        new Handler().postDelayed(new Runnable() {
+        isLoading = true;
+
+        gridHandler = new Handler();
+        gridHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 initGridView();
+                isLoading = false;
+            }
+        },DELAY_TO_GRID);
+    }
+
+    private void showSketchGridView(){
+        Log.d(TAG, "showSketchGridView: Started...");
+        isLoading  = true;
+
+        sketchHandler = new Handler();
+        sketchHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                initSketchGridView();
+                isLoading = false;
             }
         },DELAY_TO_GRID);
     }
@@ -626,6 +688,24 @@ public class DialogJobPointView extends DialogFragment {
             gridView.setAdapter(gridAdapter);
             gridView.setVisibility(View.VISIBLE);
         }
+    }
+
+    private void initSketchGridView(){
+        Log.d(TAG, "initSketchGridView: Started...");
+
+        Log.d(TAG, "Data: ProjectID: " + projectID);
+        Log.d(TAG, "Data: JobID: " + jobId);
+        Log.d(TAG, "Data: pointID: " + pointId);
+
+        if(getSketchCount(pointId)){
+            Log.d(TAG, "initSketchGridView: getSketchCount = True");
+            gridSketchAdapter = new PointGridSketchAdapter(mContext, R.layout.layout_grid_imageview, mURLSyntex, getSketchFromPointData(pointId));
+            sketchGridView.setAdapter(gridSketchAdapter);
+            sketchGridView.setVisibility(View.VISIBLE);
+        }
+
+
+
     }
 
     private void refreshGridView() {
@@ -659,6 +739,20 @@ public class DialogJobPointView extends DialogFragment {
 
     }
 
+    private ArrayList<JobSketch> getSketchFromPointData(int pointId){
+        Log.d(TAG, "getSketchFromPointData: Connecting to db");
+
+        JobDatabaseHandler jobDb = new JobDatabaseHandler(mContext, databaseName);
+        SQLiteDatabase db = jobDb.getReadableDatabase();
+
+        ArrayList<JobSketch> jobSketches = new ArrayList<>(jobDb.getJobSketchesByPointID(db,pointId));
+
+        Log.d(TAG, "getSketchFromPointData: Closing DB Connection");
+        db.close();
+
+        return jobSketches;
+    }
+
     private boolean getImageCount(int projectId, int jobId, int pointId){
         Log.d(TAG, "getImageCount: Connecting to db");
         long count = 0;
@@ -679,6 +773,26 @@ public class DialogJobPointView extends DialogFragment {
         return results;
     }
 
+    private boolean getSketchCount(int pointId){
+        Log.d(TAG, "getSketchCount: Connecting to db");
+        long count = 0;
+        boolean results = false;
+        JobDatabaseHandler jobDb = new JobDatabaseHandler(mContext, databaseName);
+        SQLiteDatabase db = jobDb.getReadableDatabase();
+
+        count = JobDatabaseHandler.getCountJobSketchByPointID(db,pointId);
+        Log.d(TAG, "getSketchCount: Count = " + count);
+
+        if (count !=0){
+            results = true;
+        }
+
+        Log.d(TAG, "getSketchCount: Closing DB Connection");
+        db.close();
+
+        return results;
+    }
+
     private void viewPhotoDialog(Integer project_id, String imagePath, int position){
         if(position == 3){
             Intent intent = new Intent(mContext, PhotoGalleryActivity.class);
@@ -695,6 +809,24 @@ public class DialogJobPointView extends DialogFragment {
         }
 
     }
+
+    private void viewSketchDialog(String imagePath, int position, int pointId){
+        if(position == 3){
+            Intent intent = new Intent(mContext, PhotoGalleryActivity.class);
+            intent.putExtra("POINT_ID",pointId);
+            startActivity(intent);
+
+        }else{
+
+
+            FragmentManager fm = getActivity().getSupportFragmentManager();
+            DialogFragment viewDialog = DialogJobPointPhotoView.newInstance(projectID, jobId, pointId,mURLSyntex,imagePath);
+            viewDialog.show(getFragmentManager(),"dialog_view");
+
+        }
+    }
+
+
 
 
     //-------------------------------------------------------------------------------------------------------------------------//

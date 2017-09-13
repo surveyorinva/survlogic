@@ -22,6 +22,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
+
                 <ImageButton
                     android:id="@+id/sketch_menu_top_item_1"
                     android:background="@color/white"
@@ -51,16 +52,6 @@
                     android:layout_weight="50"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content" />
-
-                <ImageButton
-                    android:id="@+id/sketch_menu_top_item_3"
-                    android:background="@color/white"
-                    android:src="@drawable/ic_action_horizontal_menu"
-                    android:scaleType="fitCenter"
-                    android:padding="5dp"
-                    android:layout_weight="15"
-                    android:layout_width="0dp"
-                    android:layout_height="40dp" />
 
 
             </LinearLayout>

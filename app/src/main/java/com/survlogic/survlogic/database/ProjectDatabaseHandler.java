@@ -338,6 +338,8 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
         // Project MetaData
             project.setmDateCreated(c.getInt(c.getColumnIndex(ProjectContract.ProjectEntry.KEY_DATE_CREATED)));
 
+        c.close();
+
         return project;
     }
 

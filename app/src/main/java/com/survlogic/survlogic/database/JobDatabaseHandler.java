@@ -5,12 +5,15 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Environment;
 import android.util.Log;
 
+import com.survlogic.survlogic.model.JobSketch;
 import com.survlogic.survlogic.model.PointGeodetic;
 import com.survlogic.survlogic.model.PointSurvey;
 import com.survlogic.survlogic.model.ProjectJobSettings;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -24,7 +27,9 @@ public class JobDatabaseHandler extends SQLiteOpenHelper {
     private static final String TAG = "JobDatabaseHandler";
 
     //  Database Constants
-    private static final int DB_VERSION = 1;
+    private static final int DB_VERSION = 2;
+    private static final String APP_FOLDER = "SurvLogic";
+    private static final String JOB_FOLDER = "jobs";
     private String DB_NAME;
 
     // Table Creation Queries
@@ -83,9 +88,26 @@ public class JobDatabaseHandler extends SQLiteOpenHelper {
             + JobContract.PointEntry.KEY_DATE_CREATED + " INTEGER,"
             + JobContract.PointEntry.KEY_DATE_MODIFIED + " INTEGER);";
 
+    private static final String CREATE_TABLE_SKETCH = "CREATE TABLE "
+            + JobContract.SketchEntry.TABLE_NAME
+            + "("
+            + JobContract.SketchEntry.KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+            + JobContract.SketchEntry.KEY_POINT_ID + " INTEGER,"
+            + JobContract.SketchEntry.KEY_IMAGE_PATH + " TEXT,"
+            + JobContract.SketchEntry.KEY_IMAGE_PATH_BACKGROUND + " TEXT,"
+            + JobContract.SketchEntry.KEY_PATHS + " TEXT,"
+            + JobContract.SketchEntry.KEY_CANVAS_X + " INTEGER,"
+            + JobContract.SketchEntry.KEY_CANVAS_Y + " INTEGER,"
+            + JobContract.SketchEntry.KEY_DATE_CREATED + " INTEGER,"
+            + JobContract.SketchEntry.KEY_DATE_MODIFIED + " INTEGER);";
+
+
 
     public JobDatabaseHandler(Context context, String DB_NAME) {
-        super(context, DB_NAME, null, DB_VERSION);
+        super(context, Environment.getExternalStorageDirectory() +
+                File.separator + APP_FOLDER + File.separator + JOB_FOLDER + File.separator + DB_NAME,
+                null, DB_VERSION);
+
         Log.d(TAG,"Database connected " + DB_NAME );
 
         this.DB_NAME = DB_NAME;
@@ -96,6 +118,7 @@ public class JobDatabaseHandler extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_TABLE_SETTINGS);
         db.execSQL(CREATE_TABLE_POINTS);
+        db.execSQL(CREATE_TABLE_SKETCH);
         Log.d(TAG,"Tables created...");
     }
 
@@ -105,7 +128,7 @@ public class JobDatabaseHandler extends SQLiteOpenHelper {
 
         db.execSQL("DROP IF TABLE EXISTS " + JobContract.JobSettingsEntry.TABLE_NAME);
         db.execSQL("DROP IF TABLE EXISTS " + JobContract.PointEntry.TABLE_NAME);
-
+        db.execSQL("DROP IF TABLE EXISTS " + JobContract.SketchEntry.TABLE_NAME);
         onCreate(db);
 
     }
@@ -253,6 +276,40 @@ public class JobDatabaseHandler extends SQLiteOpenHelper {
         }
 
     }
+
+    /**
+     * Add Sketch to Database
+     */
+
+    public long addSketchToDB(SQLiteDatabase db, JobSketch jobSketch){
+        Log.d(TAG, "addSketchToDB: Started...");
+
+        ContentValues contentValues = new ContentValues();
+
+        //Required
+        contentValues.put(JobContract.SketchEntry.KEY_POINT_ID, jobSketch.getPoint_id());
+        contentValues.put(JobContract.SketchEntry.KEY_IMAGE_PATH, jobSketch.getImagePath());
+        contentValues.put(JobContract.SketchEntry.KEY_IMAGE_PATH_BACKGROUND, jobSketch.getBackgroundImagePath());
+        contentValues.put(JobContract.SketchEntry.KEY_PATHS, jobSketch.getPathsCreated());
+        contentValues.put(JobContract.SketchEntry.KEY_CANVAS_X, jobSketch.getCanvasX());
+        contentValues.put(JobContract.SketchEntry.KEY_CANVAS_Y, jobSketch.getCanvasY());
+
+        contentValues.put(JobContract.SketchEntry.KEY_DATE_CREATED,(int) (new Date().getTime()/1000));
+
+        Log.d(TAG, "addData: Adding Sketch to " + JobContract.PointEntry.TABLE_NAME);
+
+        Long result = db.insert(JobContract.SketchEntry.TABLE_NAME, null, contentValues);
+        db.close();
+
+        if (result==-1){
+            Log.d(TAG,"Error, Something went wrong...");
+            return -1;
+        } else {
+            Log.d(TAG,"Success, Row inserted into Table...");
+            return result;
+        }
+    }
+
 
     //Reading---------------------------------------------------------------------------------------//
 
@@ -437,6 +494,43 @@ public class JobDatabaseHandler extends SQLiteOpenHelper {
 
     }
 
+    public List<JobSketch> getJobSketchesByPointID(SQLiteDatabase db, int point_id){
+        Log.d(TAG, "getJobSketchesByPointID: Started...");
+        List<JobSketch> lstprojectSketches = new ArrayList<>();
+        String selectQuery = "SELECT * FROM " + JobContract.SketchEntry.TABLE_NAME+  " WHERE "
+                + JobContract.SketchEntry.KEY_POINT_ID+ " = " + point_id;
+
+        Log.d(TAG, "SketchesByPointID: " + selectQuery);
+
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        // looping through all rows and adding to list
+        if (c.moveToFirst()) {
+            do {
+
+                JobSketch jobSketches = new JobSketch();
+
+                //Required
+                jobSketches.setId(c.getInt((c.getColumnIndex(JobContract.SketchEntry.KEY_ID))));
+                jobSketches.setPoint_id(c.getInt((c.getColumnIndex(JobContract.SketchEntry.KEY_POINT_ID))));
+                jobSketches.setImagePath(c.getString((c.getColumnIndex(JobContract.SketchEntry.KEY_IMAGE_PATH))));
+
+                Log.d(TAG, "getJobSketchesByPointID: " + c.getString((c.getColumnIndex(JobContract.SketchEntry.KEY_IMAGE_PATH))));
+
+                jobSketches.setDateCreated(c.getInt(c.getColumnIndex(JobContract.SketchEntry.KEY_DATE_CREATED)));
+
+                lstprojectSketches.add(jobSketches);
+            } while (c.moveToNext());
+        }
+
+        Log.d(TAG, "getJobSketchesByPointID: Success");
+
+        c.close();
+
+
+        return lstprojectSketches;
+    }
+
     public boolean checkPointNumberExists(SQLiteDatabase db, int point_no){
         Log.d(TAG, "checkPointNumberExists: Starting");
         String selectQuery = "SELECT  * FROM " + JobContract.PointEntry.TABLE_NAME + " WHERE "
@@ -456,6 +550,20 @@ public class JobDatabaseHandler extends SQLiteOpenHelper {
         db.close();
 
         return results;
+
+    }
+
+    public static long getCountJobSketchByPointID(SQLiteDatabase db, int point_id){
+        Log.d(TAG, "getCountJobSketchByPointID: Starting...");
+
+        String countQuery = "SELECT * FROM " + JobContract.SketchEntry.TABLE_NAME +  " WHERE "
+                + JobContract.SketchEntry.KEY_POINT_ID + " = " + point_id;
+
+        Cursor cursor = db.rawQuery(countQuery, null);
+        int cnt = cursor.getCount();
+        cursor.close();
+
+        return cnt;
 
     }
 

@@ -39,10 +39,10 @@
     <RelativeLayout
         android:id="@+id/rl_brush_style"
         android:background="@color/white"
-        android:layout_below="@id/rl_brush_size"
-        android:layout_marginTop="10dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/rl_brush_size"
+        android:layout_alignParentStart="true">
 
         <LinearLayout
             android:orientation="horizontal"
@@ -57,14 +57,16 @@
             
             <ImageButton
                 android:id="@+id/sketch_pen"
-                android:background="@drawable/circle_image_sketch_pen"
+                android:src="@drawable/ic_general_edit"
+                android:background="@null"
                 android:layout_weight="15"
                 android:layout_width="0dp"
                 android:layout_height="50dp" />
 
             <ImageButton
                 android:id="@+id/sketch_eraser"
-                android:background="@drawable/circle_image_sketch_eraser"
+                android:src="@drawable/ic_sketch_eraser"
+                android:background="@null"
                 android:layout_marginStart="15dp"
                 android:layout_weight="15"
                 android:layout_width="0dp"

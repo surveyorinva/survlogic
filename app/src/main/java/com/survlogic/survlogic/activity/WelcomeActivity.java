@@ -1,6 +1,7 @@
 package com.survlogic.survlogic.activity;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -14,8 +15,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 
 import com.survlogic.survlogic.R;
+import com.survlogic.survlogic.utils.FileHelper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,16 +31,21 @@ import java.util.Map;
 
 public class WelcomeActivity extends AppCompatActivity {
 
+    private Context mContext;
+
     private static final String TAG = "WelcomeActivity";
     private static final int REQUEST_ID_MULTIPLE_PERMISSIONS = 10;
 
     private Button btNext;
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_welcome);
+        mContext = WelcomeActivity.this;
+
         Log.d(TAG, "onCreate: Started---------------------------->");
         initView();
 
@@ -54,6 +62,18 @@ public class WelcomeActivity extends AppCompatActivity {
                 checkAndRequestPermissions();
             }
         });
+
+        progressBar = (ProgressBar) findViewById(R.id.progressBar_Loading);
+
+    }
+
+    private void setupFolders(){
+        Log.d(TAG, "setupFolders: Started...");
+
+        FileHelper fileHelper = new FileHelper(mContext);
+        boolean results = fileHelper.createApplicationFolders();
+
+        Log.d(TAG, "Results of New Folders: " + results);
 
     }
 
@@ -97,6 +117,9 @@ public class WelcomeActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         Log.d(TAG, "Permission callback called-------");
+
+        progressBar.setVisibility(View.VISIBLE);
+
         switch (requestCode) {
             case REQUEST_ID_MULTIPLE_PERMISSIONS: {
 
@@ -117,6 +140,7 @@ public class WelcomeActivity extends AppCompatActivity {
                             && perms.get(Manifest.permission.INTERNET) == PackageManager.PERMISSION_GRANTED) {
                         Log.d(TAG, "permissions granted");
                         // process the normal flow
+                        setupFolders();
                         callMainActivity();
 
                         //else any one or both the permissions are not granted

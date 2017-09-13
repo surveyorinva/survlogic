@@ -2,6 +2,7 @@ package com.survlogic.survlogic.view;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapShader;
 import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -10,6 +11,7 @@ import android.graphics.MaskFilter;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PorterDuff;
+import android.graphics.Rect;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
@@ -41,17 +43,27 @@ public class SketchPointView extends View {
 
     private Canvas drawCanvas, backgroundCanvas;
     private Bitmap canvasBitmap, backgroundImage;
-    private Paint canvasPaint, drawPaint;
+    private Paint canvasPaint, drawPaint, drawBackground, bitmapAlphaCanvas, canvasCheckerboard;
     private Path drawPath;
 
     private static final int DEFAULT_COLOR = Color.BLACK;
     private static final int DEFAULT_BG_COLOR = Color.WHITE;
+    private static final int NONE = 0;
+    private static final int GRID_SMALL = 1;
+    private static final int SYMBOL_TRAVERSE = 2;
+    private static final int SYMBOL_MANHOLE = 3;
+
+    private int cellWidth = 50, cellHeight = 50;
+    private int cellRows = 0, cellColumns = 0;
+
     private int backgroundColor = DEFAULT_BG_COLOR;
-    private int paintColor;
+    private int paintColor, backgroundAlpha = 255;
     private float currentBrushSize, lastBrushSize;
     private boolean emboss, blur;
     private MaskFilter mEmboss, mBlur;
     private boolean isTouchable = true;
+
+    private int currentMode = 0;
 
     private int screenWidth, screenHeight;
 
@@ -60,24 +72,32 @@ public class SketchPointView extends View {
 
 
 
-
-
     public SketchPointView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
 
         imageHelper = new ImageHelper(context);
         initPaint();
+        initGridView();
+
 
     }
 
 
     private void initPaint(){
         canvasPaint = new Paint(Paint.DITHER_FLAG);
+        canvasCheckerboard = createCheckerBoard(10);
+
 
         currentBrushSize = getResources().getInteger(R.integer.small_size);
         lastBrushSize = currentBrushSize;
 
         paintColor = DEFAULT_COLOR;
+
+        drawBackground = new Paint();
+        drawBackground.setStyle(Paint.Style.STROKE);
+        drawBackground.setColor(Color.GRAY);
+
+        bitmapAlphaCanvas = new Paint();
 
         drawPaint = new Paint();
 
@@ -97,6 +117,9 @@ public class SketchPointView extends View {
 
     }
 
+    private void initGridView(){
+
+    }
 
 
     private void pen_normal(){
@@ -122,6 +145,12 @@ public class SketchPointView extends View {
 
     }
 
+    private void clear_canvas_background(){
+        drawCanvas.drawColor(0, PorterDuff.Mode.CLEAR);
+        backgroundCanvas = null;
+
+    }
+
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
@@ -139,6 +168,12 @@ public class SketchPointView extends View {
 
         canvasBitmap = Bitmap.createBitmap(w,h,Bitmap.Config.ARGB_8888);
         drawCanvas = new Canvas(canvasBitmap);
+
+        cellRows = (screenWidth/cellWidth) + 100;
+        cellColumns = (screenHeight/cellHeight) + 100;
+
+        Log.d(TAG, "initView: Cell " + cellRows + "/" + cellColumns);
+
     }
 
     @Override
@@ -148,11 +183,50 @@ public class SketchPointView extends View {
         canvas.save();
         if (backgroundCanvas != null){
             Log.d(TAG, "BackgroundCanvas is not null ");
-            drawCanvas.drawBitmap(backgroundImage,0,0,null);
+            Log.d(TAG, "Current Alpha: " + backgroundAlpha);
+
+            drawCanvas.drawColor(0, PorterDuff.Mode.CLEAR);
+
+            bitmapAlphaCanvas.setAlpha(backgroundAlpha);
+            drawCanvas.drawBitmap(backgroundImage,0,0,bitmapAlphaCanvas);
 
             Log.d(TAG, "Background canvas drawn");
         }else{
-            drawCanvas.drawColor(backgroundColor);
+
+            switch(currentMode){
+                case NONE:
+                    Log.d(TAG, "onDraw: Drawing Color Only");
+                    drawCanvas.drawColor(backgroundColor);
+                    break;
+
+                case GRID_SMALL:
+                    Log.d(TAG, "onDraw: Drawing Grid");
+                    drawCanvas.drawColor(backgroundColor);
+
+                    for (int i = 0; i < cellRows; i++)
+                    {
+                        Log.d(TAG, "onDraw: Drawing " + cellRows + " rows");
+                        drawCanvas.drawLine(0, i * cellHeight, screenWidth, i * cellHeight, drawBackground);
+                    }
+
+                    for (int i = 0; i < cellColumns; i++)
+                    {
+                        Log.d(TAG, "onDraw: Drawing " + cellColumns + " columns");
+                        drawCanvas.drawLine(i * cellWidth, 0, i * cellWidth, screenHeight, drawBackground);
+                    }
+
+
+                    break;
+
+                case SYMBOL_TRAVERSE:
+                    drawTriangle(drawCanvas,screenWidth/2, screenHeight/2, 50, drawPaint, drawPaint);
+                    break;
+
+                case SYMBOL_MANHOLE:
+                    drawCircle(drawCanvas,screenWidth/2, screenHeight/2, 100, drawPaint, drawPaint);
+                    break;
+            }
+
         }
 
 
@@ -253,8 +327,13 @@ public class SketchPointView extends View {
 
 
     public void eraseAll(){
-        drawCanvas.drawColor(0, PorterDuff.Mode.CLEAR);
-        invalidate();
+        clear_canvas_background();
+        clear_canvas();
+    }
+
+    public void resetBackground(){
+        clear_canvas_background();
+
     }
 
     public void onClickUndo(){
@@ -298,6 +377,15 @@ public class SketchPointView extends View {
         return lastBrushSize;
     }
 
+    public int getCurrentAlphaValue(){
+        return backgroundAlpha;
+    }
+
+    public void setAlphaValue(int alphaValue){
+        backgroundAlpha = alphaValue;
+        invalidate();
+    }
+
     public int getCurrentBrushColor(){
         return paintColor;
     }
@@ -313,6 +401,46 @@ public class SketchPointView extends View {
 
     public void setTouchable(boolean isTouchable){
         this.isTouchable = isTouchable;
+
+    }
+
+    public void setBackgroundColor(){
+        Log.d(TAG, "setBackgroundColor: Started");
+
+        currentMode = NONE;
+        backgroundImage = null;
+
+        invalidate();
+
+    }
+
+    public void setBackgroundGrid(){
+        Log.d(TAG, "setBackgroundGrid: Started");
+
+        currentMode = GRID_SMALL;
+        backgroundImage = null;
+
+        invalidate();
+
+    }
+
+    public void setBackgroundTriangle(){
+        Log.d(TAG, "setBackgroundGrid: Started");
+
+        currentMode = SYMBOL_TRAVERSE;
+        backgroundImage = null;
+
+        invalidate();
+
+    }
+
+    public void setBackgroundCircle(){
+        Log.d(TAG, "setBackgroundGrid: Started");
+
+        currentMode = SYMBOL_MANHOLE;
+        backgroundImage = null;
+
+        invalidate();
 
     }
 
@@ -332,6 +460,73 @@ public class SketchPointView extends View {
         backgroundCanvas= new Canvas(backgroundImage.copy(Bitmap.Config.ARGB_8888, true));
         invalidate();
 
+    }
+
+    public void setBackgroundImage(Bitmap originalImage){
+        Log.d(TAG, "setBackgroundImage: Started");
+
+        int w = originalImage.getWidth();
+        int h = originalImage.getHeight();
+
+        Log.d(TAG, "Width Background:" + w);
+        Log.d(TAG, "Height Background: " + h);
+
+        backgroundImage = Bitmap.createScaledBitmap(originalImage,screenWidth,screenHeight,false);
+
+        backgroundCanvas= new Canvas(backgroundImage.copy(Bitmap.Config.ARGB_8888, true));
+        invalidate();
+    }
+
+    private void drawTriangle(Canvas c, float x, float y, int TRI_RADIUS, Paint fillPaint, Paint strokePaint) {
+        float x1, y1;  // Top
+        x1 = x;
+        y1 = y - TRI_RADIUS;
+
+        float x2, y2; // Lower left
+        x2 = x - TRI_RADIUS;
+        y2 = y + TRI_RADIUS;
+
+        float x3, y3; // Lower right
+        x3 = x + TRI_RADIUS;
+        y3 = y + TRI_RADIUS;
+
+        Path path = new Path();
+        path.setFillType(Path.FillType.EVEN_ODD);
+        path.moveTo(x1, y1);
+        path.lineTo(x2, y2);
+        path.lineTo(x3, y3);
+        path.lineTo(x1, y1);
+        path.close();
+
+        c.drawPath(path, fillPaint);
+        c.drawPath(path, strokePaint);
+    }
+
+    private void drawCircle(Canvas c, float x, float y, int CIRCLE_RADIUS, Paint fillPaint, Paint strokePaint) {
+
+        c.drawCircle(x, y, CIRCLE_RADIUS, fillPaint);
+        c.drawCircle(x, y, CIRCLE_RADIUS, strokePaint);
+
+
+    }
+
+    private Paint createCheckerBoard(int pixelSize)
+    {
+        Bitmap bitmap = Bitmap.createBitmap(pixelSize * 2, pixelSize * 2, Bitmap.Config.ARGB_8888);
+
+        Paint fill = new Paint(Paint.ANTI_ALIAS_FLAG);
+        fill.setStyle(Paint.Style.FILL);
+        fill.setColor(0x22000000);
+
+        Canvas canvas = new Canvas(bitmap);
+        Rect rect = new Rect(0, 0, pixelSize, pixelSize);
+        canvas.drawRect(rect, fill);
+        rect.offset(pixelSize, pixelSize);
+        canvas.drawRect(rect, fill);
+
+        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        paint.setShader(new BitmapShader(bitmap, BitmapShader.TileMode.REPEAT, BitmapShader.TileMode.REPEAT));
+        return paint;
     }
 
 }

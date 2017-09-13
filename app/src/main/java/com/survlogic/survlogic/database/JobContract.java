@@ -31,6 +31,24 @@ public class JobContract {
 
     }
 
+    public static abstract class SketchEntry {
+
+        public static final String TABLE_NAME = "sketch_table";
+
+        public static final String KEY_ID = "id";
+        public static final String KEY_POINT_ID = "pointID";
+        public static final String KEY_IMAGE_PATH = "image_path";
+        public static final String KEY_IMAGE_PATH_BACKGROUND = "background_image_path";
+        public static final String KEY_PATHS = "paths";
+        public static final String KEY_CANVAS_X = "canvas_x";
+        public static final String KEY_CANVAS_Y = "canvas_y";
+        public static final String KEY_DATE_CREATED = "created";
+        public static final String KEY_DATE_MODIFIED = "modified";
+
+    }
+
+
+
     public static abstract class JobSettingsEntry{
 
         public static final String TABLE_NAME = "settings_table";
