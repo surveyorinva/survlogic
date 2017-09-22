@@ -77,8 +77,6 @@ public class SketchPointView extends View {
 
         imageHelper = new ImageHelper(context);
         initPaint();
-        initGridView();
-
 
     }
 
@@ -117,9 +115,6 @@ public class SketchPointView extends View {
 
     }
 
-    private void initGridView(){
-
-    }
 
 
     private void pen_normal(){

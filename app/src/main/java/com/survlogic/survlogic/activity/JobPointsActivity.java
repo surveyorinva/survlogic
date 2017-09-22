@@ -26,6 +26,7 @@ import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.fragment.JobPointsHomeFragment;
 import com.survlogic.survlogic.fragment.JobPointsListFragment;
+import com.survlogic.survlogic.fragment.JobPointsMapFragment;
 import com.survlogic.survlogic.model.ProjectJobSettings;
 import com.survlogic.survlogic.utils.BottomNavigationViewHelper;
 
@@ -143,9 +144,9 @@ public class JobPointsActivity extends AppCompatActivity implements NavigationVi
         Log.d(TAG, "initViewWidgets: Starting...");
 
         Bundle extras = getIntent().getExtras();
-        project_id = extras.getInt("PROJECT_ID");
-        job_id = extras.getInt("JOB_ID");
-        jobDatabaseName = extras.getString("JOB_DB_NAME");
+        project_id = extras.getInt(getString(R.string.KEY_PROJECT_ID));
+        job_id = extras.getInt(getString(R.string.KEY_JOB_ID));
+        jobDatabaseName = extras.getString(getString(R.string.KEY_JOB_DATABASE));
         Log.d(TAG, "||Database|| : " + jobDatabaseName);
 
         rlLayout2 = (RelativeLayout) findViewById(R.id.relLayout_2) ;
@@ -207,6 +208,13 @@ public class JobPointsActivity extends AppCompatActivity implements NavigationVi
                         ACTIVITY_NUM = 2;
                         menuItem = menu.getItem(ACTIVITY_NUM);
                         menuItem.setChecked(false);
+
+
+                        JobPointsMapFragment containerFragment3 = new JobPointsMapFragment();
+                        containerFragment3.setArguments(getIntent().getExtras());
+
+                        swapFragment(containerFragment3,false,"MAP");
+
 
                         break;
 

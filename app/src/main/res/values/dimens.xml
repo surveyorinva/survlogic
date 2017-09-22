@@ -64,4 +64,5 @@
     <integer name="alpha_value_min">10</integer>
     <integer name="alpha_value_max">255</integer>
 
+
 </resources>

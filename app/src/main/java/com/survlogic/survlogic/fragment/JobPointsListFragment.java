@@ -67,9 +67,9 @@ public class JobPointsListFragment extends Fragment {
     private void initViewWidgets(View v){
         Log.d(TAG, "initViewWidgets: Starting...");
         Bundle extras = getArguments();
-        project_id = extras.getInt("PROJECT_ID");
-        job_id = extras.getInt("JOB_ID");
-        jobDatabaseName = extras.getString("JOB_DB_NAME");
+        project_id = extras.getInt(getString(R.string.KEY_PROJECT_ID));
+        job_id = extras.getInt(getString(R.string.KEY_JOB_ID));
+        jobDatabaseName = extras.getString(getString(R.string.KEY_JOB_DATABASE));
         Log.d(TAG, "Database: " + jobDatabaseName);
 
 

@@ -124,7 +124,9 @@
             android:name=".activity.SettingsCurrentJobActivity"
             android:parentActivityName=".activity.JobHomeActivity" />
 
-
+        <activity android:name=".activity.PlanarMapActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/SuperMaterialTheme"/>
 
     </application>
 

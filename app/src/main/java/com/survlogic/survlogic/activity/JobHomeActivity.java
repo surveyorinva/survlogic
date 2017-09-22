@@ -154,9 +154,9 @@ public class JobHomeActivity extends AppCompatActivity implements NavigationView
             case R.id.menu_item2_id:
                 //Go To Points Menu
                 Intent i = new Intent(this, JobPointsActivity.class);
-                i.putExtra("PROJECT_ID",project_id);
-                i.putExtra("JOB_ID", job_id);
-                i.putExtra("JOB_DB_NAME", jobDatabaseName);
+                i.putExtra(getString(R.string.KEY_PROJECT_ID),project_id);
+                i.putExtra(getString(R.string.KEY_JOB_ID), job_id);
+                i.putExtra(getString(R.string.KEY_JOB_DATABASE), jobDatabaseName);
 
                 startActivity(i);
                 overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
@@ -164,7 +164,7 @@ public class JobHomeActivity extends AppCompatActivity implements NavigationView
                 break;
 
             case R.id.menu_item3_id:
-                //Action here
+
                 break;
 
             case R.id.menu_item4_id:
