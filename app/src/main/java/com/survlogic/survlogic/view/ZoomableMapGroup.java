@@ -1,22 +1,27 @@
 package com.survlogic.survlogic.view;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.PointF;
+import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.survlogic.survlogic.interf.MapZoomListener;
+
 /**
  * Created by chrisfillmore on 9/4/2017.
  */
 
-public class ZoomableViewGroup extends ViewGroup {
+public class ZoomableMapGroup extends ViewGroup {
 
     private static final String TAG = "ZoomableViewGroup";
+    private Context mContext;
 
     // these matrices will be used to move and zoom image
     private Matrix matrix = new Matrix();
@@ -34,11 +39,19 @@ public class ZoomableViewGroup extends ViewGroup {
     private float[] lastEvent = null;
 
     private boolean initZoomApplied=false;
-
+    private boolean isZooming = false;
+    
     private float[] mDispatchTouchEventWorkingArray = new float[2];
     private float[] mOnTouchEventWorkingArray = new float[2];
 
     private float overallScale = 1;
+    private AttributeSet attrs;
+    private PlanarMapView planarMapView;
+    private PlanarMapScaleView planarMapScaleView;
+
+    private int planMapScaleDistance;
+    private Rect clipBounds_canvas;
+    private MapZoomListener mapZoomListener;
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
@@ -60,19 +73,24 @@ public class ZoomableViewGroup extends ViewGroup {
         return a;
     }
 
-    public ZoomableViewGroup(Context context) {
+    public ZoomableMapGroup(Context context) {
         super(context);
+        this.mContext = context;
         init(context);
+
     }
 
-    public ZoomableViewGroup(Context context, AttributeSet attrs) {
+    public ZoomableMapGroup(Context context, AttributeSet attrs) {
         super(context, attrs);
+        this.attrs = attrs;
+        this.mContext = context;
         init(context);
     }
 
-    public ZoomableViewGroup(Context context, AttributeSet attrs,
-                             int defStyleAttr) {
+    public ZoomableMapGroup(Context context, AttributeSet attrs,
+                            int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        this.attrs = attrs;
         init(context);
     }
 
@@ -96,9 +114,15 @@ public class ZoomableViewGroup extends ViewGroup {
 
 
     private void init(Context context){
+        planarMapView = new PlanarMapView(context, attrs);
+        planarMapScaleView = new PlanarMapScaleView(context,attrs);
 
     }
 
+    public void setOnMapZoomListener(MapZoomListener listener){
+        mapZoomListener = listener;
+
+    }
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
@@ -173,6 +197,8 @@ public class ZoomableViewGroup extends ViewGroup {
         canvas.save();
         canvas.setMatrix(matrix);
         super.dispatchDraw(canvas);
+        clipBounds_canvas = canvas.getClipBounds();
+        planMapScaleDistance = planarMapView.getMapScale(clipBounds_canvas);
         canvas.restore();
     }
 
@@ -224,15 +250,8 @@ public class ZoomableViewGroup extends ViewGroup {
                     if (newDist > 10f) {
                         matrix.set(savedMatrix);
                         float scale = (newDist / oldDist);
-                        Log.d(TAG, "Scale: " + scale);
 
-                        float scaleInstance = scale - 1;
-                        Log.d(TAG, "Instance Scale: " + scaleInstance);
-
-                        overallScale = overallScale * scaleInstance;
-
-                        Log.d(TAG, "Overall Scale: " + overallScale);
-
+                        //planMapScaleDistance = planarMapView.getMapScale(clipBounds_canvas);
 
                         matrix.postScale(scale, scale, mid.x, mid.y);
                         matrix.invert(matrixInverse);
@@ -242,7 +261,12 @@ public class ZoomableViewGroup extends ViewGroup {
         }
 
         invalidate();
+
+        mapZoomListener.onReturnValues(clipBounds_canvas,planMapScaleDistance);
+
         return true;
     }
+
+
 
 }

@@ -1,6 +1,7 @@
 package com.survlogic.survlogic.fragment;
 
 
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -16,8 +17,12 @@ import com.survlogic.survlogic.background.BackgroundSurveyPointList;
 import com.survlogic.survlogic.background.BackgroundSurveyPointMap;
 import com.survlogic.survlogic.dialog.DialogJobPointEntryAdd;
 import com.survlogic.survlogic.dialog.DialogJobPointView;
+import com.survlogic.survlogic.interf.MapZoomListener;
 import com.survlogic.survlogic.model.PointSurvey;
+import com.survlogic.survlogic.view.PlanarMapScaleView;
+import com.survlogic.survlogic.view.PlanarMapView;
 import com.survlogic.survlogic.view.SortablePointSurveyTableView;
+import com.survlogic.survlogic.view.ZoomableMapGroup;
 
 import de.codecrafters.tableview.listeners.SwipeToRefreshListener;
 import de.codecrafters.tableview.listeners.TableDataClickListener;
@@ -36,7 +41,10 @@ public class JobPointsMapFragment extends Fragment {
     private int project_id, job_id;
     private String jobDatabaseName;
 
-
+    private FloatingActionButton fabOptions;
+    PlanarMapView planarMapView;
+    PlanarMapScaleView planarScaleMapView;
+    ZoomableMapGroup zoomableMapGroup;
 
     @Nullable
     @Override
@@ -69,12 +77,31 @@ public class JobPointsMapFragment extends Fragment {
         jobDatabaseName = extras.getString(getString(R.string.KEY_JOB_DATABASE));
         Log.d(TAG, "Database: " + jobDatabaseName);
 
+        fabOptions = (FloatingActionButton) v.findViewById(R.id.layout_options);
 
+        zoomableMapGroup = (ZoomableMapGroup) v.findViewById(R.id.zoomableMapView);
+        planarMapView = (PlanarMapView) v.findViewById(R.id.map_view);
+        planarScaleMapView = (PlanarMapScaleView) v.findViewById(R.id.legendScale);
     }
 
 
     private void setOnClickListener(View v){
         Log.d(TAG, "setOnClickListener: Starting...");
+
+        fabOptions.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "onClick: Pushed");
+            }
+        });
+
+        zoomableMapGroup.setOnMapZoomListener(new MapZoomListener() {
+            @Override
+            public void onReturnValues(Rect zoomRect, int scaleDistance) {
+                Log.d(TAG, "I am Listening: Distance Is: " + scaleDistance);
+                planarScaleMapView.setScale(scaleDistance);
+            }
+        });
 
 
     }
@@ -96,6 +123,6 @@ public class JobPointsMapFragment extends Fragment {
         backgroundSurveyPointMap.execute();
 
     }
-    
+
 
 }

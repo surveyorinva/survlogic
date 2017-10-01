@@ -174,7 +174,6 @@ public class GpsSurveySkyViewFragment extends Fragment implements GpsSurveyListe
     private void initSatStatusGrid(){
             Log.e(TAG,"Start: initSatStatusGRID");
 
-
         mFlagUsa = ResourcesCompat.getDrawable(getResources(),R.drawable.ic_flag_usa,null);
         mFlagChina = ResourcesCompat.getDrawable(getResources(),R.drawable.ic_flag_china,null);
         mFlagGalileo = ResourcesCompat.getDrawable(getResources(),R.drawable.ic_flag_galileo,null);

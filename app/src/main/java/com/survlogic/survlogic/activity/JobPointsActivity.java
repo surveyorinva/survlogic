@@ -213,7 +213,7 @@ public class JobPointsActivity extends AppCompatActivity implements NavigationVi
                         JobPointsMapFragment containerFragment3 = new JobPointsMapFragment();
                         containerFragment3.setArguments(getIntent().getExtras());
 
-                        swapFragment(containerFragment3,false,"MAP");
+                        swapFragment(containerFragment3,false,"MAP_VIEW");
 
 
                         break;
