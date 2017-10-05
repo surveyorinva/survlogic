@@ -9,9 +9,9 @@ import android.graphics.Rect;
 public interface MapZoomListener {
 
 
-    void onReturnValues(Rect zoomRect, int scaleDistance);
+    void onReturnValues(Rect zoomRect);
 
-
+    void onTouchOnPoint(float X, float Y);
 
 
 }

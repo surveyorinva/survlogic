@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/fabRelativeSelect"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginTop="?attr/actionBarSize"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:orientation="vertical">
+
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fabSelect"
+        android:elevation="6dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_action_crop_info"
+        android:scaleType="center"
+        app:backgroundTint="@color/app_blue_dark"
+        app:fabSize="normal"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"/>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fabSelectByTouch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@null"
+        android:scaleType="center"
+        app:backgroundTint="@android:color/holo_green_light"
+        app:fabSize="mini"
+        android:layout_above="@id/fabSelect"
+        android:layout_marginStart="7dp"
+        android:layout_marginBottom="10dp"
+        android:visibility="invisible"/>
+
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fabSelectByFence"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@null"
+        android:scaleType="center"
+        app:backgroundTint="@android:color/holo_green_dark"
+        app:fabSize="mini"
+        android:layout_above="@id/fabSelect"
+        android:layout_marginStart="7dp"
+        android:layout_marginBottom="60dp"
+        android:visibility="invisible"/>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fabSelectBySearch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@null"
+        app:backgroundTint="@android:color/holo_green_dark"
+        app:fabSize="mini"
+        android:layout_above="@id/fabSelect"
+        android:layout_marginStart="7dp"
+        android:layout_marginBottom="110dp"
+        android:visibility="invisible"/>
+
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/cardSelectByTouch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:cardBackgroundColor="@color/cardview_light_background"
+        app:cardCornerRadius="@dimen/map_cardCornerRadius"
+        app:cardElevation="@dimen/map_cardElevation"
+        app:cardUseCompatPadding="true"
+        android:visibility="invisible"
+        android:layout_alignBottom="@+id/fabSelectByTouch"
+        android:layout_toEndOf="@+id/fabSelect">
+        <TextView
+            android:id="@+id/tvFabSelectByTouch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/map_menu_select_by_point"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textStyle="bold"
+            android:paddingRight="@dimen/map_cardview_horizontal_padding"
+            android:paddingLeft="@dimen/map_cardview_horizontal_padding"
+            android:paddingBottom="@dimen/map_cardview_vertical_padding"
+            android:paddingTop="@dimen/map_cardview_vertical_padding" />
+    </android.support.v7.widget.CardView>
+
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/cardSelectBySearch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:cardBackgroundColor="@color/cardview_light_background"
+        app:cardCornerRadius="@dimen/map_cardCornerRadius"
+        app:cardElevation="@dimen/map_cardElevation"
+        app:cardUseCompatPadding="true"
+        android:visibility="invisible"
+        android:layout_alignBottom="@+id/fabSelectBySearch"
+        android:layout_toEndOf="@+id/fabSelect">
+
+        <TextView
+            android:id="@+id/tvFabSelectBySearch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="@string/map_menu_select_by_search"
+            android:textStyle="bold"
+            android:paddingRight="@dimen/map_cardview_horizontal_padding"
+            android:paddingLeft="@dimen/map_cardview_horizontal_padding"
+            android:paddingBottom="@dimen/map_cardview_vertical_padding"
+            android:paddingTop="@dimen/map_cardview_vertical_padding" />
+
+    </android.support.v7.widget.CardView>
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/cardSelectByFence"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:cardBackgroundColor="@color/cardview_light_background"
+        app:cardCornerRadius="@dimen/map_cardCornerRadius"
+        app:cardElevation="@dimen/map_cardElevation"
+        app:cardUseCompatPadding="true"
+        android:visibility="invisible"
+        android:layout_alignBottom="@+id/fabSelectByFence"
+        android:layout_toEndOf="@+id/fabSelect">
+
+        <TextView
+            android:id="@+id/tvFabSelectByFence"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/map_menu_select_by_fence"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textStyle="bold"
+            android:paddingRight="@dimen/map_cardview_horizontal_padding"
+            android:paddingLeft="@dimen/map_cardview_horizontal_padding"
+            android:paddingBottom="@dimen/map_cardview_vertical_padding"
+            android:paddingTop="@dimen/map_cardview_vertical_padding" />
+
+    </android.support.v7.widget.CardView>
+
+</RelativeLayout>

@@ -6,6 +6,7 @@ import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.graphics.Rect;
+import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -13,6 +14,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.survlogic.survlogic.interf.MapZoomListener;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Created by chrisfillmore on 9/4/2017.
@@ -31,7 +35,11 @@ public class ZoomableMapGroup extends ViewGroup {
     private static final int NONE = 0;
     private static final int DRAG = 1;
     private static final int ZOOM = 2;
+    private static final int SELECT = 3;
     private int mode = NONE;
+    private int historyMode = NONE;
+    private ArrayList<Integer> historyArray;
+
     // remember some things for zooming
     private PointF start = new PointF();
     private PointF mid = new PointF();
@@ -49,9 +57,10 @@ public class ZoomableMapGroup extends ViewGroup {
     private PlanarMapView planarMapView;
     private PlanarMapScaleView planarMapScaleView;
 
-    private int planMapScaleDistance;
     private Rect clipBounds_canvas;
     private MapZoomListener mapZoomListener;
+
+    private float lastTouchX, lastTouchY;
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
@@ -117,6 +126,8 @@ public class ZoomableMapGroup extends ViewGroup {
         planarMapView = new PlanarMapView(context, attrs);
         planarMapScaleView = new PlanarMapScaleView(context,attrs);
 
+        historyArray = new ArrayList<>();
+        historyArray.add(NONE);
     }
 
     public void setOnMapZoomListener(MapZoomListener listener){
@@ -198,9 +209,12 @@ public class ZoomableMapGroup extends ViewGroup {
         canvas.setMatrix(matrix);
         super.dispatchDraw(canvas);
         clipBounds_canvas = canvas.getClipBounds();
-        planMapScaleDistance = planarMapView.getMapScale(clipBounds_canvas);
+        //planMapScaleDistance = planarMapView.getMapScale(clipBounds_canvas);
         canvas.restore();
     }
+
+
+
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
@@ -234,15 +248,39 @@ public class ZoomableMapGroup extends ViewGroup {
                 //d = rotation(event);
                 break;
             case MotionEvent.ACTION_UP:
+
+                //convert view coordinates to canvas coordinates
+                float[] m = new float[9];
+                matrix.getValues(m);
+
+                float transX = m[Matrix.MTRANS_X] * -1;
+                float transY = m[Matrix.MTRANS_Y] * -1;
+                float scaleX = m[Matrix.MSCALE_X];
+                float scaleY = m[Matrix.MSCALE_Y];
+
+                lastTouchX =  ((event.getX() + transX) / scaleX);
+                lastTouchY =  ((event.getY() + transY) / scaleY);
+
+                lastTouchX = Math.abs(lastTouchX);
+                lastTouchY = Math.abs(lastTouchY);
+
+
             case MotionEvent.ACTION_POINTER_UP:
                 mode = NONE;
                 lastEvent = null;
+                mapZoomListener.onTouchOnPoint(lastTouchX, lastTouchY);
+
                 break;
             case MotionEvent.ACTION_MOVE:
                 if (mode == DRAG) {
+
                     matrix.set(savedMatrix);
                     float dx = event.getX() - start.x;
                     float dy = event.getY() - start.y;
+
+                    double touchRadius = Math.sqrt((dx*dx) + (dy*dy));
+
+
                     matrix.postTranslate(dx, dy);
                     matrix.invert(matrixInverse);
                 } else if (mode == ZOOM) {
@@ -262,7 +300,7 @@ public class ZoomableMapGroup extends ViewGroup {
 
         invalidate();
 
-        mapZoomListener.onReturnValues(clipBounds_canvas,planMapScaleDistance);
+        mapZoomListener.onReturnValues(clipBounds_canvas);
 
         return true;
     }

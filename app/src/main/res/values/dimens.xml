@@ -65,4 +65,10 @@
     <integer name="alpha_value_max">255</integer>
 
 
+    <!--Map FAB-->
+    <dimen name="map_cardCornerRadius">4dp</dimen>
+    <dimen name="map_cardElevation">4dp</dimen>
+    <dimen name="map_cardview_horizontal_padding">6dp</dimen>
+    <dimen name="map_cardview_vertical_padding">2dp</dimen>
+
 </resources>

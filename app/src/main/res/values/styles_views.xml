@@ -118,6 +118,13 @@
 
     </style>
 
+    <style name="Button.Flat.Primary.Map">
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textColor">@color/button_text</item>
+        <item name="android:background">@drawable/button_ripple_semi_transparent_blue</item>
+
+    </style>
+
     <style name="Button.Flat.Primary.Save">
         <item name="android:textAllCaps">true</item>
         <item name="android:textColor">@color/button_text</item>

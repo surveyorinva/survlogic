@@ -12,8 +12,11 @@ import android.graphics.Point;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 
 import com.survlogic.survlogic.R;
@@ -31,10 +34,12 @@ import java.util.List;
 public class PlanarMapView extends View {
 
     private static final String TAG = "PlanarMapView";
+    private Context mContext;
 
-    private Canvas drawCanvas, backgroundCanvas, drawPlanarCanvas, scaleCanvas;
+    private Canvas drawCanvas, drawPlanarCanvas, scaleCanvas;
     private Bitmap canvasBitmap, planarCanvas, scaleBitmap;
-    private Paint canvasPaint, drawPaint, drawBackground, bitmapAlphaCanvas, canvasCheckerboard, scaleBarPaint, scaleTextPaint;
+    private Paint canvasPaint, drawPaint, drawBackground, bitmapAlphaCanvas, scaleBarPaint;
+    private Paint drawSelectedFill, drawSelectedStroke;
     private Path drawPath;
 
     private static final int DEFAULT_COLOR = Color.WHITE;
@@ -59,11 +64,20 @@ public class PlanarMapView extends View {
     private ArrayList<Double> lstNorthings = new ArrayList<>();
     private ArrayList<Double> lstEasting = new ArrayList<>();
 
+    private ArrayList<PointSurvey> lstSelectedPoints = new ArrayList<>();
+
     private double mapScaleZoomIn = 1, mapScaleZoomOut = 1;
     private Rect clipBounds_canvas, originalBounds_canvas;
 
+    private float screenDistance, symbolSize, textSize;
+    private static float scaleRatioSymbol= 0.08f, scaleRatioText = 0.1f;
+    private float drawingTouchRadius = 30;
+
+    private boolean mLongClick = false;
+
     public PlanarMapView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
+        this.mContext = context;
 
         initPaint();
 
@@ -99,33 +113,20 @@ public class PlanarMapView extends View {
 
         drawPaint.setStrokeWidth(currentBrushSize);
 
+        drawSelectedFill = new Paint();
+        drawSelectedFill.setStyle(Paint.Style.FILL);
+        drawSelectedFill.setColor((ContextCompat.getColor(mContext, R.color.red_primary)));
+
+        drawSelectedStroke = new Paint();
+        drawSelectedStroke.setStyle(Paint.Style.STROKE);
+        drawSelectedStroke.setColor(Color.RED);
+        drawSelectedStroke.setStrokeWidth(2);
+        drawSelectedStroke.setAntiAlias(true);
 
     }
 
 
-    private void initScale(){
-        Log.d(TAG, "initScale: Start...");
-        int scaleWidth = screenWidth/4;
-        int scaleHeight = (int) (screenHeight * 0.1);
 
-        Log.d(TAG, "initScale: Width/Height: " + scaleWidth + "x" + scaleHeight);
-
-        scaleBitmap = Bitmap.createBitmap(scaleWidth,scaleHeight,Bitmap.Config.ARGB_8888);
-        scaleCanvas = new Canvas(scaleBitmap);
-
-
-        scaleBarPaint = new Paint();
-        scaleTextPaint = new Paint();
-
-        scaleBarPaint.setColor(Color.WHITE);
-        scaleBarPaint.setStyle(Paint.Style.STROKE);
-        scaleBarPaint.setStrokeJoin(Paint.Join.ROUND);
-        scaleBarPaint.setStrokeCap(Paint.Cap.ROUND);
-        scaleBarPaint.setAntiAlias(true);
-
-
-
-    }
     private void initView(int w, int h){
         screenWidth = w;
         screenHeight = h;
@@ -140,9 +141,9 @@ public class PlanarMapView extends View {
     private void initPoints(){
         Log.d(TAG, "||initPoints: Started...");
         Log.d(TAG, "initPoints: Planar Scale: " + planarScale);
+
         for(int i=0; i<lstPoints.size(); i++) {
             PointSurvey pointSurvey = lstPoints.get(i);
-            lstPointNo.add(pointSurvey.getPoint_no());
             lstNorthings.add(pointSurvey.getNorthing());
             lstEasting.add(pointSurvey.getEasting());
         }
@@ -174,16 +175,16 @@ public class PlanarMapView extends View {
             planarScale = planarHeightScale;
         }
 
-        Log.d(TAG, "initView: Planar Scale Set: " + planarScale);
-        Log.d(TAG, "initPoints: Creating Canvas");
-
         planarCanvas = Bitmap.createBitmap(screenWidth,screenHeight,Bitmap.Config.ARGB_8888);
         drawPlanarCanvas = new Canvas(planarCanvas);
         originalBounds_canvas = drawPlanarCanvas.getClipBounds();
 
+        screenDistance = getInitialMapScaleDistance(0,screenWidth);
+        Log.d(TAG, "initPoints: Screen Distance: " + screenDistance);
+
+        setObjectSize(screenDistance);
+
         invalidate();
-
-
 
     }
 
@@ -196,17 +197,37 @@ public class PlanarMapView extends View {
 
     }
 
-    public int getMapScale(Rect viewBounds_canvas){
+    public float getInitialMapScaleDistance(float x1, float x2){
+        float value1 = (float) convertCanvasCoordinatesX(x1);
+        float value2 = (float) convertCanvasCoordinatesX(x2);
 
+        currentScreenScale = screenWidth/(value2-value1);
+
+        Log.d(TAG, "getInitialMapScaleDistance: Zoom Width: " + (value2-value1));
+        Log.d(TAG, "Screen Scale: " + currentScreenScale + " Planar Scale:" + planarScale);
+
+        currentScreenOriginX = x1;
+
+        Log.d(TAG, "getInitialMapScaleDistance: Origin:" + currentScreenOriginX + ", " + currentScreenOriginY);
+
+        float results = (value2- value1);
+
+        return results;
+
+    }
+
+
+    public float getMapScaleDistance(Rect viewBounds_canvas){
+        Log.d(TAG, "getMapScaleDistance: Started...");
         float x1 = viewBounds_canvas.left;
         float x2 = viewBounds_canvas.right;
 //
-        double n1 = convertCanvasCoordinates(x1);
-        double n2 = convertCanvasCoordinates(x2);
+        float value1 = (float) convertCanvasCoordinatesX(x1);
+        float value2 = (float) convertCanvasCoordinatesX(x2);
 
-        currentScreenScale = screenWidth/(n2-n1);
+        currentScreenScale = screenWidth/(value2-value1);
 
-        Log.d(TAG, "setMapScale: Zoom Width: " + (n2-n1));
+        Log.d(TAG, "setMapScale: Zoom Width: " + (value2-value1));
         Log.d(TAG, "Screen Scale: " + currentScreenScale + " Planar Scale:" + planarScale);
 
         currentScreenOriginX = x1;
@@ -214,7 +235,7 @@ public class PlanarMapView extends View {
 
         Log.d(TAG, "setMapScale: Origin:" + currentScreenOriginX + ", " + currentScreenOriginY);
 
-        int results = ((int) n2- (int) n1)/2;
+        float results = ( value2- value1);
 
         return results;
 
@@ -231,17 +252,75 @@ public class PlanarMapView extends View {
 
     public void setMap(){
         initPoints();
-        initScale();
+
     }
 
-    private double convertCanvasCoordinates(float x1){
-        Log.d(TAG, "convertCanvasCoordinates: Started");
+
+    public void setObjectSize(float scaleDistance){
+        Log.d(TAG, "setObjectSize: Started...");
+        this.symbolSize = scaleDistance * scaleRatioSymbol;
+
+        this.textSize = scaleDistance * scaleRatioText;
+
+        this.screenDistance = scaleDistance;
+
+
+    }
+
+    public void eraseAll(){
+        clear_canvas_background();
+    }
+
+
+    public void setDrawingTouchRadius(float touchRadius){
+        Log.d(TAG, "setdrawingTouchRadius: Started");
+
+        this.drawingTouchRadius = touchRadius;
+    }
+
+    public float getDrawingTouchRadius(){
+        Log.d(TAG, "getDrawingTouchRadius: Started");
+
+        return drawingTouchRadius;
+    }
+
+
+    private double convertCanvasCoordinatesX(float x1){
+        Log.d(TAG, "convertCanvasCoordinatesX: Started");
 
         double results = (x1/planarScale) + fakeOriginX;
 
         return results;
 
     }
+
+    private double convertCanvasCoordinatesY(float y1){
+        Log.d(TAG, "convertCanvasCoordinatesY: Started");
+
+        double results = (y1/planarScale) + fakeOriginY;
+
+        Log.i(TAG, "convertCanvasCoordinatesY: Results: " + results);
+
+        return results;
+
+    }
+
+    private double convertPlanarCoordinatesX(float e1){
+        Log.d(TAG, "convertPlanarCoordinatesX: Started...");
+
+        return (e1 - fakeOriginX) * planarScale;
+
+
+    }
+
+    private double convertPlanarCoordinatesY(float n1){
+        Log.d(TAG, "convertPlanarCoordinatesY: Started...");
+
+        return(fakeOriginY - n1) * planarScale;
+
+    }
+
+
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -259,6 +338,12 @@ public class PlanarMapView extends View {
         }
 
 
+        if(lstSelectedPoints!=null && lstSelectedPoints.size()>0){
+            Log.d(TAG, "onDraw: Selected Points = Added");
+            createPointsSelected(canvas);
+        }
+
+
         canvas.restore();
 
     }
@@ -272,31 +357,51 @@ public class PlanarMapView extends View {
             double deltaNorth = (fakeOriginY - pointNorth) * planarScale;
             int deltaNorthScaled = (int) deltaNorth;
 
+            double pointEast = pointSurvey.getEasting();
+            double deltaEast = (pointEast - fakeOriginX) * planarScale;
+            int deltaEastScaled = (int) deltaEast;
+
+            //drawing points as a cross for now
+            //drawing points as color white
+            int symbolColor = Color.WHITE;
+
+            Log.i(TAG, "POINT: " + String.valueOf(pointSurvey.getPoint_no()) + ":" + deltaNorthScaled + ", " + deltaEastScaled);
+            drawCross(c,deltaEastScaled, deltaNorthScaled,symbolSize, symbolColor);
+
+
+            if(showPointNo){
+               drawPointNo(c, deltaEastScaled, deltaNorthScaled, String.valueOf(pointSurvey.getPoint_no()),textSize,Color.WHITE );
+            }
+
+        }
+    }
+
+    private void createPointsSelected(Canvas c){
+        Log.d(TAG, "createPointsAll: Started");
+
+        for(int i=0; i<lstSelectedPoints.size(); i++) {
+            PointSurvey pointSurvey = lstSelectedPoints.get(i);
+            double pointNorth = pointSurvey.getNorthing();
+            double deltaNorth = (fakeOriginY - pointNorth) * planarScale;
+            int deltaNorthScaled = (int) deltaNorth;
 
             double pointEast = pointSurvey.getEasting();
             double deltaEast = (pointEast - fakeOriginX) * planarScale;
             int deltaEastScaled = (int) deltaEast;
 
-            Log.d(TAG, "||createPointsAllPoint No. : " + pointSurvey.getPoint_no());
-
             int symbolColor = Color.WHITE;
-            int symbolSize = 10;
 
-            drawCross(c,deltaEastScaled, deltaNorthScaled,symbolSize, symbolColor,1);
-            //drawCircle(c, deltaEastScaled, deltaNorthScaled, 10, 1, drawPaint, drawPaint);
-
-            if(showPointNo){
-                Log.d(TAG, "createPointsAll: planarScale: " + planarScale);
-                double textScale = 100 * planarScale;
-
-               drawPointNo(c, deltaEastScaled, deltaNorthScaled, String.valueOf(pointSurvey.getPoint_no()),10,Color.WHITE );
-            }
+            Log.i(TAG, "POINT: " + String.valueOf(pointSurvey.getPoint_no()) + ":" + deltaNorthScaled + ", " + deltaEastScaled);
+            drawCircle(c,deltaEastScaled,deltaNorthScaled,symbolSize,drawSelectedFill,drawSelectedStroke);
 
         }
     }
 
 
     private void drawPointNo(Canvas c, float x, float y, String pointNumber, float textSize, int textColor){
+
+        float textBufferX = symbolSize;
+        float textBufferY = symbolSize;
 
         Paint paintPointNo;
         Rect rectTextBounds = new Rect();
@@ -311,14 +416,58 @@ public class PlanarMapView extends View {
         int textHeight = rectTextBounds.height();
         int textWidth = rectTextBounds.width();
 
-        float startX = x + 10;
-        float startY = y - 10;
+        float startX = x + textBufferX;
+        float startY = y - textBufferY;
 
         c.drawText(pointNumber,startX,startY,paintPointNo);
 
     }
 
-    private void drawCircle(Canvas c, float x, float y, int CIRCLE_RADIUS, double scale, Paint fillPaint, Paint strokePaint) {
+
+
+    public ArrayList<PointSurvey> checkPointForTouch(float touchX, float touchY){
+        Log.d(TAG, "checkPointForTouch: Started");
+
+
+
+        for(int i=0; i<lstPoints.size(); i++) {
+            Log.i(TAG, "checkPointForTouch: Cycling through Points...............................................");
+            PointSurvey pointSurvey = lstPoints.get(i);
+
+            float surveyX = (float) pointSurvey.getEasting();
+            float surveyY = (float) pointSurvey.getNorthing();
+
+            float canvasX = (float) convertPlanarCoordinatesX(surveyX);
+            float canvasY = (float) convertPlanarCoordinatesY(surveyY);
+
+            double dx = Math.pow(touchX - canvasX,2);
+            double dy = Math.pow(touchY - canvasY,2);
+
+            double sumCoordinates = dx + dy;
+
+            double powerRadius = Math.pow(drawingTouchRadius,2);
+
+            if (dx + dy < Math.pow(drawingTouchRadius,2)){
+                Log.i(TAG, "checkPointForTouch: Point " + String.valueOf(pointSurvey.getPoint_no()) + " TOUCHED!");
+                lstSelectedPoints.add(lstPoints.get(i));
+                invalidate();
+            }
+
+        }
+
+        return lstSelectedPoints;
+    }
+
+    public void clearPointSelection(){
+        lstSelectedPoints.clear();
+        invalidate();
+    }
+
+
+
+
+
+    private void drawCircle(Canvas c, float x, float y, float CIRCLE_RADIUS, Paint fillPaint, Paint strokePaint) {
         Log.d(TAG, "drawCircle: Started...");
         c.drawCircle(x, y, CIRCLE_RADIUS, fillPaint);
         c.drawCircle(x, y, CIRCLE_RADIUS, strokePaint);
@@ -326,7 +475,7 @@ public class PlanarMapView extends View {
 
     }
 
-    private void drawTriangle(Canvas c, float x, float y, int TRIANGLE_RADIUS, Paint fillPaint, Paint strokePaint) {
+    private void drawTriangle(Canvas c, float x, float y, float TRIANGLE_RADIUS, Paint fillPaint, Paint strokePaint) {
         Log.d(TAG, "drawTriangle: Started...");
         float x1, y1;  // Top
         x1 = x;
@@ -352,8 +501,14 @@ public class PlanarMapView extends View {
         c.drawPath(path, strokePaint);
     }
 
-    private void drawCross(Canvas c, float x, float y, int LINE_RADIUS, int lineColor, float lineWidth){
+    private void drawCross(Canvas c, float x, float y, float LINE_RADIUS, int lineColor){
         Log.d(TAG, "drawCross: Started...");
+        Log.d(TAG, "drawCross: Line Radius Minimum: " + LINE_RADIUS);
+
+        if(LINE_RADIUS < 2.5){
+            LINE_RADIUS = 2.5f;
+        }
+
         float x0, y0;
         x0 = x;
         y0 = y;
@@ -384,7 +539,10 @@ public class PlanarMapView extends View {
         paintLine.setStrokeCap(Paint.Cap.ROUND);
         paintLine.setColor(lineColor);
 
-        paintLine.setStrokeWidth(lineWidth);
+        float lineWidth = 0.01f;
+        float scaledLineWidth = lineWidth * screenDistance;
+
+        paintLine.setStrokeWidth(scaledLineWidth);
 
 
         Path path = new Path();
@@ -405,7 +563,7 @@ public class PlanarMapView extends View {
 
     }
 
-    private void drawSquare(Canvas c, float x, float y, int LINE_RADIUS, int lineColor, float lineWidth){
+    private void drawSquare(Canvas c, float x, float y, float LINE_RADIUS, int lineColor, float lineWidth){
         float x0, y0;
         x0 = x;
         y0 = y;
@@ -449,6 +607,13 @@ public class PlanarMapView extends View {
         path.close();
 
         c.drawPath(path,paintLine);
+    }
+
+
+    private void clear_canvas_background(){
+        drawPlanarCanvas.drawColor(0, PorterDuff.Mode.CLEAR);
+        invalidate();
+
     }
 
 

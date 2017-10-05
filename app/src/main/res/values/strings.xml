@@ -286,6 +286,14 @@
     <string name="sketch_new_validation_save_success">Sketch Saved!</string>
     <string name="sketch_new_validation_save_failed">Error Saving Sketch.  Please try again.</string>
 
+    <!--Map FAB-->
+    <string name="map_menu_select_by_point">Select by touch</string>
+    <string name="map_menu_select_by_fence">Select by fence</string>
+    <string name="map_menu_select_by_search">Search by Point No.</string>
+
+    <string name="map_action_touch_action_1">Info</string>
+    <string name="map_action_touch_action_2">Inverse</string>
+    <string name="map_action_touch_action_3">Del</string>
 
     <!-- ******************************Strings related to Settings****************************** -->
 

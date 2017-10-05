@@ -77,6 +77,7 @@ public class PlanarMapScaleView extends View implements MapScale {
         scaleBarPaint.setStyle(Paint.Style.STROKE);
         scaleBarPaint.setStrokeJoin(Paint.Join.ROUND);
         scaleBarPaint.setStrokeCap(Paint.Cap.ROUND);
+        scaleBarPaint.setStrokeWidth(5);
         scaleBarPaint.setAntiAlias(true);
 
         scaleTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -107,12 +108,12 @@ public class PlanarMapScaleView extends View implements MapScale {
         canvas.drawBitmap(scaleBitmap, 0, 0, scaleBarPaint);
         scaleCanvas.drawColor(Color.BLACK);
 
-        drawScaleBar(canvas,0,0,screenWidth,screenHeight,Color.WHITE, 5);
+        drawScaleBar(canvas,0,0,screenWidth,screenHeight);
         drawScaleDistance(canvas,0,0,screenWidth,screenHeight,Color.WHITE, 5);
 
     }
 
-    private void drawScaleBar(Canvas c, float x, float y, int screen_Width, int screen_Height, int lineColor, float lineWidth){
+    private void drawScaleBar(Canvas c, float x, float y, int screen_Width, int screen_Height){
         Log.d(TAG, "createScaleBar: Started");
         float startLeft = 10 ;
         float startRight = 10;
