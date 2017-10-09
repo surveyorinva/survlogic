@@ -6,7 +6,7 @@
         android:duration="300"
         android:fromXScale="0"
         android:fromYScale="0"
-        android:interpolator="@android:anim/linear_interpolator"
+        android:interpolator="@android:anim/anticipate_overshoot_interpolator"
         android:pivotX="50%"
         android:pivotY="50%"
         android:toXScale="1"
@@ -17,7 +17,7 @@
         android:duration="500"
         android:fromXDelta="0%"
         android:fromYDelta="60%"
-        android:interpolator="@android:anim/linear_interpolator"
+        android:interpolator="@android:anim/anticipate_overshoot_interpolator"
         android:toXDelta="0%"
         android:toYDelta="0%"
 

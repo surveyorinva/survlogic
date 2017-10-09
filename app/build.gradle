@@ -34,20 +34,20 @@ dependencies {
     //Circle Image View
     compile 'de.hdodenhof:circleimageview:2.1.0'
 
-    //Glide - Possible look to delete this
+    //Glide - Used in the GPS Functionality
     compile 'com.github.bumptech.glide:glide:4.0.0-RC0'
 
     //Maps Play Services
-    compile 'com.google.android.gms:play-services-maps:11.0.2'
+    compile 'com.google.android.gms:play-services-maps:11.0.4'
 
-    //Universal Image Loader
+    //Universal Image Loader (https://github.com/nostra13/Android-Universal-Image-Loader)
     compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
 
-    //Bottom Navigation ViewEX
+    //Bottom Navigation ViewEX (https://github.com/ittianyu/BottomNavigationViewEx)
     compile 'com.github.ittianyu:BottomNavigationViewEx:1.2.2'
 
-    //SortableTable View
-    compile 'de.codecrafters.tableview:tableview:2.6.0'
+    //SortableTable View (https://github.com/ISchwarz23/SortableTableView)
+    compile 'de.codecrafters.tableview:tableview:2.8.0'
 
     //Photoview
     compile 'com.github.chrisbanes:PhotoView:2.1.3'

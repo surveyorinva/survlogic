@@ -295,6 +295,10 @@
     <string name="map_action_touch_action_2">Inverse</string>
     <string name="map_action_touch_action_3">Del</string>
 
+    <string name="map_action_fence_action_1">List</string>
+    <string name="map_action_fence_action_2">Inverse</string>
+    <string name="map_action_fence_action_3">Del</string>
+
     <!-- ******************************Strings related to Settings****************************** -->
 
     <!--**************************Current Job Preferences**************************-->

@@ -6,11 +6,13 @@ import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.EmbossMaskFilter;
+import android.graphics.MaskFilter;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
+import android.graphics.Region;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
@@ -22,6 +24,7 @@ import android.view.View;
 import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.dialog.DialogProjectDescriptionAdd;
 import com.survlogic.survlogic.model.PointSurvey;
+import com.survlogic.survlogic.model.SketchFingerPath;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,7 +43,7 @@ public class PlanarMapView extends View {
     private Bitmap canvasBitmap, planarCanvas, scaleBitmap;
     private Paint canvasPaint, drawPaint, drawBackground, bitmapAlphaCanvas, scaleBarPaint;
     private Paint drawSelectedFill, drawSelectedStroke;
-    private Path drawPath;
+    private Paint fencePaint;
 
     private static final int DEFAULT_COLOR = Color.WHITE;
     private static final int DEFAULT_BG_COLOR = Color.WHITE;
@@ -74,6 +77,8 @@ public class PlanarMapView extends View {
     private float drawingTouchRadius = 30;
 
     private boolean mLongClick = false;
+    private boolean isTouchable = true;
+
 
     public PlanarMapView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -97,11 +102,11 @@ public class PlanarMapView extends View {
 
         currentBrushSize = getResources().getInteger(R.integer.small_size);
 
-        drawBackground = new Paint();
+        drawBackground = new Paint(Paint.DITHER_FLAG);
         drawBackground.setStyle(Paint.Style.STROKE);
         drawBackground.setColor(Color.GRAY);
 
-        bitmapAlphaCanvas = new Paint();
+        bitmapAlphaCanvas = new Paint(Paint.DITHER_FLAG);
 
         drawPaint = new Paint();
         drawPaint.setAntiAlias(true);
@@ -113,11 +118,11 @@ public class PlanarMapView extends View {
 
         drawPaint.setStrokeWidth(currentBrushSize);
 
-        drawSelectedFill = new Paint();
+        drawSelectedFill = new Paint(Paint.DITHER_FLAG);
         drawSelectedFill.setStyle(Paint.Style.FILL);
         drawSelectedFill.setColor((ContextCompat.getColor(mContext, R.color.red_primary)));
 
-        drawSelectedStroke = new Paint();
+        drawSelectedStroke = new Paint(Paint.DITHER_FLAG);
         drawSelectedStroke.setStyle(Paint.Style.STROKE);
         drawSelectedStroke.setColor(Color.RED);
         drawSelectedStroke.setStrokeWidth(2);
@@ -297,11 +302,7 @@ public class PlanarMapView extends View {
     private double convertCanvasCoordinatesY(float y1){
         Log.d(TAG, "convertCanvasCoordinatesY: Started");
 
-        double results = (y1/planarScale) + fakeOriginY;
-
-        Log.i(TAG, "convertCanvasCoordinatesY: Results: " + results);
-
-        return results;
+        return (y1/planarScale) + fakeOriginY;
 
     }
 
@@ -365,7 +366,6 @@ public class PlanarMapView extends View {
             //drawing points as color white
             int symbolColor = Color.WHITE;
 
-            Log.i(TAG, "POINT: " + String.valueOf(pointSurvey.getPoint_no()) + ":" + deltaNorthScaled + ", " + deltaEastScaled);
             drawCross(c,deltaEastScaled, deltaNorthScaled,symbolSize, symbolColor);
 
 
@@ -391,7 +391,6 @@ public class PlanarMapView extends View {
 
             int symbolColor = Color.WHITE;
 
-            Log.i(TAG, "POINT: " + String.valueOf(pointSurvey.getPoint_no()) + ":" + deltaNorthScaled + ", " + deltaEastScaled);
             drawCircle(c,deltaEastScaled,deltaNorthScaled,symbolSize,drawSelectedFill,drawSelectedStroke);
 
         }
@@ -431,7 +430,6 @@ public class PlanarMapView extends View {
 
 
         for(int i=0; i<lstPoints.size(); i++) {
-            Log.i(TAG, "checkPointForTouch: Cycling through Points...............................................");
             PointSurvey pointSurvey = lstPoints.get(i);
 
             float surveyX = (float) pointSurvey.getEasting();
@@ -448,7 +446,6 @@ public class PlanarMapView extends View {
             double powerRadius = Math.pow(drawingTouchRadius,2);
 
             if (dx + dy < Math.pow(drawingTouchRadius,2)){
-                Log.i(TAG, "checkPointForTouch: Point " + String.valueOf(pointSurvey.getPoint_no()) + " TOUCHED!");
                 lstSelectedPoints.add(lstPoints.get(i));
                 invalidate();
             }
@@ -456,6 +453,38 @@ public class PlanarMapView extends View {
         }
 
         return lstSelectedPoints;
+    }
+
+    public ArrayList<PointSurvey> checkPointForFence(Region region) {
+        Log.d(TAG, "checkPointForFence: Started");
+
+
+
+        for(int i=0; i<lstPoints.size(); i++) {
+            PointSurvey pointSurvey = lstPoints.get(i);
+
+            float surveyX = (float) pointSurvey.getEasting();
+            float surveyY = (float) pointSurvey.getNorthing();
+
+            float canvasX = (float) convertPlanarCoordinatesX(surveyX);
+            float canvasY = (float) convertPlanarCoordinatesY(surveyY);
+
+            Point point = new Point();
+            point.set((int) canvasX, (int) canvasY);
+
+            if (region.contains(point.x, point.y)) {
+                // Within the path.
+                lstSelectedPoints.add(lstPoints.get(i));
+                invalidate();
+            }
+
+        }
+
+        return lstSelectedPoints;
+
+
+
+
     }
 
     public void clearPointSelection(){

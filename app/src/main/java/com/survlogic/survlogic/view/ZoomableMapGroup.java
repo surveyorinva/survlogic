@@ -2,10 +2,20 @@ package com.survlogic.survlogic.view;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.DashPathEffect;
+import android.graphics.EmbossMaskFilter;
+import android.graphics.MaskFilter;
 import android.graphics.Matrix;
+import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.PointF;
+import android.graphics.PorterDuff;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -13,7 +23,9 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.interf.MapZoomListener;
+import com.survlogic.survlogic.model.SketchFingerPath;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -61,6 +73,25 @@ public class ZoomableMapGroup extends ViewGroup {
     private MapZoomListener mapZoomListener;
 
     private float lastTouchX, lastTouchY;
+
+    //version 2
+    private boolean isZoomMode = true;
+
+    private ArrayList<SketchFingerPath> paths = new ArrayList<>();
+    private ArrayList<SketchFingerPath> undoPaths = new ArrayList<>();
+    private Path drawFencePath;
+    private float mX, mY, mOriginX, mOriginY;
+    private static final float TOUCH_TOLERANCE = 4;
+
+    private Paint drawFencePaint;
+    private int paintFenceColor, backgroundAlpha = 255;
+    private float currentBrushSize;
+    private MaskFilter mFenceEmboss, mFenceBlur;
+    private boolean embossFence, blurFence;
+    private Canvas selectionCanvas;
+
+    RectF canvasRectF;
+
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
@@ -128,6 +159,8 @@ public class ZoomableMapGroup extends ViewGroup {
 
         historyArray = new ArrayList<>();
         historyArray.add(NONE);
+
+        initFencePaint();
     }
 
     public void setOnMapZoomListener(MapZoomListener listener){
@@ -209,7 +242,31 @@ public class ZoomableMapGroup extends ViewGroup {
         canvas.setMatrix(matrix);
         super.dispatchDraw(canvas);
         clipBounds_canvas = canvas.getClipBounds();
-        //planMapScaleDistance = planarMapView.getMapScale(clipBounds_canvas);
+
+        selectionCanvas = canvas;
+
+        for (SketchFingerPath fp : paths){
+            drawFencePaint.setColor(fp.color);
+            drawFencePaint.setStrokeWidth(fp.strokeWidth);
+            drawFencePaint.setMaskFilter(null);
+
+            if (fp.emboss){
+                drawFencePaint.setMaskFilter(mFenceEmboss);
+            }else if(fp.blur){
+                drawFencePaint.setMaskFilter(mFenceBlur);
+
+            }
+
+            selectionCanvas.drawPath(fp.path,drawFencePaint);
+
+
+        }
+
+        //QC Check of bounds rectangle
+//        if(canvasRectF !=null){
+//            selectionCanvas.drawRect(canvasRectF,drawFencePaint);
+//        }
+
         canvas.restore();
     }
 
@@ -218,92 +275,247 @@ public class ZoomableMapGroup extends ViewGroup {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        // handle touch events here
-        mOnTouchEventWorkingArray[0] = event.getX();
-        mOnTouchEventWorkingArray[1] = event.getY();
+        if(isZoomMode) {
+            // handle touch events here
+            mOnTouchEventWorkingArray[0] = event.getX();
+            mOnTouchEventWorkingArray[1] = event.getY();
 
-        mOnTouchEventWorkingArray = scaledPointsToScreenPoints(mOnTouchEventWorkingArray);
+            mOnTouchEventWorkingArray = scaledPointsToScreenPoints(mOnTouchEventWorkingArray);
 
-        event.setLocation(mOnTouchEventWorkingArray[0], mOnTouchEventWorkingArray[1]);
-
-        switch (event.getAction() & MotionEvent.ACTION_MASK) {
-            case MotionEvent.ACTION_DOWN:
-                savedMatrix.set(matrix);
-                start.set(event.getX(), event.getY());
-                mode = DRAG;
-                lastEvent = null;
-                break;
-            case MotionEvent.ACTION_POINTER_DOWN:
-                oldDist = spacing(event);
-                if (oldDist > 10f) {
+            event.setLocation(mOnTouchEventWorkingArray[0], mOnTouchEventWorkingArray[1]);
+            switch (event.getAction() & MotionEvent.ACTION_MASK) {
+                case MotionEvent.ACTION_DOWN:
                     savedMatrix.set(matrix);
-                    midPoint(mid, event);
-                    mode = ZOOM;
-                }
-                lastEvent = new float[4];
-                lastEvent[0] = event.getX(0);
-                lastEvent[1] = event.getX(1);
-                lastEvent[2] = event.getY(0);
-                lastEvent[3] = event.getY(1);
-                //d = rotation(event);
-                break;
-            case MotionEvent.ACTION_UP:
-
-                //convert view coordinates to canvas coordinates
-                float[] m = new float[9];
-                matrix.getValues(m);
-
-                float transX = m[Matrix.MTRANS_X] * -1;
-                float transY = m[Matrix.MTRANS_Y] * -1;
-                float scaleX = m[Matrix.MSCALE_X];
-                float scaleY = m[Matrix.MSCALE_Y];
-
-                lastTouchX =  ((event.getX() + transX) / scaleX);
-                lastTouchY =  ((event.getY() + transY) / scaleY);
-
-                lastTouchX = Math.abs(lastTouchX);
-                lastTouchY = Math.abs(lastTouchY);
-
-
-            case MotionEvent.ACTION_POINTER_UP:
-                mode = NONE;
-                lastEvent = null;
-                mapZoomListener.onTouchOnPoint(lastTouchX, lastTouchY);
-
-                break;
-            case MotionEvent.ACTION_MOVE:
-                if (mode == DRAG) {
-
-                    matrix.set(savedMatrix);
-                    float dx = event.getX() - start.x;
-                    float dy = event.getY() - start.y;
-
-                    double touchRadius = Math.sqrt((dx*dx) + (dy*dy));
-
-
-                    matrix.postTranslate(dx, dy);
-                    matrix.invert(matrixInverse);
-                } else if (mode == ZOOM) {
-                    float newDist = spacing(event);
-                    if (newDist > 10f) {
-                        matrix.set(savedMatrix);
-                        float scale = (newDist / oldDist);
-
-                        //planMapScaleDistance = planarMapView.getMapScale(clipBounds_canvas);
-
-                        matrix.postScale(scale, scale, mid.x, mid.y);
-                        matrix.invert(matrixInverse);
+                    start.set(event.getX(), event.getY());
+                    mode = DRAG;
+                    lastEvent = null;
+                    break;
+                case MotionEvent.ACTION_POINTER_DOWN:
+                    oldDist = spacing(event);
+                    if (oldDist > 10f) {
+                        savedMatrix.set(matrix);
+                        midPoint(mid, event);
+                        mode = ZOOM;
                     }
-                }
-                break;
+                    lastEvent = new float[4];
+                    lastEvent[0] = event.getX(0);
+                    lastEvent[1] = event.getX(1);
+                    lastEvent[2] = event.getY(0);
+                    lastEvent[3] = event.getY(1);
+                    //d = rotation(event);
+                    break;
+                case MotionEvent.ACTION_UP:
+
+                    convertCoordinatesToCanvas(event.getX(),event.getY());
+
+                case MotionEvent.ACTION_POINTER_UP:
+                    mode = NONE;
+                    lastEvent = null;
+                    mapZoomListener.onTouchOnPoint(lastTouchX, lastTouchY);
+
+                    break;
+                case MotionEvent.ACTION_MOVE:
+                    if (mode == DRAG) {
+
+                        matrix.set(savedMatrix);
+                        float dx = event.getX() - start.x;
+                        float dy = event.getY() - start.y;
+
+                        double touchRadius = Math.sqrt((dx * dx) + (dy * dy));
+
+
+                        matrix.postTranslate(dx, dy);
+                        matrix.invert(matrixInverse);
+                    } else if (mode == ZOOM) {
+                        float newDist = spacing(event);
+                        if (newDist > 10f) {
+                            matrix.set(savedMatrix);
+                            float scale = (newDist / oldDist);
+
+                            //planMapScaleDistance = planarMapView.getMapScale(clipBounds_canvas);
+
+                            matrix.postScale(scale, scale, mid.x, mid.y);
+                            matrix.invert(matrixInverse);
+                        }
+                    }
+                    break;
+            }
+
+            invalidate();
+
+            mapZoomListener.onReturnValues(clipBounds_canvas);
+        }else{
+            float touchX = event.getX();
+            float touchY = event.getY();
+
+            int action = event.getActionMasked();
+
+            switch (event.getAction()) {
+
+                case MotionEvent.ACTION_DOWN:
+                    free_touch_start(touchX, touchY);
+                    invalidate();
+                    break;
+
+                case MotionEvent.ACTION_POINTER_DOWN:
+                    Log.d(TAG, "onTouchEvent: Pointer Down");
+
+                    break;
+
+                case MotionEvent.ACTION_POINTER_UP:
+                    Log.d(TAG, "onTouchEvent: Pointer Up");
+
+                    break;
+
+                case MotionEvent.ACTION_MOVE:
+                    free_touch_move(touchX, touchY);
+                    invalidate();
+                    break;
+                case MotionEvent.ACTION_UP:
+                    free_touch_up();
+                    invalidate();
+                    break;
+                default:
+                    return false;
+            }
+
         }
-
-        invalidate();
-
-        mapZoomListener.onReturnValues(clipBounds_canvas);
 
         return true;
     }
+
+    public void setTouchable(boolean isTouchable){
+        this.isZoomMode = isTouchable;
+    }
+
+    public boolean isTouchable(){
+        return this.isZoomMode;
+    }
+
+    private void free_touch_start(float x, float y){
+        undoPaths.clear();
+        drawFencePath = new Path();
+        SketchFingerPath fp = new SketchFingerPath(paintFenceColor, embossFence, blurFence, currentBrushSize, drawFencePath);
+        paths.add(fp);
+
+        drawFencePath.reset();
+        drawFencePath.moveTo(x,y);
+        mX = x;
+        mY = y;
+
+        mOriginX = mX;
+        mOriginY = mY;
+    }
+
+    private void free_touch_move(float x, float y){
+        float dx = Math.abs(x-mX);
+        float dy = Math.abs(y-mY);
+
+        if (dx>=TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE){
+            drawFencePath.quadTo(mX,mY,(x+mX)/2, (y+mY)/2);
+            mX = x;
+            mY = y;
+        }
+    }
+
+    private void free_touch_up(){
+        drawFencePath.lineTo(mX,mY);
+        drawFencePath.lineTo(mOriginX,mOriginY);
+
+        RectF bounds = new RectF();
+        drawFencePath.computeBounds(bounds, false); // fills rect with bounds
+        Log.i(TAG, "convertRectToCanvas: Bounds on Screen: " + bounds.top + "," + bounds.bottom + "," + bounds.left + ", " + bounds.right);
+
+        canvasRectF = convertPathToCanvas(drawFencePath);
+
+        mapZoomListener.onFenceAround(drawFencePath, canvasRectF);
+
+    }
+
+    private void initFencePaint(){
+        currentBrushSize = getResources().getInteger(R.integer.selection_fence_size);
+        paintFenceColor = Color.WHITE;
+
+        drawFencePaint = new Paint();
+
+        drawFencePaint.setAntiAlias(true);
+        drawFencePaint.setDither(true);
+        drawFencePaint.setStyle(Paint.Style.STROKE);
+        drawFencePaint.setStrokeJoin(Paint.Join.ROUND);
+        drawFencePaint.setStrokeCap(Paint.Cap.ROUND);
+        drawFencePaint.setPathEffect(new DashPathEffect(new float[]{5,20},0));
+
+        mFenceEmboss = new EmbossMaskFilter(new float[] {1,1,1}, 0.4f, 6, 3.5f);
+        mFenceBlur = new BlurMaskFilter(5, BlurMaskFilter.Blur.NORMAL);
+
+        drawFencePaint.setColor(paintFenceColor);
+        drawFencePaint.setStrokeWidth(currentBrushSize);
+
+        drawFencePath = new Path();
+
+        select_normal();
+
+    }
+
+    private void select_normal(){
+        embossFence = false;
+        blurFence = false;
+    }
+
+    public void clearFenceSelection(){
+        if (paths.size()>0){
+            undoPaths.add(paths.remove(paths.size()-1));
+            invalidate();
+        }
+
+    }
+
+    private void convertCoordinatesToCanvas(float zoomX, float zoomY){
+        float[] m = new float[9];
+        matrix.getValues(m);
+
+        Log.i(TAG, "convertCoordinatesToCanvas: Bounds on Screen: " + zoomX + ", " + zoomY);
+
+        float transX = m[Matrix.MTRANS_X] * -1;
+        float transY = m[Matrix.MTRANS_Y] * -1;
+        float scaleX = m[Matrix.MSCALE_X];
+        float scaleY = m[Matrix.MSCALE_Y];
+
+        lastTouchX = ((zoomX + transX) / scaleX);
+        lastTouchY = ((zoomY + transY) / scaleY);
+
+        lastTouchX = Math.abs(lastTouchX);
+        lastTouchY = Math.abs(lastTouchY);
+
+        Log.i(TAG, "convertCoordinatesToCanvas: Bounds on Canvas: " + lastTouchX + ", " + lastTouchY);
+    }
+
+    private RectF convertPathToCanvas(Path path){
+        float[] m = new float[9];
+        matrix.getValues(m);
+
+        float scaleX = m[Matrix.MSCALE_X];
+        float scaleY = m[Matrix.MSCALE_Y];
+
+        Matrix scaleMatrix = new Matrix();
+
+        RectF bounds = new RectF();
+        path.computeBounds(bounds, false); // fills rect with bounds
+
+        scaleMatrix.setScale(scaleX, scaleY, bounds.centerX(), bounds.centerY());
+        path.transform(scaleMatrix);
+
+        float boundsLeft = bounds.left;
+        float boundsTop = bounds.top;
+        float boundsRight = bounds.right;
+        float boundsBottom = bounds.bottom;
+        Log.i(TAG, "convertRectToCanvas: Bounds on Canvas: " + boundsTop + "," + boundsBottom + "," + boundsLeft + ", " + boundsRight);
+
+        return new RectF(boundsLeft,boundsTop,boundsRight,boundsBottom);
+
+    }
+
+
 
 
 

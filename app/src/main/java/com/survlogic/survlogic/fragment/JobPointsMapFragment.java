@@ -2,7 +2,10 @@ package com.survlogic.survlogic.fragment;
 
 
 import android.content.Context;
+import android.graphics.Path;
 import android.graphics.Rect;
+import android.graphics.RectF;
+import android.graphics.Region;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -21,6 +24,8 @@ import android.widget.RelativeLayout;
 
 import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.background.BackgroundSurveyPointMap;
+import com.survlogic.survlogic.dialog.DialogJobMapOptions;
+import com.survlogic.survlogic.dialog.DialogJobPointListView;
 import com.survlogic.survlogic.dialog.DialogJobPointView;
 import com.survlogic.survlogic.interf.MapZoomListener;
 import com.survlogic.survlogic.model.PointSurvey;
@@ -148,6 +153,9 @@ public class JobPointsMapFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Log.d(TAG, "onClick: Pushed");
+                openOptionsMenu();
+
+
             }
         });
 
@@ -179,7 +187,7 @@ public class JobPointsMapFragment extends Fragment {
 
             @Override
             public void onTouchOnPoint(float x, float y) {
-                Log.i(TAG, "From Listener: " + x + ", " + y);
+                Log.d(TAG, "From Listener: " + x + ", " + y);
 
                 if (fabSelectionPoint) {
                     setPointActionItems(TOUCH);
@@ -187,6 +195,7 @@ public class JobPointsMapFragment extends Fragment {
                     //Single Point Check and only allow 1 point to be selected
                     if(lstSelectedPoints!=null && lstSelectedPoints.size()==0) {
                         lstSelectedPoints = planarMapView.checkPointForTouch(x, y);
+                        Log.i(TAG, "onTouchOnPoint: Single Point Touch at: " + x + ", " + y);
                     }
 
                     if(lstSelectedPoints.size()==1){
@@ -204,12 +213,54 @@ public class JobPointsMapFragment extends Fragment {
                     }
 
 
-                    Log.i(TAG, "onTouchOnPoint: Size of Point Object: " + lstSelectedPoints.size());
+                }
+            }
 
-                }else if(fabSelectionFence){
-                    //Fence Area
+            @Override
+            public void onFenceAround(Path fencePath, RectF fenceRect) {
+                Log.d(TAG, "onFenceAround: Started...");
+
+                if(fabSelectionFence) {
+
+                    if (lstSelectedPoints != null && lstSelectedPoints.size() == 0) {
+                        Region region = new Region();
+                        region.setPath(fencePath, new Region((int) fenceRect.left, (int) fenceRect.top, (int) fenceRect.right, (int) fenceRect.bottom));
+
+                        lstSelectedPoints = planarMapView.checkPointForFence(region);
+
+                        if(lstSelectedPoints !=null && lstSelectedPoints.size() ==1){
+                            setPointActionItems(TOUCH);
+                        }else if(lstSelectedPoints !=null && lstSelectedPoints.size() > 1){
+                            setPointActionItems(FENCE);
+                        }
+
+                        zoomableMapGroup.clearFenceSelection();
+
+                    } else if (lstSelectedPoints != null && lstSelectedPoints.size() >= 1) {
+                        Region region = new Region();
+                        region.setPath(fencePath, new Region((int) fenceRect.left, (int) fenceRect.top, (int) fenceRect.right, (int) fenceRect.bottom));
+
+                        lstSelectedPoints = planarMapView.checkPointForFence(region);
+
+                        if(lstSelectedPoints !=null && lstSelectedPoints.size() ==1){
+                            setPointActionItems(TOUCH);
+                        }else if(lstSelectedPoints !=null && lstSelectedPoints.size() >1){
+                            setPointActionItems(FENCE);
+                        }
+
+                        zoomableMapGroup.clearFenceSelection();
+
+                    }
+
+
+                    if (lstSelectedPoints != null && lstSelectedPoints.size() > 0) {
+                        showMenuForPointAction();
+                    } else if (relPointActions.isShown()) {
+                        hideMenuForPointAction();
+                    }
 
                 }
+
             }
         });
 
@@ -218,13 +269,27 @@ public class JobPointsMapFragment extends Fragment {
             public void onClick(View v) {
                 hideMenuForSelect();
                 fabSelectionPoint = true;
+                fabSelectionFence = false;
             }
         });
+
+        fabSelectByFence.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                zoomableMapGroup.setTouchable(false);
+                hideMenuForSelect();
+                fabSelectionFence = true;
+                fabSelectionPoint = false;
+            }
+        });
+
 
         fabClose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showMenuForSelect();
+                zoomableMapGroup.clearFenceSelection();
+                zoomableMapGroup.setTouchable(true);
             }
         });
 
@@ -232,7 +297,11 @@ public class JobPointsMapFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if(fabSelectionPoint){
+                    Log.d(TAG, "onClick: Fence Selection");
                     infoSinglePoint();
+                }else if(fabSelectionFence){
+                    Log.d(TAG, "onClick: Fence Selection");
+                    infoMultiplePoints();
                 }
             }
         });
@@ -259,7 +328,18 @@ public class JobPointsMapFragment extends Fragment {
 
     }
 
+    private void openOptionsMenu(){
+
+        android.support.v4.app.DialogFragment pointMapOptions = DialogJobMapOptions.newInstance(project_id, job_id, jobDatabaseName);
+        pointMapOptions.show(getFragmentManager(),"dialog_map_options");
+
+    }
+
+
+
     private void closeSubMenuSelectFab(){
+        // When selection menu is open, this closes the selection menu fab items
+
         fabSelect.startAnimation(animRotateBackwards);
 
         fabSelectByTouch.startAnimation(animClose);
@@ -273,6 +353,8 @@ public class JobPointsMapFragment extends Fragment {
         fabSelectByTouch.setClickable(false);
         fabSelectByFence.setClickable(false);
         fabSelectBySearch.setClickable(false);
+        fabClose.setClickable(false);
+
 
         fabSelect.setImageResource(R.drawable.ic_action_crop_info);
 
@@ -280,6 +362,7 @@ public class JobPointsMapFragment extends Fragment {
     }
 
     private void openSubMenuSelectFab(){
+        //this opens the selection menu and the fabs
         fabSelect.startAnimation(animRotateForward);
 
         cardFabSelectByPoint.startAnimation(animOpen);
@@ -294,6 +377,7 @@ public class JobPointsMapFragment extends Fragment {
         fabSelectByTouch.setClickable(true);
         fabSelectByFence.setClickable(true);
         fabSelectBySearch.setClickable(true);
+        fabClose.setClickable(true);
 
         fabSelect.setImageResource(R.drawable.ic_close_white_24dp);
         fabExpanded = true;
@@ -301,6 +385,8 @@ public class JobPointsMapFragment extends Fragment {
     }
 
     private void hideMenuForSelect(){
+        // Hides the selection and shows the close button
+
         fabOptions.startAnimation(transitionLeft);
 
         fabSelect.startAnimation(transitionRight);
@@ -314,10 +400,13 @@ public class JobPointsMapFragment extends Fragment {
         cardFabSelectBySearch.startAnimation(transitionRight);
 
         fabClose.startAnimation(transitionRightOffScreen);
+        fabClose.setClickable(true);
 
     }
 
     private void showMenuForSelect(){
+        // Returns to select menu
+
         fabOptions.startAnimation(transitionToLeft);
 
         fabSelect.startAnimation(transitionToRight);
@@ -331,6 +420,8 @@ public class JobPointsMapFragment extends Fragment {
         cardFabSelectBySearch.startAnimation(transitionToRight);
 
         fabClose.startAnimation(transitionLeft);
+        fabClose.setClickable(false);
+
         hideMenuForPointAction();
     }
 
@@ -346,7 +437,12 @@ public class JobPointsMapFragment extends Fragment {
                 btAction1.setText(getResources().getString(R.string.map_action_touch_action_1));
                 btAction2.setText(getResources().getString(R.string.map_action_touch_action_2));
                 btAction3.setText(getResources().getString(R.string.map_action_touch_action_3));
+                break;
 
+            case FENCE:
+                btAction1.setText(getResources().getString(R.string.map_action_fence_action_1));
+                btAction2.setText(getResources().getString(R.string.map_action_fence_action_2));
+                btAction3.setText(getResources().getString(R.string.map_action_fence_action_3));
         }
 
     }
@@ -364,19 +460,25 @@ public class JobPointsMapFragment extends Fragment {
         PointSurvey pointSurvey;
 
         for(int i=0; i<lstSelectedPoints.size(); i++) {
-            Log.i(TAG, "infoSinglePoint: Cycling through Points...............................................");
             pointSurvey = lstSelectedPoints.get(i);
 
             long point_id = pointSurvey.getId();
             int pointNo = pointSurvey.getPoint_no();
 
-            Log.i(TAG, "infoSinglePoint: Point_id: " + point_id);
-            Log.i(TAG, "infoSinglePoint: Database: " + jobDatabaseName);
             android.support.v4.app.DialogFragment pointDialog = DialogJobPointView.newInstance(project_id, job_id, point_id, pointNo, jobDatabaseName);
             pointDialog.show(getFragmentManager(),"dialog");
 
 
         }
+
+
+    }
+
+    private void infoMultiplePoints(){
+        Log.d(TAG, "infoMultiplePoints: Started...");
+
+        android.support.v4.app.DialogFragment pointListDialog = DialogJobPointListView.newInstance(project_id, job_id, jobDatabaseName, lstSelectedPoints);
+        pointListDialog.show(getFragmentManager(),"dialog_list");
 
 
     }

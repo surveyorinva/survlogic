@@ -52,6 +52,7 @@
 
     <!--Sketch Sizes and Dimensions-->
     <dimen name="small_brush">10dp</dimen>
+    <integer name="selection_fence_size">5</integer>
     <integer name="small_size">10</integer>
     <dimen name="medium_brush">20dp</dimen>
     <integer name="medium_size">20</integer>
