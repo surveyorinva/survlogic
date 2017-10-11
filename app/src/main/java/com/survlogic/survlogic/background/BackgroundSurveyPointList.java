@@ -135,7 +135,7 @@ public class BackgroundSurveyPointList extends AsyncTask <PointSurvey,PointSurve
 
         if (pointSurveyTableView != null) {
 
-            final PointSurveyTableDataAdapter adapter = new PointSurveyTableDataAdapter(context, arrayList, pointSurveyTableView);
+            final PointSurveyTableDataAdapter adapter = new PointSurveyTableDataAdapter(context, arrayList, pointSurveyTableView,12);
             pointSurveyTableView.setDataAdapter(adapter);
             //Add Click and Long Click here
 

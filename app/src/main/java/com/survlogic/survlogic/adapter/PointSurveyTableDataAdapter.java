@@ -20,6 +20,8 @@ import java.util.List;
 import de.codecrafters.tableview.TableView;
 import de.codecrafters.tableview.toolkit.LongPressAwareTableDataAdapter;
 
+import static android.view.View.TEXT_ALIGNMENT_CENTER;
+
 /**
  * Created by chrisfillmore on 8/10/2017.
  */
@@ -31,14 +33,15 @@ public class PointSurveyTableDataAdapter extends LongPressAwareTableDataAdapter<
     private SharedPreferences sharedPreferences;
     PreferenceLoaderHelper preferenceLoaderHelper;
 
-    private static final int TEXT_SIZE = 14;
+    private int TEXT_SIZE = 10;
 
     private static DecimalFormat COORDINATE_FORMATTER;
 
-    public PointSurveyTableDataAdapter(final Context context, final List<PointSurvey> data, final TableView<PointSurvey> tableView) {
+    public PointSurveyTableDataAdapter(final Context context, final List<PointSurvey> data, final TableView<PointSurvey> tableView, int textSize) {
         super(context, data, tableView);
 
         this.mContext = context;
+        this.TEXT_SIZE = textSize;
 
         preferenceLoaderHelper = new PreferenceLoaderHelper(mContext);
         loadPreferences();
@@ -106,6 +109,8 @@ public class PointSurveyTableDataAdapter extends LongPressAwareTableDataAdapter<
         textView.setText(coordinateString);
         textView.setPadding(20, 10, 20, 10);
         textView.setTextSize(TEXT_SIZE);
+        textView.setTextAlignment(TEXT_ALIGNMENT_CENTER);
+
         return textView;
 
     }
@@ -118,6 +123,7 @@ public class PointSurveyTableDataAdapter extends LongPressAwareTableDataAdapter<
         textView.setText(coordinateString);
         textView.setPadding(20, 10, 20, 10);
         textView.setTextSize(TEXT_SIZE);
+        textView.setTextAlignment(TEXT_ALIGNMENT_CENTER);
         return textView;
 
     }
@@ -131,6 +137,7 @@ public class PointSurveyTableDataAdapter extends LongPressAwareTableDataAdapter<
         textView.setText(coordinateString);
         textView.setPadding(20, 10, 20, 10);
         textView.setTextSize(TEXT_SIZE);
+        textView.setTextAlignment(TEXT_ALIGNMENT_CENTER);
         return textView;
 
     }
@@ -143,6 +150,7 @@ public class PointSurveyTableDataAdapter extends LongPressAwareTableDataAdapter<
         final TextView textView = new TextView(getContext());
         textView.setText(value);
         textView.setPadding(20, 10, 20, 10);
+        textView.setTextAlignment(TEXT_ALIGNMENT_CENTER);
         textView.setTextSize(TEXT_SIZE);
         return textView;
     }

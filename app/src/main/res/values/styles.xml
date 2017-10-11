@@ -93,7 +93,7 @@
 
     <style name="MyAnimation.Window" parent="@android:style/Animation.Activity">
         <item name="android:windowEnterAnimation">@anim/anim_dialog_fade_in</item>
-        <item name="android:windowExitAnimation">@anim/anim_dialog_fade_in</item>
+        <item name="android:windowExitAnimation">@anim/anim_dialog_fade_out</item>
     </style>
 
 

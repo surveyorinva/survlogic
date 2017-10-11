@@ -11,6 +11,7 @@ import com.survlogic.survlogic.model_util.PointSurveyComparators;
 import com.survlogic.survlogic.utils.PreferenceLoaderHelper;
 
 import de.codecrafters.tableview.SortableTableView;
+import de.codecrafters.tableview.model.TableColumnDpWidthModel;
 import de.codecrafters.tableview.model.TableColumnWeightModel;
 import de.codecrafters.tableview.toolkit.SimpleTableHeaderAdapter;
 import de.codecrafters.tableview.toolkit.SortStateViewProviders;
@@ -25,7 +26,7 @@ public class SortablePointSurveyTableView extends SortableTableView <PointSurvey
     private static final String TAG = "SortablePointSurveyTabl";
 
     private Context mContext;
-    private static final int TEXT_SIZE = 14;
+    private static final int TEXT_SIZE = 10;
 
     public SortablePointSurveyTableView(final Context context) {
         this(context, null);
@@ -69,11 +70,12 @@ public class SortablePointSurveyTableView extends SortableTableView <PointSurvey
         setHeaderSortStateViewProvider(SortStateViewProviders.brightArrows());
 
         final TableColumnWeightModel tableColumnWeightModel = new TableColumnWeightModel(5);
-        tableColumnWeightModel.setColumnWeight(0,1); //Point no
+        tableColumnWeightModel.setColumnWeight(0,2); //Point no
         tableColumnWeightModel.setColumnWeight(1,3); //Northing/Easting
         tableColumnWeightModel.setColumnWeight(2,3); //Easting/Northing
         tableColumnWeightModel.setColumnWeight(3,2); //Elevation
         tableColumnWeightModel.setColumnWeight(4,2); //Description
+        setColumnModel(tableColumnWeightModel);
 
         setColumnComparator(0, PointSurveyComparators.getPointNoComparator());
 

@@ -17,7 +17,6 @@ import android.widget.Toast;
 
 import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.adapter.PointSurveyTableDataAdapter;
-import com.survlogic.survlogic.background.BackgroundSurveyPointListFromMap;
 import com.survlogic.survlogic.model.PointSurvey;
 import com.survlogic.survlogic.utils.PreferenceLoaderHelper;
 import com.survlogic.survlogic.view.SortablePointSurveyTableView;
@@ -29,7 +28,7 @@ import java.util.ArrayList;
  * Created by chrisfillmore on 8/21/2017.
  */
 
-public class DialogJobPointListView extends DialogFragment {
+public class DialogJobMapPointList extends DialogFragment {
     private static final String TAG = "DialogJobPointView";
 
     private Context mContext;
@@ -49,9 +48,9 @@ public class DialogJobPointListView extends DialogFragment {
     private static DecimalFormat COORDINATE_FORMATTER, DISTANCE_PRECISION_FORMATTER;
 
 
-    public static DialogJobPointListView newInstance(int projectId, int jobId, String databaseName, ArrayList<PointSurvey> items) {
+    public static DialogJobMapPointList newInstance(int projectId, int jobId, String databaseName, ArrayList<PointSurvey> items) {
         Log.d(TAG, "newInstance: Starting...");
-        DialogJobPointListView frag = new DialogJobPointListView();
+        DialogJobMapPointList frag = new DialogJobMapPointList();
         Bundle args = new Bundle();
         args.putInt("project_id", projectId);
         args.putInt("job_id", jobId);
@@ -79,7 +78,7 @@ public class DialogJobPointListView extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.DialogPointViewStyle);
         LayoutInflater inflater = getActivity().getLayoutInflater();
 
-        View v = inflater.inflate(R.layout.dialog_job_point_list_view,null);
+        View v = inflater.inflate(R.layout.dialog_job_map_point_list,null);
         builder.setView(v);
 
         builder.create();
@@ -171,7 +170,7 @@ public class DialogJobPointListView extends DialogFragment {
 //        backgroundSurveyPointList.execute();
 
 
-        final PointSurveyTableDataAdapter adapter = new PointSurveyTableDataAdapter(mContext, pointList, pointSurveyTableView);
+        final PointSurveyTableDataAdapter adapter = new PointSurveyTableDataAdapter(mContext, pointList, pointSurveyTableView,10);
         pointSurveyTableView.setDataAdapter(adapter);
 
         progressBar.setVisibility(View.GONE);

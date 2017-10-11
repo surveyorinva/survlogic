@@ -7,11 +7,16 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -32,7 +37,6 @@ public class DialogJobMapOptions extends DialogFragment {
     private static final String TAG = "DialogJobPointView";
 
     private Context mContext;
-    private View source;
 
     private int projectID, jobId;
     private String databaseName;
@@ -41,7 +45,7 @@ public class DialogJobMapOptions extends DialogFragment {
     private PreferenceLoaderHelper preferenceLoaderHelper;
 
 
-    public static DialogJobMapOptions newInstance(int projectId, int jobId, String databaseName, View source) {
+    public static DialogJobMapOptions newInstance(int projectId, int jobId, String databaseName) {
         Log.d(TAG, "newInstance: Starting...");
         DialogJobMapOptions frag = new DialogJobMapOptions();
         Bundle args = new Bundle();

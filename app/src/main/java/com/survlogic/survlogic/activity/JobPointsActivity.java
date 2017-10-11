@@ -27,6 +27,7 @@ import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.fragment.JobPointsHomeFragment;
 import com.survlogic.survlogic.fragment.JobPointsListFragment;
 import com.survlogic.survlogic.fragment.JobPointsMapFragment;
+import com.survlogic.survlogic.interf.JobPointsListener;
 import com.survlogic.survlogic.model.ProjectJobSettings;
 import com.survlogic.survlogic.utils.BottomNavigationViewHelper;
 
@@ -34,7 +35,7 @@ import com.survlogic.survlogic.utils.BottomNavigationViewHelper;
  * Created by chrisfillmore on 8/8/2017.
  */
 
-public class JobPointsActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
+public class JobPointsActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, JobPointsListener{
     private static final String TAG = "JobPointsActivity";
 
     private static Context mContext;
@@ -47,9 +48,14 @@ public class JobPointsActivity extends AppCompatActivity implements NavigationVi
 
     private BottomNavigationViewEx bottomNavigationViewEx;
 
+    private JobPointsMapFragment jobPointsMapFragment;
+
     private ProjectJobSettings jobSettings;
     private int project_id, job_id, job_settings_id = 1;
     private String jobDatabaseName;
+
+    private boolean listenForMapSelectionButtonsActive = false;
+    private boolean listenForMapSelectionButtonsOpen = false;
 
     private FrameLayout container;
     private RelativeLayout rlLayout2;
@@ -76,6 +82,20 @@ public class JobPointsActivity extends AppCompatActivity implements NavigationVi
     protected void onResume() {
         super.onResume();
         rlLayout2.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onBackPressed() {
+
+            if(listenForMapSelectionButtonsOpen && listenForMapSelectionButtonsActive) {
+                jobPointsMapFragment.closeActiveSelectionTools();
+
+            }else if(listenForMapSelectionButtonsOpen && !listenForMapSelectionButtonsActive){
+                jobPointsMapFragment.closeSubMenuSelectFab();
+
+            }else {
+                super.onBackPressed();
+            }
     }
 
     //---------------------------------------------------------------------------------------------//
@@ -214,7 +234,7 @@ public class JobPointsActivity extends AppCompatActivity implements NavigationVi
                         containerFragment3.setArguments(getIntent().getExtras());
 
                         swapFragment(containerFragment3,false,"MAP_VIEW");
-
+                        jobPointsMapFragment = containerFragment3;
 
                         break;
 
@@ -294,4 +314,14 @@ public class JobPointsActivity extends AppCompatActivity implements NavigationVi
 
     //----------------------------------------------------------------------------------------------//
 
+
+    @Override
+    public void isMapSelectorActive(boolean isSelected) {
+        listenForMapSelectionButtonsActive = isSelected;
+    }
+
+    @Override
+    public void isMapSelectorOpen(boolean isSelected) {
+        listenForMapSelectionButtonsOpen = isSelected;
+    }
 }

@@ -25,121 +25,157 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"/>
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fabSelectByTouch"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@null"
-        android:scaleType="center"
-        app:backgroundTint="@android:color/holo_green_light"
-        app:fabSize="mini"
-        android:layout_above="@id/fabSelect"
-        android:layout_marginStart="7dp"
-        android:layout_marginBottom="10dp"
-        android:visibility="invisible"/>
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fabSelectByFence"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@null"
-        android:scaleType="center"
-        app:backgroundTint="@android:color/holo_green_dark"
-        app:fabSize="mini"
-        android:layout_above="@id/fabSelect"
-        android:layout_marginStart="7dp"
-        android:layout_marginBottom="60dp"
-        android:visibility="invisible"/>
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fabSelectBySearch"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@null"
-        app:backgroundTint="@android:color/holo_green_dark"
-        app:fabSize="mini"
-        android:layout_above="@id/fabSelect"
-        android:layout_marginStart="7dp"
-        android:layout_marginBottom="110dp"
-        android:visibility="invisible"/>
-
-
-    <android.support.v7.widget.CardView
-        android:id="@+id/cardSelectByTouch"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:cardBackgroundColor="@color/cardview_light_background"
-        app:cardCornerRadius="@dimen/map_cardCornerRadius"
-        app:cardElevation="@dimen/map_cardElevation"
-        app:cardUseCompatPadding="true"
-        android:visibility="invisible"
-        android:layout_alignBottom="@+id/fabSelectByTouch"
-        android:layout_toEndOf="@+id/fabSelect">
-        <TextView
-            android:id="@+id/tvFabSelectByTouch"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/linearLayout_Touch"
+            android:orientation="horizontal"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="7dp"
+            android:layout_marginBottom="65dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/map_menu_select_by_point"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textStyle="bold"
-            android:paddingRight="@dimen/map_cardview_horizontal_padding"
-            android:paddingLeft="@dimen/map_cardview_horizontal_padding"
-            android:paddingBottom="@dimen/map_cardview_vertical_padding"
-            android:paddingTop="@dimen/map_cardview_vertical_padding" />
-    </android.support.v7.widget.CardView>
+            android:visibility="invisible">
+
+            <ImageButton
+                android:id="@+id/btSelectByTouch"
+                android:background="@drawable/vc_circle_blue"
+
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:visibility="visible"/>
+
+            <android.support.v7.widget.CardView
+                android:id="@+id/cardSelectByTouch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:cardBackgroundColor="@color/cardview_light_background"
+                app:cardCornerRadius="@dimen/map_cardCornerRadius"
+                app:cardElevation="@dimen/map_cardElevation"
+                app:cardUseCompatPadding="true"
+                android:visibility="visible">
+                <TextView
+                    android:id="@+id/tvFabSelectByTouch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/map_menu_select_by_point"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textStyle="bold"
+                    android:paddingRight="@dimen/map_cardview_horizontal_padding"
+                    android:paddingLeft="@dimen/map_cardview_horizontal_padding"
+                    android:paddingBottom="@dimen/map_cardview_vertical_padding"
+                    android:paddingTop="@dimen/map_cardview_vertical_padding" />
+            </android.support.v7.widget.CardView>
+
+        </LinearLayout>
 
 
-    <android.support.v7.widget.CardView
-        android:id="@+id/cardSelectBySearch"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:cardBackgroundColor="@color/cardview_light_background"
-        app:cardCornerRadius="@dimen/map_cardCornerRadius"
-        app:cardElevation="@dimen/map_cardElevation"
-        app:cardUseCompatPadding="true"
-        android:visibility="invisible"
-        android:layout_alignBottom="@+id/fabSelectBySearch"
-        android:layout_toEndOf="@+id/fabSelect">
 
-        <TextView
-            android:id="@+id/tvFabSelectBySearch"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/linearLayout_Fence"
+            android:orientation="horizontal"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="7dp"
+            android:layout_marginBottom="115dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="@string/map_menu_select_by_search"
-            android:textStyle="bold"
-            android:paddingRight="@dimen/map_cardview_horizontal_padding"
-            android:paddingLeft="@dimen/map_cardview_horizontal_padding"
-            android:paddingBottom="@dimen/map_cardview_vertical_padding"
-            android:paddingTop="@dimen/map_cardview_vertical_padding" />
+            android:visibility="invisible">
 
-    </android.support.v7.widget.CardView>
+            <ImageButton
+                android:id="@+id/btSelectByFence"
+                android:background="@drawable/vc_circle_blue"
 
-    <android.support.v7.widget.CardView
-        android:id="@+id/cardSelectByFence"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:cardBackgroundColor="@color/cardview_light_background"
-        app:cardCornerRadius="@dimen/map_cardCornerRadius"
-        app:cardElevation="@dimen/map_cardElevation"
-        app:cardUseCompatPadding="true"
-        android:visibility="invisible"
-        android:layout_alignBottom="@+id/fabSelectByFence"
-        android:layout_toEndOf="@+id/fabSelect">
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:visibility="visible"/>
 
-        <TextView
-            android:id="@+id/tvFabSelectByFence"
-            android:layout_width="wrap_content"
+
+            <android.support.v7.widget.CardView
+                android:id="@+id/cardSelectBySearch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:cardBackgroundColor="@color/cardview_light_background"
+                app:cardCornerRadius="@dimen/map_cardCornerRadius"
+                app:cardElevation="@dimen/map_cardElevation"
+                app:cardUseCompatPadding="true"
+                android:visibility="visible">
+
+                <TextView
+                    android:id="@+id/tvFabSelectBySearch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:text="@string/map_menu_select_by_fence"
+                    android:textStyle="bold"
+                    android:paddingRight="@dimen/map_cardview_horizontal_padding"
+                    android:paddingLeft="@dimen/map_cardview_horizontal_padding"
+                    android:paddingBottom="@dimen/map_cardview_vertical_padding"
+                    android:paddingTop="@dimen/map_cardview_vertical_padding" />
+
+            </android.support.v7.widget.CardView>
+
+
+
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/linearLayout_Search"
+            android:orientation="horizontal"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="7dp"
+            android:layout_marginBottom="165dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/map_menu_select_by_fence"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textStyle="bold"
-            android:paddingRight="@dimen/map_cardview_horizontal_padding"
-            android:paddingLeft="@dimen/map_cardview_horizontal_padding"
-            android:paddingBottom="@dimen/map_cardview_vertical_padding"
-            android:paddingTop="@dimen/map_cardview_vertical_padding" />
+            android:visibility="invisible">
 
-    </android.support.v7.widget.CardView>
+
+            <ImageButton
+                android:id="@+id/btSelectByZoom"
+                android:background="@drawable/vc_circle_blue"
+
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:visibility="visible"/>
+
+
+            <android.support.v7.widget.CardView
+                android:id="@+id/cardSelectByFence"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:cardBackgroundColor="@color/cardview_light_background"
+                app:cardCornerRadius="@dimen/map_cardCornerRadius"
+                app:cardElevation="@dimen/map_cardElevation"
+                app:cardUseCompatPadding="true"
+                android:visibility="visible">
+
+                <TextView
+                    android:id="@+id/tvFabSelectByFence"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/map_menu_select_by_search"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textStyle="bold"
+                    android:paddingRight="@dimen/map_cardview_horizontal_padding"
+                    android:paddingLeft="@dimen/map_cardview_horizontal_padding"
+                    android:paddingBottom="@dimen/map_cardview_vertical_padding"
+                    android:paddingTop="@dimen/map_cardview_vertical_padding" />
+
+            </android.support.v7.widget.CardView>
+
+
+
+
+
+        </LinearLayout>
+
+
+    </RelativeLayout>
+
+
 
 </RelativeLayout>

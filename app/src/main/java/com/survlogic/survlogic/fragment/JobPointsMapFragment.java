@@ -11,7 +11,6 @@ import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,13 +19,17 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
 import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.background.BackgroundSurveyPointMap;
 import com.survlogic.survlogic.dialog.DialogJobMapOptions;
-import com.survlogic.survlogic.dialog.DialogJobPointListView;
+import com.survlogic.survlogic.dialog.DialogJobMapPointList;
 import com.survlogic.survlogic.dialog.DialogJobPointView;
+import com.survlogic.survlogic.interf.JobPointsListener;
 import com.survlogic.survlogic.interf.MapZoomListener;
 import com.survlogic.survlogic.model.PointSurvey;
 import com.survlogic.survlogic.view.PlanarMapScaleView;
@@ -44,6 +47,8 @@ public class JobPointsMapFragment extends Fragment {
     private static final String TAG = "JobPointsMapFragment";
     private Context mContext;
 
+    JobPointsListener jobPointsListener;
+
     private View v;
     private static final int DELAY_TO_MAP = 300;
     private static final int NONE = 0;
@@ -55,20 +60,25 @@ public class JobPointsMapFragment extends Fragment {
     private String jobDatabaseName;
 
     private RelativeLayout relPointActions;
-
+    private LinearLayout linearLayout_Touch, linearLayout_Fence, linearLayout_Search;
     private FloatingActionButton fabClose;
     private FloatingActionButton fabOptions;
-    private FloatingActionButton fabSelect, fabSelectByTouch, fabSelectByFence, fabSelectBySearch;
+    private FloatingActionButton fabSelect;
 
     private Button btAction1, btAction2, btAction3;
+    private ImageButton ibSelectByTouch, ibSelectByFence, ibSelectByZoom;
 
     private CardView cardFabSelectByPoint, cardFabSelectByFence, cardFabSelectBySearch;
+
+    private ProgressBar progressBar;
+    private Handler dialogHandler;
+    private static final int DELAY_TO_DIALOG = 2000;
 
     private PlanarMapView planarMapView;
     private PlanarMapScaleView planarScaleMapView;
     private ZoomableMapGroup zoomableMapGroup;
 
-    private Animation animOpen, animClose, animRotateForward, animRotateBackwards,
+    private Animation animOpen_1, animOpen_2, animOpen_3, animClose_1, animClose_2, animClose_3, animRotateForward, animRotateBackwards,
             transitionLeft, transitionRight, transitionRightOffScreen,
             transitionToLeft, transitionToRight;
 
@@ -100,6 +110,12 @@ public class JobPointsMapFragment extends Fragment {
 
     }
 
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        jobPointsListener = (JobPointsListener) context;
+    }
+
     private void initViewWidgets(View v){
         Log.d(TAG, "initViewWidgets: Starting...");
         Bundle extras = getArguments();
@@ -109,19 +125,24 @@ public class JobPointsMapFragment extends Fragment {
         Log.i(TAG, "Database: " + jobDatabaseName);
 
         relPointActions = (RelativeLayout) v.findViewById(R.id.fabRelativePointActions);
+        linearLayout_Touch = (LinearLayout) v.findViewById(R.id.linearLayout_Touch);
+        linearLayout_Fence = (LinearLayout) v.findViewById(R.id.linearLayout_Fence);
+        linearLayout_Search = (LinearLayout) v.findViewById(R.id.linearLayout_Search);
 
         fabClose = (FloatingActionButton) v.findViewById(R.id.layout_close);
 
         fabOptions = (FloatingActionButton) v.findViewById(R.id.layout_options);
 
         fabSelect = (FloatingActionButton) v.findViewById(R.id.fabSelect);
-        fabSelectByTouch = (FloatingActionButton) v.findViewById(R.id.fabSelectByTouch);
-        fabSelectByFence = (FloatingActionButton) v.findViewById(R.id.fabSelectByFence);
-        fabSelectBySearch = (FloatingActionButton) v.findViewById(R.id.fabSelectBySearch);
+        progressBar = (ProgressBar) v.findViewById(R.id.progressBar);
 
         btAction1 = (Button) v.findViewById(R.id.point_action_1);
         btAction2 = (Button) v.findViewById(R.id.point_action_2);
         btAction3 = (Button) v.findViewById(R.id.point_action_extra);
+
+        ibSelectByTouch = (ImageButton) v.findViewById(R.id.btSelectByTouch);
+        ibSelectByFence = (ImageButton) v.findViewById(R.id.btSelectByFence);
+        ibSelectByZoom = (ImageButton) v.findViewById(R.id.btSelectByZoom);
 
         cardFabSelectByPoint = (CardView) v.findViewById(R.id.cardSelectByTouch);
         cardFabSelectByFence = (CardView) v.findViewById(R.id.cardSelectByFence);
@@ -131,8 +152,13 @@ public class JobPointsMapFragment extends Fragment {
         planarMapView = (PlanarMapView) v.findViewById(R.id.map_view);
         planarScaleMapView = (PlanarMapScaleView) v.findViewById(R.id.legendScale);
 
-        animOpen = AnimationUtils.loadAnimation(mContext,R.anim.anim_fab_open);
-        animClose = AnimationUtils.loadAnimation(mContext,R.anim.anim_fab_close);
+        animOpen_1 = AnimationUtils.loadAnimation(mContext,R.anim.anim_fab_open_1);
+        animOpen_2 = AnimationUtils.loadAnimation(mContext,R.anim.anim_fab_open_2);
+        animOpen_3 = AnimationUtils.loadAnimation(mContext,R.anim.anim_fab_open_3);
+
+        animClose_1 = AnimationUtils.loadAnimation(mContext,R.anim.anim_fab_close_1);
+        animClose_2 = AnimationUtils.loadAnimation(mContext,R.anim.anim_fab_close_2);
+        animClose_3 = AnimationUtils.loadAnimation(mContext,R.anim.anim_fab_close_3);
 
         animRotateForward = AnimationUtils.loadAnimation(mContext,R.anim.rotate_fab_forward);
         animRotateBackwards = AnimationUtils.loadAnimation(mContext, R.anim.rotate_fab_backward);
@@ -144,6 +170,7 @@ public class JobPointsMapFragment extends Fragment {
         transitionToLeft = AnimationUtils.loadAnimation(mContext,R.anim.anim_transition_from_left_show);
         transitionToRight = AnimationUtils.loadAnimation(mContext,R.anim.anim_transition_from_right_show);
     }
+
 
 
     private void setOnClickListener(View v){
@@ -264,7 +291,7 @@ public class JobPointsMapFragment extends Fragment {
             }
         });
 
-        fabSelectByTouch.setOnClickListener(new View.OnClickListener() {
+        ibSelectByTouch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 hideMenuForSelect();
@@ -273,7 +300,7 @@ public class JobPointsMapFragment extends Fragment {
             }
         });
 
-        fabSelectByFence.setOnClickListener(new View.OnClickListener() {
+        ibSelectByFence.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 zoomableMapGroup.setTouchable(false);
@@ -287,9 +314,8 @@ public class JobPointsMapFragment extends Fragment {
         fabClose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showMenuForSelect();
-                zoomableMapGroup.clearFenceSelection();
-                zoomableMapGroup.setTouchable(true);
+                closeActiveSelectionTools();
+
             }
         });
 
@@ -308,6 +334,13 @@ public class JobPointsMapFragment extends Fragment {
 
 
 
+    }
+
+    public void closeActiveSelectionTools(){
+        showMenuForSelect();
+
+        zoomableMapGroup.clearFenceSelection();
+        zoomableMapGroup.setTouchable(true);
     }
 
     private void showPlanarMap(){
@@ -337,22 +370,32 @@ public class JobPointsMapFragment extends Fragment {
 
 
 
-    private void closeSubMenuSelectFab(){
+    public void closeSubMenuSelectFab(){
         // When selection menu is open, this closes the selection menu fab items
+
+        jobPointsListener.isMapSelectorOpen(false);
 
         fabSelect.startAnimation(animRotateBackwards);
 
-        fabSelectByTouch.startAnimation(animClose);
-        fabSelectByFence.startAnimation(animClose);
-        fabSelectBySearch.startAnimation(animClose);
+        linearLayout_Search.startAnimation(animClose_3);
 
-        cardFabSelectByPoint.startAnimation(animClose);
-        cardFabSelectByFence.startAnimation(animClose);
-        cardFabSelectBySearch.startAnimation(animClose);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                linearLayout_Fence.startAnimation(animClose_2);
+            }
+        },50);
 
-        fabSelectByTouch.setClickable(false);
-        fabSelectByFence.setClickable(false);
-        fabSelectBySearch.setClickable(false);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                linearLayout_Touch.startAnimation(animClose_1);
+            }
+        },100);
+
+        ibSelectByTouch.setClickable(false);
+        ibSelectByFence.setClickable(false);
+        ibSelectByZoom.setClickable(false);
         fabClose.setClickable(false);
 
 
@@ -363,20 +406,30 @@ public class JobPointsMapFragment extends Fragment {
 
     private void openSubMenuSelectFab(){
         //this opens the selection menu and the fabs
+
+        jobPointsListener.isMapSelectorOpen(true);
+
         fabSelect.startAnimation(animRotateForward);
 
-        cardFabSelectByPoint.startAnimation(animOpen);
-        fabSelectByTouch.startAnimation(animOpen);
+        linearLayout_Touch.startAnimation(animOpen_1);
 
-        fabSelectByFence.startAnimation(animOpen);
-        cardFabSelectByFence.startAnimation(animOpen);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                linearLayout_Fence.startAnimation(animOpen_2);
+            }
+        },100);
 
-        fabSelectBySearch.startAnimation(animOpen);
-        cardFabSelectBySearch.startAnimation(animOpen);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                linearLayout_Search.startAnimation(animOpen_3);
+            }
+        },150);
 
-        fabSelectByTouch.setClickable(true);
-        fabSelectByFence.setClickable(true);
-        fabSelectBySearch.setClickable(true);
+        ibSelectByTouch.setClickable(true);
+        ibSelectByFence.setClickable(true);
+        ibSelectByZoom.setClickable(true);
         fabClose.setClickable(true);
 
         fabSelect.setImageResource(R.drawable.ic_close_white_24dp);
@@ -386,18 +439,15 @@ public class JobPointsMapFragment extends Fragment {
 
     private void hideMenuForSelect(){
         // Hides the selection and shows the close button
+        jobPointsListener.isMapSelectorActive(true);
 
         fabOptions.startAnimation(transitionLeft);
 
         fabSelect.startAnimation(transitionRight);
 
-        fabSelectByTouch.startAnimation(transitionRight);
-        fabSelectByFence.startAnimation(transitionRight);
-        fabSelectBySearch.startAnimation(transitionRight);
-
-        cardFabSelectByPoint.startAnimation(transitionRight);
-        cardFabSelectByFence.startAnimation(transitionRight);
-        cardFabSelectBySearch.startAnimation(transitionRight);
+        linearLayout_Touch.startAnimation(transitionRight);
+        linearLayout_Fence.startAnimation(transitionRight);
+        linearLayout_Search.startAnimation(transitionRight);
 
         fabClose.startAnimation(transitionRightOffScreen);
         fabClose.setClickable(true);
@@ -407,17 +457,15 @@ public class JobPointsMapFragment extends Fragment {
     private void showMenuForSelect(){
         // Returns to select menu
 
+        jobPointsListener.isMapSelectorActive(false);
+
         fabOptions.startAnimation(transitionToLeft);
 
         fabSelect.startAnimation(transitionToRight);
 
-        fabSelectByTouch.startAnimation(transitionToRight);
-        fabSelectByFence.startAnimation(transitionToRight);
-        fabSelectBySearch.startAnimation(transitionToRight);
-
-        cardFabSelectByPoint.startAnimation(transitionToRight);
-        cardFabSelectByFence.startAnimation(transitionToRight);
-        cardFabSelectBySearch.startAnimation(transitionToRight);
+        linearLayout_Touch.startAnimation(transitionToRight);
+        linearLayout_Fence.startAnimation(transitionToRight);
+        linearLayout_Search.startAnimation(transitionToRight);
 
         fabClose.startAnimation(transitionLeft);
         fabClose.setClickable(false);
@@ -476,11 +524,29 @@ public class JobPointsMapFragment extends Fragment {
 
     private void infoMultiplePoints(){
         Log.d(TAG, "infoMultiplePoints: Started...");
+        setProgressBar(true);
 
-        android.support.v4.app.DialogFragment pointListDialog = DialogJobPointListView.newInstance(project_id, job_id, jobDatabaseName, lstSelectedPoints);
+        android.support.v4.app.DialogFragment pointListDialog = DialogJobMapPointList.newInstance(project_id, job_id, jobDatabaseName, lstSelectedPoints);
         pointListDialog.show(getFragmentManager(),"dialog_list");
 
+        dialogHandler = new Handler();
 
+        dialogHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                setProgressBar(false);
+            }
+        },DELAY_TO_DIALOG);
+
+    }
+
+    public void setProgressBar(boolean visible){
+
+        if(visible){
+            progressBar.setVisibility(View.VISIBLE);
+        }else{
+            progressBar.setVisibility(View.GONE);
+        }
     }
 
 

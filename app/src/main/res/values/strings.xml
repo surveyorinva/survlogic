@@ -203,8 +203,8 @@
 
     <!--Point List Table-->
     <string name="job_point_list_header_pntNo">No</string>
-    <string name="job_point_list_header_northing">N</string>
-    <string name="job_point_list_header_easting">E</string>
+    <string name="job_point_list_header_northing">North</string>
+    <string name="job_point_list_header_easting">East</string>
     <string name="job_point_list_header_elevation">El</string>
     <string name="job_point_list_header_description">Desc</string>
     <string name="job_point_list_header_tag">Tag</string>

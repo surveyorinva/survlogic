@@ -131,7 +131,7 @@ public class BackgroundSurveyPointListFromMap extends AsyncTask <PointSurvey,Poi
 
         if (pointSurveyTableView != null) {
             Log.d(TAG, "initSurveyPointListRecyclerView: Table View Not Null");
-            final PointSurveyTableDataAdapter adapter = new PointSurveyTableDataAdapter(context, arrayList, pointSurveyTableView);
+            final PointSurveyTableDataAdapter adapter = new PointSurveyTableDataAdapter(context, arrayList, pointSurveyTableView,10);
             pointSurveyTableView.setDataAdapter(adapter);
             //Add Click and Long Click here
 
