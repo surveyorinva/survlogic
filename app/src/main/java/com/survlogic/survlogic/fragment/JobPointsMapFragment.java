@@ -37,6 +37,7 @@ import com.survlogic.survlogic.view.PlanarMapView;
 import com.survlogic.survlogic.view.ZoomableMapGroup;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by chrisfillmore on 5/2/2017.
@@ -286,6 +287,10 @@ public class JobPointsMapFragment extends Fragment {
                         hideMenuForPointAction();
                     }
 
+
+                    checkListPointsForDuplicates(lstSelectedPoints);
+
+
                 }
 
             }
@@ -333,6 +338,12 @@ public class JobPointsMapFragment extends Fragment {
         });
 
 
+        ibSelectByZoom.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                zoomableMapGroup.zoomToPoint();
+            }
+        });
 
     }
 
@@ -341,6 +352,14 @@ public class JobPointsMapFragment extends Fragment {
 
         zoomableMapGroup.clearFenceSelection();
         zoomableMapGroup.setTouchable(true);
+    }
+
+
+    public void getMapPointOptionsFromActivity(boolean showPointNo, boolean showPointElev, boolean showPointDesc){
+        planarMapView.setShowPointNo(showPointNo);
+        planarMapView.setShowPointElevation(showPointElev);
+        planarMapView.setShowPointDesc(showPointDesc);
+
     }
 
     private void showPlanarMap(){
@@ -363,7 +382,11 @@ public class JobPointsMapFragment extends Fragment {
 
     private void openOptionsMenu(){
 
-        android.support.v4.app.DialogFragment pointMapOptions = DialogJobMapOptions.newInstance(project_id, job_id, jobDatabaseName);
+        boolean showPointNo = planarMapView.getShowPointNo();
+        boolean showPointElev = planarMapView.getShowPointElev();
+        boolean showPointDesc = planarMapView.getShowPointDesc();
+
+        android.support.v4.app.DialogFragment pointMapOptions = DialogJobMapOptions.newInstance(showPointNo, showPointElev, showPointDesc);
         pointMapOptions.show(getFragmentManager(),"dialog_map_options");
 
     }
@@ -547,6 +570,24 @@ public class JobPointsMapFragment extends Fragment {
         }else{
             progressBar.setVisibility(View.GONE);
         }
+    }
+
+    private void checkListPointsForDuplicates(ArrayList<PointSurvey> list){
+        HashMap <Integer,PointSurvey> map = new HashMap<Integer,PointSurvey>();
+
+        PointSurvey pointSurvey;
+
+        for(int i=0; i<list.size(); i++) {
+            pointSurvey = list.get(i);
+            int pointNo = pointSurvey.getPoint_no();
+
+            map.put(pointNo, pointSurvey);
+        }
+
+        lstSelectedPoints.clear();
+        lstSelectedPoints.addAll(map.values());
+
+        map.clear();
     }
 
 

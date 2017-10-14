@@ -48,7 +48,7 @@ public class PlanarMapView extends View {
     private static final int DEFAULT_COLOR = Color.WHITE;
     private static final int DEFAULT_BG_COLOR = Color.WHITE;
 
-    private boolean showPointNo = true;
+    private boolean showPointNo = true, showPointElevation = false, showPointDesc = false;
     private boolean showScale = true;
 
     private float currentBrushSize, lastBrushSize;
@@ -199,7 +199,26 @@ public class PlanarMapView extends View {
 
     public void setShowPointNo(boolean showPointNo){
         this.showPointNo = showPointNo;
+        invalidate();
 
+    }
+
+    public boolean getShowPointElev(){
+        return showPointElevation;
+    }
+
+    public void setShowPointElevation(boolean showPointElev){
+        this.showPointElevation = showPointElev;
+        invalidate();
+    }
+
+    public boolean getShowPointDesc(){
+        return showPointDesc;
+    }
+
+    public void setShowPointDesc(boolean showPointDesc){
+        this.showPointDesc = showPointDesc;
+        invalidate();
     }
 
     public float getInitialMapScaleDistance(float x1, float x2){
@@ -373,6 +392,14 @@ public class PlanarMapView extends View {
                drawPointNo(c, deltaEastScaled, deltaNorthScaled, String.valueOf(pointSurvey.getPoint_no()),textSize,Color.WHITE );
             }
 
+            if(showPointElevation){
+                drawPointElev(c, deltaEastScaled, deltaNorthScaled, String.valueOf(pointSurvey.getElevation()),textSize,Color.RED );
+            }
+
+            if(showPointDesc){
+                drawPointDesc(c, deltaEastScaled, deltaNorthScaled, String.valueOf(pointSurvey.getDescription()),textSize,Color.GREEN );
+            }
+
         }
     }
 
@@ -419,6 +446,56 @@ public class PlanarMapView extends View {
         float startY = y - textBufferY;
 
         c.drawText(pointNumber,startX,startY,paintPointNo);
+
+    }
+
+    private void drawPointElev(Canvas c, float x, float y, String pointElev, float textSize, int textColor){
+
+        float textBufferX = symbolSize;
+        float textBufferY = symbolSize;
+
+        Paint paintPointNo;
+        Rect rectTextBounds = new Rect();
+
+        paintPointNo = new Paint();
+        paintPointNo.setColor(textColor);
+        paintPointNo.setStyle(Paint.Style.STROKE);
+        paintPointNo.setTextSize(textSize);
+        paintPointNo.setAntiAlias(true);
+
+        paintPointNo.getTextBounds(pointElev,0, pointElev.length(),rectTextBounds);
+        int textHeight = rectTextBounds.height();
+        int textWidth = rectTextBounds.width();
+
+        float startX = x + textBufferX;
+        float startY = y + textHeight/2;
+
+        c.drawText(pointElev,startX,startY,paintPointNo);
+
+    }
+
+    private void drawPointDesc(Canvas c, float x, float y, String pointDesc, float textSize, int textColor){
+
+        float textBufferX = symbolSize;
+        float textBufferY = symbolSize;
+
+        Paint paintPointNo;
+        Rect rectTextBounds = new Rect();
+
+        paintPointNo = new Paint();
+        paintPointNo.setColor(textColor);
+        paintPointNo.setStyle(Paint.Style.STROKE);
+        paintPointNo.setTextSize(textSize);
+        paintPointNo.setAntiAlias(true);
+
+        paintPointNo.getTextBounds(pointDesc,0, pointDesc.length(),rectTextBounds);
+        int textHeight = rectTextBounds.height();
+        int textWidth = rectTextBounds.width();
+
+        float startX = x + textBufferX;
+        float startY = y + textBufferY + textHeight;
+
+        c.drawText(pointDesc,startX,startY,paintPointNo);
 
     }
 

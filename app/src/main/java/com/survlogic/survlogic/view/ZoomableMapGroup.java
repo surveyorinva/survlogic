@@ -326,6 +326,8 @@ public class ZoomableMapGroup extends ViewGroup {
 
                         matrix.postTranslate(dx, dy);
                         matrix.invert(matrixInverse);
+
+                        Log.i(TAG, "LOOK AT ME PAN: " + dx + "," + dy );
                     } else if (mode == ZOOM) {
                         float newDist = spacing(event);
                         if (newDist > 10f) {
@@ -336,6 +338,8 @@ public class ZoomableMapGroup extends ViewGroup {
 
                             matrix.postScale(scale, scale, mid.x, mid.y);
                             matrix.invert(matrixInverse);
+
+                            Log.i(TAG, "LOOK AT ME ZOOM: " + scale + ":" + mid.x + ", " + mid.y );
                         }
                     }
                     break;
@@ -513,6 +517,11 @@ public class ZoomableMapGroup extends ViewGroup {
 
         return new RectF(boundsLeft,boundsTop,boundsRight,boundsBottom);
 
+    }
+
+    public void zoomToPoint(){
+        Log.d(TAG, "zoomToPoint: Started");
+        matrix.postScale(3.7887287f, 3.7887287f, 678.33984f, 1188.6875f);
     }
 
 

@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="250dp"
     android:layout_height="300dp">
@@ -9,9 +11,12 @@
         android:layout_height="wrap_content">
 
         <ImageButton
-            android:src="@drawable/ic_close_white_24dp"
+            android:id="@+id/dialog_close"
+            android:background="@drawable/ic_close_black_24dp"
             android:layout_alignParentTop="true"
             android:layout_alignParentEnd="true"
+            android:layout_marginEnd="5dp"
+            android:layout_marginTop="5dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
@@ -24,97 +29,41 @@
             android:layout_height="wrap_content" />
 
         <LinearLayout
-            android:id="@+id/map_buttons_layout_1"
+            android:id="@+id/map_layout_1"
+            android:orientation="vertical"
             android:layout_below="@id/map_type_header"
             android:layout_marginTop="10dp"
             android:weightSum="100"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="150dp">
 
-            <Space
-                android:layout_weight="2.5"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content" />
+            <android.support.v4.view.ViewPager
+                android:id="@+id/pager"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginTop="10dp"
+                android:layout_weight="80">
 
-            <ImageButton
-                android:layout_weight="27"
-                android:layout_width="0dp"
-                android:layout_height="80dp" />
+            </android.support.v4.view.ViewPager>
 
-            <Space
-                android:layout_weight="2.5"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content" />
-
-            <ImageButton
-                android:layout_weight="27"
-                android:layout_width="0dp"
-                android:layout_height="80dp" />
-
-            <Space
-                android:layout_weight="2.5"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content" />
-
-            <ImageButton
-                android:layout_weight="27"
-                android:layout_width="0dp"
-                android:layout_height="80dp" />
+            <android.support.design.widget.TabLayout
+                android:id="@+id/tabDots"
+                app:tabBackground="@drawable/tab_selector"
+                app:tabGravity="center"
+                app:tabIndicatorHeight="0dp"
+                android:layout_weight="20"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"/>
 
 
         </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/map_text_layout_1"
-            android:layout_below="@id/map_buttons_layout_1"
-            android:layout_marginTop="10dp"
-            android:weightSum="100"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
 
-            <Space
-                android:layout_weight="2.5"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content" />
-
-            <TextView
-                android:text="Default"
-                android:textAlignment="center"
-                android:layout_weight="27"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content" />
-
-            <Space
-                android:layout_weight="2.5"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content" />
-
-            <TextView
-                android:text="Satellite"
-                android:textAlignment="center"
-                android:layout_weight="27"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content" />
-
-            <Space
-                android:layout_weight="2.5"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content" />
-
-            <TextView
-                android:text="Terrain"
-                android:textAlignment="center"
-                android:layout_weight="27"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content" />
-
-
-        </LinearLayout>
 
         <ImageView
             android:id="@+id/map_divider_1"
             android:layout_marginTop="5dp"
-            android:layout_below="@id/map_text_layout_1"
+            android:layout_below="@id/map_layout_1"
             android:layout_width="match_parent"
             android:layout_height="1dp" />
 
@@ -141,6 +90,10 @@
                 android:layout_height="wrap_content" />
 
             <ImageButton
+                android:id="@+id/optionsPoints"
+                android:src="@drawable/map_details_point_settings"
+                android:background="@null"
+                android:scaleType="fitCenter"
                 android:layout_weight="27"
                 android:layout_width="0dp"
                 android:layout_height="80dp" />
@@ -153,7 +106,8 @@
             <ImageButton
                 android:layout_weight="27"
                 android:layout_width="0dp"
-                android:layout_height="80dp" />
+                android:layout_height="80dp"
+                android:visibility="invisible"/>
 
             <Space
                 android:layout_weight="2.5"
@@ -163,7 +117,8 @@
             <ImageButton
                 android:layout_weight="27"
                 android:layout_width="0dp"
-                android:layout_height="80dp" />
+                android:layout_height="80dp"
+                android:visibility="invisible"/>
 
 
         </LinearLayout>
@@ -171,7 +126,7 @@
         <LinearLayout
             android:id="@+id/details_text_layout_1"
             android:layout_below="@id/details_image_layout_1"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="2dp"
             android:weightSum="100"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -198,7 +153,8 @@
                 android:textAlignment="center"
                 android:layout_weight="27"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:visibility="invisible"/>
 
             <Space
                 android:layout_weight="2.5"
@@ -210,7 +166,8 @@
                 android:textAlignment="center"
                 android:layout_weight="27"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:visibility="invisible"/>
 
 
         </LinearLayout>

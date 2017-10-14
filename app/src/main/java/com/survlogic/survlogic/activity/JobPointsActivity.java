@@ -27,6 +27,7 @@ import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.fragment.JobPointsHomeFragment;
 import com.survlogic.survlogic.fragment.JobPointsListFragment;
 import com.survlogic.survlogic.fragment.JobPointsMapFragment;
+import com.survlogic.survlogic.interf.JobMapOptionsListener;
 import com.survlogic.survlogic.interf.JobPointsListener;
 import com.survlogic.survlogic.model.ProjectJobSettings;
 import com.survlogic.survlogic.utils.BottomNavigationViewHelper;
@@ -35,7 +36,7 @@ import com.survlogic.survlogic.utils.BottomNavigationViewHelper;
  * Created by chrisfillmore on 8/8/2017.
  */
 
-public class JobPointsActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, JobPointsListener{
+public class JobPointsActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, JobPointsListener, JobMapOptionsListener{
     private static final String TAG = "JobPointsActivity";
 
     private static Context mContext;
@@ -313,8 +314,6 @@ public class JobPointsActivity extends AppCompatActivity implements NavigationVi
 
 
     //----------------------------------------------------------------------------------------------//
-
-
     @Override
     public void isMapSelectorActive(boolean isSelected) {
         listenForMapSelectionButtonsActive = isSelected;
@@ -323,5 +322,13 @@ public class JobPointsActivity extends AppCompatActivity implements NavigationVi
     @Override
     public void isMapSelectorOpen(boolean isSelected) {
         listenForMapSelectionButtonsOpen = isSelected;
+    }
+
+    @Override
+    public void onReturnValues(boolean pointNo, boolean pointElev, boolean pointDesc) {
+        Log.d(TAG, "Listener:onReturnValues: Started");
+        Log.i(TAG, "onReturnValues: (pointNo/pointElev/pointDesc:" + pointNo + "/" + pointElev + "/" + pointDesc);
+        jobPointsMapFragment.getMapPointOptionsFromActivity(pointNo, pointElev, pointDesc);
+
     }
 }
