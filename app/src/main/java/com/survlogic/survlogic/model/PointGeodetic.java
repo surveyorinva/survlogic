@@ -6,34 +6,37 @@ package com.survlogic.survlogic.model;
 
 public class PointGeodetic extends PointSurvey{
     private double latitude, longitude, ellipsoid, ortho, accuracy;
-
+    private int pointGeodeticType;
 
     public PointGeodetic(){
 
     }
 
 
-    public PointGeodetic(double latitude, double longitude, double ellipsoid) {
+    public PointGeodetic(double latitude, double longitude, double ellipsoid, int pointGeodeticType) {
         this.latitude = latitude;
         this.longitude = longitude;
         this.ellipsoid = ellipsoid;
+        this.pointGeodeticType = pointGeodeticType;
     }
 
 
-    public PointGeodetic(double latitude, double longitude, double ellipsoid, double accuracy){
+    public PointGeodetic(double latitude, double longitude, double ellipsoid, double accuracy, int pointGeodeticType){
         this.latitude = latitude;
         this.longitude = longitude;
         this.ellipsoid = ellipsoid;
         this.accuracy = accuracy;
+        this.pointGeodeticType = pointGeodeticType;
 
     }
 
-    public PointGeodetic(double latitude, double longitude, double ellipsoid, double ortho, double accuracy){
+    public PointGeodetic(double latitude, double longitude, double ellipsoid, double ortho, double accuracy, int pointGeodeticType){
         this.latitude = latitude;
         this.longitude = longitude;
         this.ellipsoid = ellipsoid;
         this.ortho = ortho;
         this.accuracy = accuracy;
+        this.pointGeodeticType = pointGeodeticType;
     }
 
     public double getLatitude() {
@@ -77,6 +80,11 @@ public class PointGeodetic extends PointSurvey{
         this.accuracy = accuracy;
     }
 
+    public int getPointGeodeticType() {
+        return pointGeodeticType;
+    }
 
-
+    public void setPointGeodeticType(int pointGeodeticType) {
+        this.pointGeodeticType = pointGeodeticType;
+    }
 }

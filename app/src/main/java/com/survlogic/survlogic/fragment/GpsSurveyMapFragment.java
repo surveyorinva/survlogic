@@ -332,7 +332,9 @@ public class GpsSurveyMapFragment extends Fragment implements GpsSurveyListener,
         double averageOrtho = MathHelper.createAverageValueFromArray(mArrayOrtho);
         double averageAccuracy = MathHelper.createAverageValueFromArray(mArrayAccuracy);
 
-        pointGeodetic = new PointGeodetic(averageLat,averageLong,averageEllipsoid, averageOrtho, averageAccuracy);
+        int pointGeodeticType = 3; //Measured
+
+        pointGeodetic = new PointGeodetic(averageLat,averageLong,averageEllipsoid, averageOrtho, averageAccuracy, pointGeodeticType);
 
         intEpochCount = 0;
 
@@ -986,9 +988,6 @@ public class GpsSurveyMapFragment extends Fragment implements GpsSurveyListener,
 
 
         }
-
-
-
 
     }
 

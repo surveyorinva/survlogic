@@ -69,6 +69,8 @@ public class JobPointsAddAdvancedActivity extends AppCompatActivity implements P
     private String pointDescription, jobDbName;
     double mLocationLat = 0, mLocationLong = 0, mLocationEllipsoid = 0, mLocationOrtho = 0, mLocationAccuracy = 0;
 
+    private boolean entryGeodetic = false;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -245,6 +247,7 @@ public class JobPointsAddAdvancedActivity extends AppCompatActivity implements P
             tvLocation_ortho_value.setText(heightOrtho);
             tvLocation_ortho_value.setVisibility(View.VISIBLE);
 
+            entryGeodetic = false;
         }
 
     }
@@ -269,6 +272,7 @@ public class JobPointsAddAdvancedActivity extends AppCompatActivity implements P
             tvLocation_latitude_value.setText(strLatitude);
             tvLocation_latitude_value.setVisibility(View.VISIBLE);
 
+            entryGeodetic = true;
         }
 
         if (longOut !=0){
@@ -427,12 +431,24 @@ public class JobPointsAddAdvancedActivity extends AppCompatActivity implements P
         pointDescription = etPointDescription.getText().toString();
         pointGeodetic.setDescription(pointDescription);
 
-        pointGeodetic.setPointType(0);
+        pointGeodetic.setPointType(1);
 
         pointGeodetic.setLatitude(mLocationLat);
         pointGeodetic.setLongitude(mLocationLong);
         pointGeodetic.setEllipsoid(mLocationEllipsoid);
         pointGeodetic.setOrtho(mLocationOrtho);
+
+
+        int geodeticEntry;
+
+        if(entryGeodetic){
+            geodeticEntry = 1;
+        }else{
+            geodeticEntry = 3;
+        }
+
+        pointGeodetic.setPointGeodeticType(geodeticEntry);
+
 
         Log.d(TAG, "createPointGeodetic: Finished creating pointGeodetic");
         return pointGeodetic;

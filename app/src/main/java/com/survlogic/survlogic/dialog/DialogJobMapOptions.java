@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.media.Image;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.DialogFragment;
@@ -42,6 +43,7 @@ public class DialogJobMapOptions extends DialogFragment {
     private PreferenceLoaderHelper preferenceLoaderHelper;
 
     private ImageButton ibOptionsPoint, ibClose;
+
 
     public static DialogJobMapOptions newInstance(boolean pointNo, boolean pointElev, boolean pointDesc) {
         Log.d(TAG, "newInstance: Starting...");
@@ -131,6 +133,7 @@ public class DialogJobMapOptions extends DialogFragment {
                 dismiss();
             }
         });
+
 
     }
 

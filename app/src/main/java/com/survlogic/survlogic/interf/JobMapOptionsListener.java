@@ -8,7 +8,7 @@ public interface JobMapOptionsListener {
 
     void onReturnValues(boolean pointNo, boolean pointElev, boolean pointDesc);
 
-
+    void onSetMapType(boolean showPlanarView, int worldMapType);
 
 
 }

@@ -24,13 +24,17 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.survlogic.survlogic.R;
+import com.survlogic.survlogic.background.BackgroundGeodeticPointMap;
 import com.survlogic.survlogic.fragment.JobPointsHomeFragment;
 import com.survlogic.survlogic.fragment.JobPointsListFragment;
 import com.survlogic.survlogic.fragment.JobPointsMapFragment;
 import com.survlogic.survlogic.interf.JobMapOptionsListener;
 import com.survlogic.survlogic.interf.JobPointsListener;
+import com.survlogic.survlogic.model.PointGeodetic;
 import com.survlogic.survlogic.model.ProjectJobSettings;
 import com.survlogic.survlogic.utils.BottomNavigationViewHelper;
+
+import java.util.ArrayList;
 
 /**
  * Created by chrisfillmore on 8/8/2017.
@@ -237,6 +241,9 @@ public class JobPointsActivity extends AppCompatActivity implements NavigationVi
                         swapFragment(containerFragment3,false,"MAP_VIEW");
                         jobPointsMapFragment = containerFragment3;
 
+                        //Point Geodetic Load
+                        initWorldMap();
+
                         break;
 
                     case R.id.navigation_item_4:
@@ -331,4 +338,26 @@ public class JobPointsActivity extends AppCompatActivity implements NavigationVi
         jobPointsMapFragment.getMapPointOptionsFromActivity(pointNo, pointElev, pointDesc);
 
     }
+
+    @Override
+    public void onSetMapType(boolean showPlanarView, int worldMapType) {
+        Log.d(TAG, "Listener:onSetMapType: Started");
+
+        jobPointsMapFragment.setMapView(showPlanarView,worldMapType);
+
+    }
+
+    @Override
+    public void getPointsGeodetic(ArrayList<PointGeodetic> lstPointGeodetics) {
+        jobPointsMapFragment.setArrayListPointGeodetic(lstPointGeodetics);
+
+    }
+
+    private void initWorldMap(){
+        Log.d(TAG, "initWorldMap: Started...");
+        BackgroundGeodeticPointMap backgroundGeodeticPointMap = new BackgroundGeodeticPointMap(mContext, jobDatabaseName, this);
+        backgroundGeodeticPointMap.execute();
+
+    }
+
 }

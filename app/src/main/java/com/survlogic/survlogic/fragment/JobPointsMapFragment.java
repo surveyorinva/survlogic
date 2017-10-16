@@ -1,16 +1,24 @@
 package com.survlogic.survlogic.fragment;
 
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Path;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Region;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -24,6 +32,16 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.UiSettings;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.background.BackgroundSurveyPointMap;
 import com.survlogic.survlogic.dialog.DialogJobMapOptions;
@@ -31,6 +49,7 @@ import com.survlogic.survlogic.dialog.DialogJobMapPointList;
 import com.survlogic.survlogic.dialog.DialogJobPointView;
 import com.survlogic.survlogic.interf.JobPointsListener;
 import com.survlogic.survlogic.interf.MapZoomListener;
+import com.survlogic.survlogic.model.PointGeodetic;
 import com.survlogic.survlogic.model.PointSurvey;
 import com.survlogic.survlogic.view.PlanarMapScaleView;
 import com.survlogic.survlogic.view.PlanarMapView;
@@ -43,7 +62,7 @@ import java.util.HashMap;
  * Created by chrisfillmore on 5/2/2017.
  */
 
-public class JobPointsMapFragment extends Fragment {
+public class JobPointsMapFragment extends Fragment implements OnMapReadyCallback {
 
     private static final String TAG = "JobPointsMapFragment";
     private Context mContext;
@@ -60,7 +79,7 @@ public class JobPointsMapFragment extends Fragment {
     private int project_id, job_id;
     private String jobDatabaseName;
 
-    private RelativeLayout relPointActions;
+    private RelativeLayout relPointActions, relWorldMapView, relPlanarMapView;
     private LinearLayout linearLayout_Touch, linearLayout_Fence, linearLayout_Search;
     private FloatingActionButton fabClose;
     private FloatingActionButton fabOptions;
@@ -84,9 +103,19 @@ public class JobPointsMapFragment extends Fragment {
             transitionToLeft, transitionToRight;
 
     private ArrayList<PointSurvey> lstSelectedPoints = new ArrayList<>();
+    private ArrayList<PointGeodetic> lstPointGeodetic = new ArrayList<>();
+
 
     private boolean fabExpanded = false;
     private boolean fabSelectionPoint = false, fabSelectionFence = false;
+
+    //World Map View Variables
+    private SupportMapFragment supportMapFragment;
+
+    //    Mapping Variables
+    private GoogleMap mMap;
+    private UiSettings mUiSettings;
+    private int mapType = 1;
 
     @Nullable
     @Override
@@ -126,6 +155,9 @@ public class JobPointsMapFragment extends Fragment {
         Log.i(TAG, "Database: " + jobDatabaseName);
 
         relPointActions = (RelativeLayout) v.findViewById(R.id.fabRelativePointActions);
+        relPlanarMapView = (RelativeLayout) v.findViewById(R.id.relPlanarMapView);
+        relWorldMapView = (RelativeLayout) v.findViewById(R.id.relWorldMapView);
+
         linearLayout_Touch = (LinearLayout) v.findViewById(R.id.linearLayout_Touch);
         linearLayout_Fence = (LinearLayout) v.findViewById(R.id.linearLayout_Fence);
         linearLayout_Search = (LinearLayout) v.findViewById(R.id.linearLayout_Search);
@@ -380,6 +412,7 @@ public class JobPointsMapFragment extends Fragment {
 
     }
 
+
     private void openOptionsMenu(){
 
         boolean showPointNo = planarMapView.getShowPointNo();
@@ -588,6 +621,175 @@ public class JobPointsMapFragment extends Fragment {
         lstSelectedPoints.addAll(map.values());
 
         map.clear();
+    }
+
+
+    //----------------------------------------------------------------------------------------------//
+    /**
+     * Switch between planar and world views
+     */
+
+    public void setMapView(boolean showPlanarView, int mapType){
+        setMapType(mapType);
+
+        switchMapViews(showPlanarView);
+    }
+
+    private void switchMapViews(boolean showPlanarView){
+        Log.d(TAG, "switchMapViews: Started");
+        if(showPlanarView){
+            relPlanarMapView.setVisibility(View.VISIBLE);
+            relWorldMapView.setVisibility(View.INVISIBLE);
+        }else{
+            relPlanarMapView.setVisibility(View.INVISIBLE);
+            relWorldMapView.setVisibility(View.VISIBLE);
+
+        }
+
+    }
+
+    public void setMapType(int mapType){
+        this.mapType = mapType;
+        switchMapType(mMap);
+    }
+
+    public int getMapType(){
+        return mapType;
+    }
+
+
+
+    /**
+     * World Map View Methods and Functionality
+     */
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        Log.d(TAG, "Start: onMapReady");
+        mMap = googleMap;
+        mUiSettings = mMap.getUiSettings();
+
+        initMapSettings(mMap,mUiSettings);
+
+        if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        mMap.setMyLocationEnabled(false);
+
+        createPointGeodeticAll();
+
+        Log.e(TAG, "Complete: onMapReady");
+    }
+
+    private void initMapSettings(GoogleMap map, UiSettings settings){
+        Log.d(TAG, "initMapSettings: Started...");
+        switchMapType(map);
+
+        settings.setZoomControlsEnabled(true);  //Zoom Controls Shown
+        settings.setCompassEnabled(true); //Compass controls shown
+
+
+    }
+
+
+    private void switchMapType(GoogleMap map){
+        switch (mapType){
+
+            case 1:  //Normal
+                map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+                break;
+
+            case 4:  //Hybrid
+                map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+                break;
+
+            case 2: //Satellite
+                map.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+                break;
+
+            case 3:  //Terrain
+                map.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+                break;
+
+        }
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        Log.d(TAG, "onActivityCreated: Started...");
+        FragmentManager fm = getActivity().getSupportFragmentManager();
+        supportMapFragment = (SupportMapFragment) fm.findFragmentById(R.id.world_map_view);
+
+        if (supportMapFragment == null) {
+            supportMapFragment = SupportMapFragment.newInstance();
+            fm.beginTransaction().replace(R.id.world_map_view, supportMapFragment).commit();
+        }
+        Log.d(TAG, "onActivityCreated: Syncing Map...");
+        supportMapFragment.getMapAsync(this);
+    }
+
+    public void setArrayListPointGeodetic(ArrayList<PointGeodetic> lstArray){
+        Log.d(TAG, "setArrayListPointGeodetic: Started...");
+        lstPointGeodetic.clear();
+        
+        this.lstPointGeodetic = lstArray;
+        Log.d(TAG, "setArrayListPointGeodetic: Listen: " + lstPointGeodetic.size());
+    }
+
+    private void createPointGeodeticAll(){
+        Log.d(TAG, "createPointGeodeticAll: Started");
+        LatLng pointLocationAtStart = new LatLng(0,0);
+        int pointNoAtStart;
+
+        for(int i=0; i<lstPointGeodetic.size(); i++) {
+            PointGeodetic pointGeodetic = lstPointGeodetic.get(i);
+
+            double pointLatitude = pointGeodetic.getLatitude();
+            double pointLongitude = pointGeodetic.getLongitude();
+            int pointNo = pointGeodetic.getPoint_no();
+
+            Log.d(TAG, "createPointGeodeticAll: Lat/Long: " +pointNo + ": " + pointLatitude + ", " + pointLongitude);
+
+            if(i==0){
+                Log.d(TAG, "createPointGeodeticAll: 1st Entry in Array");
+                pointLocationAtStart = new LatLng(pointLatitude,pointLongitude);
+                pointNoAtStart = pointNo;
+            }
+
+            LatLng point = new LatLng(pointLatitude,pointLongitude);
+
+            Drawable circleDrawable = ContextCompat.getDrawable(getActivity(), R.drawable.map_symbol_cross_45);
+            BitmapDescriptor markerIcon = getMarkerIconFromDrawable(circleDrawable);
+
+            mMap.addMarker(new MarkerOptions()
+                    .position(point)
+                    .title(String.valueOf(pointNo))
+                    .icon(markerIcon));
+
+        }
+
+        CameraPosition cameraPosition = new CameraPosition.Builder()
+                .target(pointLocationAtStart)
+                .zoom(19)
+                .bearing(0)
+                .tilt(0)
+                .build();
+
+
+        if(pointLocationAtStart != null) {
+            mMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+        }
+
+    }
+
+    private BitmapDescriptor getMarkerIconFromDrawable(Drawable drawable) {
+        Canvas canvas = new Canvas();
+        Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        canvas.setBitmap(bitmap);
+        drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
+        drawable.draw(canvas);
+        return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
 
 

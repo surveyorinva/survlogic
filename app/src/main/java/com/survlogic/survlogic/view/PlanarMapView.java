@@ -7,11 +7,14 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.EmbossMaskFilter;
 import android.graphics.MaskFilter;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
+import android.graphics.PointF;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.graphics.Region;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
@@ -73,7 +76,7 @@ public class PlanarMapView extends View {
     private Rect clipBounds_canvas, originalBounds_canvas;
 
     private float screenDistance, symbolSize, textSize;
-    private static float scaleRatioSymbol= 0.08f, scaleRatioText = 0.1f;
+    private static float scaleRatioSymbol= 0.01f, scaleRatioText = 0.02f;
     private float drawingTouchRadius = 30;
 
     private boolean mLongClick = false;
@@ -143,6 +146,7 @@ public class PlanarMapView extends View {
 
     }
 
+
     private void initPoints(){
         Log.d(TAG, "||initPoints: Started...");
         Log.d(TAG, "initPoints: Planar Scale: " + planarScale);
@@ -174,7 +178,7 @@ public class PlanarMapView extends View {
         planarWidthScale = (double) screenWidth / (double) planarWidth;
         planarHeightScale = (double) screenHeight / (double) planarHeight;
 
-        if(planarWidthScale<planarHeightScale){
+        if(screenWidth<screenHeight){
             planarScale = planarWidthScale;
         }else{
             planarScale = planarHeightScale;
@@ -282,6 +286,8 @@ public class PlanarMapView extends View {
 
     public void setObjectSize(float scaleDistance){
         Log.d(TAG, "setObjectSize: Started...");
+
+        Log.d(TAG, "Sizes: Scale Distance: " + scaleDistance);
         this.symbolSize = scaleDistance * scaleRatioSymbol;
 
         this.textSize = scaleDistance * scaleRatioText;
@@ -386,7 +392,7 @@ public class PlanarMapView extends View {
             int symbolColor = Color.WHITE;
 
             drawCross(c,deltaEastScaled, deltaNorthScaled,symbolSize, symbolColor);
-
+            Log.d(TAG, "createPointsAll: Symbol Size: " + symbolSize);
 
             if(showPointNo){
                drawPointNo(c, deltaEastScaled, deltaNorthScaled, String.valueOf(pointSurvey.getPoint_no()),textSize,Color.WHITE );
@@ -425,7 +431,9 @@ public class PlanarMapView extends View {
 
 
     private void drawPointNo(Canvas c, float x, float y, String pointNumber, float textSize, int textColor){
+        Log.d(TAG, "drawPointNo: Started");
 
+        Log.d(TAG, "Sizes: Text: " + textSize);
         float textBufferX = symbolSize;
         float textBufferY = symbolSize;
 
@@ -645,8 +653,10 @@ public class PlanarMapView extends View {
         paintLine.setStrokeCap(Paint.Cap.ROUND);
         paintLine.setColor(lineColor);
 
-        float lineWidth = 0.01f;
+        float lineWidth = 0.003f;
         float scaledLineWidth = lineWidth * screenDistance;
+        Log.d(TAG, "Sizes: Symbol: " + LINE_RADIUS);
+        Log.d(TAG, "Sizes: Line Width: " + scaledLineWidth);
 
         paintLine.setStrokeWidth(scaledLineWidth);
 
@@ -719,6 +729,46 @@ public class PlanarMapView extends View {
     private void clear_canvas_background(){
         drawPlanarCanvas.drawColor(0, PorterDuff.Mode.CLEAR);
         invalidate();
+
+    }
+
+    //----------------------------------------------------------------------------------------------//
+    /**
+     * Version 2
+     */
+
+    private void initMapView(){
+        Log.d(TAG, "initMapView: Started...");
+        Path allPointsPath = new Path();
+        int pathVectorsCount = 0;
+
+        for(int i=0; i<lstPoints.size();i++){
+            PointSurvey pointSurvey = lstPoints.get(i);
+
+            if(i==0){
+                allPointsPath.moveTo((float) pointSurvey.getEasting(), (float) pointSurvey.getNorthing());
+                pathVectorsCount++;
+            }else{
+                allPointsPath.lineTo((float) pointSurvey.getEasting(), (float) pointSurvey.getNorthing());
+                pathVectorsCount++;
+            }
+
+        }
+
+        RectF allPointsBounds = new RectF();
+        allPointsPath.computeBounds(allPointsBounds, false);
+
+        float boundsLeft = allPointsBounds.left - screenBufferX;
+        float boundsTop = allPointsBounds.top - screenBufferY;
+        float boundsRight = allPointsBounds.right + screenBufferX;
+        float boundsBottom = allPointsBounds.bottom + screenBufferY;
+
+        Matrix scaleMatrix = new Matrix();
+
+        float scaleX = screenWidth / allPointsBounds.width();
+        float scaleY = screenWidth / allPointsBounds.height();
+
+
 
     }
 

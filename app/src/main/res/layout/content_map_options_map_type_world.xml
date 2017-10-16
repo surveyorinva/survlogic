@@ -18,6 +18,7 @@
             android:layout_height="wrap_content" />
 
         <ImageButton
+            android:id="@+id/map_type_world_default"
             android:background="@drawable/map_type_hybrid"
             android:scaleType="fitXY"
             android:layout_weight="27"
@@ -30,6 +31,7 @@
             android:layout_height="wrap_content" />
 
         <ImageButton
+            android:id="@+id/map_type_world_aerial"
             android:background="@drawable/map_type_aerial"
             android:layout_weight="27"
             android:layout_width="0dp"
@@ -41,6 +43,7 @@
             android:layout_height="wrap_content" />
 
         <ImageButton
+            android:id="@+id/map_type_world_topo"
             android:background="@drawable/map_type_topo"
             android:layout_weight="27"
             android:layout_width="0dp"
