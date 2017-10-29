@@ -125,7 +125,7 @@ public class DialogJobMapPointList extends DialogFragment {
     private void initViewWidgets(){
         Log.d(TAG, "initViewWidgets: Started...");
 
-        pointSurveyTableView = (SortablePointSurveyTableView) getDialog().findViewById(R.id.tableView_for_Points);
+        pointSurveyTableView = (SortablePointSurveyTableView) getDialog().findViewById(R.id.tableView_for_Points_Survey);
 
         progressBar = (ProgressBar) getDialog().findViewById(R.id.progressBar_Loading);
 

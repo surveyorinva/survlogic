@@ -43,7 +43,6 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.survlogic.survlogic.R;
-import com.survlogic.survlogic.background.BackgroundSurveyPointMap;
 import com.survlogic.survlogic.dialog.DialogJobMapOptions;
 import com.survlogic.survlogic.dialog.DialogJobMapPointList;
 import com.survlogic.survlogic.dialog.DialogJobPointView;
@@ -103,6 +102,7 @@ public class JobPointsMapFragment extends Fragment implements OnMapReadyCallback
             transitionToLeft, transitionToRight;
 
     private ArrayList<PointSurvey> lstSelectedPoints = new ArrayList<>();
+    private ArrayList<PointSurvey> lstPointSurvey = new ArrayList<>();
     private ArrayList<PointGeodetic> lstPointGeodetic = new ArrayList<>();
 
 
@@ -387,12 +387,30 @@ public class JobPointsMapFragment extends Fragment implements OnMapReadyCallback
     }
 
 
+    private void initSurveyMap() {
+        Log.d(TAG, "initSurveyMap: Started...");
+
+
+
+    }
+
+
     public void getMapPointOptionsFromActivity(boolean showPointNo, boolean showPointElev, boolean showPointDesc){
         planarMapView.setShowPointNo(showPointNo);
         planarMapView.setShowPointElevation(showPointElev);
         planarMapView.setShowPointDesc(showPointDesc);
 
     }
+
+
+    public void setArrayListPointSurvey(ArrayList<PointSurvey> lstArray){
+        Log.d(TAG, "setArrayListPointGeodetic: Started...");
+        lstPointSurvey.clear();
+
+        this.lstPointSurvey = lstArray;
+        Log.d(TAG, "setArrayListPointGeodetic: Listen: " + lstPointSurvey.size());
+    }
+
 
     private void showPlanarMap(){
 
@@ -407,8 +425,9 @@ public class JobPointsMapFragment extends Fragment implements OnMapReadyCallback
 
     private void initPlanarMap(){
         Log.d(TAG, "initPlanarMap: Started...");
-        BackgroundSurveyPointMap backgroundSurveyPointMap = new BackgroundSurveyPointMap(getActivity(),jobDatabaseName);
-        backgroundSurveyPointMap.execute();
+        planarMapView.setDatabaseName(jobDatabaseName);
+        planarMapView.setPointList(lstPointSurvey);
+        planarMapView.setMap();
 
     }
 
@@ -640,9 +659,15 @@ public class JobPointsMapFragment extends Fragment implements OnMapReadyCallback
         if(showPlanarView){
             relPlanarMapView.setVisibility(View.VISIBLE);
             relWorldMapView.setVisibility(View.INVISIBLE);
+
+            fabSelect.startAnimation(transitionToRight);
+
         }else{
             relPlanarMapView.setVisibility(View.INVISIBLE);
             relWorldMapView.setVisibility(View.VISIBLE);
+
+            fabSelect.startAnimation(transitionRight);
+
 
         }
 
@@ -748,23 +773,27 @@ public class JobPointsMapFragment extends Fragment implements OnMapReadyCallback
             double pointLatitude = pointGeodetic.getLatitude();
             double pointLongitude = pointGeodetic.getLongitude();
             int pointNo = pointGeodetic.getPoint_no();
+            String pointDesc = pointGeodetic.getDescription();
 
             Log.d(TAG, "createPointGeodeticAll: Lat/Long: " +pointNo + ": " + pointLatitude + ", " + pointLongitude);
 
             if(i==0){
                 Log.d(TAG, "createPointGeodeticAll: 1st Entry in Array");
                 pointLocationAtStart = new LatLng(pointLatitude,pointLongitude);
-                pointNoAtStart = pointNo;
             }
 
             LatLng point = new LatLng(pointLatitude,pointLongitude);
+
+            String markerTitle = String.valueOf(pointNo);
+            String pointSnippet = pointDesc;
 
             Drawable circleDrawable = ContextCompat.getDrawable(getActivity(), R.drawable.map_symbol_cross_45);
             BitmapDescriptor markerIcon = getMarkerIconFromDrawable(circleDrawable);
 
             mMap.addMarker(new MarkerOptions()
                     .position(point)
-                    .title(String.valueOf(pointNo))
+                    .title(markerTitle)
+                    .snippet(pointSnippet)
                     .icon(markerIcon));
 
         }

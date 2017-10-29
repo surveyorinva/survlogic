@@ -13,6 +13,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -23,6 +26,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
@@ -30,7 +34,10 @@ import android.widget.Toast;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.database.JobDatabaseHandler;
+import com.survlogic.survlogic.fragment.JobHomeHomeFragment;
+import com.survlogic.survlogic.fragment.JobPointsHomeFragment;
 import com.survlogic.survlogic.fragment.JobPointsListFragment;
+import com.survlogic.survlogic.fragment.JobPointsMapFragment;
 import com.survlogic.survlogic.model.ProjectJobSettings;
 import com.survlogic.survlogic.utils.BottomNavigationViewHelper;
 
@@ -69,6 +76,8 @@ public class JobHomeActivity extends AppCompatActivity implements NavigationView
     private RelativeLayout rlLayout2;
     private ProgressBar progressBar;
 
+    private FrameLayout container;
+
     public Handler mHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
@@ -93,6 +102,7 @@ public class JobHomeActivity extends AppCompatActivity implements NavigationView
         initViewNavigation();
         initViewWidgets();
         initBottomNavigationView();
+        initFragmentContainer(savedInstanceState);
 
         loadPreferences();
         checkPreferences();
@@ -148,17 +158,24 @@ public class JobHomeActivity extends AppCompatActivity implements NavigationView
 
         switch (item.getItemId()){
             case R.id.menu_item1_id:
-
-                break;
-
-            case R.id.menu_item2_id:
-                //Go To Points Menu
-                Intent i = new Intent(this, JobPointsActivity.class);
+                Intent i = new Intent(this, JobHomeActivity.class);
                 i.putExtra(getString(R.string.KEY_PROJECT_ID),project_id);
                 i.putExtra(getString(R.string.KEY_JOB_ID), job_id);
                 i.putExtra(getString(R.string.KEY_JOB_DATABASE), jobDatabaseName);
 
                 startActivity(i);
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+
+                break;
+
+            case R.id.menu_item2_id:
+                //Go To Points Menu
+                Intent j = new Intent(this, JobPointsActivity.class);
+                j.putExtra(getString(R.string.KEY_PROJECT_ID),project_id);
+                j.putExtra(getString(R.string.KEY_JOB_ID), job_id);
+                j.putExtra(getString(R.string.KEY_JOB_DATABASE), jobDatabaseName);
+
+                startActivity(j);
                 overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
 
                 break;
@@ -503,6 +520,7 @@ public class JobHomeActivity extends AppCompatActivity implements NavigationView
     }
 
     public void enableNavigationHome(final Context mContext, BottomNavigationViewEx view) {
+        Log.d(TAG, "enableNavigationHome: Starting....");
         view.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -513,46 +531,64 @@ public class JobHomeActivity extends AppCompatActivity implements NavigationView
                 switch (item.getItemId()) {
 
                     case R.id.navigation_item_1:
-                        Log.d(TAG, "onNavigationItemSelected: At 1");
+                        Log.d(TAG, "onNavigationItemSelected: Nav Item 1 - Start");
                         ACTIVITY_NUM = 0;
-
                         menuItem = menu.getItem(ACTIVITY_NUM);
                         menuItem.setChecked(false);
 
-                        break;
+                        JobHomeHomeFragment containerFragment1 = new JobHomeHomeFragment();
+                        containerFragment1.setArguments(getIntent().getExtras());
 
-                    case R.id.navigation_item_2:
-                        Log.d(TAG, "onNavigationItemSelected: At 2");
-                        ACTIVITY_NUM = 1;
-
-                        menuItem = menu.getItem(ACTIVITY_NUM);
-                        menuItem.setChecked(false);
+                        swapFragment(containerFragment1,true,"HOME");
 
                         break;
 
-                    case R.id.navigation_item_3:
-                        Log.d(TAG, "onNavigationItemSelected: At 3");
-                        ACTIVITY_NUM = 2;
 
-                        menuItem = menu.getItem(ACTIVITY_NUM);
-                        menuItem.setChecked(false);
-
-                        break;
-
-                    case R.id.navigation_item_4:
-                        Log.d(TAG, "onNavigationItemSelected: At 4");
-                        ACTIVITY_NUM = 3;
-
-                        menuItem = menu.getItem(ACTIVITY_NUM);
-                        menuItem.setChecked(false);
-
-                        break;
                 }
 
 
                 return false;
             }
         });
+    }
+
+
+    private void initFragmentContainer(@Nullable Bundle savedInstanceState) {
+        Log.d(TAG, "initFragmentContainer: Starting...");
+        container = (FrameLayout) findViewById(R.id.container_in_job_home);
+
+        if (container != null) {
+            if (savedInstanceState != null) {
+                return;
+            }
+
+            JobHomeHomeFragment containerFragment = new JobHomeHomeFragment();
+            containerFragment.setArguments(getIntent().getExtras());
+
+            FragmentManager fm = getSupportFragmentManager();
+            FragmentTransaction ft = fm.beginTransaction();
+            ft.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
+            ft.add(R.id.container_in_job_home, containerFragment, "HOME");
+            ft.commit();
+
+
+        }
+
+    }
+    private void swapFragment(Fragment fragment, boolean addToStack, String tag){
+        Log.d(TAG, "swapFragment: Starting..");
+
+        FragmentManager fm = getSupportFragmentManager();
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
+        ft.replace(R.id.container_in_job_home,fragment);
+
+        if(addToStack) {
+            ft.addToBackStack(tag);
+        }
+
+        ft.commit();
+
     }
 
     //-------------------------------------------------------------------------------------------------------------------------//

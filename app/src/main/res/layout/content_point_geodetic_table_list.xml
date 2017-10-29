@@ -6,15 +6,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.survlogic.survlogic.view.SortablePointSurveyTableView
-        android:id="@+id/tableView_for_Points"
+    <com.survlogic.survlogic.view.SortablePointGeodeticTableView
+        android:id="@+id/tableView_for_Points_Geodetic"
         app:tableView_columnCount="5"
         app:tableView_headerColor="@color/tableHeaderBackground"
         app:tableView_headerElevation="10"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-    </com.survlogic.survlogic.view.SortablePointSurveyTableView>
+    </com.survlogic.survlogic.view.SortablePointGeodeticTableView>
     
     
 

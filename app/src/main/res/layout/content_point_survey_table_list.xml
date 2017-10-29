@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/iew_in_content_point_table_list"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.survlogic.survlogic.view.SortablePointSurveyTableView
+        android:id="@+id/tableView_for_Points_Survey"
+        app:tableView_columnCount="5"
+        app:tableView_headerColor="@color/tableHeaderBackground"
+        app:tableView_headerElevation="10"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </com.survlogic.survlogic.view.SortablePointSurveyTableView>
+    
+    
+
+
+</RelativeLayout>

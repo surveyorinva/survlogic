@@ -209,6 +209,10 @@
     <string name="job_point_list_header_description">Desc</string>
     <string name="job_point_list_header_tag">Tag</string>
 
+    <string name="job_point_list_header_latitude">Latitude</string>
+    <string name="job_point_list_header_longitude">Longitude</string>
+    <string name="job_point_list_header_ellipsoid">Ellipsoid</string>
+
     <!--Add New Point-->
     <string name="dialog_job_point_name">Add New Point</string>
     <string name="dialog_job_point_item_pointNo">Point No.</string>
@@ -286,6 +290,11 @@
     <string name="sketch_new_validation_save_success">Sketch Saved!</string>
     <string name="sketch_new_validation_save_failed">Error Saving Sketch.  Please try again.</string>
 
+    <!--Points FAB-->
+    <string name="point_menu_select_by_point">Point Group Filter</string>
+    <string name="point_menu_select_by_options">Point Details</string>
+    <string name="point_menu_select_by_search">Search by Point No.</string>
+
     <!--Map FAB-->
     <string name="map_menu_select_by_point">Select by touch</string>
     <string name="map_menu_select_by_fence">Select by fence</string>
@@ -298,6 +307,46 @@
     <string name="map_action_fence_action_1">List</string>
     <string name="map_action_fence_action_2">Inverse</string>
     <string name="map_action_fence_action_3">Del</string>
+
+    <!--Home - Home -->
+    <string name="home_home_header_1">Quick Access</string>
+    <string name="home_home_action_1_1">Points</string>
+    <string name="home_home_action_1_2">Map \nView</string>
+    <string name="home_home_action_1_3">Survey</string>
+    <string name="home_home_action_1_4">Tools</string>
+
+    <string name="home_home_header_2">Applications</string>
+    <string name="home_home_action_2_1">Raw \nData</string>
+    <string name="home_home_action_2_2">Field \nBook</string>
+    <string name="home_home_action_2_3">Photos</string>
+    <string name="home_home_action_2_4">Job \nNotes</string>
+
+    <string name="home_home_header_3">Utilities</string>
+    <string name="home_home_action_3_1">Import/ \nExport</string>
+    <string name="home_home_action_3_2">Manage \nFiles</string>
+    <string name="home_home_action_3_3">Share</string>
+
+    <!--Point - Home -->
+    <string name="point_home_header_1">Import/Export</string>
+    <string name="point_home_action_1_1">Import \nPoints</string>
+    <string name="point_home_action_1_2">Import \nJob Files</string>
+    <string name="point_home_action_1_3">Share \nJob Files</string>
+    <string name="point_home_action_1_4">Export \nPoints</string>
+
+    <string name="point_home_header_2">Tools</string>
+    <string name="point_home_action_2_1">Coordinate \nTransformation</string>
+    <string name="point_home_action_2_2">Scale \nPoints</string>
+    <string name="point_home_action_2_3">Translate \nPoints</string>
+    <string name="point_home_action_2_4">Rotate \nPoints</string>
+    <string name="point_home_action_2_5">Align \nPoints</string>
+    <string name="point_home_action_2_6">Renumber \nPoints</string>
+
+    <string name="point_home_header_3">Utilities</string>
+    <string name="point_home_action_3_1">Reports </string>
+    <string name="point_home_action_3_2">Compare \nPoints</string>
+    <string name="point_home_action_3_3">Compress \nPoints</string>
+    <string name="point_home_action_3_4">Swap \nN and E</string>
+    <string name="point_home_action_3_5">Change \nUnits</string>
 
     <!-- ******************************Strings related to Settings****************************** -->
 

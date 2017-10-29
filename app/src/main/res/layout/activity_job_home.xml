@@ -44,16 +44,20 @@
 
         </RelativeLayout>
 
-        <RelativeLayout
-            android:id="@+id/relLayout_3"
+        <!--Container-->
+        <FrameLayout
+            android:id="@+id/container_in_job_home"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent"
+            android:layout_above="@+id/include"
+            android:layout_below="@+id/relLayout_2">
 
-        </RelativeLayout>
+        </FrameLayout>
 
         <!--Bottom Toolbar-->
         <include
-            layout="@layout/app_bar_job_bottom_home"/>
+            layout="@layout/app_bar_job_bottom_home"
+            android:id="@+id/include" />
 
 
     </RelativeLayout>

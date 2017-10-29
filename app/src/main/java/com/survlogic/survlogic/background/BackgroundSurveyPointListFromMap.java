@@ -3,7 +3,6 @@ package com.survlogic.survlogic.background;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -12,7 +11,6 @@ import android.widget.Toast;
 import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.adapter.PointSurveyTableDataAdapter;
 import com.survlogic.survlogic.adapter.ProjectListAdaptor;
-import com.survlogic.survlogic.database.JobDatabaseHandler;
 import com.survlogic.survlogic.model.PointSurvey;
 import com.survlogic.survlogic.view.SortablePointSurveyTableView;
 
@@ -127,7 +125,7 @@ public class BackgroundSurveyPointListFromMap extends AsyncTask <PointSurvey,Poi
         
         final SortablePointSurveyTableView pointSurveyTableView;
 
-        pointSurveyTableView = (SortablePointSurveyTableView) activity.findViewById(R.id.tableView_for_Points);
+        pointSurveyTableView = (SortablePointSurveyTableView) activity.findViewById(R.id.tableView_for_Points_Survey);
 
         if (pointSurveyTableView != null) {
             Log.d(TAG, "initSurveyPointListRecyclerView: Table View Not Null");

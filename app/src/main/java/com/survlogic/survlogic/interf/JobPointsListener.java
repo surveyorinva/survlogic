@@ -1,6 +1,7 @@
 package com.survlogic.survlogic.interf;
 
 import com.survlogic.survlogic.model.PointGeodetic;
+import com.survlogic.survlogic.model.PointSurvey;
 
 import java.util.ArrayList;
 
@@ -15,4 +16,6 @@ public interface JobPointsListener {
     void isMapSelectorOpen(boolean isSelected);
 
     void getPointsGeodetic(ArrayList<PointGeodetic> lstPointGeodetics);
+
+    void getPointsSurvey(ArrayList<PointSurvey> lstPointSurvey);
 }

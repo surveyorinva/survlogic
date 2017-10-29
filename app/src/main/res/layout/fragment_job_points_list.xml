@@ -10,25 +10,88 @@
         android:layout_width="match_parent"
         android:layout_height="50dp">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Points - LIST"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="10dp"
-            android:textSize="20sp"/>
+        <LinearLayout
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:weightSum="100"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Space
+                android:layout_weight="50"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content" />
+
+            <ImageButton
+                android:id="@+id/switchToWorld"
+                android:src="@drawable/vd_world"
+                android:scaleType="fitCenter"
+                android:background="@drawable/button_ripple_semi_transparent_border"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp"
+                android:layout_weight="15"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content" />
+
+            <Space
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content" />
+
+            <ImageButton
+                android:id="@+id/switchToGrid"
+                android:src="@drawable/vd_grid"
+                android:scaleType="fitCenter"
+                android:background="@drawable/button_ripple_semi_transparent_border"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp"
+                android:layout_weight="15"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content" />
+
+            <Space
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content" />
+
+            <ImageButton
+                android:id="@+id/switchToPlanar"
+                android:src="@drawable/vd_plan"
+                android:scaleType="fitCenter"
+                android:background="@drawable/button_ripple_semi_transparent_border"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp"
+                android:layout_weight="15"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
 
     </RelativeLayout>
 
     <RelativeLayout
-        android:id="@+id/rl_layout_2"
+        android:id="@+id/rl_layout_point_survey_table"
+        android:visibility="visible"
         android:layout_below="@id/rl_layout_1_header"
         android:layout_above="@+id/rl_layout_3_footer"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <include
-            layout="@layout/content_point_table_list"/>
+            layout="@layout/content_point_survey_table_list"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/rl_layout_point_geodetic_table"
+        android:visibility="invisible"
+        android:layout_below="@id/rl_layout_1_header"
+        android:layout_above="@+id/rl_layout_3_footer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <include
+            layout="@layout/content_point_geodetic_table_list"/>
 
     </RelativeLayout>
 
@@ -39,9 +102,11 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true">
 
+
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab_in_job_points"
             android:src="@drawable/ic_general_add"
+            app:fabSize="normal"
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"
             android:layout_margin="@dimen/fab_margin"
@@ -52,6 +117,6 @@
 
     </RelativeLayout>
 
-
+    <include layout="@layout/layout_point_view_fab_select_submenu"/>
 
 </RelativeLayout>

@@ -44,6 +44,51 @@
 
         </RelativeLayout>
 
+        <RelativeLayout
+            android:id="@+id/relLayout_3"
+            android:layout_below="@id/relLayout_1"
+            android:background="@color/black"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/ic_action_filter"
+                android:layout_centerVertical="true"
+                android:layout_alignParentStart="true"
+                android:background="@drawable/ic_action_filter_dark"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/tv_header"
+                android:layout_toEndOf="@id/ic_action_filter"
+                android:text="Filtering Point List"
+                android:textColor="@color/blue_primary_dark"
+                android:layout_marginTop="5dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/tv_value"
+                android:text="Showing:"
+                android:textColor="@color/white"
+                android:layout_toEndOf="@id/ic_action_filter"
+                android:layout_below="@id/tv_header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <ImageButton
+                android:id="@+id/ib_close"
+                android:layout_marginEnd="5dp"
+                android:layout_centerVertical="true"
+                android:layout_alignParentEnd="true"
+                android:background="@drawable/ic_close_white_24dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+        </RelativeLayout>
+
         <!--Container-->
         <FrameLayout
             android:id="@+id/container_in_job_points"

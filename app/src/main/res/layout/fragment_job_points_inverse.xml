@@ -1,0 +1,506 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:id="@+id/rlHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/card_label_summary"
+            android:text="INVERSE"
+            style="@style/Labels.Card.ProjectCategory"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="@dimen/card_margin_between_headers"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/rlInput"
+        android:layout_below="@id/rlHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/card_inverse"
+            app:cardCornerRadius="3dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="80dp">
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:weightSum="2"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <RelativeLayout
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent">
+
+                    <ImageView
+                        android:id="@+id/left_item1_img"
+                        android:background="@drawable/vc_circle_green"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp" />
+
+                    <TextView
+                        android:id="@+id/left_item1_header"
+                        android:text="FROM"
+                        style="@style/Labels.Card.ProjectHeader"
+                        android:layout_alignTop="@id/left_item1_img"
+                        android:layout_toEndOf="@id/left_item1_img"
+                        android:layout_marginStart="5dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <AutoCompleteTextView
+                        android:id="@+id/left_item1_value"
+                        style="@style/Labels.Card.ProjectValues"
+                        android:layout_alignStart="@id/left_item1_header"
+                        android:layout_below="@id/left_item1_header"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <ImageButton
+                        android:background="@drawable/button_ripple_semi_transparent_border"
+                        android:src="@drawable/ic_bottom_list_add"
+                        android:layout_marginEnd="5dp"
+                        android:scaleType="centerCrop"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+
+                </RelativeLayout>
+
+
+                <RelativeLayout
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:visibility="visible">
+
+                    <ImageView
+                        android:id="@+id/right_item1_img"
+                        android:background="@drawable/vc_circle_green"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp" />
+
+                    <TextView
+                        android:id="@+id/right_item1_header"
+                        android:text="TO"
+                        style="@style/Labels.Card.ProjectHeader"
+                        android:layout_alignTop="@id/right_item1_img"
+                        android:layout_toEndOf="@id/right_item1_img"
+                        android:layout_marginStart="5dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <AutoCompleteTextView
+                        android:id="@+id/right_item1_value"
+                        style="@style/Labels.Card.ProjectValues"
+                        android:layout_alignStart="@id/right_item1_header"
+                        android:layout_below="@id/right_item1_header"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <ImageButton
+                        android:background="@drawable/button_ripple_semi_transparent_border"
+                        android:src="@drawable/ic_bottom_list_add"
+                        android:layout_marginEnd="5dp"
+                        android:scaleType="centerCrop"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                </RelativeLayout>
+
+            </LinearLayout>
+
+        </android.support.v7.widget.CardView>
+
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/rlCalculations"
+        android:layout_below="@id/rlInput"
+        android:weightSum="100"
+        android:orientation="horizontal"
+        android:layout_marginTop="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Space
+            android:layout_weight="30"
+            android:layout_width="0dp"
+            android:layout_height="match_parent" />
+
+        <Button
+            android:text="Calculate"
+            style="@style/Button.Flat.Primary.Save"
+            android:layout_weight="40"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+
+
+    </LinearLayout>
+
+
+    <RelativeLayout
+        android:id="@+id/rlResults"
+        android:visibility="gone"
+        android:layout_below="@id/rlCalculations"
+        android:layout_marginTop="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/card_summary"
+            app:cardCornerRadius="3dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="200dp">
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:weightSum="2"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <RelativeLayout
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent">
+
+                    <TextView
+                        android:id="@+id/left_results1_header"
+                        android:text="Direction"
+                        style="@style/Labels.Card.ProjectHeader"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:id="@+id/left_results1_value"
+                        style="@style/Labels.Card.ProjectValues"
+                        android:layout_alignStart="@id/left_results1_header"
+                        android:layout_below="@id/left_results1_header"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:id="@+id/left_results2_header"
+                        android:text="Horiz. Distance"
+                        style="@style/Labels.Card.ProjectHeader"
+                        android:layout_below="@id/left_results1_value"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:id="@+id/left_results2_value"
+                        style="@style/Labels.Card.ProjectValues"
+                        android:layout_alignStart="@id/left_results2_header"
+                        android:layout_below="@id/left_results2_header"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:id="@+id/left_results3_header"
+                        android:text="Slope Distance"
+                        style="@style/Labels.Card.ProjectHeader"
+                        android:layout_below="@id/left_results2_value"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:id="@+id/left_results3_value"
+                        style="@style/Labels.Card.ProjectValues"
+                        android:layout_alignStart="@id/left_results3_header"
+                        android:layout_below="@id/left_results3_header"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:id="@+id/left_results4_header"
+                        android:text="Slope Distance"
+                        style="@style/Labels.Card.ProjectHeader"
+                        android:layout_below="@id/left_results3_value"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:id="@+id/left_results4_value"
+                        style="@style/Labels.Card.ProjectValues"
+                        android:layout_alignStart="@id/left_results4_header"
+                        android:layout_below="@id/left_results4_header"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:id="@+id/left_results5_header"
+                        android:text="Vertical Distance"
+                        style="@style/Labels.Card.ProjectHeader"
+                        android:layout_below="@id/left_results4_value"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:id="@+id/left_results5_value"
+                        style="@style/Labels.Card.ProjectValues"
+                        android:layout_alignStart="@id/left_results5_header"
+                        android:layout_below="@id/left_results5_header"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                </RelativeLayout>
+
+
+                <RelativeLayout
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:visibility="visible">
+
+                    <TextView
+                        android:id="@+id/left_extra0_header"
+                        android:text="FROM"
+                        style="@style/Labels.Card.ProjectHeader"
+                        android:gravity="center"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                    <LinearLayout
+                        android:id="@+id/llFromCoordinatesHeader"
+                        android:orientation="horizontal"
+                        android:weightSum="100"
+                        android:layout_below="@id/left_extra0_header"
+                        android:layout_marginStart="5dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:id="@+id/right_extra1_header"
+                            android:text="Northing"
+                            style="@style/Labels.Card.ProjectHeader"
+                            android:gravity="center"
+                            android:layout_weight="50"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content" />
+
+                        <TextView
+                            android:id="@+id/right_extra1a_header"
+                            android:text="Easting"
+                            android:gravity="center"
+                            style="@style/Labels.Card.ProjectHeader"
+                            android:layout_weight="50"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/llFromCoordinatesValue"
+                        android:orientation="horizontal"
+                        android:weightSum="100"
+                        android:layout_below="@id/llFromCoordinatesHeader"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:id="@+id/right_extra1_value"
+                            style="@style/Labels.Card.ProjectValues"
+                            android:gravity="center"
+                            android:layout_weight="50"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content" />
+
+                        <TextView
+                            android:id="@+id/right_extra1a_value"
+                            android:gravity="center"
+                            style="@style/Labels.Card.ProjectValues"
+                            android:layout_weight="50"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content" />
+
+
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/left_extra3_header"
+                        android:text="TO"
+                        style="@style/Labels.Card.ProjectHeader"
+                        android:layout_below="@id/llFromCoordinatesValue"
+                        android:gravity="center"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                    <LinearLayout
+                        android:id="@+id/llToCoordinatesHeader"
+                        android:orientation="horizontal"
+                        android:weightSum="100"
+                        android:layout_below="@id/left_extra3_header"
+                        android:layout_marginStart="5dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:id="@+id/right_extra4_header"
+                            android:text="Northing"
+                            style="@style/Labels.Card.ProjectHeader"
+                            android:gravity="center"
+                            android:layout_weight="50"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content" />
+
+                        <TextView
+                            android:id="@+id/right_extra4a_header"
+                            android:text="Easting"
+                            android:gravity="center"
+                            style="@style/Labels.Card.ProjectHeader"
+                            android:layout_weight="50"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/llToCoordinatesValue"
+                        android:orientation="horizontal"
+                        android:weightSum="100"
+                        android:layout_below="@id/llToCoordinatesHeader"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:id="@+id/right_extra4_value"
+                            style="@style/Labels.Card.ProjectValues"
+                            android:gravity="center"
+                            android:layout_weight="50"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content" />
+
+                        <TextView
+                            android:id="@+id/right_extra4a_value"
+                            android:gravity="center"
+                            style="@style/Labels.Card.ProjectValues"
+                            android:layout_weight="50"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content" />
+
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/llDeltaCoordinatesHeader"
+                        android:orientation="horizontal"
+                        android:weightSum="100"
+                        android:layout_below="@id/llToCoordinatesValue"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="25dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:id="@+id/right_extra5_header"
+                            android:text="Delta North"
+                            style="@style/Labels.Card.ProjectHeader"
+                            android:gravity="center"
+                            android:layout_weight="50"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content" />
+
+                        <TextView
+                            android:id="@+id/right_extra5a_header"
+                            android:text="Delta East"
+                            android:gravity="center"
+                            style="@style/Labels.Card.ProjectHeader"
+                            android:layout_weight="50"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/llDeltaCoordinatesValue"
+                        android:orientation="horizontal"
+                        android:weightSum="100"
+                        android:layout_below="@id/llDeltaCoordinatesHeader"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:id="@+id/right_extra5_value"
+                            style="@style/Labels.Card.ProjectValues"
+                            android:gravity="center"
+                            android:layout_weight="50"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content" />
+
+                        <TextView
+                            android:id="@+id/right_extra5a_value"
+                            android:gravity="center"
+                            style="@style/Labels.Card.ProjectValues"
+                            android:layout_weight="50"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content" />
+
+
+                    </LinearLayout>
+
+
+                </RelativeLayout>
+
+            </LinearLayout>
+
+        </android.support.v7.widget.CardView>
+
+
+    </RelativeLayout>
+
+
+
+
+</RelativeLayout>

@@ -4,19 +4,19 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Point;
 import android.os.AsyncTask;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.survlogic.survlogic.R;
+import com.survlogic.survlogic.adapter.PointSurveyTableDataAdapter;
 import com.survlogic.survlogic.adapter.ProjectListAdaptor;
 import com.survlogic.survlogic.database.JobDatabaseHandler;
 import com.survlogic.survlogic.interf.JobPointsListener;
-import com.survlogic.survlogic.model.PointGeodetic;
 import com.survlogic.survlogic.model.PointSurvey;
 import com.survlogic.survlogic.view.PlanarMapView;
+import com.survlogic.survlogic.view.SortablePointSurveyTableView;
 
 import java.util.ArrayList;
 
@@ -24,47 +24,46 @@ import java.util.ArrayList;
  * Created by chrisfillmore on 6/29/2017.
  */
 
-public class BackgroundGeodeticPointMap extends AsyncTask <PointGeodetic,PointGeodetic,ArrayList<PointGeodetic>> {
+public class BackgroundSurveyPointGet extends AsyncTask <PointSurvey,PointSurvey,String> {
 
-    private static final String TAG = "BackgroundGeodeticPoint";
+    private static final String TAG = "BackgroundProjectList";
     private ProgressDialog dialog;
 
     private Context context;
     private Activity activity;
 
-    private String DB_NAME;
-
     private final JobPointsListener mListener;
+    private String DB_NAME;
 
     RecyclerView recyclerView;
     ProjectListAdaptor adapter;
     RecyclerView.LayoutManager layoutManager;
 
-    ArrayList<PointGeodetic> arrayList = new ArrayList<PointGeodetic>();
+    ArrayList<PointSurvey> arrayList = new ArrayList<PointSurvey>();
 
+    PlanarMapView planarMapView;
 
-    public BackgroundGeodeticPointMap(Context context, String DB_NAME, JobPointsListener listener) {
+    public BackgroundSurveyPointGet(Context context, String DB_NAME, JobPointsListener listener) {
         this.context = context;
         this.dialog = new ProgressDialog(context);
         this.DB_NAME = DB_NAME;
 
         mListener = listener;
-
         activity = (Activity) context;
     }
 
 
     @Override
-    protected ArrayList<PointGeodetic> doInBackground(PointGeodetic... params) {
+    protected String doInBackground(PointSurvey... params) {
         try{
-            Log.d(TAG, "doInBackground: Started");
+            Log.d(TAG, "doInBackground: Connecting to db");
 
             JobDatabaseHandler jobDb = new JobDatabaseHandler(context, DB_NAME);
             SQLiteDatabase db = jobDb.getReadableDatabase();
 
-            final ArrayList<PointGeodetic> points = new ArrayList<PointGeodetic>(jobDb.getPointGeodeticAll(db));
+            final ArrayList<PointSurvey> points = new ArrayList<PointSurvey>(jobDb.getPointSurveysAll(db));
 
-            for(PointGeodetic point:points){
+            for(PointSurvey point:points){
                 publishProgress(point);
             }
 
@@ -77,32 +76,49 @@ public class BackgroundGeodeticPointMap extends AsyncTask <PointGeodetic,PointGe
         }
 
 
-        return arrayList;
+        return "get_info";
 
 
     }
 
     @Override
     protected void onPreExecute() {
+
+        dialog.setMessage("Retrieving ");
+        dialog.setIndeterminate(true);
+        dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        dialog.setCancelable(false);
+        dialog.show();
+
+
+
+
         super.onPreExecute();
 
     }
 
     @Override
-    protected void onProgressUpdate(PointGeodetic... values) {
+    protected void onProgressUpdate(PointSurvey... values) {
         super.onProgressUpdate(values);
 
         arrayList.add(values[0]);
     }
 
     @Override
-    protected void onPostExecute(ArrayList<PointGeodetic> result) {
+    protected void onPostExecute(String result) {
         super.onPostExecute(result);
 
-        if (mListener != null){
-            Log.d(TAG, "Points Geodetic Loaded: " + arrayList.size());
-            mListener.getPointsGeodetic(arrayList);
+        if (dialog.isShowing()) {
+            dialog.dismiss();
         }
+
+
+        if (mListener != null){
+            Log.d(TAG, "Points Survey Loaded: " + arrayList.size());
+            mListener.getPointsSurvey(arrayList);
+        }
+
+
     }
 
     private void showToast(String data, boolean shortTime) {
@@ -116,7 +132,6 @@ public class BackgroundGeodeticPointMap extends AsyncTask <PointGeodetic,PointGe
         }
 
     }
-
 
 
 

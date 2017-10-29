@@ -24,15 +24,19 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.survlogic.survlogic.R;
-import com.survlogic.survlogic.background.BackgroundGeodeticPointMap;
+import com.survlogic.survlogic.background.BackgroundGeodeticPointGet;
+import com.survlogic.survlogic.background.BackgroundSurveyPointGet;
 import com.survlogic.survlogic.fragment.JobPointsHomeFragment;
+import com.survlogic.survlogic.fragment.JobPointsInverseFragment;
 import com.survlogic.survlogic.fragment.JobPointsListFragment;
 import com.survlogic.survlogic.fragment.JobPointsMapFragment;
 import com.survlogic.survlogic.interf.JobMapOptionsListener;
 import com.survlogic.survlogic.interf.JobPointsListener;
 import com.survlogic.survlogic.model.PointGeodetic;
+import com.survlogic.survlogic.model.PointSurvey;
 import com.survlogic.survlogic.model.ProjectJobSettings;
 import com.survlogic.survlogic.utils.BottomNavigationViewHelper;
+import com.survlogic.survlogic.view.PlanarMapView;
 
 import java.util.ArrayList;
 
@@ -54,6 +58,8 @@ public class JobPointsActivity extends AppCompatActivity implements NavigationVi
     private BottomNavigationViewEx bottomNavigationViewEx;
 
     private JobPointsMapFragment jobPointsMapFragment;
+    private JobPointsListFragment jobPointsListFragment;
+    private JobPointsInverseFragment jobPointsInverseFragment;
 
     private ProjectJobSettings jobSettings;
     private int project_id, job_id, job_settings_id = 1;
@@ -65,6 +71,9 @@ public class JobPointsActivity extends AppCompatActivity implements NavigationVi
     private FrameLayout container;
     private RelativeLayout rlLayout2;
     private ProgressBar progressBar;
+
+    private ArrayList<PointSurvey> lstPointSurvey = new ArrayList<>();
+    private ArrayList<PointGeodetic> lstPointGeodetic = new ArrayList<>();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -80,7 +89,7 @@ public class JobPointsActivity extends AppCompatActivity implements NavigationVi
         initBottomNavigationView();
         initFragmentContainer(savedInstanceState);
 
-
+        initPointDataInBackground();
     }
 
     @Override
@@ -136,11 +145,25 @@ public class JobPointsActivity extends AppCompatActivity implements NavigationVi
 
         switch (item.getItemId()){
             case R.id.menu_item1_id:
+                Intent i = new Intent(this, JobHomeActivity.class);
+                i.putExtra(getString(R.string.KEY_PROJECT_ID),project_id);
+                i.putExtra(getString(R.string.KEY_JOB_ID), job_id);
+                i.putExtra(getString(R.string.KEY_JOB_DATABASE), jobDatabaseName);
+
+                startActivity(i);
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
 
                 break;
 
             case R.id.menu_item2_id:
-                //Action Here
+                //Go To Points Menu
+                Intent j = new Intent(this, JobPointsActivity.class);
+                j.putExtra(getString(R.string.KEY_PROJECT_ID),project_id);
+                j.putExtra(getString(R.string.KEY_JOB_ID), job_id);
+                j.putExtra(getString(R.string.KEY_JOB_DATABASE), jobDatabaseName);
+
+                startActivity(j);
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
 
                 break;
 
@@ -226,6 +249,10 @@ public class JobPointsActivity extends AppCompatActivity implements NavigationVi
                         containerFragment2.setArguments(getIntent().getExtras());
 
                         swapFragment(containerFragment2,false,"LIST");
+                        jobPointsListFragment = containerFragment2;
+
+                        jobPointsListFragment.setArrayListPointSurvey(lstPointSurvey);
+                        jobPointsListFragment.setArrayListPointGeodetic(lstPointGeodetic);
 
                         break;
 
@@ -241,8 +268,9 @@ public class JobPointsActivity extends AppCompatActivity implements NavigationVi
                         swapFragment(containerFragment3,false,"MAP_VIEW");
                         jobPointsMapFragment = containerFragment3;
 
-                        //Point Geodetic Load
-                        initWorldMap();
+                        jobPointsMapFragment.setArrayListPointSurvey(lstPointSurvey);
+                        jobPointsMapFragment.setArrayListPointGeodetic(lstPointGeodetic);
+
 
                         break;
 
@@ -250,6 +278,16 @@ public class JobPointsActivity extends AppCompatActivity implements NavigationVi
                         ACTIVITY_NUM = 3;
                         menuItem = menu.getItem(ACTIVITY_NUM);
                         menuItem.setChecked(false);
+
+
+                        JobPointsInverseFragment containerFragment4 = new JobPointsInverseFragment();
+                        containerFragment4.setArguments(getIntent().getExtras());
+
+                        swapFragment(containerFragment4, false, "INVERSE_VIEW");
+                        jobPointsInverseFragment = containerFragment4;
+
+                        jobPointsInverseFragment.setArrayListPointSurvey(lstPointSurvey);
+                        jobPointsInverseFragment.setArrayListPointGeodetic(lstPointGeodetic);
 
                         break;
                 }
@@ -298,6 +336,29 @@ public class JobPointsActivity extends AppCompatActivity implements NavigationVi
             ft.commit();
 
         }
+
+    private void initPointDataInBackground(){
+        //Point Survey Load
+        loadPointSurveyInBackground();
+
+        //Point Geodetic Load
+        loadPointGeodeticInBackground();
+
+    }
+
+    private void loadPointGeodeticInBackground(){
+        Log.d(TAG, "loadPointGeodeticInBackground: Started...");
+        BackgroundGeodeticPointGet backgroundGeodeticPointGet = new BackgroundGeodeticPointGet(mContext, jobDatabaseName, this);
+        backgroundGeodeticPointGet.execute();
+
+    }
+
+    private void loadPointSurveyInBackground(){
+        Log.d(TAG, "loadPointSurveyInBackground: Started...");
+
+        BackgroundSurveyPointGet backgroundSurveyPointGet = new BackgroundSurveyPointGet(mContext, jobDatabaseName, this);
+        backgroundSurveyPointGet.execute();
+    }
 
 
     //-------------------------------------------------------------------------------------------------------------------------//
@@ -349,15 +410,17 @@ public class JobPointsActivity extends AppCompatActivity implements NavigationVi
 
     @Override
     public void getPointsGeodetic(ArrayList<PointGeodetic> lstPointGeodetics) {
-        jobPointsMapFragment.setArrayListPointGeodetic(lstPointGeodetics);
+        this.lstPointGeodetic = lstPointGeodetics;
 
     }
 
-    private void initWorldMap(){
-        Log.d(TAG, "initWorldMap: Started...");
-        BackgroundGeodeticPointMap backgroundGeodeticPointMap = new BackgroundGeodeticPointMap(mContext, jobDatabaseName, this);
-        backgroundGeodeticPointMap.execute();
+    @Override
+    public void getPointsSurvey(ArrayList<PointSurvey> lstPointSurvey) {
+        this.lstPointSurvey = lstPointSurvey;
 
     }
+
+
+
 
 }

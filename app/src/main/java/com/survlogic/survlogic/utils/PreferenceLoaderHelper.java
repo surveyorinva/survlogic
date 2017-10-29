@@ -2,6 +2,7 @@ package com.survlogic.survlogic.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -187,6 +188,8 @@ public class PreferenceLoaderHelper {
 
         return results;
     }
+
+
 
 
 }

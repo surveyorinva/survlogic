@@ -5,7 +5,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
-import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.widget.Toast;
@@ -18,8 +17,6 @@ import com.survlogic.survlogic.model.PointSurvey;
 import com.survlogic.survlogic.view.SortablePointSurveyTableView;
 
 import java.util.ArrayList;
-
-import de.codecrafters.tableview.listeners.SwipeToRefreshListener;
 
 /**
  * Created by chrisfillmore on 6/29/2017.
@@ -131,7 +128,7 @@ public class BackgroundSurveyPointList extends AsyncTask <PointSurvey,PointSurve
 
         final SortablePointSurveyTableView pointSurveyTableView;
 
-        pointSurveyTableView = (SortablePointSurveyTableView) activity.findViewById(R.id.tableView_for_Points);
+        pointSurveyTableView = (SortablePointSurveyTableView) activity.findViewById(R.id.tableView_for_Points_Survey);
 
         if (pointSurveyTableView != null) {
 
