@@ -181,11 +181,25 @@ public class JobHomeActivity extends AppCompatActivity implements NavigationView
                 break;
 
             case R.id.menu_item3_id:
+                //Go To Cogo Menu
+                Intent k = new Intent(this, JobCogoActivity.class);
+                k.putExtra(getString(R.string.KEY_PROJECT_ID),project_id);
+                k.putExtra(getString(R.string.KEY_JOB_ID), job_id);
+                k.putExtra(getString(R.string.KEY_JOB_DATABASE), jobDatabaseName);
 
+                startActivity(k);
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
                 break;
 
             case R.id.menu_item4_id:
-                //Action here
+                //Go To GPS Menu
+                Intent l = new Intent(this, JobGpsActivity.class);
+                l.putExtra(getString(R.string.KEY_PROJECT_ID),project_id);
+                l.putExtra(getString(R.string.KEY_JOB_ID), job_id);
+                l.putExtra(getString(R.string.KEY_JOB_DATABASE), jobDatabaseName);
+
+                startActivity(l);
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
                 break;
 
             case R.id.menu_item5_id:
@@ -539,7 +553,7 @@ public class JobHomeActivity extends AppCompatActivity implements NavigationView
                         JobHomeHomeFragment containerFragment1 = new JobHomeHomeFragment();
                         containerFragment1.setArguments(getIntent().getExtras());
 
-                        swapFragment(containerFragment1,true,"HOME");
+                        swapFragment(containerFragment1,false,"HOME");
 
                         break;
 

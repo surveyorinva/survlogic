@@ -29,7 +29,7 @@ public class MapOptionsTypePlanarFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        v = inflater.inflate(R.layout.content_map_options_map_type_planar, container, false);
+        v = inflater.inflate(R.layout.tab_content_map_options_map_type_planar, container, false);
 
         mContext = getActivity();
         initViewWidgets(v);

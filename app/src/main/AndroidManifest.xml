@@ -108,6 +108,16 @@
             android:screenOrientation="portrait"
             android:theme="@style/SuperMaterialTheme"/>
 
+        <activity
+            android:name=".activity.JobCogoActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/SuperMaterialTheme"/>
+
+        <activity
+            android:name=".activity.JobGpsActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/SuperMaterialTheme"/>
+
         <activity android:name=".activity.JobPointsAddAdvancedActivity"
             android:screenOrientation="portrait"
             android:theme="@style/SuperMaterialTheme"/>

@@ -76,7 +76,7 @@
         android:layout_marginEnd="5dp"
         android:layout_height="250dp">
 
-        <include layout="@layout/content_point_survey_table_list" />
+        <include layout="@layout/content_point_table_survey_list" />
 
 
         <ProgressBar

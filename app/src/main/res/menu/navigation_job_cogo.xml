@@ -9,7 +9,7 @@
 
     <item
         android:id="@+id/navigation_item_2"
-        android:icon="@drawable/ic_bottom_list_add"
+        android:icon="@drawable/ic_survey_instrument_black"
         android:title="">
     </item>
 
@@ -21,7 +21,7 @@
 
     <item
         android:id="@+id/navigation_item_4"
-        android:icon="@drawable/ic_bottom_inverse"
+        android:icon="@drawable/ic_action_map"
         android:title="">
     </item>
 

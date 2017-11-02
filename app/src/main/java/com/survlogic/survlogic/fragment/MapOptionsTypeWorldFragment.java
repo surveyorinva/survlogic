@@ -9,7 +9,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.RelativeLayout;
 
 import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.interf.JobMapOptionsListener;
@@ -31,7 +30,7 @@ public class MapOptionsTypeWorldFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        v = inflater.inflate(R.layout.content_map_options_map_type_world, container, false);
+        v = inflater.inflate(R.layout.tab_content_map_options_map_type_world, container, false);
 
         mContext = getActivity();
         initViewWidgets(v);

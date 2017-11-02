@@ -1,0 +1,575 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+<LinearLayout
+
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <RelativeLayout
+        android:id="@+id/rlHeader_Occupy"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/card_label_summary_occupy"
+            android:text="Choose Setup Point"
+            style="@style/Labels.Card.ProjectCategory"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="@dimen/card_margin_between_headers"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </RelativeLayout>
+
+
+    <RelativeLayout
+        android:id="@+id/rlInput_Occupy"
+        android:layout_below="@id/rlHeader_Occupy"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/card_occupy"
+            app:cardCornerRadius="3dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:id="@+id/llOccupy_values"
+                    android:orientation="horizontal"
+                    android:weightSum="2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <RelativeLayout
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content">
+
+                        <ImageView
+                            android:id="@+id/left_item1_img"
+                            android:background="@drawable/vc_circle_green"
+                            android:layout_marginStart="10dp"
+                            android:layout_marginTop="10dp"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp" />
+
+                        <TextView
+                            android:id="@+id/left_item1_header"
+                            android:text="Occupy Point"
+                            style="@style/Labels.Card.ProjectHeader"
+                            android:layout_alignTop="@id/left_item1_img"
+                            android:layout_toEndOf="@id/left_item1_img"
+                            android:layout_marginStart="5dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                        <AutoCompleteTextView
+                            android:id="@+id/left_item1_value"
+                            style="@style/Labels.Card.ProjectValues"
+                            android:inputType="number"
+                            android:gravity="center_horizontal"
+                            android:layout_alignStart="@id/left_item1_header"
+                            android:layout_toStartOf="@+id/inverse_from_list"
+                            android:layout_below="@id/left_item1_header"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                        <ImageButton
+                            android:id="@+id/inverse_from_list"
+                            android:background="@null"
+                            android:src="@drawable/ic_bottom_list_add"
+                            android:layout_marginEnd="5dp"
+                            android:scaleType="centerCrop"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+
+                    </RelativeLayout>
+
+
+                    <RelativeLayout
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:visibility="visible">
+
+                        <ImageView
+                            android:id="@+id/right_item1_img"
+                            android:background="@drawable/vc_circle_green"
+                            android:layout_marginStart="10dp"
+                            android:layout_marginTop="10dp"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp" />
+
+                        <TextView
+                            android:id="@+id/right_item1_header"
+                            android:text="Instrument Height"
+                            style="@style/Labels.Card.ProjectHeader"
+                            android:layout_alignTop="@id/right_item1_img"
+                            android:layout_toEndOf="@id/right_item1_img"
+                            android:layout_marginStart="5dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                        <EditText
+                            android:id="@+id/right_item1_value"
+                            style="@style/Labels.Card.ProjectValues"
+                            android:inputType="number"
+                            android:gravity="center_horizontal"
+                            android:layout_alignStart="@id/right_item1_header"
+                            android:layout_below="@id/right_item1_header"
+                            android:layout_marginEnd="25dp"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+                        <ImageButton
+                            android:id="@+id/card_occupy_expand"
+                            style="@style/Button.Cards"
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:layout_marginBottom="5dp"
+                            android:layout_marginEnd="5dp"
+                            android:src="@drawable/ic_keyboard_arrow_down"
+                            android:layout_alignParentEnd="true"
+                            android:layout_alignParentBottom="true"/>
+
+
+                    </RelativeLayout>
+
+                </LinearLayout>
+
+                <RelativeLayout
+                    android:id="@+id/llOccupy_data"
+                    android:visibility="gone"
+                    android:layout_below="@id/llOccupy_values"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:id="@+id/llOccupy_data_northing"
+                        android:orientation="horizontal"
+                        android:weightSum="100"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:text="Northing:"
+                            android:layout_marginStart="10dp"
+                            android:layout_weight="60"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content" />
+
+                        <TextView
+                            android:text="5000.0000"
+                            style="@style/Labels.Card.ProjectValues"
+                            android:layout_weight="40"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content" />
+
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/llOccupy_data_easting"
+                        android:orientation="horizontal"
+                        android:weightSum="100"
+                        android:layout_below="@+id/llOccupy_data_northing"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:text="Easting:"
+                            android:layout_marginStart="10dp"
+                            android:layout_weight="60"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content" />
+
+                        <TextView
+                            android:text="5000.0000"
+                            style="@style/Labels.Card.ProjectValues"
+                            android:layout_weight="40"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/llOccupy_data_elevation"
+                        android:orientation="horizontal"
+                        android:weightSum="100"
+                        android:layout_below="@+id/llOccupy_data_easting"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:text="Elevation:"
+                            android:layout_marginStart="10dp"
+                            android:layout_weight="60"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content" />
+
+                        <TextView
+                            android:text="100.00"
+                            style="@style/Labels.Card.ProjectValues"
+                            android:layout_weight="40"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content" />
+
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/llOccupy_data_description"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="15dp"
+                        android:weightSum="100"
+                        android:layout_below="@+id/llOccupy_data_elevation"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:text="Description:"
+                            android:layout_marginStart="10dp"
+                            android:layout_weight="60"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content" />
+
+                        <TextView
+                            android:text="DESCRIPTION HERE"
+                            style="@style/Labels.Card.ProjectValues"
+                            android:layout_weight="40"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content" />
+
+
+                    </LinearLayout>
+
+                </RelativeLayout>
+
+            </RelativeLayout>
+
+        </android.support.v7.widget.CardView>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/rlHeader_Backsight"
+        android:layout_below="@+id/rlInput_Occupy"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/card_label_summary_backsight"
+            android:text="Choose Backsight Point"
+            style="@style/Labels.Card.ProjectCategory"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="@dimen/card_margin_between_headers"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </RelativeLayout>
+
+
+    <RelativeLayout
+        android:id="@+id/rlInput_Backsight"
+        android:layout_below="@id/rlHeader_Backsight"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/card_backsight"
+            app:cardCornerRadius="3dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <RelativeLayout
+                android:id="@+id/llBacksight_data_card"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <LinearLayout
+                    android:id="@+id/llBacksight_values"
+                    android:orientation="horizontal"
+                    android:weightSum="2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="80dp">
+
+                    <RelativeLayout
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent">
+
+                        <ImageView
+                            android:id="@+id/left_item2_img"
+                            android:background="@drawable/vc_circle_green"
+                            android:layout_marginStart="10dp"
+                            android:layout_marginTop="10dp"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp" />
+
+                        <TextView
+                            android:id="@+id/left_item2_header"
+                            android:text="Occupy Point"
+                            style="@style/Labels.Card.ProjectHeader"
+                            android:layout_alignTop="@id/left_item2_img"
+                            android:layout_toEndOf="@id/left_item2_img"
+                            android:layout_marginStart="5dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                        <AutoCompleteTextView
+                            android:id="@+id/left_item2_value"
+                            style="@style/Labels.Card.ProjectValues"
+                            android:inputType="number"
+                            android:gravity="center_horizontal"
+                            android:layout_alignStart="@id/left_item2_header"
+                            android:layout_toStartOf="@+id/backsight_from_list"
+                            android:layout_below="@id/left_item2_header"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                        <ImageButton
+                            android:id="@+id/backsight_from_list"
+                            android:background="@null"
+                            android:src="@drawable/ic_bottom_list_add"
+                            android:layout_marginEnd="5dp"
+                            android:scaleType="centerCrop"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+
+                    </RelativeLayout>
+
+
+                    <RelativeLayout
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:visibility="visible">
+
+                        <ImageView
+                            android:id="@+id/right_item2_img"
+                            android:background="@drawable/vc_circle_green"
+                            android:layout_marginStart="10dp"
+                            android:layout_marginTop="10dp"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp" />
+
+                        <TextView
+                            android:id="@+id/right_item2_header"
+                            android:text="Instrument Height"
+                            style="@style/Labels.Card.ProjectHeader"
+                            android:layout_alignTop="@id/right_item2_img"
+                            android:layout_toEndOf="@id/right_item2_img"
+                            android:layout_marginStart="5dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                        <EditText
+                            android:id="@+id/right_item2_value"
+                            style="@style/Labels.Card.ProjectValues"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@id/right_item2_header"
+                            android:layout_marginEnd="25dp"
+                            android:layout_toEndOf="@+id/right_item2_img"
+                            android:gravity="center_horizontal"
+                            android:inputType="number" />
+
+                        <ImageButton
+                            android:id="@+id/card_backsight_expand"
+                            style="@style/Button.Cards"
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:layout_alignParentBottom="true"
+                            android:layout_alignParentEnd="true"
+                            android:layout_marginBottom="5dp"
+                            android:layout_marginEnd="5dp"
+                            android:src="@drawable/ic_keyboard_arrow_down" />
+
+                    </RelativeLayout>
+
+                </LinearLayout>
+
+                <RelativeLayout
+                    android:id="@+id/llBacksight_data"
+                    android:visibility="gone"
+                    android:layout_below="@+id/llBacksight_values"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:id="@+id/llBacksight_data_northing"
+                        android:orientation="horizontal"
+                        android:weightSum="100"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:text="Northing:"
+                            android:layout_marginStart="10dp"
+                            android:layout_weight="60"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content" />
+
+                        <TextView
+                            android:text="5000.0000"
+                            style="@style/Labels.Card.ProjectValues"
+                            android:layout_weight="40"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content" />
+
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/llBacksight_data_easting"
+                        android:orientation="horizontal"
+                        android:weightSum="100"
+                        android:layout_below="@+id/llBacksight_data_northing"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:text="Easting:"
+                            android:layout_marginStart="10dp"
+                            android:layout_weight="60"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content" />
+
+                        <TextView
+                            android:text="5000.0000"
+                            style="@style/Labels.Card.ProjectValues"
+                            android:layout_weight="40"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/llBacksight_data_elevation"
+                        android:orientation="horizontal"
+                        android:weightSum="100"
+                        android:layout_below="@+id/llBacksight_data_easting"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:text="Elevation:"
+                            android:layout_marginStart="10dp"
+                            android:layout_weight="60"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content" />
+
+                        <TextView
+                            android:text="100.00"
+                            style="@style/Labels.Card.ProjectValues"
+                            android:layout_weight="40"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content" />
+
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/llBacksight_data_description"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="15dp"
+                        android:weightSum="100"
+                        android:layout_below="@+id/llBacksight_data_elevation"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:text="Description:"
+                            android:layout_marginStart="10dp"
+                            android:layout_weight="60"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content" />
+
+                        <TextView
+                            android:text="DESCRIPTION HERE"
+                            style="@style/Labels.Card.ProjectValues"
+                            android:layout_weight="40"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content" />
+
+
+                    </LinearLayout>
+
+
+
+                </RelativeLayout>
+
+
+            </RelativeLayout>
+
+
+        </android.support.v7.widget.CardView>
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/rlCalculations"
+        android:layout_below="@id/rlInput_Backsight"
+        android:weightSum="100"
+        android:orientation="horizontal"
+        android:layout_marginTop="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Space
+            android:layout_weight="15"
+            android:layout_width="0dp"
+            android:layout_height="match_parent" />
+
+        <Button
+            android:text="Set"
+            style="@style/Button.Flat.Primary.Save"
+            android:layout_weight="40"
+            android:layout_width="0dp"
+            android:layout_height="match_parent" />
+
+        <Space
+            android:layout_weight="10"
+            android:layout_width="0dp"
+            android:layout_height="match_parent" />
+
+        <Button
+            android:text="Check"
+            style="@style/Button.Flat.Primary.Map"
+            android:layout_weight="20"
+            android:layout_width="0dp"
+            android:layout_height="match_parent" />
+
+
+    </LinearLayout>
+
+</LinearLayout>
+
+
+</android.support.v4.widget.NestedScrollView>

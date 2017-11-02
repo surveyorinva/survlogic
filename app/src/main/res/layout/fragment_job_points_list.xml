@@ -78,7 +78,7 @@
         android:layout_height="match_parent">
 
         <include
-            layout="@layout/content_point_survey_table_list"/>
+            layout="@layout/content_point_table_survey_list"/>
 
     </RelativeLayout>
 
@@ -91,7 +91,7 @@
         android:layout_height="match_parent">
 
         <include
-            layout="@layout/content_point_geodetic_table_list"/>
+            layout="@layout/content_point_table_geodetic_list"/>
 
     </RelativeLayout>
 

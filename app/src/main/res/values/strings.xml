@@ -348,6 +348,38 @@
     <string name="point_home_action_3_4">Swap \nN and E</string>
     <string name="point_home_action_3_5">Change \nUnits</string>
 
+    <!--Cogo - Home -->
+    <string name="cogo_home_header_1">Coordinate Geometry</string>
+    <string name="cogo_home_action_1_1">Setup</string>
+    <string name="cogo_home_action_1_2">Sideshot</string>
+    <string name="cogo_home_action_1_3">Traverse</string>
+    <string name="cogo_home_action_1_4">Map \nCheck</string>
+
+    <string name="cogo_home_header_2">Survey</string>
+    <string name="cogo_home_action_2_1">Stake \nPoint</string>
+    <string name="cogo_home_action_2_2">Stake \nLine</string>
+    <string name="cogo_home_action_2_3">Stake \nOffset</string>
+    <string name="cogo_home_action_2_4">Remote \nBenchmark</string>
+    <string name="cogo_home_action_2_5">Set \nCollection</string>
+
+    <string name="cogo_home_header_3">Tools</string>
+    <string name="cogo_home_action_3_1">Intersections</string>
+    <string name="cogo_home_action_3_2">Resections</string>
+    <string name="cogo_home_action_3_3">Curve</string>
+    <string name="cogo_home_action_3_4">Area</string>
+    <string name="cogo_home_action_3_5">RPTS</string>
+
+    <!--GPS - Home -->
+    <string name="gps_home_header_1">Survey</string>
+    <string name="gps_home_action_1_1">Setup</string>
+    <string name="gps_home_action_1_2">Collect \nPoints</string>
+    <string name="gps_home_action_1_3">Stake \nPoints</string>
+    <string name="gps_home_action_1_4">Compass</string>
+
+    <string name="gps_home_header_2">Tools</string>
+    <string name="gps_home_action_2_1">Calibration</string>
+
+
     <!-- ******************************Strings related to Settings****************************** -->
 
     <!--**************************Current Job Preferences**************************-->

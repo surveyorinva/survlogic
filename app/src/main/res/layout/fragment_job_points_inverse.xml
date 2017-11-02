@@ -71,13 +71,17 @@
                     <AutoCompleteTextView
                         android:id="@+id/left_item1_value"
                         style="@style/Labels.Card.ProjectValues"
+                        android:inputType="number"
+                        android:gravity="center_horizontal"
                         android:layout_alignStart="@id/left_item1_header"
+                        android:layout_toStartOf="@+id/inverse_from_list"
                         android:layout_below="@id/left_item1_header"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
 
                     <ImageButton
-                        android:background="@drawable/button_ripple_semi_transparent_border"
+                        android:id="@+id/inverse_from_list"
+                        android:background="@null"
                         android:src="@drawable/ic_bottom_list_add"
                         android:layout_marginEnd="5dp"
                         android:scaleType="centerCrop"
@@ -116,14 +120,18 @@
 
                     <AutoCompleteTextView
                         android:id="@+id/right_item1_value"
+                        android:inputType="number"
+                        android:gravity="center_horizontal"
                         style="@style/Labels.Card.ProjectValues"
                         android:layout_alignStart="@id/right_item1_header"
+                        android:layout_toStartOf="@+id/inverse_to_list"
                         android:layout_below="@id/right_item1_header"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
 
                     <ImageButton
-                        android:background="@drawable/button_ripple_semi_transparent_border"
+                        android:id="@+id/inverse_to_list"
+                        android:background="@null"
                         android:src="@drawable/ic_bottom_list_add"
                         android:layout_marginEnd="5dp"
                         android:scaleType="centerCrop"

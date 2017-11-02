@@ -27,7 +27,7 @@
                 android:layout_marginStart="5dp"
                 android:layout_marginTop="10dp"
                 android:textSize="16sp"
-                android:text="@string/point_home_header_1"
+                android:text="@string/cogo_home_header_1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
@@ -40,7 +40,7 @@
                 android:layout_height="wrap_content" />
 
             <include
-                layout="@layout/content_point_home_page_1" />
+                layout="@layout/content_cogo_home_page_1" />
 
 
 
@@ -61,7 +61,7 @@
                 android:layout_marginStart="5dp"
                 android:layout_marginTop="10dp"
                 android:textSize="16sp"
-                android:text="@string/point_home_header_2"
+                android:text="@string/cogo_home_header_2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
@@ -74,7 +74,7 @@
                 android:layout_height="wrap_content" />
 
             <include
-                layout="@layout/content_point_home_page_2" />
+                layout="@layout/content_cogo_home_page_2" />
 
 
 
@@ -96,7 +96,7 @@
                 android:layout_marginStart="5dp"
                 android:layout_marginTop="10dp"
                 android:textSize="16sp"
-                android:text="@string/point_home_header_3"
+                android:text="@string/cogo_home_header_3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
@@ -109,8 +109,7 @@
                 android:layout_height="wrap_content" />
 
             <include
-                layout="@layout/content_point_home_page_3" />
-
+                layout="@layout/content_cogo_home_page_3" />
 
 
         </android.support.v7.widget.CardView>
