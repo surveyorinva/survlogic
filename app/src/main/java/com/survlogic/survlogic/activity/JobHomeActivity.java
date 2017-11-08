@@ -35,9 +35,6 @@ import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.database.JobDatabaseHandler;
 import com.survlogic.survlogic.fragment.JobHomeHomeFragment;
-import com.survlogic.survlogic.fragment.JobPointsHomeFragment;
-import com.survlogic.survlogic.fragment.JobPointsListFragment;
-import com.survlogic.survlogic.fragment.JobPointsMapFragment;
 import com.survlogic.survlogic.model.ProjectJobSettings;
 import com.survlogic.survlogic.utils.BottomNavigationViewHelper;
 
@@ -170,7 +167,7 @@ public class JobHomeActivity extends AppCompatActivity implements NavigationView
 
             case R.id.menu_item2_id:
                 //Go To Points Menu
-                Intent j = new Intent(this, JobPointsActivity.class);
+                Intent j = new Intent(this, JobPointsMapActivity.class);
                 j.putExtra(getString(R.string.KEY_PROJECT_ID),project_id);
                 j.putExtra(getString(R.string.KEY_JOB_ID), job_id);
                 j.putExtra(getString(R.string.KEY_JOB_DATABASE), jobDatabaseName);
@@ -221,10 +218,10 @@ public class JobHomeActivity extends AppCompatActivity implements NavigationView
         Log.d(TAG, "initView: Started");
 
         Bundle extras = getIntent().getExtras();
-        project_id = extras.getInt("PROJECT_ID");
-        job_id = extras.getInt("JOB_ID");
-        jobDatabaseName = extras.getString("JOB_DB_NAME");
-        Log.d(TAG, "||Database|| : " + jobDatabaseName);
+        project_id = extras.getInt(getString(R.string.KEY_PROJECT_ID));
+        job_id = extras.getInt(getString(R.string.KEY_JOB_ID));
+        jobDatabaseName = extras.getString(getString(R.string.KEY_JOB_DATABASE));
+        Log.d(TAG, "||Database in Home Activity|| : " + jobDatabaseName);
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 

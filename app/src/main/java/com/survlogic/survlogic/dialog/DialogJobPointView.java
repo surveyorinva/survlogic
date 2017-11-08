@@ -16,7 +16,6 @@ import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
-import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -28,7 +27,6 @@ import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.GridView;
@@ -39,11 +37,9 @@ import android.widget.Toast;
 import com.survlogic.survlogic.BuildConfig;
 import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.activity.JobPointAddSketchActivity;
-import com.survlogic.survlogic.activity.JobPointsActivity;
 import com.survlogic.survlogic.activity.PhotoGalleryActivity;
 import com.survlogic.survlogic.adapter.PointGridImageAdapter;
 import com.survlogic.survlogic.adapter.PointGridSketchAdapter;
-import com.survlogic.survlogic.adapter.ProjectGridImageAdapter;
 import com.survlogic.survlogic.database.JobDatabaseHandler;
 import com.survlogic.survlogic.database.ProjectDatabaseHandler;
 import com.survlogic.survlogic.model.JobSketch;
@@ -371,8 +367,8 @@ public class DialogJobPointView extends DialogFragment {
                 tvPointLatHeader.setText(getString(R.string.dialog_point_view_pointLatitude_header));
                 tvPointLongHeader.setText(getString(R.string.dialog_point_view_pointLongitude_header));
 
-                tvPointLat.setText(MathHelper.convertDECtoDMS(pointLatitude,3,true));
-                tvPointLong.setText(MathHelper.convertDECtoDMS(pointLongitude,3,true));
+                tvPointLat.setText(MathHelper.convertDECtoDMSGeodetic(pointLatitude,3,true));
+                tvPointLong.setText(MathHelper.convertDECtoDMSGeodetic(pointLongitude,3,true));
 
                 tvPointLat.setVisibility(View.VISIBLE);
                 tvPointLong.setVisibility(View.VISIBLE);

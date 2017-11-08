@@ -390,9 +390,9 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
             tvStorage.setText(storage_values[storage_pos]);
 
             tvLocationLat.setText(this.getString(R.string.gps_status_lat_value_string,
-                    MathHelper.convertDECtoDMS(project.getmLocationLat(),3,true)));
+                    MathHelper.convertDECtoDMSGeodetic(project.getmLocationLat(),3,true)));
             tvLocationLong.setText(this.getString(R.string.gps_status_long_value_string,
-                    MathHelper.convertDECtoDMS(project.getmLocationLong(),3,true)));
+                    MathHelper.convertDECtoDMSGeodetic(project.getmLocationLong(),3,true)));
 
             projectDescription = project.getmProjectDescription();
             if(!isStringEmpty(projectDescription)) {

@@ -3,8 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:layout_width="300dp"
-    android:layout_height="300dp">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -32,7 +32,7 @@
             android:id="@+id/map_layout_1"
             android:orientation="vertical"
             android:layout_below="@id/map_type_header"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="5dp"
             android:weightSum="100"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
@@ -42,7 +42,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_marginTop="10dp"
-                android:layout_weight="80">
+                android:layout_weight="90">
 
             </android.support.v4.view.ViewPager>
 
@@ -51,7 +51,7 @@
                 app:tabBackground="@drawable/tab_selector"
                 app:tabGravity="center"
                 app:tabIndicatorHeight="0dp"
-                android:layout_weight="20"
+                android:layout_weight="10"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"/>
 

@@ -9,14 +9,11 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.survlogic.survlogic.R;
-import com.survlogic.survlogic.adapter.PointSurveyTableDataAdapter;
 import com.survlogic.survlogic.adapter.ProjectListAdaptor;
 import com.survlogic.survlogic.database.JobDatabaseHandler;
-import com.survlogic.survlogic.interf.JobPointsListener;
+import com.survlogic.survlogic.interf.JobPointsMapListener;
 import com.survlogic.survlogic.model.PointSurvey;
 import com.survlogic.survlogic.view.PlanarMapView;
-import com.survlogic.survlogic.view.SortablePointSurveyTableView;
 
 import java.util.ArrayList;
 
@@ -32,7 +29,7 @@ public class BackgroundSurveyPointGet extends AsyncTask <PointSurvey,PointSurvey
     private Context context;
     private Activity activity;
 
-    private final JobPointsListener mListener;
+    private final JobPointsMapListener mListener;
     private String DB_NAME;
 
     RecyclerView recyclerView;
@@ -43,7 +40,7 @@ public class BackgroundSurveyPointGet extends AsyncTask <PointSurvey,PointSurvey
 
     PlanarMapView planarMapView;
 
-    public BackgroundSurveyPointGet(Context context, String DB_NAME, JobPointsListener listener) {
+    public BackgroundSurveyPointGet(Context context, String DB_NAME, JobPointsMapListener listener) {
         this.context = context;
         this.dialog = new ProgressDialog(context);
         this.DB_NAME = DB_NAME;

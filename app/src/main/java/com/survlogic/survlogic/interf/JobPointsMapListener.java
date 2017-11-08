@@ -9,7 +9,7 @@ import java.util.ArrayList;
  * Created by chrisfillmore on 10/10/2017.
  */
 
-public interface JobPointsListener {
+public interface JobPointsMapListener {
 
     void isMapSelectorActive(boolean isSelected);
 

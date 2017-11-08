@@ -2,19 +2,14 @@ package com.survlogic.survlogic.activity;
 
 import android.app.DialogFragment;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Color;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -25,7 +20,6 @@ import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.background.BackgroundPointGeodeticNew;
 import com.survlogic.survlogic.database.JobDatabaseHandler;
 import com.survlogic.survlogic.dialog.DialogJobPointGeodeticEntryAdd;
-import com.survlogic.survlogic.dialog.DialogProjectDescriptionAdd;
 import com.survlogic.survlogic.interf.PointGeodeticEntryListener;
 import com.survlogic.survlogic.model.PointGeodetic;
 import com.survlogic.survlogic.model.PointSurvey;
@@ -33,7 +27,6 @@ import com.survlogic.survlogic.utils.MathHelper;
 import com.survlogic.survlogic.utils.PreferenceLoaderHelper;
 import com.survlogic.survlogic.utils.StringUtilityHelper;
 
-import java.io.File;
 import java.text.DecimalFormat;
 
 /**
@@ -226,13 +219,13 @@ public class JobPointsAddAdvancedActivity extends AppCompatActivity implements P
             mLocationOrtho = data.getDoubleExtra(getString(R.string.KEY_POSITION_ORTHO), 0);
             String heightOrtho = DISTANCE_PRECISION_FORMATTER.format(mLocationOrtho);
 
-            String strLatitude = MathHelper.convertDECtoDMS(mLocationLat, 3, false);
+            String strLatitude = MathHelper.convertDECtoDMSGeodetic(mLocationLat, 3, false);
 
             tvLocation_latitude.setText(getString(R.string.project_new_location_latitude_title));
             tvLocation_latitude_value.setText(strLatitude);
             tvLocation_latitude_value.setVisibility(View.VISIBLE);
 
-            String strLongitude = MathHelper.convertDECtoDMS(mLocationLong, 3, true);
+            String strLongitude = MathHelper.convertDECtoDMSGeodetic(mLocationLong, 3, true);
 
             tvLocation_longitude.setText(getString(R.string.project_new_location_longitude_title));
             tvLocation_longitude_value.setText(strLongitude);
@@ -266,7 +259,7 @@ public class JobPointsAddAdvancedActivity extends AppCompatActivity implements P
         Log.d(TAG, "onReturnValues: Starting...");
         if (latOut != 0) {
             mLocationLat = latOut;
-            String strLatitude = MathHelper.convertDECtoDMS(latOut, 3, false);
+            String strLatitude = MathHelper.convertDECtoDMSGeodetic(latOut, 3, false);
 
             tvLocation_latitude.setText(getString(R.string.project_new_location_latitude_title));
             tvLocation_latitude_value.setText(strLatitude);
@@ -277,7 +270,7 @@ public class JobPointsAddAdvancedActivity extends AppCompatActivity implements P
 
         if (longOut !=0){
             mLocationLong = longOut;
-            String strLongitude = MathHelper.convertDECtoDMS(longOut,3,true);
+            String strLongitude = MathHelper.convertDECtoDMSGeodetic(longOut,3,true);
 
             tvLocation_longitude.setText(getString(R.string.project_new_location_longitude_title));
             tvLocation_longitude_value.setText(strLongitude);

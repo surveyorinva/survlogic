@@ -113,7 +113,7 @@ public class JobPointsListFragment extends Fragment {
         project_id = extras.getInt(getString(R.string.KEY_PROJECT_ID));
         job_id = extras.getInt(getString(R.string.KEY_JOB_ID));
         jobDatabaseName = extras.getString(getString(R.string.KEY_JOB_DATABASE));
-        Log.d(TAG, "Database: " + jobDatabaseName);
+        Log.d(TAG, "Database in Point List: " + jobDatabaseName);
 
 
         preferenceLoaderHelper = new PreferenceLoaderHelper(mContext);

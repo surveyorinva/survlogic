@@ -19,10 +19,21 @@
 
         <TextView
             android:id="@+id/card_label_summary_occupy"
-            android:text="Choose Setup Point"
+            android:text="Known Orientation"
             style="@style/Labels.Card.ProjectCategory"
+            android:gravity="center_horizontal"
             android:layout_marginStart="10dp"
             android:layout_marginTop="@dimen/card_margin_between_headers"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/card_label_instructions_occupy"
+            android:text="Choose Setup Point"
+            style="@style/Labels.Card.ProjectCategory"
+            android:layout_below="@id/card_label_summary_occupy"
+            android:layout_marginStart="10dp"
+
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
@@ -71,7 +82,7 @@
 
                         <TextView
                             android:id="@+id/left_item1_header"
-                            android:text="Occupy Point"
+                            android:text="Occupy ID"
                             style="@style/Labels.Card.ProjectHeader"
                             android:layout_alignTop="@id/left_item1_img"
                             android:layout_toEndOf="@id/left_item1_img"
@@ -121,7 +132,7 @@
 
                         <TextView
                             android:id="@+id/right_item1_header"
-                            android:text="Instrument Height"
+                            android:text="Inst. Height"
                             style="@style/Labels.Card.ProjectHeader"
                             android:layout_alignTop="@id/right_item1_img"
                             android:layout_toEndOf="@id/right_item1_img"
@@ -312,6 +323,7 @@
                 <LinearLayout
                     android:orientation="horizontal"
                     android:id="@+id/llBacksight_Values"
+                    android:weightSum="2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
@@ -330,7 +342,7 @@
 
                         <TextView
                             android:id="@+id/top_item2_header"
-                            android:text="Backsight Point"
+                            android:text="Backsight ID"
                             style="@style/Labels.Card.ProjectHeader"
                             android:layout_alignTop="@id/top_item2_img"
                             android:layout_toEndOf="@id/top_item2_img"
@@ -346,52 +358,6 @@
                             android:layout_alignStart="@id/top_item2_header"
                             android:layout_below="@id/top_item2_header"
                             android:layout_width="80dp"
-                            android:layout_height="wrap_content" />
-
-                    </RelativeLayout>
-
-                </LinearLayout>
-
-
-                <LinearLayout
-                    android:id="@+id/llAzimuth_values"
-                    android:layout_below="@+id/llBacksight_Values"
-                    android:orientation="horizontal"
-                    android:weightSum="2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="80dp">
-
-                    <RelativeLayout
-                        android:layout_weight="1"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent">
-
-                        <ImageView
-                            android:id="@+id/left_item2_img"
-                            android:background="@drawable/vc_circle_green"
-                            android:layout_marginStart="10dp"
-                            android:layout_marginTop="10dp"
-                            android:layout_width="40dp"
-                            android:layout_height="40dp" />
-
-                        <TextView
-                            android:id="@+id/left_item2_header"
-                            android:text="Direction"
-                            style="@style/Labels.Card.ProjectHeader"
-                            android:layout_alignTop="@id/left_item2_img"
-                            android:layout_toEndOf="@id/left_item2_img"
-                            android:layout_marginStart="5dp"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
-
-                        <EditText
-                            android:id="@+id/left_item2_value"
-                            style="@style/Labels.Card.ProjectValues"
-                            android:inputType="number"
-                            android:gravity="center_horizontal"
-                            android:layout_alignStart="@id/left_item2_header"
-                            android:layout_below="@id/left_item2_header"
-                            android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
 
                     </RelativeLayout>
@@ -412,7 +378,7 @@
 
                         <TextView
                             android:id="@+id/right_item2_header"
-                            android:text="Backsight Height"
+                            android:text="Target Height"
                             style="@style/Labels.Card.ProjectHeader"
                             android:layout_alignTop="@id/right_item2_img"
                             android:layout_toEndOf="@id/right_item2_img"
@@ -429,10 +395,70 @@
                             android:layout_marginEnd="25dp"
                             android:layout_toEndOf="@+id/right_item2_img"
                             android:gravity="center_horizontal"
-                            android:inputType="number" />
+                            android:inputType="numberDecimal" />
 
 
                     </RelativeLayout>
+
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:id="@+id/llAzimuth_values"
+                    android:layout_below="@+id/llBacksight_Values"
+                    android:orientation="horizontal"
+                    android:weightSum="1.4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="80dp">
+
+                    <RelativeLayout
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent">
+
+                        <ImageView
+                            android:id="@+id/left_item2_img"
+                            android:background="@drawable/vc_circle_green"
+                            android:layout_marginStart="10dp"
+                            android:layout_marginTop="10dp"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp" />
+
+                        <TextView
+                            android:id="@+id/left_item2_header"
+                            android:text="Bearing"
+                            style="@style/Labels.Card.ProjectHeader"
+                            android:layout_alignTop="@id/left_item2_img"
+                            android:layout_toEndOf="@id/left_item2_img"
+                            android:layout_marginStart="5dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                        <EditText
+                            android:id="@+id/left_item2_value"
+                            style="@style/Labels.Card.ProjectValues"
+                            android:inputType="numberDecimal"
+                            android:gravity="center_horizontal"
+                            android:layout_alignStart="@id/left_item2_header"
+                            android:layout_toStartOf="@+id/left_item2_button"
+                            android:layout_below="@id/left_item2_header"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+                        <ImageButton
+                            android:id="@+id/left_item2_button"
+                            android:background="@null"
+                            android:src="@drawable/ic_bottom_list_add"
+                            android:layout_marginEnd="5dp"
+                            android:scaleType="centerCrop"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                    </RelativeLayout>
+
+
 
                 </LinearLayout>
 
@@ -458,6 +484,7 @@
             android:layout_height="match_parent" />
 
         <Button
+            android:id="@+id/btn_set_direction"
             android:text="Set"
             style="@style/Button.Flat.Primary.Save"
             android:layout_weight="40"

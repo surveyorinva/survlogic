@@ -293,13 +293,13 @@ public class ProjectNewActivity extends AppCompatActivity {
                 mLocationLat = data.getDoubleExtra(getString(R.string.KEY_POSITION_LATITUDE),0);
                 mLocationLong = data.getDoubleExtra(getString(R.string.KEY_POSITION_LONGITUDE),0);
 
-                String strLatitude = MathHelper.convertDECtoDMS(mLocationLat,3,false);
+                String strLatitude = MathHelper.convertDECtoDMSGeodetic(mLocationLat,3,false);
                 //tvLocation_latitude.setText(getString(R.string.project_new_location_latitude_value,strLatitude));
                 tvLocation_latitude.setText(getString(R.string.project_new_location_latitude_title));
                 tvLocation_latitude_value.setText(strLatitude);
                 tvLocation_latitude_value.setVisibility(View.VISIBLE);
 
-                String strLongitude = MathHelper.convertDECtoDMS(mLocationLong,3,true);
+                String strLongitude = MathHelper.convertDECtoDMSGeodetic(mLocationLong,3,true);
                 //tvLocation_longitude.setText(getString(R.string.project_new_location_longitude_value,strLongitude));
                 tvLocation_longitude.setText(getString(R.string.project_new_location_longitude_title));
                 tvLocation_longitude_value.setText(strLongitude);

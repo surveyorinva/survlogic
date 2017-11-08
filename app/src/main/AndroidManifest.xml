@@ -104,12 +104,17 @@
             android:theme="@style/SuperMaterialTheme"/>
 
         <activity
-            android:name=".activity.JobPointsActivity"
+            android:name=".activity.JobPointsMapActivity"
             android:screenOrientation="portrait"
             android:theme="@style/SuperMaterialTheme"/>
 
         <activity
             android:name=".activity.JobCogoActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/SuperMaterialTheme"/>
+
+        <activity
+            android:name=".activity.JobCogoSetupActivity"
             android:screenOrientation="portrait"
             android:theme="@style/SuperMaterialTheme"/>
 

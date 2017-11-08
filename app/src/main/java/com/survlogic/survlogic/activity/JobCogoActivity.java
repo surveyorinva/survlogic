@@ -1,13 +1,9 @@
 package com.survlogic.survlogic.activity;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -16,35 +12,39 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.survlogic.survlogic.R;
-import com.survlogic.survlogic.database.JobDatabaseHandler;
-import com.survlogic.survlogic.dialog.DialogJobCogoSetup;
+import com.survlogic.survlogic.background.BackgroundGeodeticPointGet;
+import com.survlogic.survlogic.background.BackgroundSurveyPointGet;
 import com.survlogic.survlogic.fragment.JobCogoHomeFragment;
-import com.survlogic.survlogic.fragment.JobHomeHomeFragment;
-import com.survlogic.survlogic.model.ProjectJobSettings;
+import com.survlogic.survlogic.interf.JobPointsMapListener;
+import com.survlogic.survlogic.model.PointGeodetic;
+import com.survlogic.survlogic.model.PointSurvey;
 import com.survlogic.survlogic.utils.BottomNavigationViewHelper;
+import com.survlogic.survlogic.utils.MathHelper;
+import com.survlogic.survlogic.utils.StringUtilityHelper;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by chrisfillmore on 8/2/2017.
  */
 
-public class JobCogoActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class JobCogoActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, JobPointsMapListener {
     private static final String TAG = "JobHomeActivity";
 
     private Context mContext;
@@ -54,6 +54,7 @@ public class JobCogoActivity extends AppCompatActivity implements NavigationView
     private NavigationView navigationView;
 
     private int ACTIVITY_NUM = 0;
+    private static final int REQUEST_GET_SETUP = 1;
 
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
@@ -63,10 +64,18 @@ public class JobCogoActivity extends AppCompatActivity implements NavigationView
     private static int project_id, job_id;
     private String jobDatabaseName;
 
+    private PointSurvey occupyPointSurvey, backsightPointSurvey;
+
+    private ArrayList<PointSurvey> lstPointSurvey = new ArrayList<>();
+    private ArrayList<PointGeodetic> lstPointGeodetic = new ArrayList<>();
+    private HashMap<String,PointSurvey> pointMap = new HashMap<>();
+
     private RelativeLayout rlLayout2;
     private ProgressBar progressBar;
 
     private FrameLayout container;
+
+    private TextView tvPointOccupy, tvPointBacksight, tvPointDirection, tvOccupyHeight, tvBacksightHeight;
 
 
     @Override
@@ -80,7 +89,11 @@ public class JobCogoActivity extends AppCompatActivity implements NavigationView
         initViewNavigation();
         initViewWidgets();
         initBottomNavigationView();
+
+        initPointDataInBackground();
+
         initFragmentContainer(savedInstanceState);
+
 
 
     }
@@ -92,7 +105,29 @@ public class JobCogoActivity extends AppCompatActivity implements NavigationView
 
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.d(TAG, "onActivityResult: Started...");
 
+
+        if (this.REQUEST_GET_SETUP == requestCode && resultCode == RESULT_OK){
+            Log.d(TAG, "onActivityResult-Setup: Started...");
+
+            int occupyPointNo = data.getIntExtra(getString(R.string.KEY_SETUP_OCCUPY_PT), 0);
+            int backsightPointNo = data.getIntExtra(getString(R.string.KEY_SETUP_BACKSIGHT_PT), 0);
+            double occupyPointHeight = data.getDoubleExtra(getString(R.string.KEY_SETUP_OCCUPY_HT), 0);
+            double backsightPointHeight = data.getDoubleExtra(getString(R.string.KEY_SETUP_BACKSIGHT_HT), 0);
+
+            Log.d(TAG, "onActivityResult: Occupy at: " + occupyPointNo);
+            Log.d(TAG, "onActivityResult: Backsight at: " + backsightPointNo);
+            Log.d(TAG, "onActivityResult: Occupy Height: " + occupyPointHeight);
+            Log.d(TAG, "onActivityResult: Backsight Height " + backsightPointHeight);
+
+            loadSetup(occupyPointNo,backsightPointNo, occupyPointHeight, backsightPointHeight);
+
+        }
+    }
 
 
     //---------------------------------------------------------------------------------------------//
@@ -140,7 +175,7 @@ public class JobCogoActivity extends AppCompatActivity implements NavigationView
 
             case R.id.menu_item2_id:
                 //Go To Points Menu
-                Intent j = new Intent(this, JobPointsActivity.class);
+                Intent j = new Intent(this, JobPointsMapActivity.class);
                 j.putExtra(getString(R.string.KEY_PROJECT_ID),project_id);
                 j.putExtra(getString(R.string.KEY_JOB_ID), job_id);
                 j.putExtra(getString(R.string.KEY_JOB_DATABASE), jobDatabaseName);
@@ -191,15 +226,21 @@ public class JobCogoActivity extends AppCompatActivity implements NavigationView
         Log.d(TAG, "initView: Started");
 
         Bundle extras = getIntent().getExtras();
-        project_id = extras.getInt("PROJECT_ID");
-        job_id = extras.getInt("JOB_ID");
-        jobDatabaseName = extras.getString("JOB_DB_NAME");
-        Log.d(TAG, "||Database|| : " + jobDatabaseName);
+        project_id = extras.getInt(getString(R.string.KEY_PROJECT_ID));
+        job_id = extras.getInt(getString(R.string.KEY_JOB_ID));
+        jobDatabaseName = extras.getString(getString(R.string.KEY_JOB_DATABASE));
+        Log.d(TAG, "||Database in Cogo Activity|| : " + jobDatabaseName);
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         rlLayout2 = (RelativeLayout) findViewById(R.id.relLayout_2) ;
         progressBar = (ProgressBar) findViewById(R.id.progressStatus);
+
+        tvPointOccupy = (TextView) findViewById(R.id.tv_value_occupy);
+        tvPointBacksight = (TextView) findViewById(R.id.tv_value_backsight);
+        tvPointDirection = (TextView) findViewById(R.id.tv_value_direction);
+        tvOccupyHeight = (TextView) findViewById(R.id.tv_value_Occupy_Height);
+        tvBacksightHeight = (TextView) findViewById(R.id.tv_value_Backsight_Height);
 
     }
 
@@ -241,7 +282,8 @@ public class JobCogoActivity extends AppCompatActivity implements NavigationView
                         menuItem.setChecked(false);
 
                         JobCogoHomeFragment containerFragment1 = new JobCogoHomeFragment();
-                        containerFragment1.setArguments(getIntent().getExtras());
+
+                        containerFragment1.setArguments(getExtrasFromVariables());
 
                         swapFragment(containerFragment1,false,"HOME");
 
@@ -293,7 +335,7 @@ public class JobCogoActivity extends AppCompatActivity implements NavigationView
             }
 
             JobCogoHomeFragment containerFragment = new JobCogoHomeFragment();
-            containerFragment.setArguments(getIntent().getExtras());
+            containerFragment.setArguments(getExtrasFromVariables());
 
             FragmentManager fm = getSupportFragmentManager();
             FragmentTransaction ft = fm.beginTransaction();
@@ -340,4 +382,125 @@ public class JobCogoActivity extends AppCompatActivity implements NavigationView
     }
 
 
+
+    private Bundle getExtrasFromVariables(){
+        Log.d(TAG, "getExtrasFromVariables: Started...");
+        Bundle extras = new Bundle();
+        extras.putInt(getString(R.string.KEY_PROJECT_ID),project_id);
+        extras.putInt(getString(R.string.KEY_JOB_ID),job_id);
+        extras.putString(getString(R.string.KEY_JOB_DATABASE),jobDatabaseName);
+
+        return extras;
+    }
+
+
+    //-------------------------------------------------------------------------------------------------------------------------//
+
+    /**
+     * Methods
+     */
+
+    private void initPointDataInBackground(){
+        //Point Survey Load
+        loadPointSurveyInBackground();
+
+        //Point Geodetic Load
+        loadPointGeodeticInBackground();
+
+    }
+
+    private void loadPointGeodeticInBackground(){
+        Log.d(TAG, "loadPointGeodeticInBackground: Started...");
+        BackgroundGeodeticPointGet backgroundGeodeticPointGet = new BackgroundGeodeticPointGet(mContext, jobDatabaseName, this);
+        backgroundGeodeticPointGet.execute();
+
+    }
+
+    private void loadPointSurveyInBackground(){
+        Log.d(TAG, "loadPointSurveyInBackground: Started...");
+
+        BackgroundSurveyPointGet backgroundSurveyPointGet = new BackgroundSurveyPointGet(mContext, jobDatabaseName, this);
+        backgroundSurveyPointGet.execute();
+    }
+
+    private void loadSetup(int occupyPoint, int backsightPoint, double occupyHeight, double backsightHeight){
+        Log.d(TAG, "loadSetup: Started");
+
+        for(int i=0; i<lstPointSurvey.size(); i++) {
+            PointSurvey pointSurvey = lstPointSurvey.get(i);
+
+            String pointListPointNo = Integer.toString(pointSurvey.getPoint_no());
+
+            pointMap.put(pointListPointNo, pointSurvey);
+
+        }
+
+        //find occupy PointSurvey
+
+        if(pointMap.containsKey(String.valueOf(occupyPoint))) {
+            occupyPointSurvey = pointMap.get(String.valueOf(occupyPoint));
+            Log.i(TAG, "Occupy Point Loaded... ");
+        }
+
+
+        //find backsight PointSurvey
+        if(pointMap.containsKey(String.valueOf(backsightPoint))) {
+            backsightPointSurvey = pointMap.get(String.valueOf(backsightPoint));
+
+            Log.i(TAG, "Backsight Point Loaded... ");
+        }
+
+        //Determine azimuth
+
+        double inverseAzimuth = MathHelper.inverseAzimuthFromPointSurvey(occupyPointSurvey,backsightPointSurvey);
+        double inverseBearing = MathHelper.inverseBearingFromPointSurvey(occupyPointSurvey,backsightPointSurvey);
+
+        Log.d(TAG, "loadSetup: Azimuth: " + inverseAzimuth);
+        Log.d(TAG, "loadSetup: Bearing: " + inverseBearing);
+
+        tvPointOccupy.setText(String.valueOf(occupyPointSurvey.getPoint_no()));
+        tvPointBacksight.setText(String.valueOf(backsightPointSurvey.getPoint_no()));
+
+        //Direction
+        //Azimuth
+
+        //Bearing
+        tvPointDirection.setText(MathHelper.convertDECtoDMSBearing(inverseBearing,0));
+
+        tvOccupyHeight.setText(String.valueOf(occupyHeight));
+        tvBacksightHeight.setText(String.valueOf(backsightHeight));
+
+
+    }
+    
+
+    //------------------------------------------------------------------------------------------------------------------------//
+
+
+    /**
+     * Listeners
+     */
+    
+
+    @Override
+    public void getPointsGeodetic(ArrayList<PointGeodetic> lstPointGeodetics) {
+        this.lstPointGeodetic = lstPointGeodetics;
+
+    }
+
+    @Override
+    public void getPointsSurvey(ArrayList<PointSurvey> lstPointSurvey) {
+        this.lstPointSurvey = lstPointSurvey;
+
+    }
+
+    @Override
+    public void isMapSelectorActive(boolean isSelected) {
+
+    }
+
+    @Override
+    public void isMapSelectorOpen(boolean isSelected) {
+
+    }
 }

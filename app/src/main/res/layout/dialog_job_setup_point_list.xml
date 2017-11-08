@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:id="@+id/rl_layout_1_header"
+        android:background="@color/white"
+        android:layout_width="match_parent"
+        android:layout_height="50dp">
+
+        <LinearLayout
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:weightSum="100"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Space
+                android:layout_weight="50"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content" />
+
+            <ImageButton
+                android:id="@+id/switchToWorld"
+                android:src="@drawable/vd_world"
+                android:scaleType="fitCenter"
+                android:background="@drawable/button_ripple_semi_transparent_border"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp"
+                android:layout_weight="15"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content" />
+
+            <Space
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content" />
+
+            <ImageButton
+                android:id="@+id/switchToGrid"
+                android:src="@drawable/vd_grid"
+                android:scaleType="fitCenter"
+                android:background="@drawable/button_ripple_semi_transparent_border"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp"
+                android:layout_weight="15"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content" />
+
+            <Space
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content" />
+
+            <ImageButton
+                android:id="@+id/switchToPlanar"
+                android:src="@drawable/vd_plan"
+                android:scaleType="fitCenter"
+                android:background="@drawable/button_ripple_semi_transparent_border"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp"
+                android:layout_weight="15"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/rl_layout_2"
+        android:layout_below="@+id/rl_layout_1_header"
+        android:layout_above="@+id/rl_layout_3_footer"
+        android:layout_width="match_parent"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_height="match_parent">
+
+        <include layout="@layout/content_point_recycler_survey_list" />
+
+
+        <ProgressBar
+            android:id="@+id/progressBar_Loading"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_centerInParent="true"
+            android:indeterminate="true" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/rl_layout_3_footer"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:weightSum="100"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Space
+                android:layout_weight="12.5"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:layout_weight="25"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content" />
+
+            <Space
+                android:layout_weight=".1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:layout_weight="25"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content" />
+
+            <Space
+                android:layout_weight=".11"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:layout_weight="25"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</RelativeLayout>

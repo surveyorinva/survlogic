@@ -109,9 +109,9 @@ public class ProjectJobListAdaptor extends RecyclerView.Adapter<RecyclerView.Vie
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(mContext, JobHomeActivity.class);
-                intent.putExtra("PROJECT_ID",projectID);
-                intent.putExtra("JOB_ID", projectJobID);
-                intent.putExtra("JOB_DB_NAME", projectJobDatabaseName);
+                intent.putExtra(mContext.getString(R.string.KEY_PROJECT_ID),projectID);
+                intent.putExtra(mContext.getString(R.string.KEY_JOB_ID), projectJobID);
+                intent.putExtra(mContext.getString(R.string.KEY_JOB_DATABASE), projectJobDatabaseName);
                 mContext.startActivity(intent);
             }
         });

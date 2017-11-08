@@ -31,12 +31,11 @@ import com.survlogic.survlogic.fragment.JobPointsInverseFragment;
 import com.survlogic.survlogic.fragment.JobPointsListFragment;
 import com.survlogic.survlogic.fragment.JobPointsMapFragment;
 import com.survlogic.survlogic.interf.JobMapOptionsListener;
-import com.survlogic.survlogic.interf.JobPointsListener;
+import com.survlogic.survlogic.interf.JobPointsMapListener;
 import com.survlogic.survlogic.model.PointGeodetic;
 import com.survlogic.survlogic.model.PointSurvey;
 import com.survlogic.survlogic.model.ProjectJobSettings;
 import com.survlogic.survlogic.utils.BottomNavigationViewHelper;
-import com.survlogic.survlogic.view.PlanarMapView;
 
 import java.util.ArrayList;
 
@@ -44,8 +43,8 @@ import java.util.ArrayList;
  * Created by chrisfillmore on 8/8/2017.
  */
 
-public class JobPointsActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, JobPointsListener, JobMapOptionsListener{
-    private static final String TAG = "JobPointsActivity";
+public class JobPointsMapActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, JobPointsMapListener, JobMapOptionsListener{
+    private static final String TAG = "JobPointsMapActivity";
 
     private static Context mContext;
     private Toolbar toolbar;
@@ -81,7 +80,7 @@ public class JobPointsActivity extends AppCompatActivity implements NavigationVi
         Log.d(TAG, "onCreate: Starting......>");
 
         setContentView(R.layout.activity_job_points);
-        mContext = JobPointsActivity.this;
+        mContext = JobPointsMapActivity.this;
 
         initViewToolbar();
         initViewNavigation();
@@ -130,7 +129,7 @@ public class JobPointsActivity extends AppCompatActivity implements NavigationVi
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_in_job);
 
         navigationView = (NavigationView) findViewById(R.id.navigation_view);
-        navigationView.setNavigationItemSelectedListener(JobPointsActivity.this);
+        navigationView.setNavigationItemSelectedListener(JobPointsMapActivity.this);
 
         actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close);
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
@@ -157,7 +156,7 @@ public class JobPointsActivity extends AppCompatActivity implements NavigationVi
 
             case R.id.menu_item2_id:
                 //Go To Points Menu
-                Intent j = new Intent(this, JobPointsActivity.class);
+                Intent j = new Intent(this, JobPointsMapActivity.class);
                 j.putExtra(getString(R.string.KEY_PROJECT_ID),project_id);
                 j.putExtra(getString(R.string.KEY_JOB_ID), job_id);
                 j.putExtra(getString(R.string.KEY_JOB_DATABASE), jobDatabaseName);

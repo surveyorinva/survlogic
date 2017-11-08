@@ -4,19 +4,15 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Point;
 import android.os.AsyncTask;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.adapter.ProjectListAdaptor;
 import com.survlogic.survlogic.database.JobDatabaseHandler;
-import com.survlogic.survlogic.interf.JobPointsListener;
+import com.survlogic.survlogic.interf.JobPointsMapListener;
 import com.survlogic.survlogic.model.PointGeodetic;
-import com.survlogic.survlogic.model.PointSurvey;
-import com.survlogic.survlogic.view.PlanarMapView;
 
 import java.util.ArrayList;
 
@@ -34,7 +30,7 @@ public class BackgroundGeodeticPointGet extends AsyncTask <PointGeodetic,PointGe
 
     private String DB_NAME;
 
-    private final JobPointsListener mListener;
+    private final JobPointsMapListener mListener;
 
     RecyclerView recyclerView;
     ProjectListAdaptor adapter;
@@ -43,7 +39,7 @@ public class BackgroundGeodeticPointGet extends AsyncTask <PointGeodetic,PointGe
     ArrayList<PointGeodetic> arrayList = new ArrayList<PointGeodetic>();
 
 
-    public BackgroundGeodeticPointGet(Context context, String DB_NAME, JobPointsListener listener) {
+    public BackgroundGeodeticPointGet(Context context, String DB_NAME, JobPointsMapListener listener) {
         this.context = context;
         this.dialog = new ProgressDialog(context);
         this.DB_NAME = DB_NAME;

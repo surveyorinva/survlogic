@@ -1,9 +1,7 @@
 package com.survlogic.survlogic.dialog;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
@@ -18,12 +16,8 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.survlogic.survlogic.R;
-import com.survlogic.survlogic.adapter.DialogJobCogoSetupTypeAdapter;
-import com.survlogic.survlogic.adapter.DialogJobMapOptionsMapTypeAdapter;
-import com.survlogic.survlogic.interf.JobMapOptionsListener;
+import com.survlogic.survlogic.adapter.ActivityJobCogoSetupTypeAdapter;
 import com.survlogic.survlogic.utils.PreferenceLoaderHelper;
-
-import java.util.ArrayList;
 
 /**
  * Created by chrisfillmore on 8/21/2017.
@@ -64,7 +58,7 @@ public class DialogJobCogoSetup extends DialogFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.dialog_job_cogo_setup, container);
+        View view = inflater.inflate(R.layout.activity_job_cogo_setup, container);
 
         initViewWidgets(view);
         setOnClickListeners();
@@ -89,12 +83,12 @@ public class DialogJobCogoSetup extends DialogFragment {
     //-------------------------------------------------------------------------------------------------------------------------//
 
     /**
-     * JAVA Methods
+     * JAVA Met`hods
      */
 
     private void initViewWidgets(View view){
         Log.d(TAG, "initViewWidgets: Started...");
-        DialogJobCogoSetupTypeAdapter tabAdapter = new DialogJobCogoSetupTypeAdapter(getChildFragmentManager());
+        ActivityJobCogoSetupTypeAdapter tabAdapter = new ActivityJobCogoSetupTypeAdapter(getChildFragmentManager());
         ViewPager viewPager = (ViewPager) view.findViewById(R.id.pager);
         viewPager.setAdapter(tabAdapter);
 

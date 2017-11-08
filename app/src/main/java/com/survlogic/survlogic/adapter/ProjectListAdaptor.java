@@ -155,8 +155,8 @@ public class ProjectListAdaptor extends RecyclerView.Adapter<RecyclerView.ViewHo
 //        Location
         if(project.getmLocationLat() != 0){
             vh1.txtLocation.setText(mContext.getString(R.string.project_card_location_geo,
-                    MathHelper.convertDECtoDMS(project.getmLocationLat(),1,true),
-                    MathHelper.convertDECtoDMS(project.getmLocationLong(),1,true)));
+                    MathHelper.convertDECtoDMSGeodetic(project.getmLocationLat(),1,true),
+                    MathHelper.convertDECtoDMSGeodetic(project.getmLocationLong(),1,true)));
         }
 
 //        Image

@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.DialogFragment;
 import android.text.Editable;
-import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,10 +19,8 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.survlogic.survlogic.R;
-import com.survlogic.survlogic.activity.JobPointsActivity;
 import com.survlogic.survlogic.activity.JobPointsAddAdvancedActivity;
 import com.survlogic.survlogic.background.BackgroundPointSurveyNew;
-import com.survlogic.survlogic.background.BackgroundProjectJobNew;
 import com.survlogic.survlogic.database.JobDatabaseHandler;
 import com.survlogic.survlogic.model.PointSurvey;
 

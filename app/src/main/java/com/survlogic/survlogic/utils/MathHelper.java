@@ -4,6 +4,8 @@ import android.content.Context;
 import android.location.Location;
 import android.util.Log;
 
+import com.survlogic.survlogic.model.PointSurvey;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -51,8 +53,8 @@ public class MathHelper {
      */
 
 
-    public static String convertDECtoDMS(double angle,int decimalPlace, boolean signCounts){
-        Log.d(TAG, "convertDECtoDMS: Started...");
+    public static String convertDECtoDMSGeodetic(double angle, int decimalPlace, boolean signCounts){
+        Log.d(TAG, "convertDECtoDMSGeodetic: Started...");
         
         boolean neg = angle < 0;
         String myAngleDMS;
@@ -85,6 +87,8 @@ public class MathHelper {
 
         return myAngleDMS;
     }
+
+
 
     public static double convertPartsToDEC(String degreeIn, String minuteIn, String secondIn){
         Log.d(TAG, "convertPartsToDEC: Started...");
@@ -172,6 +176,116 @@ public class MathHelper {
 
     }
 
+    public static String convertDECtoDMSAzimuth(double angle, int decimalPlace){
+        Log.d(TAG, "convertDECtoDMSGeodetic: Started...");
+
+        boolean neg = angle < 0;
+        String myAngleDMS;
+
+        //TODO Deal with 0 for decimal place.  right now returns with "."  need to return " "
+
+        angle = Math.abs(angle);
+
+        if (angle ==0){
+            myAngleDMS = "0";
+        }else {
+            double deg = Math.floor(angle);                  // Round down
+            double minutes = Math.floor((angle * 60) % 60);  // This is an integer in the range [0, 60)
+            double seconds = (angle * 3600) % 60;            // This is a decimal in the range [0, 60)
+
+            myAngleDMS = (int) deg + "°" + (int) minutes + "'" + seconds;
+
+        }
+
+
+        int pointIndex = myAngleDMS.indexOf(".");
+        int endIndex;
+
+        if (decimalPlace==0){
+            endIndex = pointIndex;
+        }else {
+            endIndex = pointIndex + 1 + decimalPlace;
+        }
+
+        if (endIndex < myAngleDMS.length()) {
+            myAngleDMS = myAngleDMS.substring(0, endIndex);
+        }
+
+        myAngleDMS = myAngleDMS + "\"";
+
+
+        return myAngleDMS;
+    }
+
+    public static String convertDECtoDMSBearing(double angle, int decimalPlace){
+        Log.d(TAG, "convertDECtoDMSGeodetic: Started...");
+        String frontDirection, rearDirection;
+        String myAngleDMS;
+
+        //TODO Deal with 0 for decimal place.  right now returns with "."  need to return " "
+
+        angle = Math.abs(angle);
+        Log.d(TAG, "convertDECtoDMSBearing: Angle: " + angle);
+
+        int quadrant = Integer.parseInt(Integer.toString((int) angle).substring(0, 1));
+        Log.d(TAG, "convertDECtoDMSBearing: Quadrant: " + quadrant);
+        switch(quadrant){
+            case 1:
+                angle = angle - 100;
+                frontDirection = "N";
+                rearDirection = "E";
+                break;
+            case 2:
+                angle = angle - 200;
+                frontDirection = "S";
+                rearDirection = "E";
+                break;
+            case 3:
+                angle = angle - 300;
+                frontDirection = "S";
+                rearDirection = "W";
+                break;
+            case 4:
+                angle = angle - 400;
+                frontDirection = "N";
+                rearDirection = "W";
+                break;
+            default:
+                frontDirection = "N";
+                rearDirection = "E";
+        }
+
+
+        if (angle ==0){
+            myAngleDMS = "0";
+        }else {
+            double deg = Math.floor(angle);                  // Round down
+            double minutes = Math.floor((angle * 60) % 60);  // This is an integer in the range [0, 60)
+            double seconds = (angle * 3600) % 60;            // This is a decimal in the range [0, 60)
+
+            myAngleDMS = (int) deg + "°" + (int) minutes + "'" + seconds;
+
+        }
+
+        int pointIndex = myAngleDMS.indexOf(".");
+        int endIndex;
+
+        if (decimalPlace==0){
+            endIndex = pointIndex;
+        }else {
+            endIndex = pointIndex + 1 + decimalPlace;
+        }
+
+        if (endIndex < myAngleDMS.length()) {
+            myAngleDMS = myAngleDMS.substring(0, endIndex);
+        }
+
+        myAngleDMS = frontDirection + " " + myAngleDMS + "\" " + rearDirection;
+
+
+        return myAngleDMS;
+    }
+
 
     /**
      * Convert a DEC to the individual parts
@@ -233,5 +347,107 @@ public class MathHelper {
             sb.append(ALLOWED_CHARACTERS.charAt(random.nextInt(ALLOWED_CHARACTERS.length())));
         return sb.toString();
     }
+
+
+    public static double inverseAzimuthFromPointSurvey(PointSurvey pointSurvey1, PointSurvey pointSurvey2){
+        double results;
+
+        double northing1 = pointSurvey1.getNorthing();
+        double northing2 = pointSurvey2.getNorthing();
+
+        double easting1 = pointSurvey1.getEasting();
+        double easting2 = pointSurvey2.getEasting();
+
+        double deltaNorth, deltaEast;
+
+        deltaNorth = northing2 - northing1;
+        deltaEast = easting2 - easting1;
+
+        results = (deltaEast)/(deltaNorth);
+        results = Math.atan(results);
+        results = (180/Math.PI) * results;
+
+        boolean isNorthPos = false;
+        boolean isEastPos = false;
+
+        if (deltaNorth > 0){
+            isNorthPos = true;
+        }else{
+            isNorthPos = false;
+        }
+
+        if (deltaEast > 0){
+            isEastPos = true;
+        }else{
+            isEastPos = false;
+        }
+
+
+        if(isNorthPos && isEastPos) { //Q1
+            results = Math.abs(results);
+        }else if(!isNorthPos && isEastPos){ //Q2
+            results = 180 - Math.abs(results);
+
+        }else if(!isNorthPos && !isEastPos) { //Q3
+            results = 180 + Math.abs(results);
+
+        }else if(isNorthPos && !isEastPos) { //Q4
+            results = 360 - Math.abs(results);
+
+        }
+
+        return results;
+    }
+
+    public static double inverseBearingFromPointSurvey(PointSurvey pointSurvey1, PointSurvey pointSurvey2){
+        double results;
+
+        double northing1 = pointSurvey1.getNorthing();
+        double northing2 = pointSurvey2.getNorthing();
+
+        double easting1 = pointSurvey1.getEasting();
+        double easting2 = pointSurvey2.getEasting();
+
+        double deltaNorth, deltaEast;
+
+        deltaNorth = northing2 - northing1;
+        deltaEast = easting2 - easting1;
+
+        results = (deltaEast)/(deltaNorth);
+        results = Math.atan(results);
+        results = (180/Math.PI) * results;
+
+        boolean isNorthPos = false;
+        boolean isEastPos = false;
+
+        if (deltaNorth > 0){
+            isNorthPos = true;
+        }else{
+            isNorthPos = false;
+        }
+
+        if (deltaEast > 0){
+            isEastPos = true;
+        }else{
+            isEastPos = false;
+        }
+
+
+        if(isNorthPos && isEastPos) { //Q1
+            results = 100 + Math.abs(results);
+        }else if(!isNorthPos && isEastPos){ //Q2
+            results = 200 + Math.abs(results);
+
+        }else if(!isNorthPos && !isEastPos) { //Q3
+            results = 300 + Math.abs(results);
+
+        }else if(isNorthPos && !isEastPos) { //Q4
+            results = 400 + Math.abs(results);
+
+        }
+
+        return results;
+    }
+
 
 }

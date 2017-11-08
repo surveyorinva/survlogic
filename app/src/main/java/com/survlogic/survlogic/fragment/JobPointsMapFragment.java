@@ -46,7 +46,7 @@ import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.dialog.DialogJobMapOptions;
 import com.survlogic.survlogic.dialog.DialogJobMapPointList;
 import com.survlogic.survlogic.dialog.DialogJobPointView;
-import com.survlogic.survlogic.interf.JobPointsListener;
+import com.survlogic.survlogic.interf.JobPointsMapListener;
 import com.survlogic.survlogic.interf.MapZoomListener;
 import com.survlogic.survlogic.model.PointGeodetic;
 import com.survlogic.survlogic.model.PointSurvey;
@@ -66,7 +66,7 @@ public class JobPointsMapFragment extends Fragment implements OnMapReadyCallback
     private static final String TAG = "JobPointsMapFragment";
     private Context mContext;
 
-    JobPointsListener jobPointsListener;
+    JobPointsMapListener jobPointsMapListener;
 
     private View v;
     private static final int DELAY_TO_MAP = 300;
@@ -143,7 +143,7 @@ public class JobPointsMapFragment extends Fragment implements OnMapReadyCallback
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        jobPointsListener = (JobPointsListener) context;
+        jobPointsMapListener = (JobPointsMapListener) context;
     }
 
     private void initViewWidgets(View v){
@@ -448,7 +448,7 @@ public class JobPointsMapFragment extends Fragment implements OnMapReadyCallback
     public void closeSubMenuSelectFab(){
         // When selection menu is open, this closes the selection menu fab items
 
-        jobPointsListener.isMapSelectorOpen(false);
+        jobPointsMapListener.isMapSelectorOpen(false);
 
         fabSelect.startAnimation(animRotateBackwards);
 
@@ -482,7 +482,7 @@ public class JobPointsMapFragment extends Fragment implements OnMapReadyCallback
     private void openSubMenuSelectFab(){
         //this opens the selection menu and the fabs
 
-        jobPointsListener.isMapSelectorOpen(true);
+        jobPointsMapListener.isMapSelectorOpen(true);
 
         fabSelect.startAnimation(animRotateForward);
 
@@ -514,7 +514,7 @@ public class JobPointsMapFragment extends Fragment implements OnMapReadyCallback
 
     private void hideMenuForSelect(){
         // Hides the selection and shows the close button
-        jobPointsListener.isMapSelectorActive(true);
+        jobPointsMapListener.isMapSelectorActive(true);
 
         fabOptions.startAnimation(transitionLeft);
 
@@ -532,7 +532,7 @@ public class JobPointsMapFragment extends Fragment implements OnMapReadyCallback
     private void showMenuForSelect(){
         // Returns to select menu
 
-        jobPointsListener.isMapSelectorActive(false);
+        jobPointsMapListener.isMapSelectorActive(false);
 
         fabOptions.startAnimation(transitionToLeft);
 

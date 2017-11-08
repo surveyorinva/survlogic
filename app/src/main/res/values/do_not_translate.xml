@@ -88,8 +88,10 @@
 
     <string name="KEY_GALLERY_IMAGE_PATH">KEY_GALLERY_IMAGE_PATH</string>
 
-
-
+    <string name="KEY_SETUP_OCCUPY_PT">KEY_SETUP_OCCUPY_PT</string>
+    <string name="KEY_SETUP_BACKSIGHT_PT">KEY_SETUP_BACKSIGHT_PT</string>
+    <string name="KEY_SETUP_OCCUPY_HT">KEY_SETUP_OCCUPY_HT</string>
+    <string name="KEY_SETUP_BACKSIGHT_HT">KEY_SETUP_BACKSIGHT_HT</string>
 
     <!--Intent Answers-->
     <string name="ANSWER_Project_New">ANSWER_project_new</string>

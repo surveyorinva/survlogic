@@ -380,6 +380,10 @@
     <string name="gps_home_action_2_1">Calibration</string>
 
 
+    <!-- Cogo - Setup -->
+    <string name="cogo_setup_occupy_error_no_point">An occupy station has not been selected.  \nPlease either enter station number or choose from list.</string>
+    <string name="cogo_setup_backsight_error_no_point">A backsight station has not been selected.  \nPlease either enter station number or choose from list.</string>
+
     <!-- ******************************Strings related to Settings****************************** -->
 
     <!--**************************Current Job Preferences**************************-->
