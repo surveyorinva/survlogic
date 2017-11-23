@@ -65,6 +65,15 @@
 
     <string name="pref_key_current_job_view_table_is_planar">pref_key_current_job_view_table_is_planar</string>
 
+    <string name="pref_key_current_job_cogo_occupy_point">pref_key_current_job_cogo_occupy_point</string>
+    <string name="pref_key_current_job_cogo_backsight_point">pref_key_current_job_cogo_backsight_point</string>
+    <string name="pref_key_current_job_cogo_occupy_height">pref_key_current_job_cogo_occupy_height</string>
+    <string name="pref_key_current_job_cogo_backsight_height">pref_key_current_job_cogo_backsight_height</string>
+
+    <string name="pref_key_current_job_cogo_sideshot_hAngle">pref_key_current_job_cogo_sideshot_hAngle</string>
+    <string name="pref_key_current_job_cogo_sideshot_distance">pref_key_current_job_cogo_sideshot_distance</string>
+
+
     <!-- Default preference values -->
     <string name="pref_gps_min_time_default_sec">1</string>
     <string name="pref_gps_unit_measurement_default">3</string>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <group
+        android:id="@+id/grp1"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/sideshot_distance_item_1"
+            android:title="Horizontal Distance"
+            android:checkable="true">
+        </item>
+
+    </group>
+
+    <group
+        android:id="@+id/grp2"
+        android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/sideshot_distance_item_3"
+            android:title="Slope Distance-Zenith Angle"
+            android:checkable="true">
+        </item>
+
+        <item
+            android:id="@+id/sideshot_distance_item_4"
+            android:title="Slope Distance-Vertical Angle"
+            android:checkable="true">
+        </item>
+
+        <item
+            android:id="@+id/sideshot_distance_item_5"
+            android:title="Slope Distance-Vertical Difference"
+            android:checkable="true">
+        </item>
+
+    </group>
+
+    <item
+        android:id="@+id/sideshot_distance_item_6"
+        android:title="Convert Distance">
+    </item>
+
+
+
+</menu>

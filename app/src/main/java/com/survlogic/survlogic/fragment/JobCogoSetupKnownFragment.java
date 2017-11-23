@@ -11,6 +11,8 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -77,6 +79,8 @@ public class JobCogoSetupKnownFragment extends Fragment {
     boolean isPointsLoaded = false;
     boolean isPointOccupyDataVisible = false, isPointBacksightDataVisible = false;
 
+    private Animation animCard_1_down_btn, animCard_1_up_btn, animCard_2_down_btn, animCard_2_up_btn;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -89,6 +93,7 @@ public class JobCogoSetupKnownFragment extends Fragment {
         setOnClickListener(v);
 
 
+
         return v;
     }
 
@@ -98,6 +103,7 @@ public class JobCogoSetupKnownFragment extends Fragment {
 
         preferenceLoaderHelper = new PreferenceLoaderHelper(mContext);
         loadPreferences();
+
 
 
     }
@@ -112,7 +118,10 @@ public class JobCogoSetupKnownFragment extends Fragment {
         tvOccupyPointNo.setOnFocusChangeListener(focusListener);
 
         etOccupyHeight = (EditText) v.findViewById(R.id.right_item1_value);
+        etOccupyHeight.setSelectAllOnFocus(true);
+
         etBacksightHeight = (EditText) v.findViewById(R.id.right_item2_value);
+        etBacksightHeight.setSelectAllOnFocus(true);
 
         tvOccupyNorthing = (TextView) v.findViewById(R.id.occupy_Northing);
         tvOccupyEasting = (TextView) v.findViewById(R.id.occupy_Easting);
@@ -137,6 +146,77 @@ public class JobCogoSetupKnownFragment extends Fragment {
 
         jobCogoFragmentListener = (JobCogoFragmentListener) getActivity();
 
+        animCard_1_down_btn = AnimationUtils.loadAnimation(mContext,R.anim.rotate_card_down);
+
+        animCard_1_down_btn.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                ibtCardOccupyExpand.setImageResource(R.drawable.ic_keyboard_arrow_up);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+
+        animCard_1_up_btn = AnimationUtils.loadAnimation(mContext, R.anim.rotate_card_up);
+
+        animCard_1_up_btn.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                ibtCardOccupyExpand.setImageResource(R.drawable.ic_keyboard_arrow_down);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        animCard_2_down_btn = AnimationUtils.loadAnimation(mContext,R.anim.rotate_card_down);
+        animCard_2_down_btn.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                ibtCardBacksightExpand.setImageResource(R.drawable.ic_keyboard_arrow_up);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        animCard_2_up_btn = AnimationUtils.loadAnimation(mContext, R.anim.rotate_card_up);
+        animCard_2_up_btn.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                ibtCardBacksightExpand.setImageResource(R.drawable.ic_keyboard_arrow_down);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
     }
 
     private void setOnClickListener(View v){
@@ -170,9 +250,14 @@ public class JobCogoSetupKnownFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if (!isPointOccupyDataVisible){
+                    ibtCardOccupyExpand.startAnimation(animCard_1_down_btn);
+
                     rlOccupyMetadataView.setVisibility(View.VISIBLE);
                     isPointOccupyDataVisible = true;
+
                 }else{
+                    ibtCardOccupyExpand.startAnimation(animCard_1_up_btn);
+
                     rlOccupyMetadataView.setVisibility(View.GONE);
                     isPointOccupyDataVisible = false;
                 }
@@ -206,11 +291,18 @@ public class JobCogoSetupKnownFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if(!isPointBacksightDataVisible){
+                    ibtCardBacksightExpand.startAnimation(animCard_2_down_btn);
+
                     rlBacksightMetadataView.setVisibility(View.VISIBLE);
                     isPointBacksightDataVisible = true;
+
+
                 }else{
+                    ibtCardBacksightExpand.startAnimation(animCard_2_up_btn);
+
                     rlBacksightMetadataView.setVisibility(View.GONE);
                     isPointBacksightDataVisible = false;
+
                 }
             }
         });
@@ -221,6 +313,51 @@ public class JobCogoSetupKnownFragment extends Fragment {
                 setOccupyAndBacksightInActivity();
             }
         });
+
+    }
+
+    public void setPreDefinedSetup(){
+        Log.d(TAG, "initPreDefinedSetup: Started...");
+        int occupyPointNo = jobCogoFragmentListener.sendOccupyPointNoToFragment();
+        int backsightPointNo = jobCogoFragmentListener.sendBacksightPointNoToFragment();
+
+        double occupyHeight = jobCogoFragmentListener.sendOccupyHeightToFragment();
+        double backsightHeight = jobCogoFragmentListener.sendBacksightHeightToFragment();
+
+        Log.d(TAG, "initPreDefinedSetup: Occupy Point No: " + occupyPointNo);
+        Log.d(TAG, "initPreDefinedSetup: Backsight Point No: " + backsightPointNo);
+
+
+        if(!isPointsLoaded){
+            getPointSurveyArray();
+            isPointsLoaded = true;
+        }
+
+        Log.d(TAG, "initPreDefinedSetup: Loaded from Activity: " + lstPointSurvey.size());
+
+
+        if(occupyPointNo !=0){
+            setPointSurveyFromPreDefined(String.valueOf(occupyPointNo),true);
+        }
+
+        if(backsightPointNo !=0){
+            setPointSurveyFromPreDefined(String.valueOf(backsightPointNo),false);
+        }
+
+        if (occupyHeight != 0){
+            String occupyHeightValue = COORDINATE_FORMATTER.format(occupyHeight);
+            etOccupyHeight.setText(occupyHeightValue);
+
+        }
+
+        if (backsightHeight != 0){
+            String backsightHeightValue = COORDINATE_FORMATTER.format(backsightHeight);
+            etBacksightHeight.setText(backsightHeightValue);
+
+        }
+
+
+
 
     }
 
@@ -273,6 +410,21 @@ public class JobCogoSetupKnownFragment extends Fragment {
     /**
      * Getters/Setters
      */
+
+    private void setPointSurveyFromPreDefined(String pointNo, boolean isOccupyPoint){
+        Log.d(TAG, "setPointSurveyFromPointNo: Started");
+        PointSurvey currentPointSurvey;
+
+
+        if(pointMap.containsKey(pointNo)) {
+            currentPointSurvey = pointMap.get(pointNo);
+
+            populateSetup(currentPointSurvey, isOccupyPoint, true);
+
+        }
+
+    }
+
     private void setPointSurveyFromPointNo(String pointNo, boolean isOccupyPoint){
         Log.d(TAG, "setPointSurveyFromPointNo: Started");
         PointSurvey currentPointSurvey;
@@ -365,18 +517,22 @@ public class JobCogoSetupKnownFragment extends Fragment {
 
 
             }else{
+                if(occupyPoint == currentPointSurvey){
+                    showToast(getActivity().getResources().getString(R.string.cogo_setup_backsight_error_same_as_occupy),true);
+                }else{
+                    tvBacksightNorthing.setText(pointNorthingValue);
+                    tvBacksightEasting.setText(pointEastingValue);
+                    tvBacksightElevation.setText(pointElevationValue);
+                    tvBacksightDesc.setText(pointDescription);
 
-                tvBacksightNorthing.setText(pointNorthingValue);
-                tvBacksightEasting.setText(pointEastingValue);
-                tvBacksightElevation.setText(pointElevationValue);
-                tvBacksightDesc.setText(pointDescription);
+                    backsightPoint = currentPointSurvey;
 
-                backsightPoint = currentPointSurvey;
+                    if(showPointNo){
+                        tvBacksightPointNo.setText(String.valueOf(currentPointSurvey.getPoint_no()));
+                    }
 
-                if(showPointNo){
-                    tvBacksightPointNo.setText(String.valueOf(currentPointSurvey.getPoint_no()));
+
                 }
-
 
             }
 
@@ -426,6 +582,7 @@ public class JobCogoSetupKnownFragment extends Fragment {
             }
         }
     };
+
 
 
 }

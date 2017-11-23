@@ -37,6 +37,7 @@ import com.survlogic.survlogic.database.JobDatabaseHandler;
 import com.survlogic.survlogic.fragment.JobHomeHomeFragment;
 import com.survlogic.survlogic.model.ProjectJobSettings;
 import com.survlogic.survlogic.utils.BottomNavigationViewHelper;
+import com.survlogic.survlogic.utils.PreferenceLoaderHelper;
 
 /**
  * Created by chrisfillmore on 8/2/2017.
@@ -63,6 +64,8 @@ public class JobHomeActivity extends AppCompatActivity implements NavigationView
 
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
+
+    private PreferenceLoaderHelper preferenceLoaderHelper;
 
     private BottomNavigationViewEx bottomNavigationViewEx;
 
@@ -94,6 +97,8 @@ public class JobHomeActivity extends AppCompatActivity implements NavigationView
         Log.d(TAG, "onCreate: Starting................>");
         setContentView(R.layout.activity_job_home);
         mContext = JobHomeActivity.this;
+        preferenceLoaderHelper = new PreferenceLoaderHelper(mContext);
+
 
         initViewToolbar();
         initViewNavigation();
@@ -462,6 +467,7 @@ public class JobHomeActivity extends AppCompatActivity implements NavigationView
             Log.d(TAG, "initJobSettingsToDb: Closing DB Connection...");
             dbJob.close();
 
+
             if (row>0){
                 Log.d(TAG, "initJobSettingsToDb: Successful in Updating Settings...");
                 return true;
@@ -469,6 +475,8 @@ public class JobHomeActivity extends AppCompatActivity implements NavigationView
                 Log.d(TAG, "initJobSettingsToDb: Something Went Wrong...");
                 return false;
             }
+
+
 
         }
 
@@ -498,6 +506,7 @@ public class JobHomeActivity extends AppCompatActivity implements NavigationView
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         savePreferences();
+                        preferenceLoaderHelper.clearCogoSettings();
                         finish();
                     }
                 })

@@ -30,12 +30,14 @@ import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.background.BackgroundGeodeticPointGet;
 import com.survlogic.survlogic.background.BackgroundSurveyPointGet;
 import com.survlogic.survlogic.fragment.JobCogoHomeFragment;
+import com.survlogic.survlogic.fragment.JobCogoSideshotFragment;
+import com.survlogic.survlogic.interf.JobCogoHomeFragmentListener;
 import com.survlogic.survlogic.interf.JobPointsMapListener;
 import com.survlogic.survlogic.model.PointGeodetic;
 import com.survlogic.survlogic.model.PointSurvey;
 import com.survlogic.survlogic.utils.BottomNavigationViewHelper;
 import com.survlogic.survlogic.utils.MathHelper;
-import com.survlogic.survlogic.utils.StringUtilityHelper;
+import com.survlogic.survlogic.utils.PreferenceLoaderHelper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,7 +46,7 @@ import java.util.HashMap;
  * Created by chrisfillmore on 8/2/2017.
  */
 
-public class JobCogoActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, JobPointsMapListener {
+public class JobCogoActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, JobPointsMapListener, JobCogoHomeFragmentListener {
     private static final String TAG = "JobHomeActivity";
 
     private Context mContext;
@@ -65,6 +67,7 @@ public class JobCogoActivity extends AppCompatActivity implements NavigationView
     private String jobDatabaseName;
 
     private PointSurvey occupyPointSurvey, backsightPointSurvey;
+    double occupyPointHeight, backsightPointHeight;
 
     private ArrayList<PointSurvey> lstPointSurvey = new ArrayList<>();
     private ArrayList<PointGeodetic> lstPointGeodetic = new ArrayList<>();
@@ -77,6 +80,7 @@ public class JobCogoActivity extends AppCompatActivity implements NavigationView
 
     private TextView tvPointOccupy, tvPointBacksight, tvPointDirection, tvOccupyHeight, tvBacksightHeight;
 
+    private PreferenceLoaderHelper preferenceLoaderHelper;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -84,6 +88,8 @@ public class JobCogoActivity extends AppCompatActivity implements NavigationView
         Log.d(TAG, "onCreate: Starting................>");
         setContentView(R.layout.activity_job_cogo);
         mContext = JobCogoActivity.this;
+        preferenceLoaderHelper = new PreferenceLoaderHelper(mContext);
+
 
         initViewToolbar();
         initViewNavigation();
@@ -116,8 +122,8 @@ public class JobCogoActivity extends AppCompatActivity implements NavigationView
 
             int occupyPointNo = data.getIntExtra(getString(R.string.KEY_SETUP_OCCUPY_PT), 0);
             int backsightPointNo = data.getIntExtra(getString(R.string.KEY_SETUP_BACKSIGHT_PT), 0);
-            double occupyPointHeight = data.getDoubleExtra(getString(R.string.KEY_SETUP_OCCUPY_HT), 0);
-            double backsightPointHeight = data.getDoubleExtra(getString(R.string.KEY_SETUP_BACKSIGHT_HT), 0);
+            occupyPointHeight = data.getDoubleExtra(getString(R.string.KEY_SETUP_OCCUPY_HT), 0);
+            backsightPointHeight = data.getDoubleExtra(getString(R.string.KEY_SETUP_BACKSIGHT_HT), 0);
 
             Log.d(TAG, "onActivityResult: Occupy at: " + occupyPointNo);
             Log.d(TAG, "onActivityResult: Backsight at: " + backsightPointNo);
@@ -295,6 +301,7 @@ public class JobCogoActivity extends AppCompatActivity implements NavigationView
                         menuItem = menu.getItem(ACTIVITY_NUM);
                         menuItem.setChecked(false);
 
+                        openCogoSetupActivity();
 
                         break;
 
@@ -304,6 +311,11 @@ public class JobCogoActivity extends AppCompatActivity implements NavigationView
                         menuItem.setChecked(false);
 
 
+                        JobCogoSideshotFragment containerFragment2 = new JobCogoSideshotFragment();
+
+                        containerFragment2.setArguments(getExtrasFromVariables());
+
+                        swapFragment(containerFragment2,false,"SIDE_SHOT");
 
 
                         break;
@@ -470,9 +482,67 @@ public class JobCogoActivity extends AppCompatActivity implements NavigationView
         tvOccupyHeight.setText(String.valueOf(occupyHeight));
         tvBacksightHeight.setText(String.valueOf(backsightHeight));
 
+        //Load setup into Preferences for future use
+        preferenceLoaderHelper.setCogoOccupyPoint(occupyPointSurvey.getPoint_no());
+        preferenceLoaderHelper.setCogoBacksightPoint(backsightPointSurvey.getPoint_no());
+
+        preferenceLoaderHelper.setCogoOccupyHeight(occupyHeight);
+        preferenceLoaderHelper.setCogoBacksightHeight(backsightHeight);
+    }
+
+
+    private void initSetupFromPreferences(){
+        Log.d(TAG, "initSetupFromPreferences: Started...");
+        int occupyPoint = preferenceLoaderHelper.getCogoOccupyPoint();
+        int backsightPoint = preferenceLoaderHelper.getCogoBacksightPoint();
+
+        double occupyPointHeight = preferenceLoaderHelper.getCogoOccupyHeight();
+        double backsightPointHeight = preferenceLoaderHelper.getCogoBacksightHeight();
+
+        Log.d(TAG, "initSetupFromPreferences: Occupy Point: " + occupyPoint);
+
+        if (occupyPoint !=0){
+            loadSetup(occupyPoint,backsightPoint,occupyPointHeight,backsightPointHeight);
+
+        }
 
     }
-    
+
+    public void openCogoSetupActivity(){
+
+        boolean isOccupyPointSet = isOccupyPointSurveySet();
+        boolean isBackSightPointSet = isBacksightPointSurveySet();
+
+
+        Intent i = new Intent(mContext, JobCogoSetupActivity.class);
+        i.putExtra(getString(R.string.KEY_PROJECT_ID),project_id);
+        i.putExtra(getString(R.string.KEY_JOB_ID), job_id);
+        i.putExtra(getString(R.string.KEY_JOB_DATABASE), jobDatabaseName);
+
+        if(isOccupyPointSet && isBackSightPointSet){
+
+            PointSurvey occupyPointSurvey = getOccupyPointSurvey();
+            PointSurvey backsightPointSurvey = getBacksightPointSurvey();
+
+            i.putExtra(getString(R.string.KEY_SETUP_OCCUPY_PT),occupyPointSurvey.getPoint_no());
+            i.putExtra(getString(R.string.KEY_SETUP_BACKSIGHT_PT),backsightPointSurvey.getPoint_no());
+
+            i.putExtra(getString(R.string.KEY_SETUP_OCCUPY_HT), getOccupyHeight());
+            i.putExtra(getString(R.string.KEY_SETUP_BACKSIGHT_HT), getBacksightHeight());
+
+
+        }else{
+            i.putExtra(getString(R.string.KEY_SETUP_OCCUPY_PT),0);
+            i.putExtra(getString(R.string.KEY_SETUP_BACKSIGHT_PT),0);
+
+            i.putExtra(getString(R.string.KEY_SETUP_OCCUPY_HT), 0);
+            i.putExtra(getString(R.string.KEY_SETUP_BACKSIGHT_HT), 0);
+        }
+
+        startActivityForResult(i,REQUEST_GET_SETUP);
+        Log.d(TAG, "onClick: Request_GET_SETUP: " + REQUEST_GET_SETUP);
+        //overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+    }
 
     //------------------------------------------------------------------------------------------------------------------------//
 
@@ -492,6 +562,7 @@ public class JobCogoActivity extends AppCompatActivity implements NavigationView
     public void getPointsSurvey(ArrayList<PointSurvey> lstPointSurvey) {
         this.lstPointSurvey = lstPointSurvey;
 
+        initSetupFromPreferences();
     }
 
     @Override
@@ -502,5 +573,45 @@ public class JobCogoActivity extends AppCompatActivity implements NavigationView
     @Override
     public void isMapSelectorOpen(boolean isSelected) {
 
+    }
+
+    //JobCogoHomeFragmentListener
+    @Override
+    public PointSurvey getOccupyPointSurvey() {
+        return occupyPointSurvey;
+    }
+
+    @Override
+    public PointSurvey getBacksightPointSurvey() {
+        return backsightPointSurvey;
+    }
+
+    @Override
+    public boolean isOccupyPointSurveySet() {
+
+        if(occupyPointSurvey !=null){
+            return true;
+        }else {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean isBacksightPointSurveySet() {
+        if(backsightPointSurvey !=null){
+            return true;
+        }else {
+            return false;
+        }
+    }
+
+    @Override
+    public double getOccupyHeight() {
+        return occupyPointHeight;
+    }
+
+    @Override
+    public double getBacksightHeight() {
+        return backsightPointHeight;
     }
 }

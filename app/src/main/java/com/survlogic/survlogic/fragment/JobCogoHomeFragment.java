@@ -12,6 +12,8 @@ import android.widget.LinearLayout;
 
 import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.activity.JobCogoSetupActivity;
+import com.survlogic.survlogic.interf.JobCogoHomeFragmentListener;
+import com.survlogic.survlogic.model.PointSurvey;
 
 /**
  * Created by chrisfillmore on 5/2/2017.
@@ -27,6 +29,8 @@ public class JobCogoHomeFragment extends Fragment {
     private LinearLayout llCogoSetup;
 
     private View v;
+
+    private JobCogoHomeFragmentListener jobCogoHomeFragmentListener;
 
     private static final int REQUEST_GET_SETUP = 1;
 
@@ -66,18 +70,48 @@ public class JobCogoHomeFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
-                Intent i = new Intent(getActivity(), JobCogoSetupActivity.class);
-                i.putExtra(getString(R.string.KEY_PROJECT_ID),project_id);
-                i.putExtra(getString(R.string.KEY_JOB_ID), job_id);
-                i.putExtra(getString(R.string.KEY_JOB_DATABASE), jobDatabaseName);
-
-                getActivity().startActivityForResult(i,REQUEST_GET_SETUP);
-                Log.d(TAG, "onClick: Request_GET_SETUP: " + REQUEST_GET_SETUP);
-                getActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                openCogoSetupActivity();
 
 
             }
         });
+    }
+
+    public void openCogoSetupActivity(){
+        jobCogoHomeFragmentListener = (JobCogoHomeFragmentListener) getActivity();
+
+        boolean isOccupyPointSet = jobCogoHomeFragmentListener.isOccupyPointSurveySet();
+        boolean isBackSightPointSet = jobCogoHomeFragmentListener.isBacksightPointSurveySet();
+
+
+        Intent i = new Intent(getActivity(), JobCogoSetupActivity.class);
+        i.putExtra(getString(R.string.KEY_PROJECT_ID),project_id);
+        i.putExtra(getString(R.string.KEY_JOB_ID), job_id);
+        i.putExtra(getString(R.string.KEY_JOB_DATABASE), jobDatabaseName);
+
+        if(isOccupyPointSet && isBackSightPointSet){
+
+            PointSurvey occupyPointSurvey = jobCogoHomeFragmentListener.getOccupyPointSurvey();
+            PointSurvey backsightPointSurvey = jobCogoHomeFragmentListener.getBacksightPointSurvey();
+
+            i.putExtra(getString(R.string.KEY_SETUP_OCCUPY_PT),occupyPointSurvey.getPoint_no());
+            i.putExtra(getString(R.string.KEY_SETUP_BACKSIGHT_PT),backsightPointSurvey.getPoint_no());
+
+            i.putExtra(getString(R.string.KEY_SETUP_OCCUPY_HT), jobCogoHomeFragmentListener.getOccupyHeight());
+            i.putExtra(getString(R.string.KEY_SETUP_BACKSIGHT_HT), jobCogoHomeFragmentListener.getBacksightHeight());
+
+
+        }else{
+            i.putExtra(getString(R.string.KEY_SETUP_OCCUPY_PT),0);
+            i.putExtra(getString(R.string.KEY_SETUP_BACKSIGHT_PT),0);
+
+            i.putExtra(getString(R.string.KEY_SETUP_OCCUPY_HT), 0);
+            i.putExtra(getString(R.string.KEY_SETUP_BACKSIGHT_HT), 0);
+        }
+
+        getActivity().startActivityForResult(i,REQUEST_GET_SETUP);
+        Log.d(TAG, "onClick: Request_GET_SETUP: " + REQUEST_GET_SETUP);
+        getActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
     }
 
 }

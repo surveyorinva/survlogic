@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ll_decimal_degrees"
+    android:orientation="vertical"
+    android:layout_marginStart="75dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:visibility="visible">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:weightSum="100"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:text="Decimal Degrees"
+            android:gravity="center"
+            android:textSize="@dimen/text_size_normal"
+            android:layout_weight="90"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layout_hAngle_dec_values"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="100">
+
+
+        <EditText
+            android:id="@+id/hAngle_dec"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="4dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="1dp"
+            android:layout_weight="90"
+            android:gravity="center_horizontal"
+            android:hint="DD.xxxxxx"
+            android:inputType="numberDecimal|numberSigned"
+            android:nextFocusDown="@+id/lat_min"
+            android:textColor="@color/black"
+            android:textSize="14sp" />
+
+
+    </LinearLayout>
+
+
+</LinearLayout>

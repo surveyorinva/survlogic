@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ll_distance_slope_zenith"
+    android:orientation="vertical"
+    android:layout_marginStart="75dp"
+    android:layout_below="@+id/ll_degree_minute_second"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:visibility="visible">
+
+        <TextView
+            android:text="                 Vertical Difference"
+            android:gravity="center_horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:weightSum="100"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:text="Distance"
+                android:gravity="center"
+                android:textSize="@dimen/text_size_normal"
+                android:layout_weight="30"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content" />
+
+            <Space
+                android:layout_weight="2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content" />
+
+
+            <TextView
+                android:text="Delta Height"
+                android:gravity="center"
+                android:textSize="@dimen/text_size_normal"
+                android:layout_weight="60"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content" />
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="100">
+
+            <EditText
+                android:id="@+id/distance_slope_zenith_value"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="4dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="1dp"
+                android:layout_weight="30"
+                android:gravity="center"
+                android:hint="X,XXX.XX"
+                android:inputType="numberDecimal"
+                android:nextFocusDown="@+id/vAngle_Zenith_degree"
+                android:textColor="@color/black"
+                android:textSize="14sp" />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2" />
+
+            <EditText
+                android:id="@+id/vAngle_Zenith_degree"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="4dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="1dp"
+                android:layout_weight="60"
+                android:gravity="center"
+                android:hint="DD"
+                android:inputType="numberDecimal|numberSigned"
+                android:textColor="@color/black"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
+</LinearLayout>

@@ -44,6 +44,7 @@ public class JobCogoSetupActivity extends AppCompatActivity implements JobPoints
     private double occupyHeight, backsightHeight;
     private ProjectJobSettings jobSettings;
     private JobInformation jobInformation = new JobInformation();
+    private int occupyPointNo, backsightPointNo;
 
     private int project_id, job_id, job_settings_id = 1;
     private String jobDatabaseName;
@@ -72,10 +73,19 @@ public class JobCogoSetupActivity extends AppCompatActivity implements JobPoints
         project_id = extras.getInt(getString(R.string.KEY_PROJECT_ID));
         job_id = extras.getInt(getString(R.string.KEY_JOB_ID));
         jobDatabaseName = extras.getString(getString(R.string.KEY_JOB_DATABASE));
+        occupyPointNo = extras.getInt("KEY_SETUP_OCCUPY_PT");
+        backsightPointNo = extras.getInt("KEY_SETUP_BACKSIGHT_PT");
+        occupyHeight = extras.getDouble("KEY_SETUP_OCCUPY_HT");
+        backsightHeight = extras.getDouble("KEY_SETUP_BACKSIGHT_HT");
 
         Log.d(TAG, "||Project_ID in Cogo Setup|| : " + project_id);
         Log.d(TAG, "||Job_ID in Cogo Setup|| : " + job_id);
         Log.d(TAG, "||Database in Cogo Setup|| : " + jobDatabaseName);
+
+        Log.d(TAG, "||Occupy Point No|| " + occupyPointNo);
+        Log.d(TAG, "||Backsight Point No|| " + backsightPointNo);
+        Log.d(TAG, "||Occupy Height|| " + occupyHeight);
+        Log.d(TAG, "||Backsight Height|| " + backsightHeight);
 
         jobInformation.setProject_id(project_id);
         jobInformation.setJob_id(job_id);
@@ -161,7 +171,19 @@ public class JobCogoSetupActivity extends AppCompatActivity implements JobPoints
         Log.d(TAG, "getPointsSurvey: Started");
         this.lstPointSurvey = lstPointSurvey;
 
-        Log.d(TAG, "getPointsSurvey: Size: " + lstPointSurvey.size());
+        Log.d(TAG, "initPreDefinedSetup:getPointsSurvey: Size: " + lstPointSurvey.size());
+
+        JobCogoSetupKnownFragment jobCogoSetupKnownFragment = tabAdapter.getJobCogoSetupKnownFragment();
+        JobCogoSetupOrientationFragment jobCogoSetupOrientationFragment = tabAdapter.getJobCogoSetupOrientationFragment();
+
+        if(jobCogoSetupKnownFragment !=null) {
+            Log.d(TAG, "initPreDefinedSetup:jobCogoSetupKnownFragment: Not Null");
+            jobCogoSetupKnownFragment.setPreDefinedSetup();
+        }
+
+        if(jobCogoSetupOrientationFragment !=null){
+            Log.d(TAG, "jobCogoSetupOrientationFragment: Not Null");
+        }
 
     }
 
@@ -196,6 +218,25 @@ public class JobCogoSetupActivity extends AppCompatActivity implements JobPoints
         return pointSurvey;
     }
 
+    @Override
+    public int sendOccupyPointNoToFragment() {
+        return this.occupyPointNo;
+    }
+
+    @Override
+    public int sendBacksightPointNoToFragment() {
+        return this.backsightPointNo;
+    }
+
+    @Override
+    public double sendOccupyHeightToFragment() {
+        return this.occupyHeight;
+    }
+
+    @Override
+    public double sendBacksightHeightToFragment() {
+        return this.backsightHeight;
+    }
 
     @Override
     public void setOccupyPointSurveyFromFragment(PointSurvey pointSurvey) {

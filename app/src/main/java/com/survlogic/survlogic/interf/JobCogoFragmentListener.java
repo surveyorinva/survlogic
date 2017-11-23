@@ -20,6 +20,14 @@ public interface JobCogoFragmentListener {
 
     PointSurvey sendBacksightPointSurveyToFragment(PointSurvey pointSurvey);
 
+    int sendOccupyPointNoToFragment();
+
+    int sendBacksightPointNoToFragment();
+
+    double sendOccupyHeightToFragment();
+
+    double sendBacksightHeightToFragment();
+
     void setOccupyPointSurveyFromFragment(PointSurvey pointSurvey);
 
     void setBacksightPointSurveyFromFragment(PointSurvey pointSurvey);

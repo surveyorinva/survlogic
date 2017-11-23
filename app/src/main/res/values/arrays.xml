@@ -176,17 +176,13 @@
     </string-array>
 
     <string-array name="job_angle_display_titles">
-        <item>Degrees, Minutes, Seconds (DDD.mmss)</item>
-        <item>Degrees, Minutes, Seconds (DDD.mmss.x)</item>
-        <item>Degrees, Minutes, Seconds (DDD.mmss.xx)</item>
+        <item>Degrees, Minutes, Seconds (DD-MM-SS.ss)</item>
         <item>Decimal Degrees (DDD.ddddd)</item>
     </string-array>
 
     <string-array name="job_angle_display_values">
         <item>0</item>
         <item>1</item>
-        <item>2</item>
-        <item>3</item>
     </string-array>
 
     <string-array name="job_coordinate_entry_titles">

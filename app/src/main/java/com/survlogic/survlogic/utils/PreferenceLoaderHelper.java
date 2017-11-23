@@ -27,6 +27,10 @@ public class PreferenceLoaderHelper {
             raw_file, raw_file_timestamp, raw_gps_attribute, raw_desc_code_list,
             options_drawer_state, options_first_start;
 
+    private int cogoOccupyPoint, cogoBacksightPoint;
+    private float cogoOccupyHeight, cogoBacksightHeight;
+
+    private int cogoSurveySetHAngle, cogoSurveySetDistance;
 
     public PreferenceLoaderHelper(Context mContext) {
         Log.d(TAG, "PreferenceLoaderHelper: Starting...");
@@ -103,6 +107,15 @@ public class PreferenceLoaderHelper {
         }
 
         options_first_start = 0;
+
+        cogoOccupyPoint = sharedPreferences.getInt(mContext.getString(R.string.pref_key_current_job_cogo_occupy_point),0);
+        cogoBacksightPoint = sharedPreferences.getInt(mContext.getString(R.string.pref_key_current_job_cogo_backsight_point),0);
+
+        cogoOccupyHeight = sharedPreferences.getFloat(mContext.getString(R.string.pref_key_current_job_cogo_occupy_height),0);
+        cogoBacksightHeight = sharedPreferences.getFloat(mContext.getString(R.string.pref_key_current_job_cogo_backsight_height),0);
+
+        cogoSurveySetHAngle = sharedPreferences.getInt(mContext.getString(R.string.pref_key_current_job_cogo_sideshot_hAngle),1);
+        cogoSurveySetDistance = sharedPreferences.getInt(mContext.getString(R.string.pref_key_current_job_cogo_sideshot_distance),1);
 
     }
 
@@ -189,7 +202,102 @@ public class PreferenceLoaderHelper {
         return results;
     }
 
+    public int getCogoOccupyPoint(){
+        return cogoOccupyPoint;
+    }
+
+    public int getCogoBacksightPoint(){
+        return cogoBacksightPoint;
+    }
+
+    public double getCogoOccupyHeight(){
+        return (double) cogoOccupyHeight;
+    }
+
+    public double getCogoBacksightHeight(){
+        return (double) cogoBacksightHeight;
+    }
+
+    public void setCogoOccupyPoint(int pointNo){
+        editor = sharedPreferences.edit();
+
+        editor.putInt(mContext.getString(R.string.pref_key_current_job_cogo_occupy_point),pointNo);
+
+        editor.apply();
+    }
+
+    public void setCogoBacksightPoint(int pointNo){
+        editor = sharedPreferences.edit();
+
+        editor.putInt(mContext.getString(R.string.pref_key_current_job_cogo_backsight_point),pointNo);
+
+        editor.apply();
+    }
+
+    public void setCogoOccupyHeight(double height){
+        editor = sharedPreferences.edit();
 
 
+        editor.putFloat(mContext.getString(R.string.pref_key_current_job_cogo_occupy_height),(float) height);
+
+        editor.apply();
+    }
+
+    public void setCogoBacksightHeight(double height){
+        editor = sharedPreferences.edit();
+
+        editor.putFloat(mContext.getString(R.string.pref_key_current_job_cogo_backsight_height),(float) height);
+
+        editor.apply();
+    }
+
+    public void clearCogoSettings(){
+        Log.d(TAG, "clearCogoSettings: Clearing");
+        editor = sharedPreferences.edit();
+
+        editor.putInt(mContext.getString(R.string.pref_key_current_job_cogo_occupy_point),0);
+        editor.putInt(mContext.getString(R.string.pref_key_current_job_cogo_backsight_point),0);
+        editor.putFloat(mContext.getString(R.string.pref_key_current_job_cogo_backsight_height),0f);
+        editor.putFloat(mContext.getString(R.string.pref_key_current_job_cogo_backsight_height),0f);
+
+        editor.apply();
+    }
+
+
+    public int getSurveyGeneralType(){
+        return general_type;
+    }
+
+    public int getSurveyFormatAngleVZ(){
+        return  format_angle_vz_obsrv_display;
+    }
+
+    public int getSurveyFormatAngleHZ(){
+        return system_angle_display;
+    }
+
+    public int getCogoSurveySetHAngle(){
+        return cogoSurveySetHAngle;
+    }
+
+    public int getCogoSurveySetDistance(){
+        return cogoSurveySetDistance;
+    }
+
+    public void setCogoSurveyHAngle(int hAngleType){
+        editor = sharedPreferences.edit();
+
+        editor.putInt(mContext.getString(R.string.pref_key_current_job_cogo_sideshot_hAngle),hAngleType);
+
+        editor.apply();
+    }
+
+    public void setCogoSurveyDistance(int distanceType){
+        editor = sharedPreferences.edit();
+
+        editor.putInt(mContext.getString(R.string.pref_key_current_job_cogo_sideshot_distance),distanceType);
+
+        editor.apply();
+    }
 
 }

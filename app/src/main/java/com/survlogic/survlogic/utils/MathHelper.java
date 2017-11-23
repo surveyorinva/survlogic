@@ -6,6 +6,8 @@ import android.util.Log;
 
 import com.survlogic.survlogic.model.PointSurvey;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -173,6 +175,23 @@ public class MathHelper {
 
         }
         return results;
+
+    }
+
+    public static double convertDECToSeconds(double angle, int decimalPlace){
+        double results;
+
+        if (angle ==0){
+            results = 0;
+        }else {
+            results = Math.abs((angle * 3600) % 60);
+
+        }
+
+        BigDecimal bd = new BigDecimal(results);
+        bd = bd.setScale(decimalPlace, RoundingMode.HALF_UP);
+
+        return bd.doubleValue();
 
     }
 

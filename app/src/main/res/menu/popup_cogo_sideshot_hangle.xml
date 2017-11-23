@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group
+        android:id="@+id/grp1"
+        android:checkableBehavior="single">
+
+    <item
+        android:id="@+id/sideshot_hAngle_item_1"
+        android:title="Degrees, Minutes, Seconds (DMS)"
+        android:checkable="true">
+    </item>
+
+    <item
+        android:id="@+id/sideshot_hAngle_item_2"
+        android:title="Decimal Degrees (DEC)"
+        android:checkable="true">
+    </item>
+
+    </group>
+</menu>

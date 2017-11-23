@@ -11,6 +11,7 @@ import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.activity.JobHomeActivity;
 import com.survlogic.survlogic.model.ProjectJobs;
 import com.survlogic.survlogic.utils.AnimateHelper;
+import com.survlogic.survlogic.utils.PreferenceLoaderHelper;
 import com.survlogic.survlogic.utils.TimeHelper;
 import com.survlogic.survlogic.view.Card_View_Holder_Project_Job_Small;
 
@@ -113,6 +114,9 @@ public class ProjectJobListAdaptor extends RecyclerView.Adapter<RecyclerView.Vie
                 intent.putExtra(mContext.getString(R.string.KEY_JOB_ID), projectJobID);
                 intent.putExtra(mContext.getString(R.string.KEY_JOB_DATABASE), projectJobDatabaseName);
                 mContext.startActivity(intent);
+
+                PreferenceLoaderHelper preferenceLoaderHelper = new PreferenceLoaderHelper(mContext);
+                preferenceLoaderHelper.clearCogoSettings();
             }
         });
 
