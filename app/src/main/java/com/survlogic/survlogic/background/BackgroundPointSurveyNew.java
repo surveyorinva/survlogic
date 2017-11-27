@@ -12,6 +12,7 @@ import android.widget.Toast;
 import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.database.JobDatabaseHandler;
 import com.survlogic.survlogic.database.ProjectDatabaseHandler;
+import com.survlogic.survlogic.interf.JobPointsActivityListener;
 import com.survlogic.survlogic.model.PointSurvey;
 import com.survlogic.survlogic.model.ProjectJobSettings;
 import com.survlogic.survlogic.model.ProjectJobs;
@@ -91,12 +92,16 @@ public class BackgroundPointSurveyNew extends AsyncTask <PointSurvey,PointSurvey
             dialog.dismiss();
         }
 
+
+
         if (result.equals("One Row Inserted")){
             showToast(context.getString(R.string.job_new_validation_point_save_success),true);
 
         }else if (result.equals("Error Inserting Row")){
             showToast(context.getString(R.string.job_new_validation_point_save_failed),true);
         }
+
+
 
     }
 

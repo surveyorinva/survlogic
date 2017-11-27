@@ -31,6 +31,7 @@ import com.survlogic.survlogic.fragment.JobPointsInverseFragment;
 import com.survlogic.survlogic.fragment.JobPointsListFragment;
 import com.survlogic.survlogic.fragment.JobPointsMapFragment;
 import com.survlogic.survlogic.interf.JobMapOptionsListener;
+import com.survlogic.survlogic.interf.JobPointsActivityListener;
 import com.survlogic.survlogic.interf.JobPointsMapListener;
 import com.survlogic.survlogic.model.PointGeodetic;
 import com.survlogic.survlogic.model.PointSurvey;
@@ -43,8 +44,8 @@ import java.util.ArrayList;
  * Created by chrisfillmore on 8/8/2017.
  */
 
-public class JobPointsMapActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, JobPointsMapListener, JobMapOptionsListener{
-    private static final String TAG = "JobPointsMapActivity";
+public class JobPointsActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, JobPointsMapListener, JobMapOptionsListener, JobPointsActivityListener{
+    private static final String TAG = "JobPointsActivity";
 
     private static Context mContext;
     private Toolbar toolbar;
@@ -80,7 +81,7 @@ public class JobPointsMapActivity extends AppCompatActivity implements Navigatio
         Log.d(TAG, "onCreate: Starting......>");
 
         setContentView(R.layout.activity_job_points);
-        mContext = JobPointsMapActivity.this;
+        mContext = JobPointsActivity.this;
 
         initViewToolbar();
         initViewNavigation();
@@ -129,7 +130,7 @@ public class JobPointsMapActivity extends AppCompatActivity implements Navigatio
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_in_job);
 
         navigationView = (NavigationView) findViewById(R.id.navigation_view);
-        navigationView.setNavigationItemSelectedListener(JobPointsMapActivity.this);
+        navigationView.setNavigationItemSelectedListener(JobPointsActivity.this);
 
         actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close);
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
@@ -156,7 +157,7 @@ public class JobPointsMapActivity extends AppCompatActivity implements Navigatio
 
             case R.id.menu_item2_id:
                 //Go To Points Menu
-                Intent j = new Intent(this, JobPointsMapActivity.class);
+                Intent j = new Intent(this, JobPointsActivity.class);
                 j.putExtra(getString(R.string.KEY_PROJECT_ID),project_id);
                 j.putExtra(getString(R.string.KEY_JOB_ID), job_id);
                 j.putExtra(getString(R.string.KEY_JOB_DATABASE), jobDatabaseName);
@@ -434,6 +435,9 @@ public class JobPointsMapActivity extends AppCompatActivity implements Navigatio
     }
 
 
+    @Override
+    public void refreshPointArrays() {
+        initPointDataInBackground();
 
-
+    }
 }

@@ -25,6 +25,7 @@ import com.survlogic.survlogic.adapter.PointGeodeticTableDataAdapter;
 import com.survlogic.survlogic.adapter.PointSurveyTableDataAdapter;
 import com.survlogic.survlogic.dialog.DialogJobPointEntryAdd;
 import com.survlogic.survlogic.dialog.DialogJobPointView;
+import com.survlogic.survlogic.interf.JobPointsActivityListener;
 import com.survlogic.survlogic.model.PointGeodetic;
 import com.survlogic.survlogic.model.PointSurvey;
 import com.survlogic.survlogic.utils.PreferenceLoaderHelper;
@@ -51,12 +52,17 @@ public class JobPointsListFragment extends Fragment {
     private Context mContext;
 
     private static final int DELAY_TO_LIST = 100;
-    private static final int DELAY_TO_REFRESH = 1000;
+    private static final int DELAY_TO_REFRESH = 1500;
 
     View v;
 
     private int project_id, job_id, job_settings_id = 1;
     private String jobDatabaseName;
+
+    private JobPointsActivityListener jobPointsActivityListener;
+
+    private PointSurveyTableDataAdapter adapterSurvey;
+    private PointGeodeticTableDataAdapter adapterGeodetic;
 
     private ArrayList<PointSurvey> lstPointSurvey = new ArrayList<>();
     private ArrayList<PointGeodetic> lstPointGeodetic = new ArrayList<>();
@@ -78,7 +84,6 @@ public class JobPointsListFragment extends Fragment {
     private Animation animExitStageLeftPointGeodetic, animEnterStageRightPointGeodetic;
     private Animation animOpen_1, animOpen_2, animOpen_3, animClose_1, animClose_2, animClose_3;
     private Animation animRotateForward, animRotateBackwards;
-
 
     private boolean fabExpanded = false;
     private boolean isPointSurveyTableSetup = false, isPointGeodeticTableSetup = false;
@@ -117,6 +122,8 @@ public class JobPointsListFragment extends Fragment {
 
 
         preferenceLoaderHelper = new PreferenceLoaderHelper(mContext);
+        jobPointsActivityListener = (JobPointsActivityListener) getActivity();
+
 
         rlViewTablePlanar = (RelativeLayout) v.findViewById(R.id.rl_layout_point_survey_table);
         rlViewTableWorld = (RelativeLayout) v.findViewById(R.id.rl_layout_point_geodetic_table);
@@ -286,7 +293,7 @@ public class JobPointsListFragment extends Fragment {
                     @Override
                     public void run() {
                         refreshIndicator.hide();
-
+                        refreshPointArray();
                     }
                 }, DELAY_TO_REFRESH);
             }
@@ -339,15 +346,15 @@ public class JobPointsListFragment extends Fragment {
 
 
     private void setTableAdapterPointSurvey(){
-        final PointSurveyTableDataAdapter adapter = new PointSurveyTableDataAdapter(mContext, lstPointSurvey, pointSurveyTableView,12);
-        pointSurveyTableView.setDataAdapter(adapter);
+        adapterSurvey = new PointSurveyTableDataAdapter(mContext, lstPointSurvey, pointSurveyTableView,12);
+        pointSurveyTableView.setDataAdapter(adapterSurvey);
 
     }
 
 
     private void setTableAdapterPointGeodetic(){
-        final PointGeodeticTableDataAdapter adapter = new PointGeodeticTableDataAdapter(mContext, lstPointGeodetic, pointGeodeticTableView, 12);
-        pointGeodeticTableView.setDataAdapter(adapter);
+        adapterGeodetic = new PointGeodeticTableDataAdapter(mContext, lstPointGeodetic, pointGeodeticTableView, 12);
+        pointGeodeticTableView.setDataAdapter(adapterGeodetic);
     }
 
 
@@ -569,6 +576,15 @@ public class JobPointsListFragment extends Fragment {
         ibSelectByZoom.setClickable(false);
 
         fabExpanded = false;
+    }
+
+    private void refreshPointArray(){
+        jobPointsActivityListener.refreshPointArrays();
+
+        adapterGeodetic.notifyDataSetChanged();
+        adapterSurvey.notifyDataSetChanged();
+
+
     }
 
 }

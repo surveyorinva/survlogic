@@ -172,7 +172,7 @@ public class JobHomeActivity extends AppCompatActivity implements NavigationView
 
             case R.id.menu_item2_id:
                 //Go To Points Menu
-                Intent j = new Intent(this, JobPointsMapActivity.class);
+                Intent j = new Intent(this, JobPointsActivity.class);
                 j.putExtra(getString(R.string.KEY_PROJECT_ID),project_id);
                 j.putExtra(getString(R.string.KEY_JOB_ID), job_id);
                 j.putExtra(getString(R.string.KEY_JOB_DATABASE), jobDatabaseName);

@@ -104,7 +104,7 @@
             android:theme="@style/SuperMaterialTheme"/>
 
         <activity
-            android:name=".activity.JobPointsMapActivity"
+            android:name=".activity.JobPointsActivity"
             android:screenOrientation="portrait"
             android:theme="@style/SuperMaterialTheme"/>
 

@@ -14,6 +14,7 @@ import com.survlogic.survlogic.model.PointSurvey;
 import com.survlogic.survlogic.model.ProjectJobSettings;
 
 import java.io.File;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -597,6 +598,55 @@ public class JobDatabaseHandler extends SQLiteOpenHelper {
         return results;
 
     }
+
+    public int findNextPointNumber(SQLiteDatabase db, int point_no){
+        Log.d(TAG, "findNextPointNumber: Started");
+        int nextPointNumber = 0;
+        List<Integer> lstPoints = new ArrayList<>();
+
+        String selectQuery = "SELECT * FROM " + JobContract.PointEntry.TABLE_NAME
+                + " WHERE " + JobContract.PointEntry.KEY_POINT_NO + " > " + point_no
+                + " ORDER BY " + JobContract.PointEntry.KEY_POINT_NO + " ASC";
+
+        Log.i(TAG, selectQuery);
+
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        // looping through all rows and adding to list
+        if (c.moveToFirst()) {
+            do {
+                lstPoints.add(c.getInt((c.getColumnIndex(JobContract.PointEntry.KEY_POINT_NO))));
+            } while (c.moveToNext());
+        }
+
+        int sequenceSize = lstPoints.size();
+
+        Log.d(TAG, "findNextPointNumber: List Points Size: " + sequenceSize);
+
+        if(sequenceSize ==0){
+            //no other points above point number, add 1 to point_no
+            nextPointNumber = point_no + 1;
+        }else{
+            //run through and find sequence
+            int first = lstPoints.get(0);
+            for (int i = 0; i < sequenceSize; i++){
+
+                if((first + i) !=lstPoints.get(i)){
+                    nextPointNumber = (first + i);
+                }else{
+                    nextPointNumber = lstPoints.get(lstPoints.size() - 1) + 1;
+                }
+
+            }
+        }
+
+        Log.d(TAG, "findNextPointNumber: Next Point No is: " + nextPointNumber);
+
+        return nextPointNumber;
+
+
+    }
+
 
     public static long getCountJobSketchByPointID(SQLiteDatabase db, int point_id){
         Log.d(TAG, "getCountJobSketchByPointID: Starting...");

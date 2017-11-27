@@ -20,17 +20,25 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.survlogic.survlogic.R;
+import com.survlogic.survlogic.background.BackgroundSurveyPointCheckPointNumber;
+import com.survlogic.survlogic.background.BackgroundSurveyPointFindNextNumber;
+import com.survlogic.survlogic.dialog.DialogJobSideshotPointList;
+import com.survlogic.survlogic.interf.JobCogoFragmentListener;
+import com.survlogic.survlogic.interf.JobCogoSideshotPointListener;
+import com.survlogic.survlogic.model.PointSurvey;
 import com.survlogic.survlogic.utils.MathHelper;
 import com.survlogic.survlogic.utils.PreferenceLoaderHelper;
 import com.survlogic.survlogic.utils.StringUtilityHelper;
 
 import org.w3c.dom.Text;
 
+import java.util.ArrayList;
+
 /**
  * Created by chrisfillmore on 5/2/2017.
  */
 
-public class JobCogoSideshotFragment extends Fragment {
+public class JobCogoSideshotFragment extends Fragment implements JobCogoSideshotPointListener{
 
     private static final String TAG = "JobCogoSideshotFragment";
 
@@ -38,19 +46,30 @@ public class JobCogoSideshotFragment extends Fragment {
     private View v;
     private Context mContext;
 
+    private JobCogoFragmentListener jobCogoFragmentListener;
+
+    private static int project_id, job_id;
+    private String jobDatabaseName;
+
     private View viewHAngleDec, viewHAngleDMS, viewHd, viewSdZenith, viewSdVertical, viewSdVDelta;
     private ImageButton ibPointNoAction, ibPointhAngleAction, ibPointDistanceAction;
     private TextView tvHAngleHeader, tvDistanceHeader;
 
-    private EditText etTargetHeight;
+    private EditText etPointNumber, etTargetHeight;
     private EditText etHADeg, etHAMin, etHASec, etHADec;
 
+    private ArrayList<PointSurvey> lstPointSurvey = new ArrayList<>();
+
     private double mValueHAngleDec;
+    private boolean doesPointExist = false;
     private int popupMenuOpen = 0;
     private boolean is2dSurvey = false;
     private int horizontalAngleType = 0;
     private int viewDistanceToDisplay = 0;
+    private int enteredPointNumber, nextPointNumber;
     private static final int textValidationTwo = 1, textValidationThree = 2, textValidationFour = 4;
+
+    private JobCogoSideshotPointListener jobCogoSideshotPointListener;
 
     @Nullable
     @Override
@@ -68,8 +87,24 @@ public class JobCogoSideshotFragment extends Fragment {
         return v;
     }
 
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        jobCogoSideshotPointListener = (JobCogoSideshotPointListener) mContext;
+
+
+    }
+
     private void initViewWidgets(View v){
         Log.d(TAG, "initViewWidgets: Started...");
+
+        Bundle extras = getArguments();
+        project_id = extras.getInt(getString(R.string.KEY_PROJECT_ID));
+        job_id = extras.getInt(getString(R.string.KEY_JOB_ID));
+        jobDatabaseName = extras.getString(getString(R.string.KEY_JOB_DATABASE));
+        Log.d(TAG, "||Database_fragment_cogo_home|| : " + jobDatabaseName);
+
         viewHAngleDec = v.findViewById(R.id.layout_ha_dec);
         viewHAngleDMS = v.findViewById(R.id.layout_ha_dms);
 
@@ -82,10 +117,16 @@ public class JobCogoSideshotFragment extends Fragment {
         ibPointhAngleAction = (ImageButton) v.findViewById(R.id.hAngle_action);
         ibPointDistanceAction = (ImageButton) v.findViewById(R.id.distance_action);
 
+        etPointNumber = (EditText) v.findViewById(R.id.point_number);
+        etPointNumber.setSelectAllOnFocus(true);
+
         etTargetHeight = (EditText) v.findViewById(R.id.target_height);
+        etTargetHeight.setSelectAllOnFocus(true);
 
         tvHAngleHeader = (TextView) v.findViewById(R.id.hAngle_header);
         tvDistanceHeader = (TextView) v.findViewById(R.id.distance_header);
+
+        jobCogoFragmentListener = (JobCogoFragmentListener) mContext;
 
     }
 
@@ -168,11 +209,17 @@ public class JobCogoSideshotFragment extends Fragment {
 
                         switch (item.getItemId()){
                             case R.id.sideshot_pointNo_item_1:
-                                showToast("Next Sequential Number",true);
+                                //showToast("Next Sequential Number",true);
+
+                                getNextPointNumber();
+
                                 break;
 
                             case R.id.sideshot_pointNo_item_2:
-                                showToast("Showing Point List",true);
+                                //showToast("Showing Point List",true);
+
+                                openPointListView();
+
                                 break;
 
                         }
@@ -436,8 +483,44 @@ public class JobCogoSideshotFragment extends Fragment {
         Log.d(TAG, "initViewHADMS: Started...");
 
         etHADeg = (EditText) v.findViewById(R.id.hAngle_degree);
+        etHADeg.setSelectAllOnFocus(true);
+
         etHAMin = (EditText) v.findViewById(R.id.hAngle_min);
+        etHAMin.setSelectAllOnFocus(true);
+
         etHASec  = (EditText) v.findViewById(R.id.hAngle_sec);
+        etHASec.setSelectAllOnFocus(true);
+
+        etHADeg.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                try{
+                    int val = Integer.parseInt(s.toString());
+                    if(val > 359){
+                        //s.replace(0,s.length(),"359",0,3);
+
+                        showToast("Error.  Enter between 0 - 360",true);
+                    }
+
+
+                }catch (NumberFormatException ex){
+
+                }
+
+
+            }
+        });
+
 
         etHAMin.addTextChangedListener(new TextWatcher() {
             @Override
@@ -450,13 +533,54 @@ public class JobCogoSideshotFragment extends Fragment {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
 
+
             }
 
             @Override
             public void afterTextChanged(Editable s) {
+                try{
+                    int val = Integer.parseInt(s.toString());
+                    if(val > 59){
+                        s.replace(0,s.length(),"59",0,2);
+                        showToast("Error.  Enter between 0 - 59",true);
+                    }
+
+
+                }catch (NumberFormatException ex){
+
+                }
+
 
             }
         });
+
+        etHASec.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                try{
+                    int val = Integer.parseInt(s.toString());
+                    if(val > 60){
+                        s.replace(0,s.length(),"59",0,2);
+                        showToast("Error.  Enter between 0 - 59",true);
+                    }
+
+
+                }catch (NumberFormatException ex){
+
+                }
+            }
+        });
+
 
         if(mValueHAngleDec !=0){
             etHADeg.setText(String.valueOf(MathHelper.convertDECToDegree(mValueHAngleDec)));
@@ -491,7 +615,46 @@ public class JobCogoSideshotFragment extends Fragment {
 
     }
 
+    private void checkPointNumber(int pointNumber){
+        Log.d(TAG, "checkPointNumber: Started...");
+        BackgroundSurveyPointCheckPointNumber backgroundSurveyPointCheckPointNumber = new BackgroundSurveyPointCheckPointNumber(mContext,jobDatabaseName,this,pointNumber);
+        backgroundSurveyPointCheckPointNumber.execute();
 
+
+
+    }
+
+    private void getNextPointNumber(){
+        String pointNumber;
+
+        if(etPointNumber !=null){
+            pointNumber =  etPointNumber.getText().toString();
+
+            if(!StringUtilityHelper.isStringNull(pointNumber)){
+                //Point number in field is there
+                //1st Increment to the next number
+
+                enteredPointNumber = Integer.parseInt(pointNumber);
+                nextPointNumber = enteredPointNumber + 1;
+
+                //2nd Test new number against DB
+                checkPointNumber(nextPointNumber);
+
+            }
+
+        }
+
+    }
+
+    private void openPointListView(){
+        Log.d(TAG, "openPointListSelect: Started...");
+
+        lstPointSurvey = jobCogoFragmentListener.sendPointSurveyToFragment();
+
+        android.support.v4.app.DialogFragment pointListDialog = DialogJobSideshotPointList.newInstance(project_id, job_id, jobDatabaseName, lstPointSurvey);
+        pointListDialog.show(getFragmentManager(),"dialog_list");
+
+    }
 
     //-------------------------------------------------------------------------------------------------------------------------//
 
@@ -511,4 +674,34 @@ public class JobCogoSideshotFragment extends Fragment {
         }
     }
 
+    //-------------------------------------------------------------------------------------------------------------------------//
+
+    /**
+     * Listeners
+     */
+
+    @Override
+    public void doesPointExist(boolean isPointFound) {
+        Log.d(TAG, "doesPointExist: Started");
+        if(!isPointFound){
+            //If Pass, set number in field
+            etPointNumber.setText(String.valueOf(nextPointNumber));
+        }else{
+            //if Fail, continue to increment until it passes
+            Log.d(TAG, "getNextPointNumber: Point Exists");
+
+            BackgroundSurveyPointFindNextNumber backgroundSurveyPointFindNextNumber = new BackgroundSurveyPointFindNextNumber(mContext,jobDatabaseName,this,enteredPointNumber);
+            backgroundSurveyPointFindNextNumber.execute();
+
+        }
+
+    }
+
+    @Override
+    public void whatIsNextPointNumber(int pointNumber) {
+        Log.d(TAG, "whatIsNextPointNumber: Next Point Number Is: " + pointNumber);
+
+        etPointNumber.setText(String.valueOf(pointNumber));
+
+    }
 }

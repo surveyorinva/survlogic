@@ -31,8 +31,10 @@ import com.survlogic.survlogic.background.BackgroundGeodeticPointGet;
 import com.survlogic.survlogic.background.BackgroundSurveyPointGet;
 import com.survlogic.survlogic.fragment.JobCogoHomeFragment;
 import com.survlogic.survlogic.fragment.JobCogoSideshotFragment;
+import com.survlogic.survlogic.interf.JobCogoFragmentListener;
 import com.survlogic.survlogic.interf.JobCogoHomeFragmentListener;
 import com.survlogic.survlogic.interf.JobPointsMapListener;
+import com.survlogic.survlogic.model.JobInformation;
 import com.survlogic.survlogic.model.PointGeodetic;
 import com.survlogic.survlogic.model.PointSurvey;
 import com.survlogic.survlogic.utils.BottomNavigationViewHelper;
@@ -46,7 +48,7 @@ import java.util.HashMap;
  * Created by chrisfillmore on 8/2/2017.
  */
 
-public class JobCogoActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, JobPointsMapListener, JobCogoHomeFragmentListener {
+public class JobCogoActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, JobPointsMapListener, JobCogoHomeFragmentListener, JobCogoFragmentListener {
     private static final String TAG = "JobHomeActivity";
 
     private Context mContext;
@@ -181,7 +183,7 @@ public class JobCogoActivity extends AppCompatActivity implements NavigationView
 
             case R.id.menu_item2_id:
                 //Go To Points Menu
-                Intent j = new Intent(this, JobPointsMapActivity.class);
+                Intent j = new Intent(this, JobPointsActivity.class);
                 j.putExtra(getString(R.string.KEY_PROJECT_ID),project_id);
                 j.putExtra(getString(R.string.KEY_JOB_ID), job_id);
                 j.putExtra(getString(R.string.KEY_JOB_DATABASE), jobDatabaseName);
@@ -613,5 +615,71 @@ public class JobCogoActivity extends AppCompatActivity implements NavigationView
     @Override
     public double getBacksightHeight() {
         return backsightPointHeight;
+    }
+
+
+    @Override
+    public ArrayList<PointSurvey> sendPointSurveyToFragment() {
+        return lstPointSurvey;
+    }
+
+    @Override
+    public JobInformation sendJobInformationToFragment() {
+        return null;
+    }
+
+    @Override
+    public PointSurvey sendOccupyPointSurveyToFragment(PointSurvey pointSurvey) {
+        return null;
+    }
+
+    @Override
+    public PointSurvey sendBacksightPointSurveyToFragment(PointSurvey pointSurvey) {
+        return null;
+    }
+
+    @Override
+    public int sendOccupyPointNoToFragment() {
+        return 0;
+    }
+
+    @Override
+    public int sendBacksightPointNoToFragment() {
+        return 0;
+    }
+
+    @Override
+    public double sendOccupyHeightToFragment() {
+        return 0;
+    }
+
+    @Override
+    public double sendBacksightHeightToFragment() {
+        return 0;
+    }
+
+    @Override
+    public void setOccupyPointSurveyFromFragment(PointSurvey pointSurvey) {
+
+    }
+
+    @Override
+    public void setBacksightPointSurveyFromFragment(PointSurvey pointSurvey) {
+
+    }
+
+    @Override
+    public void setOccupyHeightFromFragment(double measureUp) {
+
+    }
+
+    @Override
+    public void setBacksightHeightFromFragment(double measureUp) {
+
+    }
+
+    @Override
+    public void sendSetupToMainActivity() {
+
     }
 }
