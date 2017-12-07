@@ -31,14 +31,15 @@ public class BackgroundSurveyPointCheckPointNumber extends AsyncTask <PointSurve
     private final JobCogoSideshotPointListener mListener;
     private String DB_NAME;
     private int pointNumber;
-    private boolean isPointFound = false;
+    private boolean isPointFound = false, forASearch = false;
 
-    public BackgroundSurveyPointCheckPointNumber(Context context, String DB_NAME, JobCogoSideshotPointListener listener, int pointNumber) {
+    public BackgroundSurveyPointCheckPointNumber(Context context, String DB_NAME, JobCogoSideshotPointListener listener, int pointNumber, boolean forASearch) {
         this.context = context;
         this.DB_NAME = DB_NAME;
 
         mListener = listener;
         this.pointNumber = pointNumber;
+        this.forASearch = forASearch;
     }
 
 
@@ -84,7 +85,12 @@ public class BackgroundSurveyPointCheckPointNumber extends AsyncTask <PointSurve
         Log.d(TAG, "onPostExecute: Started...");
         if (mListener != null){
             Log.d(TAG, "onPostExecute: mListener Not Null");
-            mListener.doesPointExist(isPointFound);
+            if(forASearch){
+                mListener.doesPointExist(isPointFound);
+            }else{
+                mListener.isPointValidForDatabase(isPointFound);
+            }
+
         }
 
 

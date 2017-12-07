@@ -3,7 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/ll_degree_minute_second"
     android:orientation="vertical"
-    android:layout_marginStart="75dp"
+    android:layout_marginStart="78dp"
+    android:layout_marginBottom="10dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:visibility="visible">
@@ -19,12 +20,12 @@
             android:text="Degrees"
             android:gravity="center"
             android:textSize="@dimen/text_size_normal"
-            android:layout_weight="20"
+            android:layout_weight="30"
             android:layout_width="0dp"
             android:layout_height="wrap_content" />
 
         <Space
-            android:layout_weight="5"
+            android:layout_weight="4"
             android:layout_width="0dp"
             android:layout_height="wrap_content" />
 
@@ -32,12 +33,12 @@
             android:text="Minutes"
             android:gravity="center"
             android:textSize="@dimen/text_size_normal"
-            android:layout_weight="20"
+            android:layout_weight="30"
             android:layout_width="0dp"
             android:layout_height="wrap_content" />
 
         <Space
-            android:layout_weight="5"
+            android:layout_weight="4"
             android:layout_width="0dp"
             android:layout_height="wrap_content" />
 
@@ -45,60 +46,49 @@
             android:text="Seconds"
             android:gravity="center"
             android:textSize="@dimen/text_size_normal"
-            android:layout_weight="25"
+            android:layout_weight="30"
             android:layout_width="0dp"
             android:layout_height="wrap_content" />
-
-        <Space
-            android:layout_weight="5"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content" />
-
 
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/layout_hAngle_values"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="45dp"
         android:orientation="horizontal"
         android:weightSum="100">
-
 
         <EditText
             android:id="@+id/hAngle_degree"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="4dp"
-            android:layout_marginStart="4dp"
+            android:layout_height="match_parent"
             android:layout_marginTop="1dp"
-            android:layout_weight="20"
+            android:layout_weight="30"
             android:gravity="center"
-            android:hint="DDD"
+            android:hint="@string/cogo_hint_degrees_three"
             android:inputType="number|numberSigned"
             android:nextFocusDown="@+id/hAngle_min"
-            android:textColor="@color/black"
-            android:textSize="14sp" />
+            style="@style/InputField.EditText"
+            android:background="@drawable/editbox_background_normal" />
 
         <Space
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="3" />
+            android:layout_weight="4" />
 
         <EditText
             android:id="@+id/hAngle_min"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="4dp"
-            android:layout_marginStart="4dp"
+            android:layout_height="match_parent"
             android:layout_marginTop="1dp"
-            android:layout_weight="20"
+            android:layout_weight="30"
             android:gravity="center"
-            android:hint="MM"
+            android:hint="@string/cogo_hint_minutes"
             android:inputType="number"
             android:nextFocusDown="@+id/hAngle_sec"
-            android:textColor="@color/black"
-            android:textSize="14sp" />
+            style="@style/InputField.EditText"
+            android:background="@drawable/editbox_background_normal" />
 
         <Space
             android:layout_width="0dp"
@@ -108,16 +98,16 @@
         <EditText
             android:id="@+id/hAngle_sec"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="4dp"
-            android:layout_marginStart="4dp"
             android:layout_marginTop="1dp"
             android:layout_weight="30"
-            android:hint="ss.ssss"
+            android:hint="@string/cogo_hint_seconds_decimal"
             android:inputType="numberDecimal"
-            android:gravity="center_horizontal"
-            android:textColor="@color/black"
-            android:textSize="14sp" />
+            android:gravity="center"
+            style="@style/InputField.EditText"
+            android:background="@drawable/editbox_background_normal"
+            android:layout_height="match_parent"/>
+
+
     </LinearLayout>
 
 </LinearLayout>

@@ -44,153 +44,16 @@
 
         </RelativeLayout>
 
-        <RelativeLayout
+        <include
             android:id="@+id/relLayout_3"
             android:layout_below="@id/relLayout_1"
-            android:background="@color/black"
+            layout="@layout/content_job_cogo_setup"
             android:layout_width="match_parent"
             android:layout_height="45dp"
             android:visibility="visible">
 
-            <ImageView
-                android:id="@+id/ic_action_occupy"
-                android:layout_marginStart="5dp"
-                android:layout_centerVertical="true"
-                android:layout_alignParentStart="true"
-                android:background="@drawable/ic_survey_instrument_white"
-                android:layout_width="30dp"
-                android:layout_height="30dp" />
 
-
-            <TextView
-                android:id="@+id/tv_header"
-                android:layout_toEndOf="@id/ic_action_occupy"
-                android:text="Occupy"
-                android:layout_marginStart="5dp"
-                style="@style/Labels.Card.ProjectHeader"
-                android:textColor="@color/blue_primary_dark"
-                android:layout_marginTop="1dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-            <TextView
-                android:id="@+id/tv_value_occupy"
-                android:gravity="center_horizontal"
-                android:layout_marginStart="5dp"
-                android:textColor="@color/white"
-                android:layout_toEndOf="@id/ic_action_occupy"
-                android:layout_below="@id/tv_header"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-            <ImageView
-                android:id="@+id/ic_action_backsight"
-                android:layout_marginStart="100dp"
-                android:layout_centerVertical="true"
-                android:layout_alignParentStart="true"
-                android:background="@drawable/ic_action_filter_dark"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-            <TextView
-                android:id="@+id/tv_header_backsight"
-                android:layout_toEndOf="@id/ic_action_backsight"
-                android:text="Backsight"
-                style="@style/Labels.Card.ProjectHeader"
-                android:textColor="@color/blue_primary_dark"
-                android:layout_marginTop="1dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-            <TextView
-                android:id="@+id/tv_value_backsight"
-                android:gravity="center_horizontal"
-                android:textColor="@color/white"
-                android:layout_toEndOf="@id/ic_action_backsight"
-                android:layout_below="@id/tv_header"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-            <TextView
-                android:id="@+id/tv_header_direction"
-                android:layout_toEndOf="@id/tv_header_backsight"
-                android:layout_toStartOf="@+id/ll_Occupy_Height"
-                android:text="Direction"
-                android:gravity="center_horizontal"
-                style="@style/Labels.Card.ProjectHeader"
-                android:textColor="@color/blue_primary_dark"
-                android:layout_marginTop="1dp"
-                android:layout_marginStart="5dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            <TextView
-                android:id="@+id/tv_value_direction"
-                android:textColor="@color/white"
-                android:gravity="center_horizontal"
-                android:layout_toEndOf="@id/tv_header_backsight"
-                android:layout_toStartOf="@+id/ll_Occupy_Height"
-                android:layout_below="@id/tv_header"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            
-            <LinearLayout
-                android:id="@+id/ll_Occupy_Height"
-                android:orientation="horizontal"
-                android:layout_alignParentEnd="true"
-                android:layout_marginTop="1dp"
-                android:layout_marginEnd="3dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-
-                <TextView
-                    android:id="@+id/tv_header_Occupy_Height"
-                    android:text="HI:"
-                    style="@style/Labels.Card.ProjectHeader"
-                    android:textColor="@color/blue_primary_dark"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-
-                <TextView
-                    android:id="@+id/tv_value_Occupy_Height"
-                    style="@style/Labels.Card.ProjectHeader"
-                    android:textColor="@color/white"
-                    android:gravity="center_horizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_alignParentEnd="true"
-                android:layout_marginTop="20dp"
-                android:layout_marginEnd="3dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-
-                <TextView
-                    android:id="@+id/tv_header_Backsight_Height"
-                    android:text="BHI:"
-                    style="@style/Labels.Card.ProjectHeader"
-                    android:textColor="@color/blue_primary_dark"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-
-                <TextView
-                    android:id="@+id/tv_value_Backsight_Height"
-                    style="@style/Labels.Card.ProjectHeader"
-                    android:textColor="@color/white"
-                    android:gravity="center_horizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-
-            </LinearLayout>
-
-
-
-        </RelativeLayout>
+        </include>
 
         <!--Container-->
         <FrameLayout

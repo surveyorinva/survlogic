@@ -8,6 +8,8 @@ public interface JobCogoSideshotPointListener {
 
     void doesPointExist(boolean isPointFound);
 
+    void isPointValidForDatabase(boolean isPointFound);
+
     void whatIsNextPointNumber(int pointNumber);
 
 }

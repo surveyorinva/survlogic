@@ -468,5 +468,25 @@ public class MathHelper {
         return results;
     }
 
+    public static double convertSlopeDistanceToHorizontalDistanceByZenith(double slopeDistance, double zenithAngle){
+        double results=0;
+        double zenithAngleInRadians = Math.toRadians(zenithAngle);
+
+        results = slopeDistance * Math.sin(zenithAngleInRadians);
+
+
+        return results;
+    }
+
+    public static double convertSlopeDistanceToDeltaElevationByZenith(double slopeDistance, double zenithAngle){
+        double results=0;
+        double zenithAngleInRadians = Math.toRadians(zenithAngle);
+
+        results = slopeDistance * Math.cos(zenithAngleInRadians);
+
+
+        return results;
+    }
+
 
 }

@@ -3,7 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/ll_distance_slope_zenith"
     android:orientation="vertical"
-    android:layout_marginStart="75dp"
+    android:layout_marginStart="78dp"
+    android:layout_marginBottom="5dp"
     android:layout_below="@+id/ll_degree_minute_second"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -25,7 +26,7 @@
                 android:text="Distance"
                 android:gravity="center"
                 android:textSize="@dimen/text_size_normal"
-                android:layout_weight="30"
+                android:layout_weight="37"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content" />
 
@@ -52,7 +53,7 @@
                 android:text="Minutes"
                 android:gravity="center"
                 android:textSize="@dimen/text_size_normal"
-                android:layout_weight="20"
+                android:layout_weight="18"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content" />
 
@@ -65,11 +66,9 @@
                 android:text="Seconds"
                 android:gravity="center"
                 android:textSize="@dimen/text_size_normal"
-                android:layout_weight="25"
+                android:layout_weight="18"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content" />
-
-
 
         </LinearLayout>
 
@@ -84,16 +83,14 @@
                 android:id="@+id/distance_slope_zenith_value"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="4dp"
-                android:layout_marginStart="4dp"
                 android:layout_marginTop="1dp"
-                android:layout_weight="30"
+                android:layout_weight="37"
                 android:gravity="center"
-                android:hint="X,XXX.XX"
+                android:hint="@string/cogo_hint_distance_font_small"
                 android:inputType="numberDecimal"
                 android:nextFocusDown="@+id/vAngle_Zenith_degree"
-                android:textColor="@color/black"
-                android:textSize="14sp" />
+                style="@style/InputField.EditText"
+                android:background="@drawable/editbox_background_normal" />
 
             <Space
                 android:layout_width="0dp"
@@ -104,16 +101,14 @@
                 android:id="@+id/vAngle_Zenith_degree"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="4dp"
-                android:layout_marginStart="4dp"
                 android:layout_marginTop="1dp"
                 android:layout_weight="20"
                 android:gravity="center"
-                android:hint="DD"
+                android:hint="@string/cogo_hint_degrees_two_font_small"
                 android:inputType="number"
                 android:nextFocusDown="@+id/vAngle_Zenith_min"
-                android:textColor="@color/black"
-                android:textSize="14sp" />
+                style="@style/InputField.EditText"
+                android:background="@drawable/editbox_background_normal" />
 
             <Space
                 android:layout_width="0dp"
@@ -124,16 +119,14 @@
                 android:id="@+id/vAngle_Zenith_min"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="4dp"
-                android:layout_marginStart="4dp"
                 android:layout_marginTop="1dp"
-                android:layout_weight="20"
+                android:layout_weight="18"
                 android:gravity="center"
-                android:hint="MM"
+                android:hint="@string/cogo_hint_minutes_font_small"
                 android:inputType="number"
                 android:nextFocusDown="@+id/vAngle_Zenith_sec"
-                android:textColor="@color/black"
-                android:textSize="14sp" />
+                style="@style/InputField.EditText"
+                android:background="@drawable/editbox_background_normal" />
 
             <Space
                 android:layout_width="0dp"
@@ -144,15 +137,13 @@
                 android:id="@+id/vAngle_Zenith_sec"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="4dp"
-                android:layout_marginStart="4dp"
                 android:layout_marginTop="1dp"
-                android:layout_weight="24"
-                android:gravity="center_horizontal"
-                android:hint="ss.ss"
+                android:layout_weight="18"
+                android:gravity="center"
+                android:hint="@string/cogo_hint_seconds_font_small"
                 android:inputType="numberDecimal"
-                android:textColor="@color/black"
-                android:textSize="14sp" />
+                style="@style/InputField.EditText"
+                android:background="@drawable/editbox_background_normal"/>
         </LinearLayout>
 
 </LinearLayout>

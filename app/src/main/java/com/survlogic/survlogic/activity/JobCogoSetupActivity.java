@@ -208,6 +208,17 @@ public class JobCogoSetupActivity extends AppCompatActivity implements JobPoints
         return jobInformation;
     }
 
+
+    @Override
+    public PointSurvey sendOccupyPointSurveyToFragment() {
+        return null;
+    }
+
+    @Override
+    public PointSurvey sendBacksightPointSurveyToFragment() {
+        return null;
+    }
+
     @Override
     public PointSurvey sendOccupyPointSurveyToFragment(PointSurvey pointSurvey) {
         return pointSurvey;

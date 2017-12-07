@@ -16,9 +16,14 @@ public interface JobCogoFragmentListener {
 
     JobInformation sendJobInformationToFragment();
 
+    PointSurvey sendOccupyPointSurveyToFragment();
+
+    PointSurvey sendBacksightPointSurveyToFragment();
+
     PointSurvey sendOccupyPointSurveyToFragment(PointSurvey pointSurvey);
 
     PointSurvey sendBacksightPointSurveyToFragment(PointSurvey pointSurvey);
+
 
     int sendOccupyPointNoToFragment();
 

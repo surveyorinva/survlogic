@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-
     <!--Input Fields-->
     <style name="InputField" parent="Widget.AppCompat.EditText">
         <item name="android:paddingStart">@dimen/edit_text_padding_start</item>
@@ -24,6 +22,12 @@
     <style name="InputField.DetailText">
         <item name="android:textSize">@dimen/text_size_location_value</item>
         <item name="android:textColor">@color/black</item>
+
+    </style>
+
+    <style name="InputField.EditText">
+        <item name="android:textSize">@dimen/text_size_medium</item>
+        <item name="android:textColor">@color/blue_primary</item>
 
     </style>
 
@@ -106,6 +110,16 @@
         <item name="android:fontFamily">sans-serif</item>
         <item name="android:textColor">@color/white</item>
         <item name="android:textSize">@dimen/text_size_normal</item>
+    </style>
+
+    <style name="Labels.Card.Switch_On">
+        <item name="android:textSize">@dimen/text_size_medium</item>
+        <item name="android:textColor">@color/blue_primary</item>
+    </style>
+
+    <style name="Labels.Card.Switch_Off">
+        <item name="android:textSize">@dimen/text_size_header</item>
+        <item name="android:textColor">@color/gray</item>
     </style>
 
     <!--Containers-->

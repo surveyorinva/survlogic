@@ -3,156 +3,147 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/ll_distance_slope_vertical"
     android:orientation="vertical"
-    android:layout_marginStart="75dp"
+    android:layout_marginStart="78dp"
+    android:layout_marginBottom="5dp"
     android:layout_below="@+id/ll_degree_minute_second"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:visibility="visible">
 
         <TextView
-            android:text="                 Vertical Angle"
+            android:text="                           Vertical Angle"
             android:gravity="center_horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
-        <LinearLayout
-            android:orientation="horizontal"
-            android:weightSum="100"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+    <LinearLayout
+        android:orientation="horizontal"
+        android:weightSum="100"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-            <TextView
-                android:text="Distance"
-                android:gravity="center"
-                android:textSize="@dimen/text_size_normal"
-                android:layout_weight="30"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content" />
+        <TextView
+            android:text="Distance"
+            android:gravity="center"
+            android:textSize="@dimen/text_size_normal"
+            android:layout_weight="37"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
 
-            <Space
-                android:layout_weight="2"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content" />
-
-
-            <TextView
-                android:text="Degrees"
-                android:gravity="center"
-                android:textSize="@dimen/text_size_normal"
-                android:layout_weight="20"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content" />
-
-            <Space
-                android:layout_weight="2"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content" />
-
-            <TextView
-                android:text="Minutes"
-                android:gravity="center"
-                android:textSize="@dimen/text_size_normal"
-                android:layout_weight="20"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content" />
-
-            <Space
-                android:layout_weight="2"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content" />
-
-            <TextView
-                android:text="Seconds"
-                android:gravity="center"
-                android:textSize="@dimen/text_size_normal"
-                android:layout_weight="25"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content" />
+        <Space
+            android:layout_weight="2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
 
 
+        <TextView
+            android:text="Degrees"
+            android:gravity="center"
+            android:textSize="@dimen/text_size_normal"
+            android:layout_weight="20"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
 
-        </LinearLayout>
+        <Space
+            android:layout_weight="2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <TextView
+            android:text="Minutes"
+            android:gravity="center"
+            android:textSize="@dimen/text_size_normal"
+            android:layout_weight="18"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+
+        <Space
+            android:layout_weight="2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:text="Seconds"
+            android:gravity="center"
+            android:textSize="@dimen/text_size_normal"
+            android:layout_weight="18"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="100">
+
+
+        <EditText
+            android:id="@+id/distance_slope_Vertical_value"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:weightSum="100">
+            android:layout_marginTop="1dp"
+            android:layout_weight="37"
+            android:gravity="center"
+            android:hint="@string/cogo_hint_distance_font_small"
+            android:inputType="numberDecimal"
+            android:nextFocusDown="@+id/vAngle_Vertical_degree"
+            style="@style/InputField.EditText"
+            android:background="@drawable/editbox_background_normal" />
 
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2" />
 
-            <EditText
-                android:id="@+id/distance_slope_zenith_value"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="4dp"
-                android:layout_marginStart="4dp"
-                android:layout_marginTop="1dp"
-                android:layout_weight="30"
-                android:gravity="center"
-                android:hint="X,XXX.XX"
-                android:inputType="numberDecimal"
-                android:nextFocusDown="@+id/vAngle_Zenith_degree"
-                android:textColor="@color/black"
-                android:textSize="14sp" />
+        <EditText
+            android:id="@+id/vAngle_Vertical_degree"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="1dp"
+            android:layout_weight="20"
+            android:gravity="center"
+            android:hint="@string/cogo_hint_degrees_two_font_small"
+            android:inputType="number"
+            android:nextFocusDown="@+id/vAngle_Vertical_min"
+            style="@style/InputField.EditText"
+            android:background="@drawable/editbox_background_normal" />
 
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="2" />
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2" />
 
-            <EditText
-                android:id="@+id/vAngle_Zenith_degree"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="4dp"
-                android:layout_marginStart="4dp"
-                android:layout_marginTop="1dp"
-                android:layout_weight="20"
-                android:gravity="center"
-                android:hint="DD"
-                android:inputType="number|numberSigned"
-                android:nextFocusDown="@+id/vAngle_Zenith_min"
-                android:textColor="@color/black"
-                android:textSize="14sp" />
+        <EditText
+            android:id="@+id/vAngle_Vertical_min"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="1dp"
+            android:layout_weight="18"
+            android:gravity="center"
+            android:hint="@string/cogo_hint_minutes_font_small"
+            android:inputType="number"
+            android:nextFocusDown="@+id/vAngle_Vertical_sec"
+            style="@style/InputField.EditText"
+            android:background="@drawable/editbox_background_normal" />
 
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="2" />
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2" />
 
-            <EditText
-                android:id="@+id/vAngle_Zenith_min"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="4dp"
-                android:layout_marginStart="4dp"
-                android:layout_marginTop="1dp"
-                android:layout_weight="20"
-                android:gravity="center"
-                android:hint="MM"
-                android:inputType="number"
-                android:nextFocusDown="@+id/vAngle_Zenith_sec"
-                android:textColor="@color/black"
-                android:textSize="14sp" />
-
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="2" />
-
-            <EditText
-                android:id="@+id/vAngle_Zenith_sec"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="4dp"
-                android:layout_marginStart="4dp"
-                android:layout_marginTop="1dp"
-                android:layout_weight="24"
-                android:gravity="center_horizontal"
-                android:hint="ss.ss"
-                android:inputType="numberDecimal"
-                android:textColor="@color/black"
-                android:textSize="14sp" />
-        </LinearLayout>
+        <EditText
+            android:id="@+id/vAngle_Vertical_sec"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="1dp"
+            android:layout_weight="18"
+            android:gravity="center"
+            android:hint="@string/cogo_hint_seconds_font_small"
+            android:inputType="numberDecimal"
+            style="@style/InputField.EditText"
+            android:background="@drawable/editbox_background_normal"/>
+    </LinearLayout>
 
 </LinearLayout>

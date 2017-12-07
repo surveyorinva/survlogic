@@ -7,15 +7,19 @@ import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,30 +50,45 @@ public class JobCogoSideshotFragment extends Fragment implements JobCogoSideshot
     private View v;
     private Context mContext;
 
-    private JobCogoFragmentListener jobCogoFragmentListener;
-
     private static int project_id, job_id;
     private String jobDatabaseName;
 
     private View viewHAngleDec, viewHAngleDMS, viewHd, viewSdZenith, viewSdVertical, viewSdVDelta;
+    private Button btSave;
     private ImageButton ibPointNoAction, ibPointhAngleAction, ibPointDistanceAction;
     private TextView tvHAngleHeader, tvDistanceHeader;
+    private TextView tvSwitchTraverse, tvSwitchSideshot;
 
-    private EditText etPointNumber, etTargetHeight;
+    private EditText etPointNumber, etTargetHeight, etPointDescription;
     private EditText etHADeg, etHAMin, etHASec, etHADec;
+    private EditText etDistanceHD, etDistanceVDZenith, etDistanceVDVertical, etDistanceVDDelta;
+    private EditText etVDDeg, etVDMin, etVDSec, etZNDeg, etZNMin, etZNSec, etVDDelta;
+
+    private Switch switchTypeOfSurvey;
+    private Boolean isTypeOfSurveySideshot = true;
 
     private ArrayList<PointSurvey> lstPointSurvey = new ArrayList<>();
 
-    private double mValueHAngleDec;
+    private int mValuePointNo;
+    private double mValueHAngleDec, mValueDistance, mValueSlope, mValueVAngleDec, mValueVDelta;
+    private double mValueTargetHeight;
+    private String mValuePointDesc;
+
     private boolean doesPointExist = false;
     private int popupMenuOpen = 0;
+
     private boolean is2dSurvey = false;
+
     private int horizontalAngleType = 0;
     private int viewDistanceToDisplay = 0;
     private int enteredPointNumber, nextPointNumber;
     private static final int textValidationTwo = 1, textValidationThree = 2, textValidationFour = 4;
 
+    private PointSurvey occupyPointSurvey, backsightPointSurvey;
+
     private JobCogoSideshotPointListener jobCogoSideshotPointListener;
+    private JobCogoFragmentListener jobCogoFragmentListener;
+
 
     @Nullable
     @Override
@@ -90,7 +109,7 @@ public class JobCogoSideshotFragment extends Fragment implements JobCogoSideshot
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-
+        Log.d(TAG, "onAttach: Started...");
         jobCogoSideshotPointListener = (JobCogoSideshotPointListener) mContext;
 
 
@@ -113,6 +132,8 @@ public class JobCogoSideshotFragment extends Fragment implements JobCogoSideshot
         viewSdVertical = v.findViewById(R.id.layout_sd_vertical_angle);
         viewSdVDelta = v.findViewById(R.id.layout_sd_vertical_difference);
 
+        btSave = (Button) v.findViewById(R.id.Save_button);
+
         ibPointNoAction = (ImageButton) v.findViewById(R.id.point_Number_action);
         ibPointhAngleAction = (ImageButton) v.findViewById(R.id.hAngle_action);
         ibPointDistanceAction = (ImageButton) v.findViewById(R.id.distance_action);
@@ -123,10 +144,56 @@ public class JobCogoSideshotFragment extends Fragment implements JobCogoSideshot
         etTargetHeight = (EditText) v.findViewById(R.id.target_height);
         etTargetHeight.setSelectAllOnFocus(true);
 
+        etPointDescription = (EditText) v.findViewById(R.id.point_Description_value);
+
         tvHAngleHeader = (TextView) v.findViewById(R.id.hAngle_header);
         tvDistanceHeader = (TextView) v.findViewById(R.id.distance_header);
 
+        tvSwitchTraverse = (TextView) v.findViewById(R.id.switch_traverse_text);
+        tvSwitchSideshot = (TextView) v.findViewById(R.id.switch_sideshot_text);
+
+        switchTypeOfSurvey = (Switch) v.findViewById(R.id.type_of_measurement_switch);
+
         jobCogoFragmentListener = (JobCogoFragmentListener) mContext;
+        jobCogoFragmentListener = (JobCogoFragmentListener) mContext;
+
+        initViewHADMS();
+        initViewHADEC();
+
+        initViewVDHorizontal();
+        initViewVDSlopeZenith();
+        initViewVDSlopeVertical();
+        initViewVDSlopeDelta();
+
+        etPointNumber.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+                try{
+                    String pointNo = null;
+                    pointNo = etPointNumber.getText().toString();
+
+                    if(!StringUtilityHelper.isStringNull(pointNo)){
+                        mValuePointNo = Integer.parseInt(pointNo);
+                        validatePointNumber(mValuePointNo);
+                    }
+
+                }catch(NumberFormatException ex){
+                    showToast("Error.  Check Number Format", true);
+
+                }
+            }
+        });
 
     }
 
@@ -285,6 +352,7 @@ public class JobCogoSideshotFragment extends Fragment implements JobCogoSideshot
                 if(is2dSurvey){
                     popupMenuDistance.getMenu().findItem(R.id.sideshot_distance_item_1).setChecked(true);
                     viewDistanceToDisplay = 1;
+
                 }else{
                     popupMenuDistance.getMenu().findItem(R.id.sideshot_distance_item_1).setChecked(false);
                 }
@@ -349,12 +417,56 @@ public class JobCogoSideshotFragment extends Fragment implements JobCogoSideshot
                     }
                 });
 
-
-
-
                 popupMenuDistance.show();
             }
+
+
         });
+
+        switchTypeOfSurvey.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    //sideshot
+                    setTextSizeTypeOfSurvey(true);
+                    isTypeOfSurveySideshot = true;
+
+
+
+                }else{
+                    //traverse
+                    setTextSizeTypeOfSurvey(false);
+                    isTypeOfSurveySideshot = false;
+
+                }
+            }
+        });
+
+        btSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "btSave_onClick ");
+                boolean isFormReady = false;
+                boolean isFormInError = validateFormForNull();
+
+                Log.d(TAG, "btSave_onClick:isFormInError: " + isFormInError);
+
+                if(!isFormInError){
+                    //No Nulls, now check for consistency
+                    isFormReady = validateFormForSetup();
+                    Log.d(TAG, "onClick: isFormReady: " + isFormReady);
+                }
+
+
+                if(isFormReady){
+                    saveObservation();
+                }
+
+
+
+            }
+        });
+
 
     }
 
@@ -367,9 +479,6 @@ public class JobCogoSideshotFragment extends Fragment implements JobCogoSideshot
         switch (viewToShow){
 
             case 1:
-                //showToast("Switching View to Degrees-Minutes-Seconds",true);
-
-                //Retrieve data if it is there.
                 //Going from DEC to DMS
 
                 if(etHADec !=null){
@@ -386,7 +495,7 @@ public class JobCogoSideshotFragment extends Fragment implements JobCogoSideshot
 
                 horizontalAngleType = 0;
 
-                initViewHADMS();
+                etTargetHeight.setNextFocusDownId(R.id.hAngle_degree);
 
                 break;
 
@@ -410,17 +519,25 @@ public class JobCogoSideshotFragment extends Fragment implements JobCogoSideshot
 
                 horizontalAngleType = 1;
 
-                initViewHADEC();
+                etTargetHeight.setNextFocusDownId(R.id.hAngle_dec);
+
         }
 
 
     }
 
     private void swapDistanceItems(int itemToShow){
+        Log.d(TAG, "swapDistanceItems: Started");
+        Log.d(TAG, "swapDistanceItems: mDistance: " + mValueDistance);
+        Log.d(TAG, "swapDistanceItems: Item: " + itemToShow);
+
         switch (itemToShow){
 
             case 1:
                 //showToast("Switching View to Horizontal Distance Entry",true);
+
+                getDistanceFromWidget();
+
                 viewHd.setVisibility(View.VISIBLE);
                 viewSdZenith.setVisibility(View.GONE);
                 viewSdVertical.setVisibility(View.GONE);
@@ -429,11 +546,22 @@ public class JobCogoSideshotFragment extends Fragment implements JobCogoSideshot
                 is2dSurvey = true;
                 viewDistanceToDisplay = 1;
 
+                setDistanceToWidget(viewDistanceToDisplay);
+
                 tvDistanceHeader.setText("HD");
+
+                if(horizontalAngleType ==0){
+                    etHASec.setNextFocusDownId(R.id.distance_horizontal_value);
+                }else{
+                    etHADec.setNextFocusDownId(R.id.distance_horizontal_value);
+                }
 
                 break;
 
             case 3:
+
+                getDistanceFromWidget();
+
                 //showToast("Switching View to Slope Distance with Zenith Angle Entry",true);
                 viewHd.setVisibility(View.GONE);
                 viewSdZenith.setVisibility(View.VISIBLE);
@@ -443,11 +571,22 @@ public class JobCogoSideshotFragment extends Fragment implements JobCogoSideshot
                 is2dSurvey=false;
                 viewDistanceToDisplay = 3;
 
+                setDistanceToWidget(viewDistanceToDisplay);
+
                 tvDistanceHeader.setText("SD");
 
+                if(horizontalAngleType ==0){
+                    etHASec.setNextFocusDownId(R.id.distance_slope_zenith_value);
+                }else{
+                    etHADec.setNextFocusDownId(R.id.distance_slope_zenith_value);
+                }
+                
                 break;
 
             case 4:
+
+                getDistanceFromWidget();
+
                 //showToast("Switching View to Slope Distance with Vertical Angle Entry",true);
                 viewHd.setVisibility(View.GONE);
                 viewSdZenith.setVisibility(View.GONE);
@@ -457,11 +596,22 @@ public class JobCogoSideshotFragment extends Fragment implements JobCogoSideshot
                 is2dSurvey=false;
                 viewDistanceToDisplay = 4;
 
+                setDistanceToWidget(viewDistanceToDisplay);
+
                 tvDistanceHeader.setText("SD");
+
+                if(horizontalAngleType ==0){
+                    etHASec.setNextFocusDownId(R.id.distance_slope_Vertical_value);
+                }else{
+                    etHADec.setNextFocusDownId(R.id.distance_slope_Vertical_value);
+                }
 
                 break;
 
             case 5:
+
+                getDistanceFromWidget();
+
                 //showToast("Switching View to Slope Distance with Vertical Difference Entry",true);
                 viewHd.setVisibility(View.GONE);
                 viewSdZenith.setVisibility(View.GONE);
@@ -471,8 +621,17 @@ public class JobCogoSideshotFragment extends Fragment implements JobCogoSideshot
                 is2dSurvey=false;
                 viewDistanceToDisplay = 5;
 
+                setDistanceToWidget(viewDistanceToDisplay);
+
                 tvDistanceHeader.setText("SD");
 
+                if(horizontalAngleType ==0){
+                    etHASec.setNextFocusDownId(R.id.distance_slope_Delta_value);
+                }else{
+                    etHADec.setNextFocusDownId(R.id.distance_slope_Delta_value);
+                }
+
+                
                 break;
 
         }
@@ -507,9 +666,10 @@ public class JobCogoSideshotFragment extends Fragment implements JobCogoSideshot
                 try{
                     int val = Integer.parseInt(s.toString());
                     if(val > 359){
-                        //s.replace(0,s.length(),"359",0,3);
-
-                        showToast("Error.  Enter between 0 - 360",true);
+                        etHADeg.setError(getResources().getString(R.string.cogo_angle_circle_error_out_of_range));
+                        btSave.setClickable(false);
+                    }else{
+                        btSave.setClickable(true);
                     }
 
 
@@ -541,8 +701,10 @@ public class JobCogoSideshotFragment extends Fragment implements JobCogoSideshot
                 try{
                     int val = Integer.parseInt(s.toString());
                     if(val > 59){
-                        s.replace(0,s.length(),"59",0,2);
-                        showToast("Error.  Enter between 0 - 59",true);
+                        etHAMin.setError(getResources().getString(R.string.cogo_angle_error_out_of_range));
+                        btSave.setClickable(false);
+                    }else{
+                        btSave.setClickable(true);
                     }
 
 
@@ -568,10 +730,12 @@ public class JobCogoSideshotFragment extends Fragment implements JobCogoSideshot
             @Override
             public void afterTextChanged(Editable s) {
                 try{
-                    int val = Integer.parseInt(s.toString());
-                    if(val > 60){
-                        s.replace(0,s.length(),"59",0,2);
-                        showToast("Error.  Enter between 0 - 59",true);
+                    double val = Double.parseDouble(s.toString());
+                    if(val > 59.999){
+                        etHASec.setError(getResources().getString(R.string.cogo_angle_error_out_of_range));
+                        btSave.setClickable(false);
+                    }else{
+                        btSave.setClickable(true);
                     }
 
 
@@ -598,7 +762,6 @@ public class JobCogoSideshotFragment extends Fragment implements JobCogoSideshot
             }
         }
 
-        etTargetHeight.setNextFocusDownId(R.id.hAngle_degree);
 
     }
 
@@ -606,22 +769,260 @@ public class JobCogoSideshotFragment extends Fragment implements JobCogoSideshot
         Log.d(TAG, "initViewHADEC: Started...");
 
         etHADec = (EditText) v.findViewById(R.id.hAngle_dec);
+        etHADec.setSelectAllOnFocus(true);
 
         if(mValueHAngleDec !=0){
             etHADec.setText(String.valueOf(mValueHAngleDec));
         }
 
-        etTargetHeight.setNextFocusDownId(R.id.hAngle_dec);
 
     }
 
+    private void initViewVDHorizontal(){
+        Log.d(TAG, "initViewVDHorizontal: Started...");
+        Log.d(TAG, "swapDistanceItems: mValueDistance (hDistance): " + mValueDistance);
+        etDistanceHD = (EditText) v.findViewById(R.id.distance_horizontal_value);
+        etDistanceHD.setSelectAllOnFocus(true);
+
+    }
+
+    private void initViewVDSlopeZenith(){
+        Log.d(TAG, "initViewVDSlopeZenith: Started...");
+        Log.d(TAG, "initViewVDSlopeZenith: mValueDistance(Zenith): " + mValueDistance);
+
+        etDistanceVDZenith = (EditText) v.findViewById(R.id.distance_slope_zenith_value);
+        etDistanceVDZenith.setSelectAllOnFocus(true);
+
+        etZNDeg = (EditText) v.findViewById(R.id.vAngle_Zenith_degree);
+        etZNDeg.setSelectAllOnFocus(true);
+
+        etZNMin = (EditText) v.findViewById(R.id.vAngle_Zenith_min);
+        etZNMin.setSelectAllOnFocus(true);
+
+        etZNSec = (EditText) v.findViewById(R.id.vAngle_Zenith_sec);
+        etZNSec.setSelectAllOnFocus(true);
+
+        etZNDeg.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                try{
+                    int val = Integer.parseInt(s.toString());
+                    if(val > 180){
+                        etZNDeg.setError(getResources().getString(R.string.cogo_angle_error_out_of_range));
+                        btSave.setClickable(false);
+                    }else{
+                        btSave.setClickable(true);
+                    }
+
+
+                }catch (NumberFormatException ex){
+
+                }
+            }
+        });
+
+        etZNMin.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                try{
+                    int val = Integer.parseInt(s.toString());
+                    if(val > 59){
+                        etZNMin.setError(getResources().getString(R.string.cogo_angle_error_out_of_range));
+                        btSave.setClickable(false);
+                    }else{
+                        btSave.setClickable(true);
+                    }
+
+
+                }catch (NumberFormatException ex){
+
+                }
+            }
+        });
+
+        etZNSec.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                try{
+                    double val = Double.parseDouble(s.toString());
+                    if(val > 59.999){
+                        etZNSec.setError(getResources().getString(R.string.cogo_angle_error_out_of_range));
+                        btSave.setClickable(false);
+                    }else{
+                        btSave.setClickable(true);
+                    }
+
+
+                }catch (NumberFormatException ex){
+
+                }
+            }
+        });
+
+
+
+    }
+
+    private void initViewVDSlopeVertical(){
+        Log.d(TAG, "initViewVDSlopeVertical: Started...");
+        Log.d(TAG, "swapDistanceItems: mValueDistance:(Vertical) " + mValueDistance);
+
+        etDistanceVDVertical = (EditText) v.findViewById(R.id.distance_slope_Vertical_value);
+        etDistanceVDVertical.setSelectAllOnFocus(true);
+
+        etVDDeg = (EditText) v.findViewById(R.id.vAngle_Vertical_degree);
+        etVDDeg.setSelectAllOnFocus(true);
+
+        etVDMin = (EditText) v.findViewById(R.id.vAngle_Vertical_min);
+        etVDMin.setSelectAllOnFocus(true);
+
+        etVDSec = (EditText) v.findViewById(R.id.vAngle_Vertical_sec);
+        etVDSec.setSelectAllOnFocus(true);
+
+        etVDDeg.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                try{
+                    int val = Integer.parseInt(s.toString());
+                    if(val > 180){
+                        etVDDeg.setError(getResources().getString(R.string.cogo_angle_error_out_of_range));
+                        btSave.setClickable(false);
+                    }else {
+                        btSave.setClickable(true);
+                    }
+
+
+                }catch (NumberFormatException ex){
+
+                }
+            }
+        });
+
+        etVDMin.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                try{
+                    int val = Integer.parseInt(s.toString());
+                    if(val > 59){
+                        etVDMin.setError(getResources().getString(R.string.cogo_angle_error_out_of_range));
+                        btSave.setClickable(false);
+                    }else{
+                        btSave.setClickable(true);
+                    }
+
+
+                }catch (NumberFormatException ex){
+
+                }
+            }
+        });
+
+        etVDSec.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                try {
+                    double val = Double.parseDouble(s.toString());
+                    if (val > 59.999) {
+                        etVDSec.setError(getResources().getString(R.string.cogo_angle_error_out_of_range));
+                        btSave.setClickable(false);
+                    }else{
+                        btSave.setClickable(true);
+                    }
+
+
+                } catch (NumberFormatException ex) {
+
+                }
+            }
+        });
+
+    }
+
+    private void initViewVDSlopeDelta(){
+        Log.d(TAG, "initViewVDSlopeDelta: Started...");
+        Log.d(TAG, "initViewVDSlopeDelta: mValueDistance (Delta): " + mValueDistance);
+
+        etDistanceVDDelta = (EditText) v.findViewById(R.id.distance_slope_Delta_value);
+        etDistanceVDDelta.setSelectAllOnFocus(true);
+
+        etVDDelta = (EditText) v.findViewById(R.id.vAngle_Vertical_delta);
+        etVDDelta.setSelectAllOnFocus(true);
+
+    }
+
+
     private void checkPointNumber(int pointNumber){
         Log.d(TAG, "checkPointNumber: Started...");
-        BackgroundSurveyPointCheckPointNumber backgroundSurveyPointCheckPointNumber = new BackgroundSurveyPointCheckPointNumber(mContext,jobDatabaseName,this,pointNumber);
+        BackgroundSurveyPointCheckPointNumber backgroundSurveyPointCheckPointNumber = new BackgroundSurveyPointCheckPointNumber(mContext,jobDatabaseName,this,pointNumber,true);
         backgroundSurveyPointCheckPointNumber.execute();
 
+    }
 
+    private void validatePointNumber(int pointNumber){
+        Log.d(TAG, "validatePointNumber: Started...");
 
+        BackgroundSurveyPointCheckPointNumber backgroundSurveyPointCheckPointNumber = new BackgroundSurveyPointCheckPointNumber(mContext,jobDatabaseName,this,pointNumber,false);
+        backgroundSurveyPointCheckPointNumber.execute();
     }
 
     private void getNextPointNumber(){
@@ -655,6 +1056,401 @@ public class JobCogoSideshotFragment extends Fragment implements JobCogoSideshot
         pointListDialog.show(getFragmentManager(),"dialog_list");
 
     }
+
+
+    private void setTextSizeTypeOfSurvey(boolean isSideShotOn){
+
+        if(isSideShotOn){
+
+            tvSwitchSideshot.setTextSize(TypedValue.COMPLEX_UNIT_PX,getResources().getDimension(R.dimen.text_size_medium));
+            tvSwitchSideshot.setTextColor(getResources().getColor(R.color.blue_primary));
+
+            tvSwitchTraverse.setTextSize(TypedValue.COMPLEX_UNIT_PX,getResources().getDimension(R.dimen.text_size_header));
+            tvSwitchTraverse.setTextColor(getResources().getColor(R.color.gray));
+
+        }else{
+            tvSwitchTraverse.setTextSize(TypedValue.COMPLEX_UNIT_PX,getResources().getDimension(R.dimen.text_size_medium));
+            tvSwitchTraverse.setTextColor(getResources().getColor(R.color.blue_primary));
+
+            tvSwitchSideshot.setTextSize(TypedValue.COMPLEX_UNIT_PX,getResources().getDimension(R.dimen.text_size_header));
+            tvSwitchSideshot.setTextColor(getResources().getColor(R.color.gray));
+
+        }
+
+    }
+
+    private void getDistanceFromWidget(){
+        Log.d(TAG, "grabDistance: Started");
+        Log.i(TAG, "getDistanceFromWidget: Item To Show: " + viewDistanceToDisplay);
+
+        String results=null;
+
+        switch (viewDistanceToDisplay){
+            case 1:
+                if(etDistanceHD !=null){
+                    results =  etDistanceHD.getText().toString();
+
+                }
+                break;
+
+            case 3:
+                if(etDistanceVDZenith !=null){
+                    results =  etDistanceVDZenith.getText().toString();
+
+                }
+                break;
+
+            case 4:
+                if(etDistanceVDVertical !=null){
+                    results =  etDistanceVDVertical.getText().toString();
+
+                }
+                break;
+
+            case 5:
+                if(etDistanceVDDelta !=null){
+                    results =  etDistanceVDDelta.getText().toString();
+
+                }
+                break;
+
+            default:
+                results = null;
+
+
+        }
+
+        if(!StringUtilityHelper.isStringNull(results)){
+            mValueDistance = Double.parseDouble(results);
+        }
+
+        Log.i(TAG, "getDistanceFromWidget: Distance set to: " + mValueDistance);
+
+    }
+
+    private void setDistanceToWidget(int itemToShow){
+        Log.d(TAG, "setDistanceToWidget: Started");
+        Log.i(TAG, "setDistanceToWidget: Distance in Memory: " + mValueDistance);
+        Log.i(TAG, "getDistanceFromWidget: Item To Show: " + itemToShow);
+
+        switch (itemToShow){
+            case 1:
+                if(mValueDistance !=0){
+                    Log.i(TAG, "setDistanceToWidget: etDistanceHD");
+                    etDistanceHD.setText(String.valueOf(mValueDistance));
+                }
+                break;
+
+            case 3:
+                if(mValueDistance !=0){
+                    Log.i(TAG, "setDistanceToWidget: etDistanceVDZenith");
+                    etDistanceVDZenith.setText(String.valueOf(mValueDistance));
+                }
+                break;
+
+            case 4:
+                if(mValueDistance !=0){
+                    Log.i(TAG, "setDistanceToWidget: etDistanceVDVertical");
+                    etDistanceVDVertical.setText(String.valueOf(mValueDistance));
+                }
+                break;
+
+            case 5:
+                if(mValueDistance !=0){
+                    Log.i(TAG, "setDistanceToWidget: etDistanceVDDelta");
+                    etDistanceVDDelta.setText(String.valueOf(mValueDistance));
+                }
+                break;
+
+        }
+
+
+
+    }
+
+    //-------------------------------------------------------------------------------------------------------------------------//
+
+    /**
+     * Validating, creating point and then saving points!
+     */
+
+    private boolean validateFormForNull(){
+        Log.d(TAG, "validateForm: Started...");
+        boolean isThereAnError = false;
+
+        //Point No.
+        String pointNo = null;
+        pointNo = etPointNumber.getText().toString();
+
+        if(!StringUtilityHelper.isStringNull(pointNo)){
+            mValuePointNo = Integer.parseInt(pointNo);
+        }else{
+            etPointNumber.setError(getResources().getString(R.string.cogo_point_no_not_entered));
+            isThereAnError = true;
+        }
+
+        //Rod Height
+        String targetHeight = null;
+        targetHeight = etTargetHeight.getText().toString();
+
+        if(!StringUtilityHelper.isStringNull(targetHeight)){
+            mValueTargetHeight = Double.parseDouble(targetHeight);
+        }else{
+            etTargetHeight.setError(getResources().getString(R.string.cogo_point_height_not_entered));
+            isThereAnError = true;
+        }
+
+        //Horizontal Angle
+        switch(horizontalAngleType){
+            case 0:  //D-M-S
+                String d, m, s;
+                d = etHADeg.getText().toString();
+                m = etHAMin.getText().toString();
+                s = etHASec.getText().toString();
+
+                if(!StringUtilityHelper.isStringNull(d) && !StringUtilityHelper.isStringNull(m) && !StringUtilityHelper.isStringNull(s)){
+                    //Save horizontal angle as a decimal degree
+                    mValueHAngleDec = MathHelper.convertPartsToDEC(d,m,s);
+
+                }else {
+                    if(StringUtilityHelper.isStringNull(d)) {
+                        etHADeg.setError(getResources().getString(R.string.cogo_ha_deg_not_entered));
+                        isThereAnError = true;
+                    }
+
+                    if(StringUtilityHelper.isStringNull(m)) {
+                        etHAMin.setError(getResources().getString(R.string.cogo_ha_min_not_entered));
+                        isThereAnError = true;
+
+                    }
+                    if(StringUtilityHelper.isStringNull(s)) {
+                        etHASec.setError(getResources().getString(R.string.cogo_ha_sec_not_entered));
+                        isThereAnError = true;
+                    }
+                }
+
+                break;
+
+            case 1: //DEC
+                String dec;
+                dec = etHADec.getText().toString();
+
+                if(!StringUtilityHelper.isStringNull(dec)){
+                    //Save horizontal angle as a decimal degree
+                    mValueHAngleDec = Double.parseDouble(dec);
+                }else{
+                    etHADec.setError(getResources().getString(R.string.cogo_ha_dec_not_entered));
+                    isThereAnError = true;
+                }
+
+                break;
+        }
+
+        //Distance and Vertical Component
+
+        switch(viewDistanceToDisplay){
+            case 1: //Horizontal
+                String hDistance;
+
+                hDistance = etDistanceHD.getText().toString();
+
+                if(!StringUtilityHelper.isStringNull(hDistance)){
+                    //Save horizontal angle as a decimal degree
+                    mValueDistance = Double.parseDouble(hDistance);
+                }else{
+                    etDistanceHD.setError(getResources().getString(R.string.cogo_distance_not_entered));
+                    isThereAnError = true;
+                }
+
+
+                break;
+
+            case 3:  //Zenith
+                String sDistanceZenith, zenithDeg, zenithMin, zenithSec;
+
+                sDistanceZenith = etDistanceVDZenith.getText().toString();
+                zenithDeg = etZNDeg.getText().toString();
+                zenithMin = etZNMin.getText().toString();
+                zenithSec = etZNSec.getText().toString();
+
+                if(!StringUtilityHelper.isStringNull(sDistanceZenith)){
+                    //Save horizontal angle as a decimal degree
+                    mValueDistance = Double.parseDouble(sDistanceZenith);
+                }else{
+                    etDistanceVDZenith.setError(getResources().getString(R.string.cogo_distance_not_entered));
+                    isThereAnError = true;
+                }
+
+                if(!StringUtilityHelper.isStringNull(zenithDeg) && !StringUtilityHelper.isStringNull(zenithMin) && !StringUtilityHelper.isStringNull(zenithSec)){
+                    //Save horizontal angle as a decimal degree
+                    mValueVAngleDec = MathHelper.convertPartsToDEC(zenithDeg,zenithMin,zenithSec);
+
+                }else{
+
+                    if(StringUtilityHelper.isStringNull(zenithDeg)) {
+                        etZNDeg.setError(getResources().getString(R.string.cogo_ha_deg_not_entered));
+                        isThereAnError = true;
+                    }
+
+                    if(StringUtilityHelper.isStringNull(zenithMin)) {
+                        etZNMin.setError(getResources().getString(R.string.cogo_ha_min_not_entered));
+                        isThereAnError = true;
+                    }
+
+                    if(StringUtilityHelper.isStringNull(zenithSec)) {
+                        etZNSec.setError(getResources().getString(R.string.cogo_ha_sec_not_entered));
+                        isThereAnError = true;
+                    }
+                }
+
+
+                break;
+
+            case 4:  //Vertical
+                String sDistanceVertical, verticalDeg, verticalMin, verticalSec;
+
+                sDistanceVertical = etDistanceVDVertical.getText().toString();
+                verticalDeg = etVDDeg.getText().toString();
+                verticalMin = etVDMin.getText().toString();
+                verticalSec = etVDSec.getText().toString();
+
+                if(!StringUtilityHelper.isStringNull(sDistanceVertical)){
+                    //Save horizontal angle as a decimal degree
+                    mValueDistance = Double.parseDouble(sDistanceVertical);
+                }else{
+                    etDistanceVDVertical.setError(getResources().getString(R.string.cogo_distance_not_entered));
+                    isThereAnError = true;
+                }
+
+                if(!StringUtilityHelper.isStringNull(verticalDeg) && !StringUtilityHelper.isStringNull(verticalMin) && !StringUtilityHelper.isStringNull(verticalSec)){
+                    //Save horizontal angle as a decimal degree
+                    mValueVAngleDec = MathHelper.convertPartsToDEC(verticalDeg,verticalMin,verticalSec);
+
+                }else {
+
+                    if(StringUtilityHelper.isStringNull(verticalDeg)) {
+                        etVDDeg.setError(getResources().getString(R.string.cogo_ha_deg_not_entered));
+                        isThereAnError = true;
+
+                    }
+
+                    if(StringUtilityHelper.isStringNull(verticalMin)) {
+                        etVDMin.setError(getResources().getString(R.string.cogo_ha_min_not_entered));
+                        isThereAnError = true;
+
+                    }
+
+                    if(StringUtilityHelper.isStringNull(verticalSec)) {
+                        etVDSec.setError(getResources().getString(R.string.cogo_ha_sec_not_entered));
+                        isThereAnError = true;
+                    }
+                }
+
+                break;
+
+            case 5:  //Delta
+                String sDistanceDelta, verticalDelta;
+
+                sDistanceDelta = etDistanceVDDelta.getText().toString();
+                verticalDelta = etVDDelta.getText().toString();
+
+                if(!StringUtilityHelper.isStringNull(sDistanceDelta)){
+                    //Save horizontal angle as a decimal degree
+                    mValueDistance = Double.parseDouble(sDistanceDelta);
+                }else{
+                    etDistanceVDDelta.setError(getResources().getString(R.string.cogo_distance_not_entered));
+                    isThereAnError = true;
+                }
+
+                if(!StringUtilityHelper.isStringNull(verticalDelta)){
+                    //Save horizontal angle as a decimal degree
+                    mValueVDelta = Double.parseDouble(verticalDelta);
+                }else{
+                    etVDDelta.setError(getResources().getString(R.string.cogo_ha_dec_not_entered));
+                    isThereAnError = true;
+                }
+
+                break;
+
+
+
+        }
+
+        //Description
+        String pointDescription = null;
+        pointDescription = etPointDescription.getText().toString();
+
+        if(!StringUtilityHelper.isStringNull(pointDescription)){
+            mValuePointDesc = pointDescription;
+        }else{
+            etPointDescription.setError(getResources().getString(R.string.cogo_description_not_entered));
+            isThereAnError = true;
+        }
+
+        return  isThereAnError;
+
+    }
+
+
+    private boolean validateFormForSetup(){
+        Log.d(TAG, "validateFormForValues: Started...");
+        boolean isTheFormReady = true;
+
+        int occupyPointNo = jobCogoFragmentListener.sendOccupyPointNoToFragment();
+        int backsightPointNo = jobCogoFragmentListener.sendBacksightPointNoToFragment();
+
+        if(occupyPointNo == 0){
+            showToast("Occupy and Backsight Not Set",true);
+            isTheFormReady = false;
+        }
+
+        return isTheFormReady;
+
+    }
+
+    private void saveObservation(){
+        Log.d(TAG, "saveObservation: Started...");
+
+        //Get Occupy Point No. and Backsight
+        occupyPointSurvey = jobCogoFragmentListener.sendOccupyPointSurveyToFragment();
+        backsightPointSurvey = jobCogoFragmentListener.sendBacksightPointSurveyToFragment();
+
+        //determine Azimuth
+        double inverseAzimuth = MathHelper.inverseAzimuthFromPointSurvey(occupyPointSurvey,backsightPointSurvey);
+        double inverseBearing = MathHelper.inverseBearingFromPointSurvey(occupyPointSurvey,backsightPointSurvey);
+
+        Log.d(TAG, "saveObservation: Azimuth: " + inverseAzimuth);
+
+        //determine hDistance
+
+        switch (viewDistanceToDisplay){
+            case 1:
+                //nothing to do
+                Log.d(TAG, "saveObservation: H. Distance: " + mValueDistance);
+                break;
+
+            case 3:  //Zenith
+                 mValueDistance = MathHelper.convertSlopeDistanceToHorizontalDistanceByZenith(mValueDistance,mValueVAngleDec);
+                Log.d(TAG, "saveObservation: H. Distance: " + mValueDistance);
+                break;
+
+            case 4: //Vertical
+
+                break;
+
+            case 5:  //Delta Difference
+
+
+
+
+        }
+
+
+
+
+    }
+
+
 
     //-------------------------------------------------------------------------------------------------------------------------//
 
@@ -701,7 +1497,20 @@ public class JobCogoSideshotFragment extends Fragment implements JobCogoSideshot
     public void whatIsNextPointNumber(int pointNumber) {
         Log.d(TAG, "whatIsNextPointNumber: Next Point Number Is: " + pointNumber);
 
-        etPointNumber.setText(String.valueOf(pointNumber));
+        etPointNumber.setText(String.valueOf(pointNumber+1));
+
+
+    }
+
+    @Override
+    public void isPointValidForDatabase(boolean isPointFound) {
+
+        if(isPointFound){
+            etPointNumber.setError(getResources().getString(R.string.cogo_point_no_exists));
+            btSave.setClickable(false);
+        }else
+            etPointNumber.setError(null);
+            btSave.setClickable(true);
 
     }
 }

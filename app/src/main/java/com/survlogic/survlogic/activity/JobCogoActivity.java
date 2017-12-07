@@ -70,6 +70,7 @@ public class JobCogoActivity extends AppCompatActivity implements NavigationView
 
     private PointSurvey occupyPointSurvey, backsightPointSurvey;
     double occupyPointHeight, backsightPointHeight;
+    int occupyPointNo, backsightPointNo;
 
     private ArrayList<PointSurvey> lstPointSurvey = new ArrayList<>();
     private ArrayList<PointGeodetic> lstPointGeodetic = new ArrayList<>();
@@ -122,8 +123,9 @@ public class JobCogoActivity extends AppCompatActivity implements NavigationView
         if (this.REQUEST_GET_SETUP == requestCode && resultCode == RESULT_OK){
             Log.d(TAG, "onActivityResult-Setup: Started...");
 
-            int occupyPointNo = data.getIntExtra(getString(R.string.KEY_SETUP_OCCUPY_PT), 0);
-            int backsightPointNo = data.getIntExtra(getString(R.string.KEY_SETUP_BACKSIGHT_PT), 0);
+            occupyPointNo = data.getIntExtra(getString(R.string.KEY_SETUP_OCCUPY_PT), 0);
+            backsightPointNo = data.getIntExtra(getString(R.string.KEY_SETUP_BACKSIGHT_PT), 0);
+
             occupyPointHeight = data.getDoubleExtra(getString(R.string.KEY_SETUP_OCCUPY_HT), 0);
             backsightPointHeight = data.getDoubleExtra(getString(R.string.KEY_SETUP_BACKSIGHT_HT), 0);
 
@@ -629,23 +631,33 @@ public class JobCogoActivity extends AppCompatActivity implements NavigationView
     }
 
     @Override
+    public PointSurvey sendOccupyPointSurveyToFragment() {
+        return occupyPointSurvey;
+    }
+
+    @Override
+    public PointSurvey sendBacksightPointSurveyToFragment() {
+        return backsightPointSurvey;
+    }
+
+    @Override
     public PointSurvey sendOccupyPointSurveyToFragment(PointSurvey pointSurvey) {
-        return null;
+        return pointSurvey;
     }
 
     @Override
     public PointSurvey sendBacksightPointSurveyToFragment(PointSurvey pointSurvey) {
-        return null;
+        return pointSurvey;
     }
 
     @Override
     public int sendOccupyPointNoToFragment() {
-        return 0;
+        return occupyPointNo;
     }
 
     @Override
     public int sendBacksightPointNoToFragment() {
-        return 0;
+        return backsightPointNo;
     }
 
     @Override
