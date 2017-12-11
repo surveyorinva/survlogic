@@ -43,4 +43,8 @@ public interface JobCogoFragmentListener {
 
     void sendSetupToMainActivity();
 
+    void sendTraverseSetupToMainActivity(int occupyPointNo, int backsightPointNo, double occupyHI, double backsightHI);
+
+    void invalidatePointSurveyList();
+
 }

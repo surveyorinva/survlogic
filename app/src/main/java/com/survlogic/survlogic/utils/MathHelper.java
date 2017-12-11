@@ -4,6 +4,7 @@ import android.content.Context;
 import android.location.Location;
 import android.util.Log;
 
+import com.survlogic.survlogic.model.Point;
 import com.survlogic.survlogic.model.PointSurvey;
 
 import java.math.BigDecimal;
@@ -237,7 +238,10 @@ public class MathHelper {
     }
 
     public static String convertDECtoDMSBearing(double angle, int decimalPlace){
-        Log.d(TAG, "convertDECtoDMSGeodetic: Started...");
+        Log.d(TAG, "convertDECtoDMSBearing: Started...");
+        Log.d(TAG, "convertDECtoDMSBearing: Angle: " + angle);
+        Log.d(TAG, "convertDECtoDMSBearing: Decimal Place: " + decimalPlace);
+
         String frontDirection, rearDirection;
         String myAngleDMS;
 
@@ -274,10 +278,12 @@ public class MathHelper {
                 rearDirection = "E";
         }
 
-
+        Log.d(TAG, "convertDECtoDMSBearing: Angle: " + angle);
         if (angle ==0){
-            myAngleDMS = "0";
+            Log.d(TAG, "convertDECtoDMSBearing: Angle is 0");
+            myAngleDMS = "0.0";
         }else {
+            Log.d(TAG, "convertDECtoDMSBearing: Angle is Not 0");
             double deg = Math.floor(angle);                  // Round down
             double minutes = Math.floor((angle * 60) % 60);  // This is an integer in the range [0, 60)
             double seconds = (angle * 3600) % 60;            // This is a decimal in the range [0, 60)
@@ -286,8 +292,11 @@ public class MathHelper {
 
         }
 
+        Log.d(TAG, "convertDECtoDMSBearing: myAngleDMS: " + myAngleDMS);
         int pointIndex = myAngleDMS.indexOf(".");
         int endIndex;
+
+        Log.d(TAG, "convertDECtoDMSBearing: pointIndex: " + pointIndex);
 
         if (decimalPlace==0){
             endIndex = pointIndex;
@@ -486,6 +495,79 @@ public class MathHelper {
 
 
         return results;
+    }
+
+    public static Point solveForCoordinatesFromTurnedAngleAndDistance(PointSurvey occupyPointSurvey, PointSurvey backsightPointSurvey, double hzAngle, double sDistance, double znAngle){
+        Log.d(TAG, "solveForCoordinatesFromTurnedAngleAndDistance: Started");
+        Point results = new Point();
+        double observedAzimuth, hzDistance, dNorth, dEast;
+        double northing, easting;
+
+        //determine Azimuth
+        double baseAzimuth = MathHelper.inverseAzimuthFromPointSurvey(occupyPointSurvey,backsightPointSurvey);
+
+        observedAzimuth = baseAzimuth + hzAngle;
+        observedAzimuth = (Math.PI/180) * observedAzimuth;
+
+        Log.d(TAG, "solveForCoordinatesFromTurnedAngleAndDistance: Observed Azimith: " + observedAzimuth);
+
+        hzDistance = convertSlopeDistanceToHorizontalDistanceByZenith(sDistance,znAngle);
+
+        dNorth = hzDistance * Math.cos(observedAzimuth);
+        dEast = hzDistance * Math.sin(observedAzimuth);
+
+        Log.d(TAG, "MathHelper: dN: " + dNorth + " dEast: " + dEast);
+
+        northing = occupyPointSurvey.getNorthing() + dNorth;
+        easting = occupyPointSurvey.getEasting() + dEast;
+
+        Log.d(TAG, "Northing: " + northing + ", Easting: " + easting);
+
+        results.setNorthing(northing);
+        results.setEasting(easting);
+        results.setElevation(0d);
+
+        return results;
+
+    }
+
+    public static Point solveForCoordinatesFromTurnedAngleAndDistance(PointSurvey occupyPointSurvey, PointSurvey backsightPointSurvey, double hzAngle, double sDistance, double znAngle, double heightInstrument, double targetHeight){
+        Log.d(TAG, "solveForCoordinatesFromTurnedAngleAndDistance: Started");
+        Point results = new Point();
+        double observedAzimuth, hzDistance, dNorth, dEast, dElev;
+        double northing, easting, elevation;
+
+        //determine Azimuth
+        double baseAzimuth = MathHelper.inverseAzimuthFromPointSurvey(occupyPointSurvey,backsightPointSurvey);
+
+        observedAzimuth = baseAzimuth + hzAngle;
+        observedAzimuth = (Math.PI/180) * observedAzimuth;
+
+        Log.i(TAG, "solveForCoordinatesFromTurnedAngleAndDistance: Observed Azimith: " + observedAzimuth);
+
+        hzDistance = convertSlopeDistanceToHorizontalDistanceByZenith(sDistance,znAngle);
+
+        dNorth = hzDistance * Math.cos(observedAzimuth);
+        dEast = hzDistance * Math.sin(observedAzimuth);
+
+        Log.i(TAG, "MathHelper: dN: " + dNorth + " dEast: " + dEast);
+
+        northing = occupyPointSurvey.getNorthing() + dNorth;
+        easting = occupyPointSurvey.getEasting() + dEast;
+
+        Log.i(TAG, "Northing: " + northing + ", Easting: " + easting);
+
+        dElev = convertSlopeDistanceToDeltaElevationByZenith(sDistance,znAngle);
+
+        elevation = occupyPointSurvey.getElevation() + heightInstrument + dElev - targetHeight;
+
+        Log.i(TAG, "Elevation: " + elevation);
+        results.setNorthing(northing);
+        results.setEasting(easting);
+        results.setElevation(elevation);
+
+        return results;
+
     }
 
 

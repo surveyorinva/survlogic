@@ -410,10 +410,12 @@
     <string name="cogo_ha_dec_not_entered">Decimal Degrees Required</string>
     <string name="cogo_angle_circle_error_out_of_range">Enter between 0-359</string>
     <string name="cogo_angle_error_out_of_range">Enter between 0-59</string>
-
     <string name="cogo_distance_not_entered">Distance Required</string>
-
     <string name="cogo_description_not_entered">Point Description Required</string>
+    <string name="cogo_setup_no_occupy_backsight">"Occupy and Backsight Not Set"</string>
+
+    <string name="cogo_traverse_time_to_move_title">Traverse</string>
+    <string name="cogo_traverse_time_to_move_message">Are you Ready to Move to Next Station</string>
 
     <!-- ******************************Strings related to Settings****************************** -->
 

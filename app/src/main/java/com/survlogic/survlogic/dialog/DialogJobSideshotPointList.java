@@ -179,7 +179,7 @@ public class DialogJobSideshotPointList extends DialogFragment {
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setHasFixedSize(false);
 
-        adapter = new JobSideshotPointListAdaptor(mContext,pointList, DialogJobSideshotPointList.this);
+        adapter = new JobSideshotPointListAdaptor(mContext,pointList, DialogJobSideshotPointList.this, COORDINATE_FORMATTER);
         mRecyclerView.setAdapter(adapter);
 
         Log.e(TAG,"Complete: initProjectListRecyclerView");

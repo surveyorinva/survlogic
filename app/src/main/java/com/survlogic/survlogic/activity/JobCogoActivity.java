@@ -435,12 +435,14 @@ public class JobCogoActivity extends AppCompatActivity implements NavigationView
     private void loadPointSurveyInBackground(){
         Log.d(TAG, "loadPointSurveyInBackground: Started...");
 
+
         BackgroundSurveyPointGet backgroundSurveyPointGet = new BackgroundSurveyPointGet(mContext, jobDatabaseName, this);
         backgroundSurveyPointGet.execute();
     }
 
     private void loadSetup(int occupyPoint, int backsightPoint, double occupyHeight, double backsightHeight){
         Log.d(TAG, "loadSetup: Started");
+        boolean isPointListValid = true;
 
         for(int i=0; i<lstPointSurvey.size(); i++) {
             PointSurvey pointSurvey = lstPointSurvey.get(i);
@@ -456,42 +458,57 @@ public class JobCogoActivity extends AppCompatActivity implements NavigationView
         if(pointMap.containsKey(String.valueOf(occupyPoint))) {
             occupyPointSurvey = pointMap.get(String.valueOf(occupyPoint));
             Log.i(TAG, "Occupy Point Loaded... ");
-        }
+        }else{
+            Log.d(TAG, "loadSetup: Occupy Point Does not exists");
+            isPointListValid = false;
 
+
+        }
 
         //find backsight PointSurvey
         if(pointMap.containsKey(String.valueOf(backsightPoint))) {
             backsightPointSurvey = pointMap.get(String.valueOf(backsightPoint));
 
             Log.i(TAG, "Backsight Point Loaded... ");
+        }else{
+            Log.d(TAG, "loadSetup: Backsight Point Does not exists");
+            isPointListValid = false;
+
         }
 
         //Determine azimuth
+        if(isPointListValid){
+            Log.d(TAG, "loadSetup: Point Valid");
+            double inverseAzimuth = MathHelper.inverseAzimuthFromPointSurvey(occupyPointSurvey,backsightPointSurvey);
+            double inverseBearing = MathHelper.inverseBearingFromPointSurvey(occupyPointSurvey,backsightPointSurvey);
 
-        double inverseAzimuth = MathHelper.inverseAzimuthFromPointSurvey(occupyPointSurvey,backsightPointSurvey);
-        double inverseBearing = MathHelper.inverseBearingFromPointSurvey(occupyPointSurvey,backsightPointSurvey);
+            Log.d(TAG, "loadSetup: Azimuth: " + inverseAzimuth);
+            Log.d(TAG, "loadSetup: Bearing: " + inverseBearing);
 
-        Log.d(TAG, "loadSetup: Azimuth: " + inverseAzimuth);
-        Log.d(TAG, "loadSetup: Bearing: " + inverseBearing);
+            tvPointOccupy.setText(String.valueOf(occupyPointSurvey.getPoint_no()));
+            tvPointBacksight.setText(String.valueOf(backsightPointSurvey.getPoint_no()));
 
-        tvPointOccupy.setText(String.valueOf(occupyPointSurvey.getPoint_no()));
-        tvPointBacksight.setText(String.valueOf(backsightPointSurvey.getPoint_no()));
+            //Direction
+            //Azimuth
 
-        //Direction
-        //Azimuth
+            //Bearing
+            tvPointDirection.setText(MathHelper.convertDECtoDMSBearing(inverseBearing,0));
 
-        //Bearing
-        tvPointDirection.setText(MathHelper.convertDECtoDMSBearing(inverseBearing,0));
+            tvOccupyHeight.setText(String.valueOf(occupyHeight));
+            tvBacksightHeight.setText(String.valueOf(backsightHeight));
 
-        tvOccupyHeight.setText(String.valueOf(occupyHeight));
-        tvBacksightHeight.setText(String.valueOf(backsightHeight));
+            //Load setup into Preferences for future use
+            preferenceLoaderHelper.setCogoOccupyPoint(occupyPointSurvey.getPoint_no());
+            preferenceLoaderHelper.setCogoBacksightPoint(backsightPointSurvey.getPoint_no());
 
-        //Load setup into Preferences for future use
-        preferenceLoaderHelper.setCogoOccupyPoint(occupyPointSurvey.getPoint_no());
-        preferenceLoaderHelper.setCogoBacksightPoint(backsightPointSurvey.getPoint_no());
+            preferenceLoaderHelper.setCogoOccupyHeight(occupyHeight);
+            preferenceLoaderHelper.setCogoBacksightHeight(backsightHeight);
+        }else{
+            //point list is not valid.  call
+            Log.d(TAG, "loadSetup: Point Not Valid");
+            updatePointList();
+        }
 
-        preferenceLoaderHelper.setCogoOccupyHeight(occupyHeight);
-        preferenceLoaderHelper.setCogoBacksightHeight(backsightHeight);
     }
 
 
@@ -546,6 +563,14 @@ public class JobCogoActivity extends AppCompatActivity implements NavigationView
         startActivityForResult(i,REQUEST_GET_SETUP);
         Log.d(TAG, "onClick: Request_GET_SETUP: " + REQUEST_GET_SETUP);
         //overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+    }
+
+    //------------------------------------------------------------------------------------------------------------------------//
+    private void updatePointList(){
+        Log.d(TAG, "updatePointList: Started...");
+        loadPointSurveyInBackground();
+
+
     }
 
     //------------------------------------------------------------------------------------------------------------------------//
@@ -692,6 +717,30 @@ public class JobCogoActivity extends AppCompatActivity implements NavigationView
 
     @Override
     public void sendSetupToMainActivity() {
+
+    }
+
+    @Override
+    public void sendTraverseSetupToMainActivity(int occupyPointNo, int backsightPointNo, double occupyHI, double backsightHI) {
+        Log.d(TAG, "sendTraverseSetupToMainActivity: Started...");
+
+        this.occupyPointNo = occupyPointNo;
+        this.backsightPointNo = backsightPointNo;
+        this.occupyPointHeight = occupyHI;
+        this.backsightPointHeight = backsightHI;
+
+        Log.d(TAG, "sendTraverseSetupToMainActivity: Occupy at: " + occupyPointNo);
+        Log.d(TAG, "sendTraverseSetupToMainActivity: Backsight at: " + backsightPointNo);
+        Log.d(TAG, "sendTraverseSetupToMainActivity: Occupy Height: " + occupyPointHeight);
+        Log.d(TAG, "sendTraverseSetupToMainActivity: Backsight Height " + backsightPointHeight);
+
+        loadSetup(occupyPointNo,backsightPointNo, occupyHI, backsightHI);
+    }
+
+    @Override
+    public void invalidatePointSurveyList() {
+        Log.d(TAG, "invalidatePointSurveyList: Started...");
+        updatePointList();
 
     }
 }

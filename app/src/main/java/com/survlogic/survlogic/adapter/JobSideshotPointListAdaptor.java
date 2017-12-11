@@ -11,6 +11,7 @@ import com.survlogic.survlogic.model.PointSurvey;
 import com.survlogic.survlogic.utils.AnimateHelper;
 import com.survlogic.survlogic.view.Card_View_Holder_Job_PointSurvey_Small;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 /**
@@ -29,15 +30,16 @@ public class JobSideshotPointListAdaptor extends RecyclerView.Adapter<RecyclerVi
 
     private Context mContext;
     private boolean isOccupyPoint;
-
+    private static DecimalFormat COORDINATE_FORMATTER, DISTANCE_PRECISION_FORMATTER;
 
 //    CONSTRUCTOR!!!!!
-    public JobSideshotPointListAdaptor(Context context, ArrayList<PointSurvey> pointSurveys, DialogJobSideshotPointList dialogJobSideshotPointList){
+    public JobSideshotPointListAdaptor(Context context, ArrayList<PointSurvey> pointSurveys, DialogJobSideshotPointList dialogJobSideshotPointList, DecimalFormat COORDINATE_FORMATTER){
         this.pointSurveys = pointSurveys;
 
         mContext = context;
         this.isOccupyPoint = isOccupyPoint;
         this.dialogJobSideshotPointList = dialogJobSideshotPointList;
+        this.COORDINATE_FORMATTER = COORDINATE_FORMATTER;
     }
 
     @Override
@@ -87,9 +89,9 @@ public class JobSideshotPointListAdaptor extends RecyclerView.Adapter<RecyclerVi
 
         final String pointNo = String.valueOf(pointSurvey.getPoint_no());
         final String pointDesc = pointSurvey.getDescription();
-        final String pointNorth = String.valueOf(pointSurvey.getNorthing());
-        final String pointEast = String.valueOf(pointSurvey.getEasting());
-        final String pointElev = String.valueOf(pointSurvey.getElevation());
+        final String pointNorth = COORDINATE_FORMATTER.format(pointSurvey.getNorthing());
+        final String pointEast = COORDINATE_FORMATTER.format(pointSurvey.getEasting());
+        final String pointElev = COORDINATE_FORMATTER.format(pointSurvey.getElevation());
 
         vh1.tvPointNo.setText(pointNo);
         vh1.tvPointDesc.setText(pointDesc);

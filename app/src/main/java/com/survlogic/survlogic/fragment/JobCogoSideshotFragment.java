@@ -1,10 +1,13 @@
 package com.survlogic.survlogic.fragment;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.util.TypedValue;
@@ -24,11 +27,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.survlogic.survlogic.R;
+import com.survlogic.survlogic.background.BackgroundPointSurveyNew;
+import com.survlogic.survlogic.background.BackgroundPointSurveyNewFromObservation;
 import com.survlogic.survlogic.background.BackgroundSurveyPointCheckPointNumber;
 import com.survlogic.survlogic.background.BackgroundSurveyPointFindNextNumber;
 import com.survlogic.survlogic.dialog.DialogJobSideshotPointList;
 import com.survlogic.survlogic.interf.JobCogoFragmentListener;
 import com.survlogic.survlogic.interf.JobCogoSideshotPointListener;
+import com.survlogic.survlogic.model.Point;
 import com.survlogic.survlogic.model.PointSurvey;
 import com.survlogic.survlogic.utils.MathHelper;
 import com.survlogic.survlogic.utils.PreferenceLoaderHelper;
@@ -154,8 +160,7 @@ public class JobCogoSideshotFragment extends Fragment implements JobCogoSideshot
 
         switchTypeOfSurvey = (Switch) v.findViewById(R.id.type_of_measurement_switch);
 
-        jobCogoFragmentListener = (JobCogoFragmentListener) mContext;
-        jobCogoFragmentListener = (JobCogoFragmentListener) mContext;
+        jobCogoFragmentListener = (JobCogoFragmentListener) getActivity();
 
         initViewHADMS();
         initViewHADEC();
@@ -476,16 +481,19 @@ public class JobCogoSideshotFragment extends Fragment implements JobCogoSideshot
      */
 
     private void swapHAngleItems(int viewToShow){
+        Log.d(TAG, "swapHAngleItems: Started...");
         switch (viewToShow){
 
             case 1:
                 //Going from DEC to DMS
 
                 if(etHADec !=null){
+                    Log.d(TAG, "swapHAngleItems: etHADec not Null");
                     String results =  etHADec.getText().toString();
 
                     if(!StringUtilityHelper.isStringNull(results)){
                         mValueHAngleDec = Double.parseDouble(results);
+                        Log.d(TAG, "swapHAngleItems: mValueHAngleDec: " + mValueHAngleDec);
                     }
 
                 }
@@ -496,6 +504,7 @@ public class JobCogoSideshotFragment extends Fragment implements JobCogoSideshot
                 horizontalAngleType = 0;
 
                 etTargetHeight.setNextFocusDownId(R.id.hAngle_degree);
+                setHAngleFromWidget(1);
 
                 break;
 
@@ -503,12 +512,14 @@ public class JobCogoSideshotFragment extends Fragment implements JobCogoSideshot
                 //showToast("Switching View to Decimal Degrees",true);
 
                 if(etHADeg !=null){
+                    Log.d(TAG, "swapHAngleItems: etHADeg: Is Not Null");
                     String resultsDeg = etHADeg.getText().toString();
                     String resultsMin = etHAMin.getText().toString();
                     String resultsSec = etHASec.getText().toString();
 
                     if(!StringUtilityHelper.isStringNull(resultsDeg) && !StringUtilityHelper.isStringNull(resultsMin) && !StringUtilityHelper.isStringNull(resultsSec)){
                         mValueHAngleDec = MathHelper.convertPartsToDEC(resultsDeg,resultsMin,resultsSec);
+                        Log.d(TAG, "swapHAngleItems: mValueHAngleDec: " + mValueHAngleDec);
 
                     }
 
@@ -520,7 +531,7 @@ public class JobCogoSideshotFragment extends Fragment implements JobCogoSideshot
                 horizontalAngleType = 1;
 
                 etTargetHeight.setNextFocusDownId(R.id.hAngle_dec);
-
+                setHAngleFromWidget(2);
         }
 
 
@@ -746,21 +757,7 @@ public class JobCogoSideshotFragment extends Fragment implements JobCogoSideshot
         });
 
 
-        if(mValueHAngleDec !=0){
-            etHADeg.setText(String.valueOf(MathHelper.convertDECToDegree(mValueHAngleDec)));
-            etHAMin.setText(String.valueOf(MathHelper.convertDECToMinute(mValueHAngleDec)));
 
-            double resultsSeconds = MathHelper.convertDECToSeconds(mValueHAngleDec);
-
-            int decimalPlaces = 0;
-
-            if(decimalPlaces ==0){
-                String mResultSeconds = String.valueOf((int) resultsSeconds);
-                etHASec.setText(mResultSeconds);
-            }else {
-                etHASec.setText(String.valueOf(MathHelper.convertDECToSeconds(mValueHAngleDec, decimalPlaces)));
-            }
-        }
 
 
     }
@@ -770,10 +767,6 @@ public class JobCogoSideshotFragment extends Fragment implements JobCogoSideshot
 
         etHADec = (EditText) v.findViewById(R.id.hAngle_dec);
         etHADec.setSelectAllOnFocus(true);
-
-        if(mValueHAngleDec !=0){
-            etHADec.setText(String.valueOf(mValueHAngleDec));
-        }
 
 
     }
@@ -1025,6 +1018,8 @@ public class JobCogoSideshotFragment extends Fragment implements JobCogoSideshot
         backgroundSurveyPointCheckPointNumber.execute();
     }
 
+
+
     private void getNextPointNumber(){
         String pointNumber;
 
@@ -1078,6 +1073,49 @@ public class JobCogoSideshotFragment extends Fragment implements JobCogoSideshot
         }
 
     }
+
+    private void getHAngleFromWidget(){
+        Log.d(TAG, "getHAngleFromWidget: Started...");
+
+
+
+
+
+
+    }
+
+    private void setHAngleFromWidget(int itemToShow){
+        Log.d(TAG, "setHAngleFromWidget: Started");
+
+        switch(itemToShow){
+            case 1:
+                if(mValueHAngleDec !=0){
+                    etHADeg.setText(String.valueOf(MathHelper.convertDECToDegree(mValueHAngleDec)));
+                    etHAMin.setText(String.valueOf(MathHelper.convertDECToMinute(mValueHAngleDec)));
+
+                    double resultsSeconds = MathHelper.convertDECToSeconds(mValueHAngleDec);
+
+                    int decimalPlaces = 0;
+
+                    if(decimalPlaces ==0){
+                        String mResultSeconds = String.valueOf((int) resultsSeconds);
+                        etHASec.setText(mResultSeconds);
+                    }else {
+                        etHASec.setText(String.valueOf(MathHelper.convertDECToSeconds(mValueHAngleDec, decimalPlaces)));
+                    }
+                }
+                break;
+            case 2:
+                if(mValueHAngleDec !=0){
+                    etHADec.setText(String.valueOf(mValueHAngleDec));
+                }
+
+                break;
+
+        }
+
+    }
+
 
     private void getDistanceFromWidget(){
         Log.d(TAG, "grabDistance: Started");
@@ -1400,7 +1438,7 @@ public class JobCogoSideshotFragment extends Fragment implements JobCogoSideshot
         int backsightPointNo = jobCogoFragmentListener.sendBacksightPointNoToFragment();
 
         if(occupyPointNo == 0){
-            showToast("Occupy and Backsight Not Set",true);
+            showToast(getResources().getString(R.string.cogo_setup_no_occupy_backsight),true);
             isTheFormReady = false;
         }
 
@@ -1410,47 +1448,133 @@ public class JobCogoSideshotFragment extends Fragment implements JobCogoSideshot
 
     private void saveObservation(){
         Log.d(TAG, "saveObservation: Started...");
+        Point mObservedCoordinates = new Point();
 
         //Get Occupy Point No. and Backsight
         occupyPointSurvey = jobCogoFragmentListener.sendOccupyPointSurveyToFragment();
         backsightPointSurvey = jobCogoFragmentListener.sendBacksightPointSurveyToFragment();
-
-        //determine Azimuth
-        double inverseAzimuth = MathHelper.inverseAzimuthFromPointSurvey(occupyPointSurvey,backsightPointSurvey);
-        double inverseBearing = MathHelper.inverseBearingFromPointSurvey(occupyPointSurvey,backsightPointSurvey);
-
-        Log.d(TAG, "saveObservation: Azimuth: " + inverseAzimuth);
 
         //determine hDistance
 
         switch (viewDistanceToDisplay){
             case 1:
                 //nothing to do
-                Log.d(TAG, "saveObservation: H. Distance: " + mValueDistance);
+                Log.d(TAG, "saveObservation: Case 1");
+                mValueVAngleDec = 90d;
                 break;
 
             case 3:  //Zenith
-                 mValueDistance = MathHelper.convertSlopeDistanceToHorizontalDistanceByZenith(mValueDistance,mValueVAngleDec);
-                Log.d(TAG, "saveObservation: H. Distance: " + mValueDistance);
+                Log.d(TAG, "saveObservation: Case 3");
                 break;
 
             case 4: //Vertical
-
+                Log.d(TAG, "saveObservation: Case 4");
+                mValueVAngleDec = 90d - mValueVAngleDec;
                 break;
 
             case 5:  //Delta Difference
+                Log.d(TAG, "saveObservation: Case 5");
+                mValueVAngleDec = 90d;
+
+        }
+
+        double targetHeight = Double.parseDouble(etTargetHeight.getText().toString());
+        double instrumentHeight = jobCogoFragmentListener.sendOccupyHeightToFragment();
+
+        if(is2dSurvey && targetHeight == 0){
+            mObservedCoordinates = MathHelper.solveForCoordinatesFromTurnedAngleAndDistance(occupyPointSurvey,backsightPointSurvey,mValueHAngleDec,mValueDistance,mValueVAngleDec);
+        }else{
+            mObservedCoordinates = MathHelper.solveForCoordinatesFromTurnedAngleAndDistance(occupyPointSurvey,backsightPointSurvey,mValueHAngleDec,mValueDistance,mValueVAngleDec,instrumentHeight, targetHeight);
+        }
 
 
+        Log.d(TAG, "submitForm: Validation Approved, Saving...");
+        // Setup Background Task
+        BackgroundPointSurveyNewFromObservation backgroundPointSurveyNew = new BackgroundPointSurveyNewFromObservation(mContext, jobDatabaseName, jobCogoFragmentListener);
+        PointSurvey pointSurvey = populateValues(mObservedCoordinates);
 
+        // Execute background task
+        backgroundPointSurveyNew.execute(pointSurvey);
+
+        //Clear form
+        clearForm();
+
+        //Add one to Point number and check if exists
+        Log.d(TAG, "saveObservation: Next Point Number: " + nextPointNumber);
+        etPointNumber.setText(String.valueOf(nextPointNumber));
+
+        //Clear variables
+        clearVariables();
+
+        if(!isTypeOfSurveySideshot){
+            //Is traverse, ask if move up to next station
+            checkDialogToMoveStation(pointSurvey, occupyPointSurvey);
 
         }
 
 
+    }
 
+    private PointSurvey populateValues(Point point){
+        Log.d(TAG, "populateValues: Started...");
+
+        PointSurvey pointSurvey = new PointSurvey();
+
+        int pointNumber = mValuePointNo;
+        pointSurvey.setPoint_no(pointNumber);
+
+        double pointNorthing = point.getNorthing();
+        pointSurvey.setNorthing(pointNorthing);
+
+        double pointEasting = point.getEasting();
+        pointSurvey.setEasting(pointEasting);
+
+        double pointElevation = point.getElevation();
+        pointSurvey.setElevation(pointElevation);
+
+        String pointDescription = mValuePointDesc;
+        pointSurvey.setDescription(pointDescription);
+
+        pointSurvey.setPointType(3);
+
+        return pointSurvey;
+    }
+
+    private void checkDialogToMoveStation(final PointSurvey pointToMoveTo, final PointSurvey pointToBacksight){
+        Log.d(TAG, "checkDialogToMoveStation: Started");
+        final boolean[] moveStationUp = new boolean[]{false};
+
+
+        AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
+        dialog.setTitle(getString(R.string.cogo_traverse_time_to_move_title));
+        dialog.setMessage(getString(R.string.cogo_traverse_time_to_move_message));
+
+        dialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Log.d(TAG, "checkDialogToMoveStation: Return True");
+                moveStationUp[0] = true;
+                setOccupyAndBacksightInActivity(pointToMoveTo, pointToBacksight);
+
+            }
+        });
+        dialog.setNegativeButton("No", null);
+        dialog.create();
+        dialog.show();
+
+        Log.d(TAG, "checkDialogToMoveStation: Returning to finish");
 
     }
 
+    private void setOccupyAndBacksightInActivity(PointSurvey occupyPoint, PointSurvey backsightPoint){
+        Log.d(TAG, "setOccupyAndBacksightInActivity: Started");
+        Double occupyPointHeight=0d, backsightPointHeight=0d;
 
+        jobCogoFragmentListener.sendTraverseSetupToMainActivity(occupyPoint.getPoint_no(), backsightPoint.getPoint_no(),occupyPointHeight,backsightPointHeight);
+
+
+
+    }
 
     //-------------------------------------------------------------------------------------------------------------------------//
 
@@ -1458,6 +1582,41 @@ public class JobCogoSideshotFragment extends Fragment implements JobCogoSideshot
      * Method Helpers
      */
 
+    private void clearForm(){
+        etPointNumber.setText("");
+        etPointDescription.setText("");
+        etTargetHeight.setText("0.00");
+
+        etHADeg.setText("");
+        etHAMin.setText("");
+        etHASec.setText("");
+        etHADec.setText("");
+
+        etDistanceHD.setText("");
+        etDistanceVDZenith.setText("");
+        etDistanceVDVertical.setText("");
+        etDistanceVDDelta.setText("");
+
+        etVDDeg.setText("");
+        etVDMin.setText("");
+        etVDSec.setText("");
+        etVDDelta.setText("");
+
+    }
+
+    private void clearVariables(){
+        mValuePointNo = 0;
+        mValueTargetHeight = 0;
+
+        mValueHAngleDec = 0;
+        mValueDistance = 0;
+        mValueVAngleDec = 0;
+        mValueVDelta = 0;
+
+        mValuePointDesc = null;
+
+
+    }
 
     private void showToast(String data, boolean shortTime) {
 
@@ -1511,6 +1670,8 @@ public class JobCogoSideshotFragment extends Fragment implements JobCogoSideshot
         }else
             etPointNumber.setError(null);
             btSave.setClickable(true);
+            int pointNumber = Integer.parseInt(etPointNumber.getText().toString());
+            nextPointNumber = pointNumber + 1;
 
     }
 }

@@ -183,7 +183,7 @@ public class DialogJobSetupPointList extends DialogFragment {
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setHasFixedSize(false);
 
-        adapter = new JobSetupPointListAdaptor(mContext,pointList, DialogJobSetupPointList.this);
+        adapter = new JobSetupPointListAdaptor(mContext,pointList, DialogJobSetupPointList.this, COORDINATE_FORMATTER);
         mRecyclerView.setAdapter(adapter);
 
         Log.e(TAG,"Complete: initProjectListRecyclerView");

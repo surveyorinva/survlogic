@@ -309,4 +309,14 @@ public class JobCogoSetupActivity extends AppCompatActivity implements JobPoints
         }
 
     }
+
+    @Override
+    public void sendTraverseSetupToMainActivity(int occupyPointNo, int backsightPointNo, double occupyHI, double backsightHI) {
+
+    }
+
+    @Override
+    public void invalidatePointSurveyList() {
+
+    }
 }
