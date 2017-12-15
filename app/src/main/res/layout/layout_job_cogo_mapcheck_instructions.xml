@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:text="Let's get started"
+            style="@style/Labels.Card.Header"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:text="Please add legs of the map"
+            android:textSize="@dimen/text_size_header"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/add_new_leg"
+            android:text="Add Leg"
+            style="@style/Button.Raised.Primary.List"
+            android:layout_marginTop="25dp"
+            android:layout_width="100dp"
+            android:layout_height="40dp" />
+
+    </LinearLayout>
+
+
+
+
+
+
+</RelativeLayout>

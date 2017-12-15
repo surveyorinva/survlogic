@@ -11,6 +11,7 @@
     <string name="general_add">Add</string>
     <string name="general_post">Post</string>
     <string name="general_clear">Clear</string>
+    <string name="general_solve">Solve</string>
     <string name="general_delete">Delete</string>
     <string name="general_open">Open</string>
     <string name="general_close">Close</string>
@@ -387,6 +388,7 @@
 
 
     <!--Sideshot/Traverse -->
+    <string name="cogo_hint_quadrant">1-4</string>
     <string name="cogo_hint_degrees_three">DDD</string>
     <string name="cogo_hint_degrees_three_font_small"><font size="15">DDD</font></string>
     <string name="cogo_hint_degrees_two_font_small"><font size="15">DD</font></string>

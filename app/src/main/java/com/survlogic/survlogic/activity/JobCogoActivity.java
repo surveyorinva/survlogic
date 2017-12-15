@@ -59,6 +59,7 @@ public class JobCogoActivity extends AppCompatActivity implements NavigationView
 
     private int ACTIVITY_NUM = 0;
     private static final int REQUEST_GET_SETUP = 1;
+    private static final int REQUEST_GET_MAPCHECK = 2;
 
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
@@ -563,6 +564,16 @@ public class JobCogoActivity extends AppCompatActivity implements NavigationView
         startActivityForResult(i,REQUEST_GET_SETUP);
         Log.d(TAG, "onClick: Request_GET_SETUP: " + REQUEST_GET_SETUP);
         //overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+    }
+
+    private void openCogoMapCheckActivity(){
+        Intent i = new Intent(mContext, JobCogoSetupActivity.class);
+        i.putExtra(getString(R.string.KEY_PROJECT_ID),project_id);
+        i.putExtra(getString(R.string.KEY_JOB_ID), job_id);
+        i.putExtra(getString(R.string.KEY_JOB_DATABASE), jobDatabaseName);
+
+        startActivityForResult(i,REQUEST_GET_MAPCHECK);
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
     }
 
     //------------------------------------------------------------------------------------------------------------------------//

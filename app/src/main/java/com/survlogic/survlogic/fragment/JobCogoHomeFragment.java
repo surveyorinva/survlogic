@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import com.survlogic.survlogic.R;
+import com.survlogic.survlogic.activity.JobCogoMapCheckActivity;
 import com.survlogic.survlogic.activity.JobCogoSetupActivity;
 import com.survlogic.survlogic.interf.JobCogoHomeFragmentListener;
 import com.survlogic.survlogic.model.PointSurvey;
@@ -25,14 +26,15 @@ public class JobCogoHomeFragment extends Fragment {
     
     private static int project_id, job_id;
     private String jobDatabaseName;
-    
-    private LinearLayout llCogoSetup;
+
+    private LinearLayout llCogoSetup, llCogoMapcheck;
 
     private View v;
 
     private JobCogoHomeFragmentListener jobCogoHomeFragmentListener;
 
     private static final int REQUEST_GET_SETUP = 1;
+    private static final int REQUEST_GET_MAPCHECK = 2;
 
     @Nullable
     @Override
@@ -58,7 +60,7 @@ public class JobCogoHomeFragment extends Fragment {
 
 
         llCogoSetup = (LinearLayout) v.findViewById(R.id.llActionItemSetup);
-
+        llCogoMapcheck = (LinearLayout) v.findViewById(R.id.llActionItemMapcheck);
 
 
     }
@@ -73,6 +75,13 @@ public class JobCogoHomeFragment extends Fragment {
                 openCogoSetupActivity();
 
 
+            }
+        });
+
+        llCogoMapcheck.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openCogoMapCheckActivity();
             }
         });
     }
@@ -111,6 +120,16 @@ public class JobCogoHomeFragment extends Fragment {
 
         getActivity().startActivityForResult(i,REQUEST_GET_SETUP);
         Log.d(TAG, "onClick: Request_GET_SETUP: " + REQUEST_GET_SETUP);
+        getActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+    }
+
+    private void openCogoMapCheckActivity(){
+        Intent i = new Intent(getActivity(), JobCogoMapCheckActivity.class);
+        i.putExtra(getString(R.string.KEY_PROJECT_ID),project_id);
+        i.putExtra(getString(R.string.KEY_JOB_ID), job_id);
+        i.putExtra(getString(R.string.KEY_JOB_DATABASE), jobDatabaseName);
+
+        startActivityForResult(i,REQUEST_GET_MAPCHECK);
         getActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
     }
 

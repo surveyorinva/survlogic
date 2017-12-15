@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -85,8 +86,6 @@ public class JobCogoSetupKnownFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         v = inflater.inflate(R.layout.tab_content_cogo_setup_known, container, false);
-
-
         mContext = getActivity();
 
         initViewWidgets(v);
@@ -229,6 +228,7 @@ public class JobCogoSetupKnownFragment extends Fragment {
                 String stringPointNo = pointAdapter.getItem(position);
 
                 setPointSurveyFromPointNo(stringPointNo,true);
+                hideKeypadFromAutoCompleteET(tvOccupyPointNo);
 
             }
         });
@@ -270,6 +270,7 @@ public class JobCogoSetupKnownFragment extends Fragment {
                 String stringPointNo = pointAdapter.getItem(position);
 
                 setPointSurveyFromPointNo(stringPointNo,false);
+                hideKeypadFromAutoCompleteET(tvOccupyPointNo);
             }
         });
 
@@ -358,6 +359,17 @@ public class JobCogoSetupKnownFragment extends Fragment {
 
 
 
+
+    }
+
+    private void hideKeypadFromAutoCompleteET (AutoCompleteTextView aedtView) {
+        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        try{
+            imm.hideSoftInputFromWindow(aedtView.getWindowToken(), 0);
+
+        }catch (Exception e){
+
+        }
 
     }
 

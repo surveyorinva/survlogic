@@ -83,6 +83,7 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/llActionItemMapcheck"
             android:padding="16dp"
             android:background="@drawable/button_ripple_transparent_no_border"
             android:layout_width="wrap_content"

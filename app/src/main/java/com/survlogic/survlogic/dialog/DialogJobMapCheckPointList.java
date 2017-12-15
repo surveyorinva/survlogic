@@ -2,12 +2,12 @@ package com.survlogic.survlogic.dialog;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.DialogFragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -19,7 +19,9 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.survlogic.survlogic.R;
+import com.survlogic.survlogic.adapter.JobMapCheckPointListAdaptor;
 import com.survlogic.survlogic.adapter.JobSetupPointListAdaptor;
+import com.survlogic.survlogic.interf.JobCogoMapCheckPointListListener;
 import com.survlogic.survlogic.interf.JobCogoSetupPointListListener;
 import com.survlogic.survlogic.model.PointSurvey;
 import com.survlogic.survlogic.utils.PreferenceLoaderHelper;
@@ -32,7 +34,7 @@ import java.util.ArrayList;
  * Created by chrisfillmore on 8/21/2017.
  */
 
-public class DialogJobSetupPointList extends DialogFragment {
+public class DialogJobMapCheckPointList extends DialogFragment {
     private static final String TAG = "DialogJobPointView";
 
     private Context mContext;
@@ -45,7 +47,7 @@ public class DialogJobSetupPointList extends DialogFragment {
 
     private RecyclerView mRecyclerView;
     private RecyclerView.LayoutManager layoutManager;
-    private JobSetupPointListAdaptor adapter;
+    private JobMapCheckPointListAdaptor adapter;
 
     private ProgressBar progressBar;
 
@@ -59,9 +61,9 @@ public class DialogJobSetupPointList extends DialogFragment {
     private static final int DELAY_TO_REFRESH = 1000;
 
 
-    public static DialogJobSetupPointList newInstance(int projectId, int jobId, String databaseName, ArrayList<PointSurvey> items, boolean isOccupyPoint) {
+    public static DialogJobMapCheckPointList newInstance(int projectId, int jobId, String databaseName, ArrayList<PointSurvey> items, boolean isOccupyPoint) {
         Log.d(TAG, "newInstance: Starting...");
-        DialogJobSetupPointList frag = new DialogJobSetupPointList();
+        DialogJobMapCheckPointList frag = new DialogJobMapCheckPointList();
         Bundle args = new Bundle();
         args.putInt("project_id", projectId);
         args.putInt("job_id", jobId);
@@ -184,14 +186,14 @@ public class DialogJobSetupPointList extends DialogFragment {
     private void initPointsLocal(){
         Log.d(TAG, "initPointsLocal: Started");
 
-        JobCogoSetupPointListListener listener = (JobCogoSetupPointListListener) getActivity();
+        JobCogoMapCheckPointListListener listener = (JobCogoMapCheckPointListListener) getActivity();
 
         mRecyclerView = (RecyclerView) getDialog().findViewById(R.id.pointListRecyclerView);
         layoutManager = new LinearLayoutManager(mContext);
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setHasFixedSize(false);
 
-        adapter = new JobSetupPointListAdaptor(mContext,pointList, DialogJobSetupPointList.this, COORDINATE_FORMATTER);
+        adapter = new JobMapCheckPointListAdaptor(mContext,pointList, DialogJobMapCheckPointList.this, COORDINATE_FORMATTER);
         mRecyclerView.setAdapter(adapter);
 
         Log.e(TAG,"Complete: initProjectListRecyclerView");
@@ -206,13 +208,9 @@ public class DialogJobSetupPointList extends DialogFragment {
     public void setPointSurveyData(PointSurvey pointSurvey){
         Log.d(TAG, "setPointSurveyData: Point No. Clicked:" + String.valueOf(pointSurvey.getPoint_no()));
 
-        JobCogoSetupPointListListener listener = (JobCogoSetupPointListListener) getActivity();
+        JobCogoMapCheckPointListListener listener = (JobCogoMapCheckPointListListener) getActivity();
 
-        if(isOccupyPoint){
-            listener.onReturnValuesOccupy(pointSurvey);
-        }else{
-            listener.onReturnValuesBacksight(pointSurvey);
-        }
+        listener.onReturnValuesOccupy(pointSurvey);
 
     }
 

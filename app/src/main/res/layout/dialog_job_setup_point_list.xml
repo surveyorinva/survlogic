@@ -96,43 +96,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <LinearLayout
-            android:orientation="horizontal"
-            android:weightSum="100"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+        <Button
+            android:id="@+id/dialog_close"
+            android:text="@string/general_close"
+            android:layout_centerInParent="true"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content" />
 
-            <Space
-                android:layout_weight="12.5"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content" />
 
-            <Button
-                android:layout_weight="25"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content" />
-
-            <Space
-                android:layout_weight=".1"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content" />
-
-            <Button
-                android:layout_weight="25"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content" />
-
-            <Space
-                android:layout_weight=".11"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content" />
-
-            <Button
-                android:layout_weight="25"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content" />
-
-        </LinearLayout>
 
     </RelativeLayout>
 

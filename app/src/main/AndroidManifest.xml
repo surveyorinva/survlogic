@@ -119,6 +119,11 @@
             android:theme="@style/SuperMaterialTheme"/>
 
         <activity
+            android:name=".activity.JobCogoMapCheckActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/SuperMaterialTheme"/>
+
+        <activity
             android:name=".activity.JobGpsActivity"
             android:screenOrientation="portrait"
             android:theme="@style/SuperMaterialTheme"/>

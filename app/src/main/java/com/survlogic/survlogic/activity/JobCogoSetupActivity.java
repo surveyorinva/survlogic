@@ -46,7 +46,7 @@ public class JobCogoSetupActivity extends AppCompatActivity implements JobPoints
     private JobInformation jobInformation = new JobInformation();
     private int occupyPointNo, backsightPointNo;
 
-    private int project_id, job_id, job_settings_id = 1;
+    private int project_id, job_id;
     private String jobDatabaseName;
 
     private ImageButton ibClose;

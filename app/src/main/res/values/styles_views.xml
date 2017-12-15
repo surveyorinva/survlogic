@@ -38,6 +38,14 @@
 
     </style>
 
+    <style name="Labels.Toolbar">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">@dimen/text_size_title</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    
+    
     <style name="Labels.EditBoxHeaders">
         <item name="android:fontFamily">sans-serif</item>
         <item name="android:textColor">@color/header_text</item>
@@ -124,6 +132,20 @@
 
     <!--Containers-->
     <!--Buttons-->
+
+    <style name="Button.Raised" parent="Widget.AppCompat.Button" />
+
+    <style name="Button.Raised.Primary">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textSize">15sp</item>
+    </style>
+
+    <style name="Button.Raised.Primary.List">
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textColor">@color/button_text</item>
+        <item name="android:background">@drawable/button_ripple_blue_raised</item>
+    </style>
+
     <style name="Button.Flat" parent="Widget.AppCompat.Button.Borderless" />
 
     <style name="Button.Flat.Primary">
@@ -153,10 +175,21 @@
 
     </style>
 
+    <style name="Button.Flat.Primary.Blue">
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textColor">@color/button_text</item>
+        <item name="android:background">@drawable/button_ripple_blue</item>
+
+    </style>
+
     <style name="Button.Flat.Transparent">
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
 
-
-
+    <style name="Button.Flat.Dark">
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textColor">@color/black</item>
     </style>
 
     <style name="Button.Flat.Primary.BlueButton">
