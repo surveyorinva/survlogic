@@ -62,7 +62,7 @@
             android:text="Minutes"
             android:gravity="center"
             android:textSize="@dimen/text_size_normal"
-            android:layout_weight="20"
+            android:layout_weight="25"
             android:layout_width="0dp"
             android:layout_height="wrap_content" />
 
@@ -96,7 +96,7 @@
             android:gravity="center"
             android:hint="@string/cogo_hint_quadrant"
             android:inputType="number"
-            android:nextFocusDown="@+id/hAngle_degree"
+            android:nextFocusDown="@+id/hAngle_bearing_degree"
             style="@style/InputField.EditText"
             android:background="@drawable/editbox_background_normal" />
 
@@ -112,9 +112,9 @@
             android:layout_marginTop="1dp"
             android:layout_weight="20"
             android:gravity="center"
-            android:hint="@string/cogo_hint_degrees_three"
+            android:hint="@string/cogo_hint_degrees_two"
             android:inputType="number"
-            android:nextFocusDown="@+id/hAngle_min"
+            android:nextFocusDown="@+id/hAngle_bearing_min"
             style="@style/InputField.EditText"
             android:background="@drawable/editbox_background_normal" />
 
@@ -128,11 +128,11 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginTop="1dp"
-            android:layout_weight="20"
+            android:layout_weight="25"
             android:gravity="center"
             android:hint="@string/cogo_hint_minutes"
             android:inputType="number"
-            android:nextFocusDown="@+id/hAngle_sec"
+            android:nextFocusDown="@+id/hAngle_bearing_sec"
             style="@style/InputField.EditText"
             android:background="@drawable/editbox_background_normal" />
 
@@ -149,6 +149,7 @@
             android:hint="@string/cogo_hint_seconds"
             android:inputType="number"
             android:gravity="center"
+            android:nextFocusDown="@+id/ha_bearing_distance"
             style="@style/InputField.EditText"
             android:background="@drawable/editbox_background_normal"
             android:layout_height="match_parent"/>
@@ -189,8 +190,8 @@
             android:layout_weight="65"
             android:gravity="center"
             android:hint="@string/cogo_hint_distance"
-            android:inputType="number"
-            android:nextFocusDown="@+id/hAngle_min"
+            android:inputType="numberDecimal"
+            android:nextFocusDown="@+id/point_Description_value"
             style="@style/InputField.EditText"
             android:background="@drawable/editbox_background_normal" />
 

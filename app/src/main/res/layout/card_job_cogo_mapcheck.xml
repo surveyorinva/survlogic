@@ -18,64 +18,6 @@
             android:layout_marginTop="5dp"
             android:layout_marginBottom="5dp"
             android:layout_width="match_parent"
-            android:layout_height="35dp">
-
-            <LinearLayout
-                android:orientation="horizontal"
-                android:weightSum="100"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <android.support.v4.widget.Space
-                    android:layout_weight="20"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent" />
-
-                <TextView
-                    android:id="@+id/switch_traverse_text"
-                    android:text="Line"
-                    style="@style/Labels.Card.Switch_On"
-                    android:gravity="center"
-                    android:layout_weight="20"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent" />
-
-                <android.support.v4.widget.Space
-                    android:layout_weight="5"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent" />
-
-                <Switch
-                    android:id="@+id/type_of_measurement_switch"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="15"
-                    android:checked="false"
-                    android:gravity="center" />
-
-                <TextView
-                    android:id="@+id/switch_sideshot_text"
-                    android:text="Curve"
-                    style="@style/Labels.Card.Switch_Off"
-                    android:gravity="center"
-                    android:layout_weight="25"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent" />
-
-
-            </LinearLayout>
-
-
-        </android.support.v7.widget.CardView>
-
-
-        <android.support.v7.widget.CardView
-            app:cardCornerRadius="3dp"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
-            android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
             <RelativeLayout
@@ -83,7 +25,7 @@
                 android:layout_height="match_parent">
 
                 <ImageButton
-                    android:id="@+id/hAngle_action"
+                    android:id="@+id/typeOfObservation"
                     android:background="@drawable/vc_circle_green"
                     android:layout_marginStart="5dp"
                     android:layout_marginTop="30dp"
@@ -94,7 +36,7 @@
                     android:id="@+id/hAngle_header"
                     android:text="HA"
                     android:textSize="18sp"
-                    android:layout_toEndOf="@+id/hAngle_action"
+                    android:layout_toEndOf="@+id/typeOfObservation"
                     android:layout_marginTop="40dp"
                     android:layout_marginStart="5dp"
                     android:layout_width="wrap_content"
@@ -103,7 +45,7 @@
                 <ImageButton
                     android:id="@+id/distance_action"
                     android:background="@drawable/vc_circle_green"
-                    android:layout_below="@+id/hAngle_action"
+                    android:layout_below="@+id/typeOfObservation"
                     android:layout_marginStart="5dp"
                     android:layout_marginTop="26dp"
                     android:layout_width="40dp"
@@ -114,7 +56,7 @@
                     android:id="@+id/distance_header"
                     android:text="HD"
                     android:textSize="18sp"
-                    android:layout_toEndOf="@+id/hAngle_action"
+                    android:layout_toEndOf="@+id/typeOfObservation"
                     android:layout_alignTop="@+id/distance_action"
                     android:layout_marginTop="10dp"
                     android:layout_marginStart="5dp"
@@ -243,6 +185,7 @@
                             android:layout_weight="65"
                             android:gravity="center_vertical|start"
                             android:hint="Add Description"
+                            android:nextFocusDown="@id/point_number"
                             android:inputType="textCapCharacters|textAutoCorrect"
                             style="@style/InputField.EditText"
                             android:background="@drawable/editbox_background_normal" />
@@ -261,9 +204,9 @@
                             android:layout_weight="30"
                             android:gravity="center"
                             android:hint="####"
-                            android:nextFocusDown="@id/target_height"
                             android:inputType="number"
                             style="@style/InputField.EditText"
+                            android:imeOptions="actionDone"
                             android:background="@drawable/editbox_background_normal" />
 
                     </LinearLayout>
@@ -283,12 +226,12 @@
             android:layout_height="70dp">
 
             <android.support.v4.widget.Space
-                android:layout_weight="25"
+                android:layout_weight="5"
                 android:layout_width="0dp"
                 android:layout_height="match_parent" />
 
             <Button
-                android:id="@+id/Save_button"
+                android:id="@+id/save_observation_button"
                 android:text="@string/general_save"
                 style="@style/Button.Flat.Primary.Save"
                 android:layout_margin="1dp"
@@ -296,6 +239,19 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent" />
 
+            <android.support.v4.widget.Space
+                android:layout_weight="5"
+                android:layout_width="0dp"
+                android:layout_height="match_parent" />
+
+            <Button
+                android:id="@+id/cancel_observation_button"
+                android:text="@string/general_cancel"
+                style="@style/Button.Flat.Primary.Cancel"
+                android:layout_margin="1dp"
+                android:layout_weight="35"
+                android:layout_width="0dp"
+                android:layout_height="match_parent" />
 
         </LinearLayout>
 

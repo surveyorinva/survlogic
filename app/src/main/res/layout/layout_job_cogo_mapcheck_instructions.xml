@@ -28,6 +28,7 @@
             android:id="@+id/add_new_leg"
             android:text="Add Leg"
             style="@style/Button.Raised.Primary.List"
+            android:clickable="false"
             android:layout_marginTop="25dp"
             android:layout_width="100dp"
             android:layout_height="40dp" />

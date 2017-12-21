@@ -7,12 +7,10 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
-import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,14 +18,12 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.survlogic.survlogic.R;
-import com.survlogic.survlogic.background.BackgroundPointSurveyNew;
 import com.survlogic.survlogic.background.BackgroundPointSurveyNewFromObservation;
 import com.survlogic.survlogic.background.BackgroundSurveyPointCheckPointNumber;
 import com.survlogic.survlogic.background.BackgroundSurveyPointFindNextNumber;
@@ -39,8 +35,6 @@ import com.survlogic.survlogic.model.PointSurvey;
 import com.survlogic.survlogic.utils.MathHelper;
 import com.survlogic.survlogic.utils.PreferenceLoaderHelper;
 import com.survlogic.survlogic.utils.StringUtilityHelper;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
@@ -141,7 +135,7 @@ public class JobCogoSideshotFragment extends Fragment implements JobCogoSideshot
         btSave = (Button) v.findViewById(R.id.Save_button);
 
         ibPointNoAction = (ImageButton) v.findViewById(R.id.point_Number_action);
-        ibPointhAngleAction = (ImageButton) v.findViewById(R.id.hAngle_action);
+        ibPointhAngleAction = (ImageButton) v.findViewById(R.id.typeOfObservation);
         ibPointDistanceAction = (ImageButton) v.findViewById(R.id.distance_action);
 
         etPointNumber = (EditText) v.findViewById(R.id.point_number);

@@ -62,7 +62,7 @@
             android:text="Minutes"
             android:gravity="center"
             android:textSize="@dimen/text_size_normal"
-            android:layout_weight="20"
+            android:layout_weight="25"
             android:layout_width="0dp"
             android:layout_height="wrap_content" />
 
@@ -88,7 +88,7 @@
         android:weightSum="100">
 
         <EditText
-            android:id="@+id/curve_bearing_quadrant"
+            android:id="@+id/cb_curve_bearing_quadrant"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginTop="1dp"
@@ -96,7 +96,7 @@
             android:gravity="center"
             android:hint="@string/cogo_hint_quadrant"
             android:inputType="number"
-            android:nextFocusDown="@+id/hAngle_degree"
+            android:nextFocusDown="@+id/cb_curve_bearing_deg"
             style="@style/InputField.EditText"
             android:background="@drawable/editbox_background_normal" />
 
@@ -106,15 +106,15 @@
             android:layout_weight="3" />
 
         <EditText
-            android:id="@+id/curve_bearing_deg"
+            android:id="@+id/cb_curve_bearing_deg"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginTop="1dp"
             android:layout_weight="20"
             android:gravity="center"
-            android:hint="@string/cogo_hint_degrees_three"
+            android:hint="@string/cogo_hint_degrees_two"
             android:inputType="number"
-            android:nextFocusDown="@+id/hAngle_min"
+            android:nextFocusDown="@+id/cb_curve_bearing_min"
             style="@style/InputField.EditText"
             android:background="@drawable/editbox_background_normal" />
 
@@ -124,15 +124,15 @@
             android:layout_weight="3" />
 
         <EditText
-            android:id="@+id/curve_bearing_min"
+            android:id="@+id/cb_curve_bearing_min"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginTop="1dp"
-            android:layout_weight="20"
+            android:layout_weight="25"
             android:gravity="center"
             android:hint="@string/cogo_hint_minutes"
             android:inputType="number"
-            android:nextFocusDown="@+id/hAngle_sec"
+            android:nextFocusDown="@+id/cb_curve_bearing_sec"
             style="@style/InputField.EditText"
             android:background="@drawable/editbox_background_normal" />
 
@@ -142,12 +142,13 @@
             android:layout_weight="3" />
 
         <EditText
-            android:id="@+id/curve_bearing_sec"
+            android:id="@+id/cb_curve_bearing_sec"
             android:layout_width="0dp"
             android:layout_marginTop="1dp"
             android:layout_weight="20"
             android:hint="@string/cogo_hint_seconds"
             android:inputType="number"
+            android:nextFocusDown="@+id/cb_curve_chord_distance"
             android:gravity="center"
             style="@style/InputField.EditText"
             android:background="@drawable/editbox_background_normal"
@@ -182,17 +183,57 @@
 
 
         <EditText
-            android:id="@+id/curve_chord_distance"
+            android:id="@+id/cb_curve_chord_distance"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginTop="1dp"
             android:layout_weight="65"
             android:gravity="center"
             android:hint="@string/cogo_hint_distance"
-            android:inputType="number"
-            android:nextFocusDown="@+id/hAngle_min"
+            android:inputType="numberDecimal"
+            android:nextFocusDown="@+id/cb_switch_direction"
             style="@style/InputField.EditText"
             android:background="@drawable/editbox_background_normal" />
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:weightSum="100"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/switch_traverse_text"
+            android:text="Right"
+            style="@style/Labels.Card.Switch_On"
+            android:gravity="center"
+            android:layout_weight="20"
+            android:layout_width="0dp"
+            android:layout_height="match_parent" />
+
+        <android.support.v4.widget.Space
+            android:layout_weight="2"
+            android:layout_width="0dp"
+            android:layout_height="match_parent" />
+
+        <Switch
+            android:id="@+id/cb_switch_direction"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="20"
+            android:checked="false"
+            android:gravity="center" />
+
+        <TextView
+            android:id="@+id/switch_sideshot_text"
+            android:text="Left"
+            style="@style/Labels.Card.Switch_Off"
+            android:gravity="center"
+            android:layout_weight="25"
+            android:layout_width="0dp"
+            android:layout_height="match_parent" />
 
         <Space
             android:layout_weight="5"
@@ -200,7 +241,7 @@
             android:layout_height="match_parent" />
 
         <Button
-            android:id="@+id/curve_cb_cd_solve"
+            android:id="@+id/curve_cb_ch_solve"
             android:text="@string/general_solve"
             style="@style/Button.Flat.Primary.Blue"
             android:layout_weight="25"

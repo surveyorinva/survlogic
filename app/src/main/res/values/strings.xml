@@ -390,6 +390,7 @@
     <!--Sideshot/Traverse -->
     <string name="cogo_hint_quadrant">1-4</string>
     <string name="cogo_hint_degrees_three">DDD</string>
+    <string name="cogo_hint_degrees_two">DD</string>
     <string name="cogo_hint_degrees_three_font_small"><font size="15">DDD</font></string>
     <string name="cogo_hint_degrees_two_font_small"><font size="15">DD</font></string>
     <string name="cogo_hint_minutes">MM</string>
@@ -406,6 +407,7 @@
     <string name="cogo_point_no_exists">Point Number Exists</string>
     <string name="cogo_point_height_not_entered">Target Height Required</string>
 
+    <string name="cogo_ha_quadrant_not_entered">Bearing Quadrant Required</string>
     <string name="cogo_ha_deg_not_entered">Degrees Required</string>
     <string name="cogo_ha_min_not_entered">Minutes Required</string>
     <string name="cogo_ha_sec_not_entered">Seconds Required</string>
@@ -418,6 +420,8 @@
 
     <string name="cogo_traverse_time_to_move_title">Traverse</string>
     <string name="cogo_traverse_time_to_move_message">Are you Ready to Move to Next Station</string>
+
+    <string name="cogo_mapcheck_quandarnt_out_of_range">1=NE, 2=SE, 3=SW, 4=NW</string>
 
     <!-- ******************************Strings related to Settings****************************** -->
 

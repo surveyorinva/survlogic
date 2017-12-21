@@ -5,19 +5,19 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <ListView
+    <android.support.v7.widget.RecyclerView
         android:id="@+id/mapcheck_items_list"
         android:layout_weight="1"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:visibility="gone">
 
-    </ListView>
+    </android.support.v7.widget.RecyclerView>
 
     <include
         android:id="@+id/new_leg"
         layout="@layout/card_job_cogo_mapcheck"
-        android:visibility="visible" />
+        android:visibility="gone" />
 
     <Button
         android:id="@+id/mapcheck_items_btn"

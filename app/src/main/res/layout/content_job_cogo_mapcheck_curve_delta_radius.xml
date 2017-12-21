@@ -13,65 +13,13 @@
         android:orientation="horizontal"
         android:weightSum="100"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <TextView
-            android:text="Direction:"
-            android:gravity="center"
-            android:layout_weight="20"
-            android:layout_width="0dp"
-            android:layout_height="match_parent" />
-
-        <android.support.v4.widget.Space
-            android:layout_weight="5"
-            android:layout_width="0dp"
-            android:layout_height="match_parent" />
-
-        <TextView
-            android:id="@+id/switch_traverse_text"
-            android:text="Right"
-            style="@style/Labels.Card.Switch_On"
-            android:gravity="center"
-            android:layout_weight="20"
-            android:layout_width="0dp"
-            android:layout_height="match_parent" />
-
-        <android.support.v4.widget.Space
-            android:layout_weight="5"
-            android:layout_width="0dp"
-            android:layout_height="match_parent" />
-
-        <Switch
-            android:id="@+id/type_of_measurement_switch"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="15"
-            android:checked="false"
-            android:gravity="center" />
-
-        <TextView
-            android:id="@+id/switch_sideshot_text"
-            android:text="Left"
-            style="@style/Labels.Card.Switch_Off"
-            android:gravity="center"
-            android:layout_weight="25"
-            android:layout_width="0dp"
-            android:layout_height="match_parent" />
-
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:weightSum="100"
-        android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
         <TextView
             android:text="Delta"
             android:gravity="center"
             android:textSize="@dimen/text_size_normal"
-            android:layout_weight="68"
+            android:layout_weight="100"
             android:layout_width="0dp"
             android:layout_height="wrap_content" />
 
@@ -89,7 +37,7 @@
             android:text="Degrees"
             android:gravity="center"
             android:textSize="@dimen/text_size_normal"
-            android:layout_weight="20"
+            android:layout_weight="30"
             android:layout_width="0dp"
             android:layout_height="wrap_content" />
 
@@ -102,7 +50,7 @@
             android:text="Minutes"
             android:gravity="center"
             android:textSize="@dimen/text_size_normal"
-            android:layout_weight="20"
+            android:layout_weight="25"
             android:layout_width="0dp"
             android:layout_height="wrap_content" />
 
@@ -130,15 +78,15 @@
 
 
         <EditText
-            android:id="@+id/delta_degree"
+            android:id="@+id/dr_delta_degree"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginTop="1dp"
-            android:layout_weight="20"
+            android:layout_weight="30"
             android:gravity="center"
             android:hint="@string/cogo_hint_degrees_three"
             android:inputType="number"
-            android:nextFocusDown="@+id/hAngle_min"
+            android:nextFocusDown="@+id/dr_delta_min"
             style="@style/InputField.EditText"
             android:background="@drawable/editbox_background_normal" />
 
@@ -148,15 +96,15 @@
             android:layout_weight="3" />
 
         <EditText
-            android:id="@+id/delta_min"
+            android:id="@+id/dr_delta_min"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginTop="1dp"
-            android:layout_weight="20"
+            android:layout_weight="25"
             android:gravity="center"
             android:hint="@string/cogo_hint_minutes"
             android:inputType="number"
-            android:nextFocusDown="@+id/hAngle_sec"
+            android:nextFocusDown="@+id/dr_delta_sec"
             style="@style/InputField.EditText"
             android:background="@drawable/editbox_background_normal" />
 
@@ -166,7 +114,7 @@
             android:layout_weight="3" />
 
         <EditText
-            android:id="@+id/delta_sec"
+            android:id="@+id/dr_delta_sec"
             android:layout_width="0dp"
             android:layout_marginTop="1dp"
             android:layout_weight="20"
@@ -174,7 +122,7 @@
             android:inputType="number"
             android:gravity="center"
             style="@style/InputField.EditText"
-            android:nextFocusDown="@+id/hAngle_radius"
+            android:nextFocusDown="@+id/dr_curve_radius"
             android:background="@drawable/editbox_background_normal"
             android:layout_height="match_parent"/>
 
@@ -208,17 +156,56 @@
 
 
         <EditText
-            android:id="@+id/curve_radius"
+            android:id="@+id/dr_curve_radius"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginTop="1dp"
             android:layout_weight="65"
             android:gravity="center"
             android:hint="@string/cogo_hint_distance"
-            android:inputType="number"
-            android:nextFocusDown="@+id/hAngle_min"
+            android:inputType="numberDecimal"
+            android:nextFocusDown="@+id/dr_switch_direction"
             style="@style/InputField.EditText"
             android:background="@drawable/editbox_background_normal" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:weightSum="100"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/switch_traverse_text"
+            android:text="Right"
+            style="@style/Labels.Card.Switch_On"
+            android:gravity="center"
+            android:layout_weight="20"
+            android:layout_width="0dp"
+            android:layout_height="match_parent" />
+
+        <android.support.v4.widget.Space
+            android:layout_weight="2"
+            android:layout_width="0dp"
+            android:layout_height="match_parent" />
+
+        <Switch
+            android:id="@+id/dr_switch_direction"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="20"
+            android:checked="false"
+            android:gravity="center" />
+
+        <TextView
+            android:id="@+id/switch_sideshot_text"
+            android:text="Left"
+            style="@style/Labels.Card.Switch_Off"
+            android:gravity="center"
+            android:layout_weight="25"
+            android:layout_width="0dp"
+            android:layout_height="match_parent" />
 
         <Space
             android:layout_weight="5"

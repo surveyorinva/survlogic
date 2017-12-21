@@ -193,7 +193,7 @@
                 android:layout_height="match_parent">
 
                 <ImageButton
-                    android:id="@+id/hAngle_action"
+                    android:id="@+id/typeOfObservation"
                     android:background="@drawable/vc_circle_green"
                     android:layout_marginStart="5dp"
                     android:layout_marginTop="20dp"
@@ -204,7 +204,7 @@
                     android:id="@+id/hAngle_header"
                     android:text="HA"
                     android:textSize="18sp"
-                    android:layout_toEndOf="@+id/hAngle_action"
+                    android:layout_toEndOf="@+id/typeOfObservation"
                     android:layout_marginTop="25dp"
                     android:layout_marginStart="5dp"
                     android:layout_width="wrap_content"
@@ -213,7 +213,7 @@
                 <ImageButton
                     android:id="@+id/distance_action"
                     android:background="@drawable/vc_circle_green"
-                    android:layout_below="@+id/hAngle_action"
+                    android:layout_below="@+id/typeOfObservation"
                     android:layout_marginStart="5dp"
                     android:layout_marginTop="26dp"
                     android:layout_width="40dp"
@@ -223,7 +223,7 @@
                     android:id="@+id/distance_header"
                     android:text="HD"
                     android:textSize="18sp"
-                    android:layout_toEndOf="@+id/hAngle_action"
+                    android:layout_toEndOf="@+id/typeOfObservation"
                     android:layout_alignTop="@+id/distance_action"
                     android:layout_marginTop="10dp"
                     android:layout_marginStart="5dp"
