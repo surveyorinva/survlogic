@@ -4,6 +4,7 @@
     <!--General App strings-->
     <string name="general_save">Save</string>
     <string name="general_cancel">Cancel</string>
+    <string name="general_edit">Edit</string>
     <string name="general_start">Start</string>
     <string name="general_stop">Stop</string>
     <string name="general_yes">Yes</string>

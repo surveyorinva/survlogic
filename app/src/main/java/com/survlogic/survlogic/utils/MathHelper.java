@@ -248,10 +248,10 @@ public class MathHelper {
         //TODO Deal with 0 for decimal place.  right now returns with "."  need to return " "
 
         angle = Math.abs(angle);
-        Log.d(TAG, "convertDECtoDMSBearing: Angle: " + angle);
+
 
         int quadrant = Integer.parseInt(Integer.toString((int) angle).substring(0, 1));
-        Log.d(TAG, "convertDECtoDMSBearing: Quadrant: " + quadrant);
+
         switch(quadrant){
             case 1:
                 angle = angle - 100;
@@ -278,21 +278,42 @@ public class MathHelper {
                 rearDirection = "E";
         }
 
-        Log.d(TAG, "convertDECtoDMSBearing: Angle: " + angle);
+
         if (angle ==0){
-            Log.d(TAG, "convertDECtoDMSBearing: Angle is 0");
-            myAngleDMS = "0.0";
+            myAngleDMS = "00°00'00.0";
+
         }else {
-            Log.d(TAG, "convertDECtoDMSBearing: Angle is Not 0");
             double deg = Math.floor(angle);                  // Round down
             double minutes = Math.floor((angle * 60) % 60);  // This is an integer in the range [0, 60)
             double seconds = (angle * 3600) % 60;            // This is a decimal in the range [0, 60)
 
-            myAngleDMS = (int) deg + "°" + (int) minutes + "'" + seconds;
+            //myAngleDMS = (int) deg + "°" + (int) minutes + "'" + seconds;
+
+            String sDeg, sMin, sSec;
+
+            if(deg <10){
+                sDeg = "0" + (int)deg + "°";
+            }else{
+                sDeg = (int) deg + "°";
+            }
+
+            if(minutes <10){
+                sMin = "0" + (int)minutes + "'";
+            }else{
+                sMin = (int) minutes + "'";
+            }
+
+            if(seconds <10){
+                sSec = "0" + (int) seconds + ".0";
+            }else{
+                sSec = (int) seconds + ".0";
+            }
+
+            myAngleDMS = sDeg + "" + sMin + "" + sSec;
+            Log.d(TAG, "convertDECtoDMSBearing: Angle: " + myAngleDMS);
 
         }
 
-        Log.d(TAG, "convertDECtoDMSBearing: myAngleDMS: " + myAngleDMS);
         int pointIndex = myAngleDMS.indexOf(".");
         int endIndex;
 

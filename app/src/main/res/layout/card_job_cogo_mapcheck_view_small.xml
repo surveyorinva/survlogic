@@ -2,9 +2,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:style="http://schemas.android.com/tools"
     android:id="@+id/card_project_job_view_small"
-    android:clickable="false"
+    android:clickable="true"
     android:focusable="false"
-    android:elevation="1dp"
+    android:elevation="0dp"
     android:layout_margin="3dp"
     android:layout_width="match_parent"
     android:layout_height="60dp">

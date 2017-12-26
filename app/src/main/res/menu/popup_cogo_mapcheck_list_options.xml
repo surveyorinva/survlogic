@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/mapcheck_item_1"
+        android:title="@string/general_edit">
+    </item>
+
+    <item
+        android:id="@+id/mapcheck_item_2"
+        android:title="@string/general_delete">
+    </item>
+
+
+</menu>

@@ -1,5 +1,6 @@
 package com.survlogic.survlogic.view;
 
+import android.app.Activity;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
@@ -9,6 +10,8 @@ import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -31,7 +34,7 @@ import java.util.ArrayList;
 
 public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder  {
     private static final String TAG = "Card_View_Holder_Job_Ma";
-    
+
     public View mCardView;
     private Context mContext;
     private MapcheckListener mapcheckListener;
@@ -40,7 +43,9 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder  
     private View vListAdd_ha_bearing, vListAdd_ha_turnedAngle, vListAdd_ha_azimuth,
             vListAdd_curve_da_r, vListAdd_curve_da_l, vListAdd_curve_r_l, vListAdd_curve_cb_ch;
 
-    private EditText etMapCheckPointDescription, etMapCheckPointNumber;
+    private EditText etMapCheckPointDescription;
+    public EditText etMapCheckPointNumber;
+
     private Switch switchTypeOfObservation;
     private ImageButton ibSwapObservation;
     public Button btSaveObservation, btCancelObservation;
@@ -211,21 +216,15 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder  
         etMapCheckPointDescription = (EditText) itemView.findViewById(R.id.point_Description_value);
 
         etMapCheckPointNumber = (EditText) itemView.findViewById(R.id.point_number);
-        etMapCheckPointNumber.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if(actionId == EditorInfo.IME_ACTION_DONE){
-
-                }
-
-                return false;
-            }
-        });
 
         btSaveObservation = (Button) itemView.findViewById(R.id.save_observation_button);
-
-
         btCancelObservation = (Button) itemView.findViewById(R.id.cancel_observation_button);
+
+        //------------------------------------------------------------------------------------------//
+        viewCurrentTypeToDisplay = 0;
+
+        swapTypeOfObservation(0);
+
 
     }
 
@@ -565,7 +564,21 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder  
 
     }
 
+    private void clearAllViews(){
+        Log.d(TAG, "clearAllViews: Clearing All Views");
+        clearHaBearing();
+
+        clearPointData();
+        clearMethodVariables();
+    }
+
+    private void clearPointData(){
+        etMapCheckPointDescription.setText("");
+        etMapCheckPointNumber.setText("");
+    }
+
     private void clearHaBearing(){
+        Log.d(TAG, "clearHaBearing: Clearing Text");
         etBearingQuadrant.setText("");
         etBearingDeg.setText("");
         etBearingMin.setText("");
@@ -575,13 +588,30 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder  
         etBearingQuadrant.requestFocus();
     }
 
+    private void clearMethodVariables(){
+        Log.d(TAG, "clearMethodVariables: Clearing Variables");
+        mValuePointNo = 0;
+        mValuePointDesc = null;
+        mValueDistance = 0;
+        mValueBearing = 0;
+        mValueAzimuth = 0;
+        mValueTurnedAngle = 0;
+        mValueCurveDelta = 0;
+        mValueCurveRadius = 0;
+        mValueCurveLength = 0;
+        mValueCurveCB = 0;
+        mValueCurveCH = 0;
+
+
+    }
+
     //-------------------------------------------------------------------------------------------------------------------------//
 
     /**
      * Validating, creating point and then saving points!
      */
 
-    public void saveObservation(int position){
+    public void saveObservation(int position, boolean isFromButton){
         Log.d(TAG, "btSave_onClick ");
         boolean isFormReady = false;
         boolean isFormInError = validateFormForNull();
@@ -589,7 +619,12 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder  
         Log.d(TAG, "btSave_onClick:isFormInError: " + isFormInError);
 
         if(!isFormInError){
-            saveObservationToArray(position);
+            if(isFromButton) {
+                saveObservationToArray(position);
+            }else{
+                saveObservationToArray(position);
+
+            }
         }
     }
 
@@ -724,8 +759,41 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder  
         }
 
         mapcheckListener.sendNewMapcheckToActivity(mapCheck, position);
+        clearAllViews();
+
+        mapcheckListener.hideKeyboard();
 
     }
-    
+
+    public void cancelObservation(int position){
+        mapcheckListener.deleteNewMapcheckUserCancel(position);
+    }
+
+    //----------------------------------------------------------------------------------------------//
+
+    private void hideKeypadFromET (EditText etView) {
+        Log.d(TAG, "hideKeypadFromET: Started...");
+        InputMethodManager imm = (InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+        try{
+            Log.d(TAG, "hideKeypadFromET: Edit Text Found!");
+            imm.hideSoftInputFromWindow(etView.getWindowToken(), 0);
+
+        }catch (Exception e){
+
+        }
+
+    }
+
+    private void hideKeypadFromUI(Context context, View view){
+        InputMethodManager imm = (InputMethodManager) context.getSystemService(Activity.INPUT_METHOD_SERVICE);
+
+        try{
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+
+        }catch (Exception e){
+
+        }
+
+    }
 
 }

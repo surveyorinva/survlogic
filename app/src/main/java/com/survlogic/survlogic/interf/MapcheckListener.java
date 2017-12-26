@@ -10,4 +10,8 @@ public interface MapcheckListener {
 
     void sendNewMapcheckToActivity(PointMapCheck pointMapCheck, int position);
 
+    void deleteNewMapcheckUserCancel(int position);
+
+    void hideKeyboard();
+
 }

@@ -14,11 +14,6 @@
 
     </android.support.v7.widget.RecyclerView>
 
-    <include
-        android:id="@+id/new_leg"
-        layout="@layout/card_job_cogo_mapcheck"
-        android:visibility="gone" />
-
     <Button
         android:id="@+id/mapcheck_items_btn"
         android:drawableLeft="@drawable/ic_add_circle_outline"
