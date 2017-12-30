@@ -6,38 +6,44 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.KeyEvent;
+import android.util.TypedValue;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.survlogic.survlogic.R;
+import com.survlogic.survlogic.background.BackgroundSurveyPointCheckPointNumber;
+import com.survlogic.survlogic.background.BackgroundSurveyPointExistInDatabase;
+import com.survlogic.survlogic.interf.DatabaseDoesPointExistFromAsyncListener;
 import com.survlogic.survlogic.interf.MapcheckListener;
 import com.survlogic.survlogic.model.PointMapCheck;
+import com.survlogic.survlogic.model.PointSurvey;
 import com.survlogic.survlogic.utils.MathHelper;
 import com.survlogic.survlogic.utils.StringUtilityHelper;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by chrisfillmore on 6/30/2017.
  */
 
-public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder  {
+public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder implements DatabaseDoesPointExistFromAsyncListener {
     private static final String TAG = "Card_View_Holder_Job_Ma";
 
     public View mCardView;
     private Context mContext;
     private MapcheckListener mapcheckListener;
+    private String jobDatabaseName;
 
     //-Add New Observation-//
     private View vListAdd_ha_bearing, vListAdd_ha_turnedAngle, vListAdd_ha_azimuth,
@@ -45,6 +51,8 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder  
 
     private EditText etMapCheckPointDescription;
     public EditText etMapCheckPointNumber;
+
+    public CheckBox cbIsClosingPoint;
 
     private Switch switchTypeOfObservation;
     private ImageButton ibSwapObservation;
@@ -56,6 +64,12 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder  
     private boolean isHaAzimuthInit = false, isHaBearingInit = false, isHaTurnedInit = false;
     private boolean isCurveDARInit = false, isCurveDALInit = false, isCurveRLInit = false;
     private boolean isCurveCBCHInit = false;
+
+    private TextView tvIsClosingPoint, tvPointNumberHeader;
+    private TextView tvCurveARight, tvCurveALeft;
+    private TextView tvCurveBRight, tvCurveBLeft;
+    private TextView tvCurveCRight, tvCurveCLeft;
+    private TextView tvCurveDRight, tvCurveDLeft;
 
     private EditText etBearingQuadrant, etBearingDeg, etBearingMin, etBearingSec, etBearingDistance;
     private EditText etAzimuthDeg, etAzimuthMin, etAzimuthSec, etAzimuthDistance;
@@ -70,6 +84,13 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder  
     private Switch switchCurveCIsRight;
     private Switch switchCurveDIsRight;
 
+    private boolean isSwitchCurveAIsRight = true;
+    private boolean isSwitchCurveBIsRight = true;
+    private boolean isSwitchCurveCIsRight = true;
+    private boolean isSwitchCurveDIsRight = true;
+
+    private static final int CURVE_A = 0, CURVE_B = 1, CURVE_C = 2, CURVE_D = 3;
+
     private Button btCurveASolve, btCurveBSolve, btCurveCSolve, btCurveDSolve;
 
     //-Method Variables-//
@@ -82,13 +103,18 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder  
     //-Helpers-//
     private static final int textValidationOne = 0, textValidationTwo = 1, textValidationThree = 2, textValidationFour = 4;
 
+    //-From Activity-//
+    private ArrayList<PointMapCheck> lstPointMapCheck = new ArrayList<>();
+    private int listPosition = 0;
 
-    public Card_View_Holder_Job_Mapcheck_Add(View itemView, Context mContext, MapcheckListener mapcheckListener) {
+    public Card_View_Holder_Job_Mapcheck_Add(View itemView, Context mContext, MapcheckListener mapcheckListener, String jobDatabaseName) {
         super(itemView);
 
         this.mContext = mContext;
-        mCardView = itemView;
+        this.mCardView = itemView;
         this.mapcheckListener = mapcheckListener;
+        this.jobDatabaseName = jobDatabaseName;
+
         initVewListAddNewObservation();
 
     }
@@ -109,113 +135,52 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder  
         ibSwapObservation = (ImageButton) itemView.findViewById(R.id.typeOfObservation);
 
 
-        ibSwapObservation.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                popupMenuOpen = 1;
+        Log.d(TAG, "initVewListAddNewObservation: position: " + listPosition);
 
-                PopupMenu popupMenuObsType = new PopupMenu(mContext, ibSwapObservation);
-                popupMenuObsType.inflate(R.menu.popup_cogo_mapcheck_observation_type);
+        setPopupMenuForObservationType(0);
 
-                switch(viewCurrentTypeToDisplay){
-
-                    case 0:
-                        popupMenuObsType.getMenu().findItem(R.id.mapcheck_item_1).setChecked(true);
-                        break;
-
-                    case 1:
-                        popupMenuObsType.getMenu().findItem(R.id.mapcheck_item_2).setChecked(true);
-                        break;
-
-                    case 2:
-                        popupMenuObsType.getMenu().findItem(R.id.mapcheck_item_3).setChecked(true);
-                        break;
-
-                    case 3:
-                        popupMenuObsType.getMenu().findItem(R.id.mapcheck_item_4).setChecked(true);
-                        break;
-
-                    case 4:
-                        popupMenuObsType.getMenu().findItem(R.id.mapcheck_item_5).setChecked(true);
-                        break;
-
-                    case 5:
-                        popupMenuObsType.getMenu().findItem(R.id.mapcheck_item_6).setChecked(true);
-                        break;
-
-                    case 6:
-                        popupMenuObsType.getMenu().findItem(R.id.mapcheck_item_7).setChecked(true);
-                        break;
-
-                    default:
-                        break;
-
-                }
-
-
-                popupMenuObsType.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-
-                        switch (item.getItemId()){
-                            case R.id.mapcheck_item_1:
-                                //Swap to Line by Bearing
-                                viewCurrentTypeToDisplay = 0;
-                                swapTypeOfObservation(0);
-
-                                break;
-
-                            case R.id.mapcheck_item_2:
-                                //Swap to Line by Turned Angle
-                                viewCurrentTypeToDisplay = 1;
-                                swapTypeOfObservation(1);
-                                break;
-
-                            case R.id.mapcheck_item_3:
-                                //Swap to Line by Azimuth
-                                viewCurrentTypeToDisplay = 2;
-                                swapTypeOfObservation(2);
-                                break;
-
-                            case R.id.mapcheck_item_4:
-                                //Swap to Curve Delta-Radius
-                                viewCurrentTypeToDisplay = 3;
-                                swapTypeOfObservation(3);
-                                break;
-
-                            case R.id.mapcheck_item_5:
-                                //Swap to Curve Delta-Arc Length
-                                viewCurrentTypeToDisplay = 4;
-                                swapTypeOfObservation(4);
-
-                                break;
-
-                            case R.id.mapcheck_item_6:
-                                //Swap to Curve Radius-Arc Length
-                                viewCurrentTypeToDisplay = 5;
-                                swapTypeOfObservation(5);
-
-                                break;
-
-                            case R.id.mapcheck_item_7:
-                                //Swap to Curve Chord Bearing-Chord Distance
-                                viewCurrentTypeToDisplay = 6;
-                                swapTypeOfObservation(6);
-
-                                break;
-                        }
-
-                        return true;
-                    }
-                });
-
-                popupMenuObsType.show();
-            }
-        });
 
         etMapCheckPointDescription = (EditText) itemView.findViewById(R.id.point_Description_value);
 
+        tvPointNumberHeader = (TextView) itemView.findViewById(R.id.point_number_header);
         etMapCheckPointNumber = (EditText) itemView.findViewById(R.id.point_number);
+
+
+        etMapCheckPointNumber.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+                try{
+                    String pointNo = null;
+                    pointNo = etMapCheckPointNumber.getText().toString();
+
+                    if(!StringUtilityHelper.isStringNull(pointNo)){
+                        mValuePointNo = Integer.parseInt(pointNo);
+                        checkPointNumberFromDatabase(mValuePointNo);
+                    }
+
+                }catch(NumberFormatException ex){
+                    showToast("Error.  Check Number Format", true);
+
+                }
+            }
+        });
+
+
+
+
+        cbIsClosingPoint = (CheckBox) itemView.findViewById(R.id.is_closing_point);
+        tvIsClosingPoint = (TextView) itemView.findViewById(R.id.is_closing_point_desc);
 
         btSaveObservation = (Button) itemView.findViewById(R.id.save_observation_button);
         btCancelObservation = (Button) itemView.findViewById(R.id.cancel_observation_button);
@@ -396,6 +361,117 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder  
             etAzimuthDistance.setNextFocusDownId(R.id.point_Description_value);
 
             isHaAzimuthInit = true;
+
+            etAzimuthDeg.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                    if(etAzimuthDeg.getText().toString().length()==textValidationThree){
+                        etAzimuthMin.requestFocus();
+                    }
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    try{
+                        int val = Integer.parseInt(s.toString());
+                        if(val > 359){
+                            etAzimuthDeg.setError(mContext.getResources().getString(R.string.cogo_angle_circle_error_out_of_range));
+                            btSaveObservation.setClickable(false);
+                        }else{
+                            btSaveObservation.setClickable(true);
+                        }
+
+
+                    }catch (NumberFormatException ex){
+
+                    }
+                }
+            });
+
+            etAzimuthMin.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                    if(etAzimuthMin.getText().toString().length()==textValidationTwo){
+                        etAzimuthSec.requestFocus();
+                    }
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    try{
+                        int val = Integer.parseInt(s.toString());
+                        if(val > 59){
+                            etAzimuthMin.setError(mContext.getResources().getString(R.string.cogo_angle_error_out_of_range));
+                            btSaveObservation.setClickable(false);
+                        }else{
+                            btSaveObservation.setClickable(true);
+                        }
+
+
+                    }catch (NumberFormatException ex){
+
+                    }
+                }
+            });
+
+            etAzimuthSec.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+
+                }
+            });
+
+            etAzimuthSec.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    try{
+                        int val = Integer.parseInt(s.toString());
+                        if(val > 59.999){
+                            etAzimuthSec.setError(mContext.getString(R.string.cogo_angle_error_out_of_range));
+                            btSaveObservation.setClickable(false);
+                        }else{
+                            btSaveObservation.setClickable(true);
+                        }
+
+
+                    }catch (NumberFormatException ex){
+
+                    }
+                }
+
+            });
+
+
         }
 
     }
@@ -417,6 +493,100 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder  
             etTurnedDistance.setNextFocusDownId(R.id.point_Description_value);
 
             isHaTurnedInit = true;
+
+            etTurnedDeg.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                    if(etTurnedDeg.getText().toString().length()==textValidationThree){
+                        etTurnedMin.requestFocus();
+                    }
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    try{
+                        int val = Integer.parseInt(s.toString());
+                        if(val > 359){
+                            etTurnedDeg.setError(mContext.getString(R.string.cogo_angle_circle_error_out_of_range));
+                            btSaveObservation.setClickable(false);
+                        }else{
+                            btSaveObservation.setClickable(true);
+                        }
+
+
+                    }catch (NumberFormatException ex){
+
+                    }
+                }
+            });
+
+            etTurnedMin.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                    if(etTurnedMin.getText().toString().length()==textValidationTwo){
+                        etTurnedSec.requestFocus();
+                    }
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    try{
+                        int val = Integer.parseInt(s.toString());
+                        if(val > 59){
+                            etTurnedMin.setError(mContext.getString(R.string.cogo_angle_error_out_of_range));
+                            btSaveObservation.setClickable(false);
+                        }else{
+                            btSaveObservation.setClickable(true);
+                        }
+
+
+                    }catch (NumberFormatException ex){
+
+                    }
+                }
+            });
+
+            etTurnedSec.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    try{
+                        int val = Integer.parseInt(s.toString());
+                        if(val > 59.999){
+                            etTurnedSec.setError(mContext.getString(R.string.cogo_angle_error_out_of_range));
+                            btSaveObservation.setClickable(false);
+                        }else{
+                            btSaveObservation.setClickable(true);
+                        }
+
+
+                    }catch (NumberFormatException ex){
+
+                    }
+                }
+            });
+
+
+
         }
 
     }
@@ -437,9 +607,122 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder  
             etCurveARadius.setSelectAllOnFocus(true);
 
             switchCurveAIsRight = (Switch)  itemView.findViewById(R.id.dr_switch_direction);
+            tvCurveARight = (TextView) itemView.findViewById(R.id.switch_curve_a_right);
+            tvCurveALeft = (TextView) itemView.findViewById(R.id.switch_curve_a_left);
 
             btCurveASolve = (Button) itemView.findViewById(R.id.curve_delta_radius_solve);
             isCurveDARInit = true;
+
+            etCurveADeltaDeg.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                    if(etCurveADeltaDeg.getText().toString().length()==textValidationThree){
+                        etCurveADeltaMin.requestFocus();
+                    }
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    try{
+                        int val = Integer.parseInt(s.toString());
+                        if(val > 359){
+                            etCurveADeltaDeg.setError(mContext.getString(R.string.cogo_angle_circle_error_out_of_range));
+                            btSaveObservation.setClickable(false);
+                        }else{
+                            btSaveObservation.setClickable(true);
+                        }
+
+
+                    }catch (NumberFormatException ex){
+
+                    }
+                }
+            });
+
+            etCurveADeltaMin.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                    if(etCurveADeltaMin.getText().toString().length()==textValidationTwo){
+                        etCurveADeltaSec.requestFocus();
+                    }
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    try{
+                        int val = Integer.parseInt(s.toString());
+                        if(val > 59){
+                            etCurveADeltaMin.setError(mContext.getString(R.string.cogo_angle_error_out_of_range));
+                            btSaveObservation.setClickable(false);
+                        }else{
+                            btSaveObservation.setClickable(true);
+                        }
+
+
+                    }catch (NumberFormatException ex){
+
+                    }
+                }
+            });
+
+            etCurveADeltaSec.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    try{
+                        int val = Integer.parseInt(s.toString());
+                        if(val > 59.999){
+                            etCurveADeltaSec.setError(mContext.getString(R.string.cogo_angle_error_out_of_range));
+                            btSaveObservation.setClickable(false);
+                        }else{
+                            btSaveObservation.setClickable(true);
+                        }
+
+
+                    }catch (NumberFormatException ex){
+
+                    }
+                }
+            });
+
+            switchCurveAIsRight.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if(isChecked){
+                        //curve to Right
+                        setTextSizeCurveDirection(true,CURVE_A);
+                        isSwitchCurveAIsRight = true;
+
+
+
+                    }else{
+                        //curve to left
+                        setTextSizeCurveDirection(false,CURVE_A);
+                        isSwitchCurveAIsRight = false;
+
+                    }
+                }
+            });
+
         }
 
     }
@@ -460,9 +743,121 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder  
             etCurveBLength.setSelectAllOnFocus(true);
 
             switchCurveBIsRight = (Switch)  itemView.findViewById(R.id.dl_switch_direction);
+            tvCurveBRight = (TextView) itemView.findViewById(R.id.switch_curve_b_right);
+            tvCurveBLeft = (TextView) itemView.findViewById(R.id.switch_curve_b_left);
 
             btCurveBSolve = (Button) itemView.findViewById(R.id.curve_delta_length_solve);
             isCurveDALInit = true;
+
+            etCurveBDeltaDeg.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                    if(etCurveBDeltaDeg.getText().toString().length()==textValidationThree){
+                        etCurveBDeltaMin.requestFocus();
+                    }
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    try{
+                        int val = Integer.parseInt(s.toString());
+                        if(val > 359){
+                            etCurveBDeltaDeg.setError(mContext.getString(R.string.cogo_angle_circle_error_out_of_range));
+                            btSaveObservation.setClickable(false);
+                        }else{
+                            btSaveObservation.setClickable(true);
+                        }
+
+
+                    }catch (NumberFormatException ex){
+
+                    }
+                }
+            });
+
+            etCurveBDeltaMin.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                    if(etCurveBDeltaMin.getText().toString().length()==textValidationTwo){
+                        etCurveBDeltaSec.requestFocus();
+                    }
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    try{
+                        int val = Integer.parseInt(s.toString());
+                        if(val > 59){
+                            etCurveBDeltaMin.setError(mContext.getString(R.string.cogo_angle_error_out_of_range));
+                            btSaveObservation.setClickable(false);
+                        }else{
+                            btSaveObservation.setClickable(true);
+                        }
+
+
+                    }catch (NumberFormatException ex){
+
+                    }
+                }
+            });
+
+            etCurveBDeltaSec.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    try{
+                        int val = Integer.parseInt(s.toString());
+                        if(val > 59.999){
+                            etCurveBDeltaSec.setError(mContext.getString(R.string.cogo_angle_error_out_of_range));
+                            btSaveObservation.setClickable(false);
+                        }else{
+                            btSaveObservation.setClickable(true);
+                        }
+
+
+                    }catch (NumberFormatException ex){
+
+                    }
+                }
+            });
+
+            switchCurveBIsRight.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if(isChecked){
+                        //curve to Right
+                        setTextSizeCurveDirection(true,CURVE_B);
+                        isSwitchCurveBIsRight = true;
+
+
+
+                    }else{
+                        //curve to left
+                        setTextSizeCurveDirection(false,CURVE_B);
+                        isSwitchCurveBIsRight = false;
+
+                    }
+                }
+            });
         }
 
     }
@@ -477,9 +872,32 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder  
             etCurveCLength.setSelectAllOnFocus(true);
 
             switchCurveCIsRight = (Switch)  itemView.findViewById(R.id.rl_switch_direction);
+            tvCurveCRight = (TextView) itemView.findViewById(R.id.switch_curve_c_right);
+            tvCurveCLeft = (TextView) itemView.findViewById(R.id.switch_curve_c_left);
 
             btCurveCSolve = (Button) itemView.findViewById(R.id.curve_radius_length_solve);
             isCurveRLInit = true;
+
+
+            switchCurveCIsRight.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if(isChecked){
+                        //curve to Right
+                        setTextSizeCurveDirection(true,CURVE_C);
+                        isSwitchCurveCIsRight = true;
+
+
+
+                    }else{
+                        //curve to left
+                        setTextSizeCurveDirection(false,CURVE_C);
+                        isSwitchCurveCIsRight = false;
+
+                    }
+                }
+            });
+
         }
 
     }
@@ -510,6 +928,155 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder  
 
     }
 
+    public void setPopupMenuForObservationType(int position){
+        Log.d(TAG, "setPopupMenu: Started...");
+        if(listPosition == position ){
+            ibSwapObservation.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    popupMenuOpen = 1;
+
+                    PopupMenu popupMenuObsType = new PopupMenu(mContext, ibSwapObservation);
+                    popupMenuObsType.inflate(R.menu.popup_cogo_mapcheck_observation_type_position_zero);
+
+                    switch(viewCurrentTypeToDisplay){
+
+                        case 0:
+                            popupMenuObsType.getMenu().findItem(R.id.mapcheck_item_1).setChecked(true);
+                            break;
+
+                        case 1:
+                            popupMenuObsType.getMenu().findItem(R.id.mapcheck_item_2).setChecked(true);
+                            break;
+
+
+                    }
+
+
+                    popupMenuObsType.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                        @Override
+                        public boolean onMenuItemClick(MenuItem item) {
+
+                            switch (item.getItemId()){
+                                case R.id.mapcheck_item_1:
+                                    //Swap to Line by Bearing
+                                    viewCurrentTypeToDisplay = 0;
+                                    swapTypeOfObservation(0);
+
+                                    break;
+
+                                case R.id.mapcheck_item_2:
+                                    ////Swap to Line by Azimuth
+                                    viewCurrentTypeToDisplay = 1;
+                                    swapTypeOfObservation(1);
+                                    break;
+
+                            }
+
+                            return true;
+                        }
+                    });
+
+                    popupMenuObsType.show();
+                }
+            });
+        }else{
+            ibSwapObservation.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    popupMenuOpen = 1;
+
+                    PopupMenu popupMenuObsType = new PopupMenu(mContext, ibSwapObservation);
+                    popupMenuObsType.inflate(R.menu.popup_cogo_mapcheck_observation_type);
+
+                    switch(viewCurrentTypeToDisplay){
+
+                        case 0:
+                            popupMenuObsType.getMenu().findItem(R.id.mapcheck_item_1).setChecked(true);
+                            break;
+
+                        case 1:
+                            popupMenuObsType.getMenu().findItem(R.id.mapcheck_item_2).setChecked(true);
+                            break;
+
+                        case 2:
+                            popupMenuObsType.getMenu().findItem(R.id.mapcheck_item_3).setChecked(true);
+                            break;
+
+                        case 3:
+                            popupMenuObsType.getMenu().findItem(R.id.mapcheck_item_4).setChecked(true);
+                            break;
+
+                        case 4:
+                            popupMenuObsType.getMenu().findItem(R.id.mapcheck_item_5).setChecked(true);
+                            break;
+
+                        case 5:
+                            popupMenuObsType.getMenu().findItem(R.id.mapcheck_item_6).setChecked(true);
+                            break;
+
+                        default:
+                            break;
+
+                    }
+
+
+                    popupMenuObsType.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                        @Override
+                        public boolean onMenuItemClick(MenuItem item) {
+
+                            switch (item.getItemId()){
+                                case R.id.mapcheck_item_1:
+                                    //Swap to Line by Bearing
+                                    viewCurrentTypeToDisplay = 0;
+                                    swapTypeOfObservation(0);
+
+                                    break;
+
+                                case R.id.mapcheck_item_2:
+                                    ////Swap to Line by Azimuth
+                                    viewCurrentTypeToDisplay = 1;
+                                    swapTypeOfObservation(1);
+                                    break;
+
+                                case R.id.mapcheck_item_3:
+                                    //Swap to Line by Turned Angle
+                                    viewCurrentTypeToDisplay = 2;
+                                    swapTypeOfObservation(2);
+                                    break;
+
+                                case R.id.mapcheck_item_4:
+                                    //Swap to Curve Delta-Radius
+                                    viewCurrentTypeToDisplay = 3;
+                                    swapTypeOfObservation(3);
+                                    break;
+
+                                case R.id.mapcheck_item_5:
+                                    //Swap to Curve Delta-Arc Length
+                                    viewCurrentTypeToDisplay = 4;
+                                    swapTypeOfObservation(4);
+
+                                    break;
+
+                                case R.id.mapcheck_item_6:
+                                    //Swap to Curve Radius-Arc Length
+                                    viewCurrentTypeToDisplay = 5;
+                                    swapTypeOfObservation(5);
+
+                                    break;
+
+                            }
+
+                            return true;
+                        }
+                    });
+
+                    popupMenuObsType.show();
+                }
+            });
+        }
+    }
+
 
     //----------------------------------------------------------------------------------------------//
     private void swapTypeOfObservation(int viewToShow){
@@ -530,13 +1097,13 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder  
                 break;
 
             case 1:
-                vListAdd_ha_turnedAngle.setVisibility(View.VISIBLE);
-                initLayoutHaTurnedAngle();
+                vListAdd_ha_azimuth.setVisibility(View.VISIBLE);
+                initLayoutHaAzimuth();
                 break;
 
             case 2:
-                vListAdd_ha_azimuth.setVisibility(View.VISIBLE);
-                initLayoutHaAzimuth();
+                vListAdd_ha_turnedAngle.setVisibility(View.VISIBLE);
+                initLayoutHaTurnedAngle();
                 break;
 
             case 3:
@@ -564,9 +1131,59 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder  
 
     }
 
+    public void swapPointClosingCheckBox(boolean amIToShow){
+
+        if(amIToShow){
+            tvIsClosingPoint.setVisibility(View.VISIBLE);
+            cbIsClosingPoint.setVisibility(View.VISIBLE);
+            cbIsClosingPoint.setChecked(false);
+
+        }else{
+            tvIsClosingPoint.setVisibility(View.GONE);
+            cbIsClosingPoint.setVisibility(View.GONE);
+            cbIsClosingPoint.setChecked(false);
+        }
+
+    }
+
+
+    public void swapPointClosing(boolean isClosingPoint){
+        Log.d(TAG, "swapPointClosing: Started...");
+        if(isClosingPoint){
+            Log.d(TAG, "swapPointClosing: Closing Point Checked, setting stage");
+            //Turn off Point Number
+            //Set point Number to 0
+            int falsePointNumber = 0;
+
+            etMapCheckPointNumber.setVisibility(View.GONE);
+            tvPointNumberHeader.setVisibility(View.GONE);
+            etMapCheckPointNumber.setText(String.valueOf(falsePointNumber));
+            mValuePointNo = 0;
+
+
+
+        }else{
+            Log.d(TAG, "swapPointClosing: Closing Point Not Checked, back to normal");
+            //Turn on Point Number
+            //Allow user to set point number
+            tvPointNumberHeader.setVisibility(View.VISIBLE);
+            etMapCheckPointNumber.setVisibility(View.VISIBLE);
+
+            etMapCheckPointNumber.setText("");
+
+        }
+
+    }
+
     private void clearAllViews(){
         Log.d(TAG, "clearAllViews: Clearing All Views");
         clearHaBearing();
+        clearHaAzimuth();
+        clearHaTurnedAng();
+
+        clearCurveADaR();
+        clearCurveBDaL();
+        clearCurveBRL();
 
         clearPointData();
         clearMethodVariables();
@@ -579,13 +1196,83 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder  
 
     private void clearHaBearing(){
         Log.d(TAG, "clearHaBearing: Clearing Text");
-        etBearingQuadrant.setText("");
-        etBearingDeg.setText("");
-        etBearingMin.setText("");
-        etBearingSec.setText("");
-        etBearingDistance.setText("");
 
-        etBearingQuadrant.requestFocus();
+        if(isHaBearingInit){
+            etBearingQuadrant.setText("");
+            etBearingDeg.setText("");
+            etBearingMin.setText("");
+            etBearingSec.setText("");
+            etBearingDistance.setText("");
+
+            etBearingQuadrant.requestFocus();
+        }
+
+    }
+
+    private void clearHaAzimuth(){
+        Log.d(TAG, "clearHaAzimuth: Clearing Text");
+
+       if(isHaAzimuthInit){
+           etAzimuthDeg.setText("");
+           etAzimuthMin.setText("");
+           etAzimuthSec.setText("");
+           etAzimuthDistance.setText("");
+
+           etAzimuthDeg.requestFocus();
+       }
+    }
+
+    private void clearHaTurnedAng(){
+        Log.d(TAG, "clearHaTurnedAng: Clearing Text");
+
+        if(isHaTurnedInit){
+            etTurnedDeg.setText("");
+            etTurnedMin.setText("");
+            etTurnedSec.setText("");
+            etTurnedDistance.setText("");
+
+            etTurnedDeg.requestFocus();
+        }
+    }
+
+    private void clearCurveADaR(){
+        Log.d(TAG, "clearCurveADaR: Clearing Text");
+
+        if(isCurveDARInit){
+            etCurveADeltaDeg.setText("");
+            etCurveADeltaMin.setText("");
+            etCurveADeltaSec.setText("");
+            etCurveARadius.setText("");
+
+            etCurveADeltaDeg.requestFocus();
+        }
+
+    }
+
+    private void clearCurveBDaL(){
+        Log.d(TAG, "clearCurvebDaL: Clearing Text");
+
+        if(isCurveDALInit){
+            etCurveBDeltaDeg.setText("");
+            etCurveBDeltaMin.setText("");
+            etCurveBDeltaSec.setText("");
+            etCurveBLength.setText("");
+
+            etCurveBDeltaDeg.requestFocus();
+        }
+
+    }
+
+    private void clearCurveBRL(){
+        Log.d(TAG, "clearCurvebDaL: Clearing Text");
+
+        if(isCurveRLInit){
+            etCurveCRadius.setText("");
+            etCurveCLength.setText("");
+
+            etCurveBDeltaDeg.requestFocus();
+        }
+
     }
 
     private void clearMethodVariables(){
@@ -601,6 +1288,69 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder  
         mValueCurveLength = 0;
         mValueCurveCB = 0;
         mValueCurveCH = 0;
+
+
+    }
+
+
+    private void setTextSizeCurveDirection(boolean isCurveRight, int whichCurve){
+        switch (whichCurve){
+            case CURVE_A:
+                if(isCurveRight){
+                    tvCurveARight.setTextSize(TypedValue.COMPLEX_UNIT_PX,mContext.getResources().getDimension(R.dimen.text_size_medium));
+                    tvCurveARight.setTextColor(mContext.getResources().getColor(R.color.blue_primary));
+
+                    tvCurveALeft.setTextSize(TypedValue.COMPLEX_UNIT_PX,mContext.getResources().getDimension(R.dimen.text_size_header));
+                    tvCurveALeft.setTextColor(mContext.getResources().getColor(R.color.gray));
+
+                }else{
+                    tvCurveALeft.setTextSize(TypedValue.COMPLEX_UNIT_PX,mContext.getResources().getDimension(R.dimen.text_size_medium));
+                    tvCurveALeft.setTextColor(mContext.getResources().getColor(R.color.blue_primary));
+
+                    tvCurveARight.setTextSize(TypedValue.COMPLEX_UNIT_PX,mContext.getResources().getDimension(R.dimen.text_size_header));
+                    tvCurveARight.setTextColor(mContext.getResources().getColor(R.color.gray));
+
+                }
+
+
+                break;
+
+            case CURVE_B:
+                if(isCurveRight){
+                    tvCurveBRight.setTextSize(TypedValue.COMPLEX_UNIT_PX,mContext.getResources().getDimension(R.dimen.text_size_medium));
+                    tvCurveBRight.setTextColor(mContext.getResources().getColor(R.color.blue_primary));
+
+                    tvCurveBLeft.setTextSize(TypedValue.COMPLEX_UNIT_PX,mContext.getResources().getDimension(R.dimen.text_size_header));
+                    tvCurveBLeft.setTextColor(mContext.getResources().getColor(R.color.gray));
+
+                }else{
+                    tvCurveBLeft.setTextSize(TypedValue.COMPLEX_UNIT_PX,mContext.getResources().getDimension(R.dimen.text_size_medium));
+                    tvCurveBLeft.setTextColor(mContext.getResources().getColor(R.color.blue_primary));
+
+                    tvCurveBRight.setTextSize(TypedValue.COMPLEX_UNIT_PX,mContext.getResources().getDimension(R.dimen.text_size_header));
+                    tvCurveBRight.setTextColor(mContext.getResources().getColor(R.color.gray));
+                }
+
+                break;
+
+            case CURVE_C:
+                if(isCurveRight){
+                    tvCurveCRight.setTextSize(TypedValue.COMPLEX_UNIT_PX,mContext.getResources().getDimension(R.dimen.text_size_medium));
+                    tvCurveCRight.setTextColor(mContext.getResources().getColor(R.color.blue_primary));
+
+                    tvCurveCLeft.setTextSize(TypedValue.COMPLEX_UNIT_PX,mContext.getResources().getDimension(R.dimen.text_size_header));
+                    tvCurveCLeft.setTextColor(mContext.getResources().getColor(R.color.gray));
+
+                }else{
+                    tvCurveCLeft.setTextSize(TypedValue.COMPLEX_UNIT_PX,mContext.getResources().getDimension(R.dimen.text_size_medium));
+                    tvCurveCLeft.setTextColor(mContext.getResources().getColor(R.color.blue_primary));
+
+                    tvCurveCRight.setTextSize(TypedValue.COMPLEX_UNIT_PX,mContext.getResources().getDimension(R.dimen.text_size_header));
+                    tvCurveCRight.setTextColor(mContext.getResources().getColor(R.color.gray));
+
+                }
+
+        }
 
 
     }
@@ -706,23 +1456,192 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder  
 
                 break;
 
-            case 1:
+            case 1:  //Azimuth
+                String dAz, mAz, sAz;
+
+                dAz = etAzimuthDeg.getText().toString();
+                mAz = etAzimuthMin.getText().toString();
+                sAz = etAzimuthSec.getText().toString();
+
+                if(!StringUtilityHelper.isStringNull(dAz) && !StringUtilityHelper.isStringNull(mAz) && !StringUtilityHelper.isStringNull(sAz)){
+                    //Save horizontal angle as a decimal degree
+                    mValueAzimuth = MathHelper.convertPartsToDEC(dAz,mAz,sAz);
+
+                }else {
+                    if(StringUtilityHelper.isStringNull(dAz)) {
+                        etAzimuthDeg.setError(mContext.getResources().getString(R.string.cogo_ha_deg_not_entered));
+                        isThereAnError = true;
+                    }
+
+                    if(StringUtilityHelper.isStringNull(mAz)) {
+                        etAzimuthMin.setError(mContext.getResources().getString(R.string.cogo_ha_min_not_entered));
+                        isThereAnError = true;
+
+                    }
+                    if(StringUtilityHelper.isStringNull(sAz)) {
+                        etAzimuthSec.setError(mContext.getResources().getString(R.string.cogo_ha_sec_not_entered));
+                        isThereAnError = true;
+                    }
+                }
+
+                String hAzDistance;
+                hAzDistance = etAzimuthDistance.getText().toString();
+
+                if(!StringUtilityHelper.isStringNull(hAzDistance)){
+                    //Save horizontal angle as a decimal degree
+                    mValueDistance = Double.parseDouble(hAzDistance);
+                }else{
+                    etAzimuthDistance.setError(mContext.getResources().getString(R.string.cogo_distance_not_entered));
+                    isThereAnError = true;
+                }
 
                 break;
 
-            case 2:
+            case 2: //Turned Angle
+                String dTurn, mTurn, sTurn;
+
+                dTurn = etTurnedDeg.getText().toString();
+                mTurn = etTurnedMin.getText().toString();
+                sTurn = etTurnedSec.getText().toString();
+
+                if(!StringUtilityHelper.isStringNull(dTurn) && !StringUtilityHelper.isStringNull(mTurn) && !StringUtilityHelper.isStringNull(sTurn)){
+                    //Save horizontal angle as a decimal degree
+                    mValueTurnedAngle = MathHelper.convertPartsToDEC(dTurn,mTurn,sTurn);
+
+                }else {
+                    if(StringUtilityHelper.isStringNull(dTurn)) {
+                        etTurnedDeg.setError(mContext.getResources().getString(R.string.cogo_ha_deg_not_entered));
+                        isThereAnError = true;
+                    }
+
+                    if(StringUtilityHelper.isStringNull(mTurn)) {
+                        etTurnedMin.setError(mContext.getResources().getString(R.string.cogo_ha_min_not_entered));
+                        isThereAnError = true;
+
+                    }
+                    if(StringUtilityHelper.isStringNull(sTurn)) {
+                        etTurnedSec.setError(mContext.getResources().getString(R.string.cogo_ha_sec_not_entered));
+                        isThereAnError = true;
+                    }
+                }
+
+                String hTurnDistance;
+                hTurnDistance = etTurnedDistance.getText().toString();
+
+                if(!StringUtilityHelper.isStringNull(hTurnDistance)){
+                    //Save horizontal angle as a decimal degree
+                    mValueDistance = Double.parseDouble(hTurnDistance);
+                }else{
+                    etTurnedDistance.setError(mContext.getResources().getString(R.string.cogo_distance_not_entered));
+                    isThereAnError = true;
+                }
 
                 break;
 
-            case 3:
+            case 3:  //Delta - Radius
+                String dCurveA, mCurveA, sCurveA;
+
+                dCurveA = etCurveADeltaDeg.getText().toString();
+                mCurveA = etCurveADeltaMin.getText().toString();
+                sCurveA = etCurveADeltaSec.getText().toString();
+
+                if(!StringUtilityHelper.isStringNull(dCurveA) && !StringUtilityHelper.isStringNull(mCurveA) && !StringUtilityHelper.isStringNull(sCurveA)){
+                    //Save horizontal angle as a decimal degree
+                    mValueCurveDelta = MathHelper.convertPartsToDEC(dCurveA,mCurveA,sCurveA);
+
+                }else {
+                    if(StringUtilityHelper.isStringNull(dCurveA)) {
+                        etCurveADeltaDeg.setError(mContext.getResources().getString(R.string.cogo_ha_deg_not_entered));
+                        isThereAnError = true;
+                    }
+
+                    if(StringUtilityHelper.isStringNull(mCurveA)) {
+                        etCurveADeltaMin.setError(mContext.getResources().getString(R.string.cogo_ha_min_not_entered));
+                        isThereAnError = true;
+
+                    }
+                    if(StringUtilityHelper.isStringNull(sCurveA)) {
+                        etCurveADeltaSec.setError(mContext.getResources().getString(R.string.cogo_ha_sec_not_entered));
+                        isThereAnError = true;
+                    }
+                }
+
+                String hCurveARadius;
+                hCurveARadius = etCurveARadius.getText().toString();
+
+                if(!StringUtilityHelper.isStringNull(hCurveARadius)){
+                    //Save horizontal angle as a decimal degree
+                    mValueCurveRadius = Double.parseDouble(hCurveARadius);
+                }else{
+                    etCurveARadius.setError(mContext.getResources().getString(R.string.cogo_distance_not_entered));
+                    isThereAnError = true;
+                }
 
                 break;
 
-            case 4:
+            case 4:  //Delta - Length
+                String dCurveB, mCurveB, sCurveB;
 
+                dCurveB = etCurveBDeltaDeg.getText().toString();
+                mCurveB = etCurveBDeltaMin.getText().toString();
+                sCurveB = etCurveBDeltaSec.getText().toString();
+
+                if(!StringUtilityHelper.isStringNull(dCurveB) && !StringUtilityHelper.isStringNull(mCurveB) && !StringUtilityHelper.isStringNull(sCurveB)){
+                    //Save horizontal angle as a decimal degree
+                    mValueCurveDelta = MathHelper.convertPartsToDEC(dCurveB,mCurveB,sCurveB);
+
+                }else {
+                    if(StringUtilityHelper.isStringNull(dCurveB)) {
+                        etCurveBDeltaDeg.setError(mContext.getResources().getString(R.string.cogo_ha_deg_not_entered));
+                        isThereAnError = true;
+                    }
+
+                    if(StringUtilityHelper.isStringNull(mCurveB)) {
+                        etCurveBDeltaMin.setError(mContext.getResources().getString(R.string.cogo_ha_min_not_entered));
+                        isThereAnError = true;
+
+                    }
+                    if(StringUtilityHelper.isStringNull(sCurveB)) {
+                        etCurveBDeltaSec.setError(mContext.getResources().getString(R.string.cogo_ha_sec_not_entered));
+                        isThereAnError = true;
+                    }
+                }
+
+                String hCurveBLength;
+                hCurveBLength = etCurveBLength.getText().toString();
+
+                if(!StringUtilityHelper.isStringNull(hCurveBLength)){
+                    //Save horizontal angle as a decimal degree
+                    mValueCurveLength = Double.parseDouble(hCurveBLength);
+                }else{
+                    etCurveBLength.setError(mContext.getResources().getString(R.string.cogo_distance_not_entered));
+                    isThereAnError = true;
+                }
                 break;
 
-            case 5:
+            case 5:  //Curve - Radius and Length
+
+                String hCurveCRadius;
+                hCurveCRadius = etCurveCRadius.getText().toString();
+
+                if(!StringUtilityHelper.isStringNull(hCurveCRadius)){
+                    //Save horizontal angle as a decimal degree
+                    mValueCurveRadius = Double.parseDouble(hCurveCRadius);
+                }else{
+                    etCurveCRadius.setError(mContext.getResources().getString(R.string.cogo_distance_not_entered));
+                    isThereAnError = true;
+                }
+
+                String hCurveCLength;
+                hCurveCLength = etCurveCLength.getText().toString();
+
+                if(!StringUtilityHelper.isStringNull(hCurveCLength)){
+                    //Save horizontal angle as a decimal degree
+                    mValueCurveLength = Double.parseDouble(hCurveCLength);
+                }else{
+                    etCurveCLength.setError(mContext.getResources().getString(R.string.cogo_distance_not_entered));
+                    isThereAnError = true;
+                }
 
                 break;
 
@@ -745,18 +1664,49 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder  
         PointMapCheck mapCheck = new PointMapCheck();
 
         switch(viewCurrentTypeToDisplay) {
-            case 0: // Bearing: D-M-S
+            case 0: // Bearing:
                 mapCheck.setObservationType(0);
                 mapCheck.setLineAngle(mValueBearing);
                 mapCheck.setLineDistance(mValueDistance);
-                mapCheck.setPointDescription(mValuePointDesc);
-                mapCheck.setNewPointNo(mValuePointNo);
+                break;
 
+            case 1: //Azimuth
+                mapCheck.setObservationType(1);
+                mapCheck.setLineAngle(mValueAzimuth);
+                mapCheck.setLineDistance(mValueDistance);
+                break;
+
+            case 2: //Turned Angle
+                mapCheck.setObservationType(2);
+                mapCheck.setLineAngle(mValueTurnedAngle);
+                mapCheck.setLineDistance(mValueDistance);
+                break;
+
+            case 3: //Curve Delta/Radius
+                mapCheck.setObservationType(3);
+                mapCheck.setCurveDelta(mValueCurveDelta);
+                mapCheck.setCurveRadius(mValueCurveRadius);
+                break;
+
+            case 4: //Curve Delta/Length
+                mapCheck.setObservationType(4);
+                mapCheck.setCurveDelta(mValueCurveDelta);
+                mapCheck.setCurveLength(mValueCurveLength);
+                break;
+
+            case 5: //Curve Radius/Length
+                mapCheck.setObservationType(5);
+                mapCheck.setCurveRadius(mValueCurveRadius);
+                mapCheck.setCurveLength(mValueCurveLength);
                 break;
 
             default:
                 break;
         }
+
+
+        mapCheck.setPointDescription(mValuePointDesc);
+        mapCheck.setToPointNo(mValuePointNo);
 
         mapcheckListener.sendNewMapcheckToActivity(mapCheck, position);
         clearAllViews();
@@ -770,6 +1720,58 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder  
     }
 
     //----------------------------------------------------------------------------------------------//
+
+    /**
+     * Point Numbers
+     *
+     */
+
+    private boolean checkPointNumberFromArrayList(int pointNumber){
+        boolean doesPointExist;
+        HashMap pointMap = new HashMap();
+
+        lstPointMapCheck = mapcheckListener.getPointMapCheck();
+
+        for(int i=0; i<lstPointMapCheck.size(); i++) {
+            PointMapCheck pointMapCheck = lstPointMapCheck.get(i);
+
+            String pointListPointNo = Integer.toString(pointMapCheck.getToPointNo());
+
+            pointMap.put(pointListPointNo, pointMapCheck);
+
+        }
+
+        if(pointMap.containsKey(String.valueOf(pointNumber))) {
+            doesPointExist = true;
+        }else{
+            Log.d(TAG, "loadSetup: Point Does not exists");
+            doesPointExist = false;
+
+        }
+
+
+        return doesPointExist;
+    }
+
+    private void checkPointNumberFromDatabase(int pointNumber){
+        Log.d(TAG, "checkPointNumber: Started...");
+        BackgroundSurveyPointExistInDatabase backgroundSurveyPointExistInDatabase = new BackgroundSurveyPointExistInDatabase(mContext,jobDatabaseName,this,pointNumber);
+        backgroundSurveyPointExistInDatabase.execute();
+
+    }
+
+    //----------------------------------------------------------------------------------------------//
+
+    private void showToast(String data, boolean shortTime) {
+
+        if (shortTime) {
+            Toast.makeText(mContext, data, Toast.LENGTH_SHORT).show();
+
+        } else{
+            Toast.makeText(mContext, data, Toast.LENGTH_LONG).show();
+
+        }
+    }
 
     private void hideKeypadFromET (EditText etView) {
         Log.d(TAG, "hideKeypadFromET: Started...");
@@ -796,4 +1798,39 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder  
 
     }
 
+    //----------------------------------------------------------------------------------------------//
+    /**
+     * Listeners
+     */
+
+    @Override
+    public void doesPointExist(int pointNumber, boolean isPointFoundInDatabase) {
+        boolean isPointFoundInArray = false;
+
+        if(!isPointFoundInDatabase){
+            //point is not found, look in array and see if it exists
+            isPointFoundInArray = checkPointNumberFromArrayList(pointNumber);
+        }
+
+        if(isPointFoundInDatabase || isPointFoundInArray){
+            //point exists in either the database or array, throw flag
+                etMapCheckPointNumber.setError(mContext.getResources().getString(R.string.cogo_point_no_exists));
+                btSaveObservation.setClickable(false);
+            }else{
+            etMapCheckPointNumber.setError(null);
+            btSaveObservation.setClickable(true);
+
+        }
+
+    }
+
+    //----------------------------------------------------------------------------------------------//
+
+    public int getListPosition() {
+        return listPosition;
+    }
+
+    public void setListPosition(int listPosition) {
+        this.listPosition = listPosition;
+    }
 }

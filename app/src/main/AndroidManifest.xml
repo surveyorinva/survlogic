@@ -123,6 +123,10 @@
             android:screenOrientation="portrait"
             android:theme="@style/SuperMaterialTheme"/>
 
+        <activity android:name=".activity.JobCogoMapCheckResultsActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/SuperMaterialTheme"/>
+
         <activity
             android:name=".activity.JobGpsActivity"
             android:screenOrientation="portrait"

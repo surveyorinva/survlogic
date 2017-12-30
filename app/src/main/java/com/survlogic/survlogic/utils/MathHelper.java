@@ -28,6 +28,22 @@ public class MathHelper {
     }
 
     /**
+     * A simple algorithm to generate a random generate of code based upon size entered
+     * @param sizeOfRandomString
+     * @return
+     */
+
+    public static String getRandomString(final int sizeOfRandomString){
+        Log.d(TAG, "getRandomString: Started...");
+        final Random random=new Random();
+        final StringBuilder sb=new StringBuilder(sizeOfRandomString);
+        for(int i=0;i<sizeOfRandomString;++i)
+            sb.append(ALLOWED_CHARACTERS.charAt(random.nextInt(ALLOWED_CHARACTERS.length())));
+        return sb.toString();
+    }
+
+
+    /**
      * Creates an average value from an Array list of values
      * @param arrayList
      * @return
@@ -44,54 +60,6 @@ public class MathHelper {
         return avg;
 
     }
-
-
-    /**
-     * Covert decimal degrees to Degrees - Minutes - Seconds.
-     * If the entry requires the cardinal direction to be included, signCounts = true
-     * @param angle
-     * @param decimalPlace
-     * @param signCounts
-     * @return
-     */
-
-
-    public static String convertDECtoDMSGeodetic(double angle, int decimalPlace, boolean signCounts){
-        Log.d(TAG, "convertDECtoDMSGeodetic: Started...");
-        
-        boolean neg = angle < 0;
-        String myAngleDMS;
-
-        //TODO Deal with 0 for decimal place.  right now returns with "."  need to return " "
-
-        angle = Math.abs(angle);
-
-        if (angle ==0){
-            myAngleDMS = "0";
-        }else{
-            double deg = Math.floor(angle);                  // Round down
-            double minutes = Math.floor((angle * 60) % 60);  // This is an integer in the range [0, 60)
-            double seconds = (angle * 3600) % 60;            // This is a decimal in the range [0, 60)
-
-            myAngleDMS = (int)deg + "°" + (int)minutes + "'"+ seconds;
-
-            int pointIndex = myAngleDMS.indexOf(".");
-            int endIndex = pointIndex + 1 + decimalPlace;
-            if(endIndex < myAngleDMS.length()) {
-                myAngleDMS = myAngleDMS.substring(0, endIndex);
-            }
-
-            if (neg){
-                myAngleDMS = myAngleDMS + "\" W";
-            }else{
-                myAngleDMS = myAngleDMS + "\" E";
-            }
-        }
-
-        return myAngleDMS;
-    }
-
-
 
     public static double convertPartsToDEC(String degreeIn, String minuteIn, String secondIn){
         Log.d(TAG, "convertPartsToDEC: Started...");
@@ -196,6 +164,83 @@ public class MathHelper {
 
     }
 
+    public static String convertDECtoDMS(double angle, int decimalPlace){
+        Log.d(TAG, "convertDECtoDMSGeodetic: Started...");
+
+        boolean neg = angle < 0;
+        String myAngleDMS;
+
+        //TODO Deal with 0 for decimal place.  right now returns with "."  need to return " "
+
+        angle = Math.abs(angle);
+
+        if (angle ==0){
+            myAngleDMS = "0";
+        }else {
+            double deg = Math.floor(angle);                  // Round down
+            double minutes = Math.floor((angle * 60) % 60);  // This is an integer in the range [0, 60)
+            double seconds = (angle * 3600) % 60;            // This is a decimal in the range [0, 60)
+
+            myAngleDMS = (int) deg + "°" + (int) minutes + "'" + seconds;
+
+        }
+
+
+        int pointIndex = myAngleDMS.indexOf(".");
+        int endIndex;
+
+        if (decimalPlace==0){
+            endIndex = pointIndex;
+        }else {
+            endIndex = pointIndex + 1 + decimalPlace;
+        }
+
+        if (endIndex < myAngleDMS.length()) {
+            myAngleDMS = myAngleDMS.substring(0, endIndex);
+        }
+
+        myAngleDMS = myAngleDMS + "\"";
+
+
+        return myAngleDMS;
+    }
+
+
+    public static String convertDECtoDMSGeodetic(double angle, int decimalPlace, boolean signCounts){
+        Log.d(TAG, "convertDECtoDMSGeodetic: Started...");
+
+        boolean neg = angle < 0;
+        String myAngleDMS;
+
+        //TODO Deal with 0 for decimal place.  right now returns with "."  need to return " "
+
+        angle = Math.abs(angle);
+
+        if (angle ==0){
+            myAngleDMS = "0";
+        }else{
+            double deg = Math.floor(angle);                  // Round down
+            double minutes = Math.floor((angle * 60) % 60);  // This is an integer in the range [0, 60)
+            double seconds = (angle * 3600) % 60;            // This is a decimal in the range [0, 60)
+
+            myAngleDMS = (int)deg + "°" + (int)minutes + "'"+ seconds;
+
+            int pointIndex = myAngleDMS.indexOf(".");
+            int endIndex = pointIndex + 1 + decimalPlace;
+            if(endIndex < myAngleDMS.length()) {
+                myAngleDMS = myAngleDMS.substring(0, endIndex);
+            }
+
+            if (neg){
+                myAngleDMS = myAngleDMS + "\" W";
+            }else{
+                myAngleDMS = myAngleDMS + "\" E";
+            }
+        }
+
+        return myAngleDMS;
+    }
+
     public static String convertDECtoDMSAzimuth(double angle, int decimalPlace){
         Log.d(TAG, "convertDECtoDMSGeodetic: Started...");
 
@@ -235,6 +280,44 @@ public class MathHelper {
 
 
         return myAngleDMS;
+    }
+
+    public static double convertDECBearingtToDECAzimuth(double bearing){
+        Log.d(TAG, "convertDECBearingtToDECAzimuth: Started...");
+        Log.d(TAG, "convertDECBearingtToDECAzimuth: Bearing: " + bearing);
+
+        int quadrant = Integer.parseInt(Integer.toString((int) bearing).substring(0, 1));
+        Log.d(TAG, "convertDECBearingtToDECAzimuth: Quadrant: " + quadrant);
+        double angle = 0;
+
+        switch(quadrant){
+            case 1:
+                angle = bearing - 100;
+                Log.d(TAG, "convertDECBearingtToDECAzimuth: Angle: " + angle);
+                break;
+            case 2:
+                angle = bearing - 200;
+                angle = 180 - angle;
+                Log.d(TAG, "convertDECBearingtToDECAzimuth: Angle: " + angle);
+
+                break;
+            case 3:
+                angle = bearing - 300;
+                angle = 180 + angle;
+                Log.d(TAG, "convertDECBearingtToDECAzimuth: Angle: " + angle);
+                break;
+            case 4:
+                angle = bearing - 400;
+                angle = 360 - angle;
+                Log.d(TAG, "convertDECBearingtToDECAzimuth: Angle: " + angle);
+                break;
+            default:
+
+        }
+
+        return angle;
+
+
     }
 
     public static String convertDECtoDMSBearing(double angle, int decimalPlace){
@@ -380,23 +463,55 @@ public class MathHelper {
         return results;
     }
 
+    public static double inverseAzimuthFromPoint(Point pointSurvey1, Point pointSurvey2){
+        double results;
+
+        double northing1 = pointSurvey1.getNorthing();
+        double northing2 = pointSurvey2.getNorthing();
+
+        double easting1 = pointSurvey1.getEasting();
+        double easting2 = pointSurvey2.getEasting();
+
+        double deltaNorth, deltaEast;
+
+        deltaNorth = northing2 - northing1;
+        deltaEast = easting2 - easting1;
+
+        results = (deltaEast)/(deltaNorth);
+        results = Math.atan(results);
+        results = (180/Math.PI) * results;
+
+        boolean isNorthPos = false;
+        boolean isEastPos = false;
+
+        if (deltaNorth > 0){
+            isNorthPos = true;
+        }else{
+            isNorthPos = false;
+        }
+
+        if (deltaEast > 0){
+            isEastPos = true;
+        }else{
+            isEastPos = false;
+        }
 
 
-    /**
-     * A simple algorithm to generate a random generate of code based upon size entered
-     * @param sizeOfRandomString
-     * @return
-     */
+        if(isNorthPos && isEastPos) { //Q1
+            results = Math.abs(results);
+        }else if(!isNorthPos && isEastPos){ //Q2
+            results = 180 - Math.abs(results);
 
-    public static String getRandomString(final int sizeOfRandomString){
-        Log.d(TAG, "getRandomString: Started...");
-        final Random random=new Random();
-        final StringBuilder sb=new StringBuilder(sizeOfRandomString);
-        for(int i=0;i<sizeOfRandomString;++i)
-            sb.append(ALLOWED_CHARACTERS.charAt(random.nextInt(ALLOWED_CHARACTERS.length())));
-        return sb.toString();
+        }else if(!isNorthPos && !isEastPos) { //Q3
+            results = 180 + Math.abs(results);
+
+        }else if(isNorthPos && !isEastPos) { //Q4
+            results = 360 - Math.abs(results);
+
+        }
+
+        return results;
     }
-
 
     public static double inverseAzimuthFromPointSurvey(PointSurvey pointSurvey1, PointSurvey pointSurvey2){
         double results;
@@ -514,6 +629,87 @@ public class MathHelper {
 
         results = slopeDistance * Math.cos(zenithAngleInRadians);
 
+
+        return results;
+    }
+
+
+    public static Point solveForCoordinatesFromBearing(Point occupyPoint, double hzAngle, double sDistance, double znAngle){
+        Log.d(TAG, "solveForCoordinatesFromBearing: Started");
+        double hzAzimuth, hzDistance, dNorth, dEast;
+        Point results = new Point();
+
+        hzAzimuth = convertDECBearingtToDECAzimuth(hzAngle);
+        hzAzimuth = (Math.PI/180) * hzAzimuth;
+
+        Log.d(TAG, "solveForCoordinatesFromBearing: Converted Az: " + hzAzimuth);
+        hzDistance = convertSlopeDistanceToHorizontalDistanceByZenith(sDistance,znAngle);
+        Log.d(TAG, "solveForCoordinatesFromBearing: Converted Hd:" + hzDistance);
+
+        dNorth = hzDistance * Math.cos(hzAzimuth);
+        dEast = hzDistance * Math.sin(hzAzimuth);
+
+        results.setNorthing(occupyPoint.getNorthing() + dNorth);
+        results.setEasting(occupyPoint.getEasting() + dEast);
+        results.setElevation(0d);
+
+        return results;
+
+    }
+
+    public static Point solveForCoordinatesFromAzimuth(Point occupyPoint, double hzAngle, double sDistance, double znAngle){
+        Log.d(TAG, "solveForCoordinatesFromAzimuth: Started");
+
+        double hzAzimuth, hzDistance, dNorth, dEast;
+        Point results = new Point();
+
+        hzAzimuth = (Math.PI/180);
+
+        Log.d(TAG, "solveForCoordinatesFromBearing: Converted Az: " + hzAzimuth);
+        hzDistance = convertSlopeDistanceToHorizontalDistanceByZenith(sDistance,znAngle);
+        Log.d(TAG, "solveForCoordinatesFromBearing: Converted Hd:" + hzDistance);
+
+        dNorth = hzDistance * Math.cos(hzAzimuth);
+        dEast = hzDistance * Math.sin(hzAzimuth);
+
+        results.setNorthing(occupyPoint.getNorthing() + dNorth);
+        results.setEasting(occupyPoint.getEasting() + dEast);
+        results.setElevation(0d);
+
+        return results;
+
+
+    }
+
+    public static Point solveForCoordinatesFromTurnedAngleAndDistance(Point occupyPoint, Point backsightPoint,double hzAngle, double sDistance, double znAngle){
+        Log.d(TAG, "solveForCoordinatesFromTurnedAngleAndDistance: Started");
+        Point results = new Point();
+        double observedAzimuth, hzDistance, dNorth, dEast;
+        double northing, easting;
+
+        //determine Azimuth
+        double baseAzimuth = MathHelper.inverseAzimuthFromPoint(occupyPoint,backsightPoint);
+
+        observedAzimuth = baseAzimuth + hzAngle;
+        observedAzimuth = (Math.PI/180) * observedAzimuth;
+
+        Log.d(TAG, "solveForCoordinatesFromTurnedAngleAndDistance: Observed Azimith: " + observedAzimuth);
+
+        hzDistance = convertSlopeDistanceToHorizontalDistanceByZenith(sDistance,znAngle);
+
+        dNorth = hzDistance * Math.cos(observedAzimuth);
+        dEast = hzDistance * Math.sin(observedAzimuth);
+
+        Log.d(TAG, "MathHelper: dN: " + dNorth + " dEast: " + dEast);
+
+        northing = occupyPoint.getNorthing() + dNorth;
+        easting = occupyPoint.getEasting() + dEast;
+
+        Log.d(TAG, "Northing: " + northing + ", Easting: " + easting);
+
+        results.setNorthing(northing);
+        results.setEasting(easting);
+        results.setElevation(0d);
 
         return results;
     }

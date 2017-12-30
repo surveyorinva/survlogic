@@ -2,11 +2,13 @@ package com.survlogic.survlogic.activity;
 
 import android.app.DialogFragment;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
@@ -32,6 +34,7 @@ import com.survlogic.survlogic.model.PointGeodetic;
 import com.survlogic.survlogic.model.PointMapCheck;
 import com.survlogic.survlogic.model.PointSurvey;
 import com.survlogic.survlogic.utils.PreferenceLoaderHelper;
+import com.survlogic.survlogic.utils.SwipeAndDragHelper;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -54,7 +57,7 @@ public class JobCogoMapCheckActivity extends AppCompatActivity implements Databa
     private View vInstructions, vList;
     private RelativeLayout rlOccupyMetadataView;
     private ImageButton ibToolbarBack, ibStartCardExpand, ibtOccupyFromList;
-    private Button btToolbarFinish, btAddLegMapCheckStarted, btAddLegMapCheckNew, btCancelLegMapCheckNew;
+    private Button btToolbarFinish, btAddLegMapCheckStarted, btAddLegMapCheckNew;
     private AutoCompleteTextView tvOccupyPointNo;
     private TextView tvOccupyNorthing, tvOccupyEasting, tvOccupyElevation, tvOccupyDesc;
     private Animation animCard_1_down_btn, animCard_1_up_btn;
@@ -283,6 +286,19 @@ public class JobCogoMapCheckActivity extends AppCompatActivity implements Databa
                 openPointListSelect(true);
             }
         });
+
+
+        btToolbarFinish.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                callFinishActivity();
+
+
+            }
+        });
+
+
     }
 
 
@@ -312,6 +328,48 @@ public class JobCogoMapCheckActivity extends AppCompatActivity implements Databa
 
     }
 
+    private void callFinishActivity(){
+        Log.d(TAG, "callFinishActivity: Started");
+        //Check to see if start point is setup
+        boolean isStartPointLoaded = false, isListLoaded = false;
+        boolean isOccupyPointAssigned = validateFormForSetup();
+
+        if(!isOccupyPointAssigned){
+            tvOccupyPointNo.setError(getString(R.string.cogo_mapcheck_starting_point_not_set));
+        }else{
+            isStartPointLoaded  =true;
+        }
+
+        //Check to see if lstPointMapCheck has a size
+        boolean areThereObjectsInList = validateFormForMapCheckList();
+
+        if(!areThereObjectsInList){
+            showToast(getString(R.string.cogo_mapcheck_list_not_added),true);
+        }else{
+            isListLoaded = true;
+        }
+
+
+        //send to openFinishActivity and let the magic begin!
+        if(isStartPointLoaded && isListLoaded) {
+            openFinishActivity();
+        }
+
+    }
+
+    private void openFinishActivity(){
+        Log.d(TAG, "openFinishActivity: Started");
+        Intent intentFinish = new Intent(this,JobCogoMapCheckResultsActivity.class);
+
+        intentFinish.putExtra(getString(R.string.KEY_SETUP_OCCUPY_PT),occupyPoint);
+        intentFinish.putExtra(getString(R.string.KEY_ARRAY_LIST_MAPCHECK),lstPointMapCheck);
+        intentFinish.putExtra(getString(R.string.KEY_PROJECT_ID),project_id);
+        intentFinish.putExtra(getString(R.string.KEY_JOB_ID), job_id);
+        intentFinish.putExtra(getString(R.string.KEY_JOB_DATABASE), jobDatabaseName);
+
+        startActivity(intentFinish);
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+    }
     //----------------------------------------------------------------------------------------------//
 
     private void addFirstLegView(){
@@ -369,8 +427,13 @@ public class JobCogoMapCheckActivity extends AppCompatActivity implements Databa
         mRecyclerViewMapCheck.setLayoutManager(layoutManagerMapCheck);
         mRecyclerViewMapCheck.setHasFixedSize(false);
 
-        adapterMapCheckListAdd = new JobMapCheckObservationsAdaptor(mContext,lstPointMapCheck, COORDINATE_FORMATTER, this);
+        adapterMapCheckListAdd = new JobMapCheckObservationsAdaptor(mContext,lstPointMapCheck, COORDINATE_FORMATTER, this, jobDatabaseName);
+
+        SwipeAndDragHelper swipeAndDragHelper = new SwipeAndDragHelper(adapterMapCheckListAdd);
+        ItemTouchHelper touchHelper = new ItemTouchHelper(swipeAndDragHelper);
+        adapterMapCheckListAdd.setTouchHelper(touchHelper);
         mRecyclerViewMapCheck.setAdapter(adapterMapCheckListAdd);
+        touchHelper.attachToRecyclerView(mRecyclerViewMapCheck);
 
         Log.e(TAG,"Complete: setMapCheckAdapter");
     }
@@ -416,6 +479,7 @@ public class JobCogoMapCheckActivity extends AppCompatActivity implements Databa
 
             if (showPointNo) {
                 tvOccupyPointNo.setText(String.valueOf(currentPointSurvey.getPoint_no()));
+                tvOccupyPointNo.setError(null);
             }
 
             btAddLegMapCheckNew.setClickable(true);
@@ -462,11 +526,27 @@ public class JobCogoMapCheckActivity extends AppCompatActivity implements Databa
 
         if(occupyPointNo == 0){
             Log.d(TAG, "validateFormForSetup: No Occupy Number, showing toast");
-            showToast(getString(R.string.cogo_setup_no_occupy_backsight),true);
+            showToast(getString(R.string.cogo_mapcheck_starting_point_not_set),true);
             isTheFormReady = false;
         }
 
         return isTheFormReady;
+
+    }
+
+    private boolean validateFormForMapCheckList(){
+        Log.d(TAG, "validateFormForMapCheckList: Started");
+        boolean isTheFormReady = true;
+
+        int listSize = 0;
+
+        listSize = lstPointMapCheck.size();
+
+        if(listSize == 0){
+            isTheFormReady = false;
+        }
+
+        return  isTheFormReady;
 
     }
 
@@ -551,6 +631,11 @@ public class JobCogoMapCheckActivity extends AppCompatActivity implements Databa
     @Override
     public void hideKeyboard() {
         hideKeyBoardInFocus();
+    }
+
+    @Override
+    public ArrayList<PointMapCheck> getPointMapCheck() {
+        return lstPointMapCheck;
     }
 
     //----------------------------------------------------------------------------------------------//

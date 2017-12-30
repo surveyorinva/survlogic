@@ -37,6 +37,17 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
+        <TextView
+            android:id="@+id/observation_points"
+            style="@style/Labels.Card.Details"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="2dp"
+            android:layout_below="@id/observation"
+            android:layout_toEndOf="@id/stepNumber"
+            android:layout_toStartOf="@id/observation_type"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
 
         <ImageView
             android:id="@+id/observation_type"
@@ -45,6 +56,7 @@
             android:layout_centerVertical="true"
             android:layout_width="50dp"
             android:layout_height="50dp" />
+
 
         <ImageButton
             android:id="@+id/options_menu"

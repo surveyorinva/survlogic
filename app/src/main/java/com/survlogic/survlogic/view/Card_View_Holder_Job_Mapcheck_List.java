@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
@@ -12,6 +13,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.survlogic.survlogic.R;
+import com.survlogic.survlogic.model.PointMapCheck;
+
+import org.w3c.dom.Text;
+
+import java.util.ArrayList;
 
 /**
  * Created by chrisfillmore on 6/30/2017.
@@ -21,7 +27,7 @@ public class Card_View_Holder_Job_Mapcheck_List extends RecyclerView.ViewHolder 
     private static final String TAG = "Card_View_Holder_Job_Ma";
     private Context mContext;
 
-    public TextView tvPointNo, tvPointDesc, tvPointObservation, tvStepNo;
+    public TextView tvPointString, tvPointDesc, tvPointObservation, tvStepNo;
     public ImageView ivObservation_Type;
     public ImageButton ibOptions_Menu;
     public View mCardView;
@@ -44,43 +50,53 @@ public class Card_View_Holder_Job_Mapcheck_List extends RecyclerView.ViewHolder 
         ivObservation_Type = (ImageView) itemView.findViewById(R.id.observation_type);
         ibOptions_Menu = (ImageButton) itemView.findViewById(R.id.options_menu);
 
-
+        tvPointString = (TextView) itemView.findViewById(R.id.observation_points);
 
     }
 
-    public void popUpOnClickListener(int position){
-        Log.d(TAG, "popUpOnClickListener: Started...");
-        final String sPosition = String.valueOf(position);
 
-        ibOptions_Menu.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                PopupMenu popupMenuObsType = new PopupMenu(mContext, ibOptions_Menu);
-                popupMenuObsType.inflate(R.menu.popup_cogo_mapcheck_list_options);
+    //----------------------------------------------------------------------------------------------//
 
-                popupMenuObsType.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
+    public String getObservationSetupString(int currentPosition, ArrayList<PointMapCheck> pointMapChecks, int observationType){
+        String results, pointFrom, pointTo;
+        String pointFromPrefix, pointToPrefix;
 
-                        switch (item.getItemId()){
-                            case R.id.mapcheck_item_1:
-                                    showToast("Edit Position " + sPosition, true);
-                                break;
 
-                            case R.id.mapcheck_item_2:
-                                showToast("Delete Position " + sPosition, true);
-                                break;
+        if(currentPosition == 0){
+            PointMapCheck pointMapCheckTo = pointMapChecks.get(currentPosition);
+            pointFrom = mContext.getResources().getString(R.string.general_start);
+            pointTo = String.valueOf(pointMapCheckTo.getToPointNo());
 
-                        }
+        }else{
+            PointMapCheck pointMapCheckFrom = pointMapChecks.get(currentPosition - 1);
+            PointMapCheck pointMapCheckTo = pointMapChecks.get(currentPosition);
 
-                        return true;
-                    }
-                });
+            pointFrom = String.valueOf(pointMapCheckFrom.getToPointNo());
 
-                popupMenuObsType.show();
+            if(pointMapCheckTo.getToPointNo() == 0){
+                pointTo = mContext.getResources().getString(R.string.general_start);
+            }else{
+                pointTo = String.valueOf(pointMapCheckTo.getToPointNo());
             }
-        });
+
+        }
+
+        if(observationType == 0 || observationType == 1 || observationType == 2){
+            //This is a line
+            pointFromPrefix = "FROM: ";
+            pointToPrefix = " TO: ";
+
+        }else{
+            //This is a curve
+            pointFromPrefix = "PC: ";
+            pointToPrefix = " PT: ";
+        }
+
+        results = pointFromPrefix + "" + pointFrom + "" + pointToPrefix + "" + pointTo;
+
+        return results;
     }
+
 
     //----------------------------------------------------------------------------------------------//
 

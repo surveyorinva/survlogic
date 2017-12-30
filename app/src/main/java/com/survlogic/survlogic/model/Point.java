@@ -11,6 +11,12 @@ public class Point {
 
     }
 
+    public Point(Point point){
+        this.northing = point.getNorthing();
+        this.easting = point.getEasting();
+        this.elevation = point.getElevation();
+    }
+
     public Point(double northing, double easting) {
         this.northing = northing;
         this.easting = easting;

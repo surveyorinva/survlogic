@@ -13,13 +13,13 @@
 
         <item
             android:id="@+id/mapcheck_item_2"
-            android:title="Line by Turned Angle"
+            android:title="Line by Azimuth"
             android:checkable="true">
         </item>
 
         <item
             android:id="@+id/mapcheck_item_3"
-            android:title="Line by Azimuth"
+            android:title="Line by Turned Angle"
             android:checkable="true">
         </item>
 
@@ -38,12 +38,6 @@
         <item
             android:id="@+id/mapcheck_item_6"
             android:title="Curve by Radius-Arch Length"
-            android:checkable="true">
-        </item>
-
-        <item
-            android:id="@+id/mapcheck_item_7"
-            android:title="Curve by Chord Bearing-Distance"
             android:checkable="true">
         </item>
 

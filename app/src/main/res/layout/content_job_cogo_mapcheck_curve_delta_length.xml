@@ -176,9 +176,9 @@
         android:layout_height="match_parent">
 
         <TextView
-            android:id="@+id/switch_traverse_text"
-            android:text="Right"
-            style="@style/Labels.Card.Switch_On"
+            android:id="@+id/switch_curve_b_left"
+            android:text="Left"
+            style="@style/Labels.Card.Switch_Off"
             android:gravity="center"
             android:layout_weight="20"
             android:layout_width="0dp"
@@ -194,13 +194,13 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="20"
-            android:checked="false"
+            android:checked="true"
             android:gravity="center" />
 
         <TextView
-            android:id="@+id/switch_sideshot_text"
-            android:text="Left"
-            style="@style/Labels.Card.Switch_Off"
+            android:id="@+id/switch_curve_b_right"
+            android:text="Right"
+            style="@style/Labels.Card.Switch_On"
             android:gravity="center"
             android:layout_weight="25"
             android:layout_width="0dp"

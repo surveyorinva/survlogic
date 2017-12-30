@@ -102,6 +102,8 @@
     <string name="KEY_SETUP_OCCUPY_HT">KEY_SETUP_OCCUPY_HT</string>
     <string name="KEY_SETUP_BACKSIGHT_HT">KEY_SETUP_BACKSIGHT_HT</string>
 
+    <string name="KEY_ARRAY_LIST_MAPCHECK">KEY_ARRAY_LIST_MAPCHECK</string>
+
     <!--Intent Answers-->
     <string name="ANSWER_Project_New">ANSWER_project_new</string>
 

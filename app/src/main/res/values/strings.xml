@@ -3,6 +3,7 @@
 
     <!--General App strings-->
     <string name="general_save">Save</string>
+    <string name="general_finish">Finish</string>
     <string name="general_cancel">Cancel</string>
     <string name="general_edit">Edit</string>
     <string name="general_start">Start</string>
@@ -419,10 +420,18 @@
     <string name="cogo_description_not_entered">Point Description Required</string>
     <string name="cogo_setup_no_occupy_backsight">"Occupy and Backsight Not Set"</string>
 
+
     <string name="cogo_traverse_time_to_move_title">Traverse</string>
     <string name="cogo_traverse_time_to_move_message">Are you Ready to Move to Next Station</string>
 
+    <string name="cogo_mapcheck_starting_point_not_set">"Starting Point Not Set"</string>
+    <string name="cogo_mapcheck_list_not_added">Please add observation legs before clicking Finish</string>
     <string name="cogo_mapcheck_quandarnt_out_of_range">1=NE, 2=SE, 3=SW, 4=NW</string>
+    <string name="cogo_mapcheck_point_number_zero_error">Point Number cannot be 0</string>
+    <string name="cogo_mapcheck_results_distance_traveled">Distance \nTraveled</string>
+    <string name="cogo_mapcheck_results_closure_error">Closure Error</string>
+    <string name="cogo_mapcheck_results_area">Area</string>
+    <string name="cogo_mapcheck_results_closure">Closure Precision</string>
 
     <!-- ******************************Strings related to Settings****************************** -->
 

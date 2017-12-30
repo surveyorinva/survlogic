@@ -1,30 +1,66 @@
 package com.survlogic.survlogic.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.util.Log;
+
 /**
  * Created by chrisfillmore on 12/20/2017.
  */
 
-public class PointMapCheck {
+public class PointMapCheck implements Parcelable{
+    private static final String TAG = "PointMapCheck";
 
-    int observationType, newPointNo;
+    int observationType, toPointNo, fromPointNo;
     String pointDescription;
     double lineAngle, lineDistance;
     double curveDelta, curveRadius, curveLength, curveAngle, curveChord;
 
+    double toPointNorth, toPointEast;
+
     public PointMapCheck() {
     }
 
-    public PointMapCheck(int observationType, int newPointNo, String pointDescription, double lineAngle, double lineDistance) {
+    public PointMapCheck(PointMapCheck pointMapCheck){
+        this.observationType = pointMapCheck.getObservationType();
+        this.toPointNo = pointMapCheck.getToPointNo();
+        this.pointDescription = pointMapCheck.getPointDescription();
+        this.lineAngle = pointMapCheck.getLineAngle();
+        this.lineDistance = pointMapCheck.getLineDistance();
+
+        this.curveDelta = pointMapCheck.getCurveDelta();
+        this.curveRadius = pointMapCheck.getCurveRadius();
+        this.curveLength = pointMapCheck.getCurveLength();
+        this.curveAngle = pointMapCheck.getCurveAngle();
+        this.curveChord = pointMapCheck.getCurveChord();
+    }
+
+    private PointMapCheck(Parcel in){
+        this.observationType = in.readInt();
+        this.toPointNo = in.readInt();
+        this.pointDescription = in.readString();
+
+        this.lineAngle = in.readDouble();
+        this.lineDistance = in.readDouble();
+
+        this.curveDelta = in.readDouble();
+        this.curveRadius = in.readDouble();
+        this.curveLength = in.readDouble();
+        this.curveAngle = in.readDouble();
+        this.curveChord = in.readDouble();
+    }
+
+    public PointMapCheck(int observationType, int toPointNo, String pointDescription, double lineAngle, double lineDistance) {
         this.observationType = observationType;
-        this.newPointNo = newPointNo;
+        this.toPointNo = toPointNo;
         this.pointDescription = pointDescription;
         this.lineAngle = lineAngle;
         this.lineDistance = lineDistance;
     }
 
-    public PointMapCheck(int observationType, int newPointNo, String pointDescription, double curveDelta, double curveRadius, double curveLength, double curveAngle, double curveChord) {
+    public PointMapCheck(int observationType, int toPointNo, String pointDescription, double curveDelta, double curveRadius, double curveLength, double curveAngle, double curveChord) {
         this.observationType = observationType;
-        this.newPointNo = newPointNo;
+        this.toPointNo = toPointNo;
         this.pointDescription = pointDescription;
         this.curveDelta = curveDelta;
         this.curveRadius = curveRadius;
@@ -41,12 +77,20 @@ public class PointMapCheck {
         this.observationType = observationType;
     }
 
-    public int getNewPointNo() {
-        return newPointNo;
+    public int getToPointNo() {
+        return toPointNo;
     }
 
-    public void setNewPointNo(int newPointNo) {
-        this.newPointNo = newPointNo;
+    public void setToPointNo(int toPointNo) {
+        this.toPointNo = toPointNo;
+    }
+
+    public int getFromPointNo() {
+        return fromPointNo;
+    }
+
+    public void setFromPointNo(int fromPointNo) {
+        this.fromPointNo = fromPointNo;
     }
 
     public String getPointDescription() {
@@ -112,4 +156,60 @@ public class PointMapCheck {
     public void setCurveChord(double curveChord) {
         this.curveChord = curveChord;
     }
+
+    public double getToPointNorth() {
+        return toPointNorth;
+    }
+
+    public void setToPointNorth(double toPointNorth) {
+        this.toPointNorth = toPointNorth;
+    }
+
+    public double getToPointEast() {
+        return toPointEast;
+    }
+
+    public void setToPointEast(double toPointEast) {
+        this.toPointEast = toPointEast;
+    }
+
+
+    //-----------------------------------------------------------------------------------------------//Parceable Functionality
+
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        Log.d(TAG, "writeToParcel: Started");
+        dest.writeInt(observationType);
+        dest.writeInt(toPointNo);
+        dest.writeString(pointDescription);
+
+        dest.writeDouble(lineAngle);
+        dest.writeDouble(lineDistance);
+
+        dest.writeDouble(curveDelta);
+        dest.writeDouble(curveRadius);
+        dest.writeDouble(curveLength);
+        dest.writeDouble(curveAngle);
+        dest.writeDouble(curveChord);
+    }
+
+    public static final Parcelable.Creator<PointMapCheck> CREATOR = new Parcelable.Creator<PointMapCheck>() {
+        @Override
+        public PointMapCheck createFromParcel(Parcel source) {
+            return new PointMapCheck(source);
+
+        }
+
+        @Override
+        public PointMapCheck[] newArray(int size) {
+            return new PointMapCheck[size];
+        }
+    };
+
 }
