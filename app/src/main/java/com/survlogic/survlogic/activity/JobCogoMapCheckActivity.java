@@ -27,9 +27,12 @@ import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.adapter.JobMapCheckObservationsAdaptor;
 import com.survlogic.survlogic.background.BackgroundSurveyPointGetForActivity;
 import com.survlogic.survlogic.dialog.DialogJobMapCheckPointList;
+import com.survlogic.survlogic.dialog.DialogToolsCurveSolve;
+import com.survlogic.survlogic.interf.CallCurveSolutionDialogListener;
 import com.survlogic.survlogic.interf.DatabasePointsFromAsyncListener;
 import com.survlogic.survlogic.interf.JobCogoMapCheckPointListListener;
 import com.survlogic.survlogic.interf.MapcheckListener;
+import com.survlogic.survlogic.model.CurveSurvey;
 import com.survlogic.survlogic.model.PointGeodetic;
 import com.survlogic.survlogic.model.PointMapCheck;
 import com.survlogic.survlogic.model.PointSurvey;
@@ -44,7 +47,7 @@ import java.util.HashMap;
  * Created by chrisfillmore on 12/13/2017.
  */
 
-public class JobCogoMapCheckActivity extends AppCompatActivity implements DatabasePointsFromAsyncListener, JobCogoMapCheckPointListListener, MapcheckListener{
+public class JobCogoMapCheckActivity extends AppCompatActivity implements DatabasePointsFromAsyncListener, JobCogoMapCheckPointListListener, MapcheckListener, CallCurveSolutionDialogListener{
     private static final String TAG = "JobCogoMapCheckActivity";
     private Context mContext;
 
@@ -427,7 +430,7 @@ public class JobCogoMapCheckActivity extends AppCompatActivity implements Databa
         mRecyclerViewMapCheck.setLayoutManager(layoutManagerMapCheck);
         mRecyclerViewMapCheck.setHasFixedSize(false);
 
-        adapterMapCheckListAdd = new JobMapCheckObservationsAdaptor(mContext,lstPointMapCheck, COORDINATE_FORMATTER, this, jobDatabaseName);
+        adapterMapCheckListAdd = new JobMapCheckObservationsAdaptor(mContext,lstPointMapCheck, COORDINATE_FORMATTER, this, this, jobDatabaseName);
 
         SwipeAndDragHelper swipeAndDragHelper = new SwipeAndDragHelper(adapterMapCheckListAdd);
         ItemTouchHelper touchHelper = new ItemTouchHelper(swipeAndDragHelper);
@@ -636,6 +639,13 @@ public class JobCogoMapCheckActivity extends AppCompatActivity implements Databa
     @Override
     public ArrayList<PointMapCheck> getPointMapCheck() {
         return lstPointMapCheck;
+    }
+
+
+    @Override
+    public void showCurveSolutionDialog(CurveSurvey curveSurvey) {
+        DialogToolsCurveSolve dialogToolsCurveSolve = DialogToolsCurveSolve.newInstance(curveSurvey);
+        dialogToolsCurveSolve.show(getFragmentManager(),"dialog");
     }
 
     //----------------------------------------------------------------------------------------------//

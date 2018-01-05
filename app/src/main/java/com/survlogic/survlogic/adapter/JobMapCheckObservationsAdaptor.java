@@ -18,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.survlogic.survlogic.R;
+import com.survlogic.survlogic.interf.CallCurveSolutionDialogListener;
 import com.survlogic.survlogic.interf.MapcheckListener;
 import com.survlogic.survlogic.model.PointMapCheck;
 import com.survlogic.survlogic.utils.AnimateHelper;
@@ -40,6 +41,8 @@ public class JobMapCheckObservationsAdaptor extends RecyclerView.Adapter<Recycle
     private static final String TAG = "JobMapCheckObservations";
 
     private MapcheckListener mapcheckListener;
+    private CallCurveSolutionDialogListener callCurveSolutionDialogListener;
+
     private ArrayList<PointMapCheck> pointMapChecks = new ArrayList<>();
     private final int LIST = 0, ADD = 1;
 
@@ -48,17 +51,18 @@ public class JobMapCheckObservationsAdaptor extends RecyclerView.Adapter<Recycle
     private Context mContext;
     private String jobDatabaseName;
 
-    private static DecimalFormat COORDINATE_FORMATTER, DISTANCE_PRECISION_FORMATTER;
+    private DecimalFormat COORDINATE_FORMATTER, DISTANCE_PRECISION_FORMATTER;
 
     private ItemTouchHelper touchHelper;
 
 //    CONSTRUCTOR!!!!!
-    public JobMapCheckObservationsAdaptor(Context context, ArrayList<PointMapCheck> pointMapChecks, DecimalFormat COORDINATE_FORMATTER, MapcheckListener mapcheckListener, String jobDatabaseName){
+    public JobMapCheckObservationsAdaptor(Context context, ArrayList<PointMapCheck> pointMapChecks, DecimalFormat DISTANCE_PRECISION_FORMATTER, MapcheckListener mapcheckListener, CallCurveSolutionDialogListener callCurveSolutionDialogListener, String jobDatabaseName){
         this.pointMapChecks = pointMapChecks;
         this.mContext = context;
         this.mapcheckListener = mapcheckListener;
+        this.callCurveSolutionDialogListener = callCurveSolutionDialogListener;
         this.jobDatabaseName = jobDatabaseName;
-        this.COORDINATE_FORMATTER = COORDINATE_FORMATTER;
+        this.DISTANCE_PRECISION_FORMATTER = DISTANCE_PRECISION_FORMATTER;
     }
 
     @Override
@@ -76,7 +80,7 @@ public class JobMapCheckObservationsAdaptor extends RecyclerView.Adapter<Recycle
 
             case ADD:
                 View v2 = mInflater.inflate(R.layout.card_job_cogo_mapcheck_add,parent,false);
-                viewHolder = new Card_View_Holder_Job_Mapcheck_Add(v2, mContext, mapcheckListener, jobDatabaseName);
+                viewHolder = new Card_View_Holder_Job_Mapcheck_Add(v2, mContext, mapcheckListener, callCurveSolutionDialogListener, jobDatabaseName);
                 break;
 
             default:
@@ -144,7 +148,7 @@ public class JobMapCheckObservationsAdaptor extends RecyclerView.Adapter<Recycle
             case 0:  //Bearing
 
                 String bearing = MathHelper.convertDECtoDMSBearing(pointMapCheck.getLineAngle(),0);
-                String distance = COORDINATE_FORMATTER.format(pointMapCheck.getLineDistance());
+                String distance = DISTANCE_PRECISION_FORMATTER.format(pointMapCheck.getLineDistance());
 
                 observation = String.valueOf(bearing + " " + distance);
 
@@ -155,7 +159,7 @@ public class JobMapCheckObservationsAdaptor extends RecyclerView.Adapter<Recycle
             case 1: //Azimuth
 
                 String azimuthAngle = MathHelper.convertDECtoDMSAzimuth(pointMapCheck.getLineAngle(),0);
-                String azimuthDistance = COORDINATE_FORMATTER.format(pointMapCheck.getLineDistance());
+                String azimuthDistance = DISTANCE_PRECISION_FORMATTER.format(pointMapCheck.getLineDistance());
 
                 observation = String.valueOf("Az " + azimuthAngle + " " + azimuthDistance);
 
@@ -165,7 +169,7 @@ public class JobMapCheckObservationsAdaptor extends RecyclerView.Adapter<Recycle
 
             case 2: //Turned Angle
                 String turnedAngle = MathHelper.convertDECtoDMS(pointMapCheck.getLineAngle(),0);
-                String turnedDistance = COORDINATE_FORMATTER.format(pointMapCheck.getLineDistance());
+                String turnedDistance = DISTANCE_PRECISION_FORMATTER.format(pointMapCheck.getLineDistance());
 
                 observation = String.valueOf("< " + turnedAngle + " " + turnedDistance);
 
@@ -174,7 +178,7 @@ public class JobMapCheckObservationsAdaptor extends RecyclerView.Adapter<Recycle
 
             case 3: //Curve: Delta and Radius
                 String curveADeltaAngle = MathHelper.convertDECtoDMS(pointMapCheck.getCurveDelta(),0);
-                String curveARadius = COORDINATE_FORMATTER.format(pointMapCheck.getCurveRadius());
+                String curveARadius = DISTANCE_PRECISION_FORMATTER.format(pointMapCheck.getCurveRadius());
 
                 observation = String.valueOf("Da: " + curveADeltaAngle + " R: " + curveARadius);
 
@@ -184,7 +188,7 @@ public class JobMapCheckObservationsAdaptor extends RecyclerView.Adapter<Recycle
 
             case 4: //Curve: Delta and Length
                 String curveBDeltaAngle = MathHelper.convertDECtoDMS(pointMapCheck.getCurveDelta(),0);
-                String curveBLength = COORDINATE_FORMATTER.format(pointMapCheck.getCurveRadius());
+                String curveBLength = DISTANCE_PRECISION_FORMATTER.format(pointMapCheck.getCurveLength());
 
                 observation = String.valueOf("Da: " + curveBDeltaAngle + " L: " + curveBLength);
 
@@ -193,8 +197,8 @@ public class JobMapCheckObservationsAdaptor extends RecyclerView.Adapter<Recycle
                 break;
 
             case 5: //Curve: Radius and Length
-                String curveCRadius = MathHelper.convertDECtoDMS(pointMapCheck.getCurveDelta(),0);
-                String curveCLength = COORDINATE_FORMATTER.format(pointMapCheck.getCurveRadius());
+                String curveCRadius = DISTANCE_PRECISION_FORMATTER.format(pointMapCheck.getCurveRadius());
+                String curveCLength = DISTANCE_PRECISION_FORMATTER.format(pointMapCheck.getCurveLength());
 
                 observation = String.valueOf("R: " + curveCRadius + " L: " + curveCLength);
 

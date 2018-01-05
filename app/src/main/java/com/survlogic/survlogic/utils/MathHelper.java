@@ -181,7 +181,30 @@ public class MathHelper {
             double minutes = Math.floor((angle * 60) % 60);  // This is an integer in the range [0, 60)
             double seconds = (angle * 3600) % 60;            // This is a decimal in the range [0, 60)
 
-            myAngleDMS = (int) deg + "°" + (int) minutes + "'" + seconds;
+            //myAngleDMS = (int) deg + "°" + (int) minutes + "'" + seconds;
+
+            String sDeg, sMin, sSec;
+
+            if(deg <10){
+                sDeg = "0" + (int)deg + "°";
+            }else{
+                sDeg = (int) deg + "°";
+            }
+
+            if(minutes <10){
+                sMin = "0" + (int)minutes + "'";
+            }else{
+                sMin = (int) minutes + "'";
+            }
+
+            if(seconds <10){
+                sSec = "0" + (int) seconds + ".0";
+            }else{
+                sSec = (int) seconds + ".0";
+            }
+
+            myAngleDMS = sDeg + "" + sMin + "" + sSec;
+            Log.d(TAG, "convertDECtoDMS: Angle: " + myAngleDMS);
 
         }
 
@@ -613,6 +636,26 @@ public class MathHelper {
         return results;
     }
 
+    public static double inverseDistanceFromPointSurvey(PointSurvey pointSurvey1, PointSurvey pointSurvey2){
+        Log.d(TAG, "inverseDistanceFromPointSurvey: Started");
+
+        double n1,e1,n2,e2;
+        double results;
+
+        n1 = pointSurvey1.getNorthing();
+        e1 = pointSurvey1.getEasting();
+
+        n2 = pointSurvey2.getNorthing();
+        e2 = pointSurvey2.getEasting();
+
+        results = Math.pow((n1-n2),2) + Math.pow((e1-e2),2);
+        results = Math.sqrt(results);
+
+        Log.d(TAG, "inverseDistanceFromPointSurvey: Dist: " + results);
+        return results;
+
+    }
+
     public static double convertSlopeDistanceToHorizontalDistanceByZenith(double slopeDistance, double zenithAngle){
         double results=0;
         double zenithAngleInRadians = Math.toRadians(zenithAngle);
@@ -663,11 +706,11 @@ public class MathHelper {
         double hzAzimuth, hzDistance, dNorth, dEast;
         Point results = new Point();
 
-        hzAzimuth = (Math.PI/180);
+        hzAzimuth = hzAngle * (Math.PI/180);
 
-        Log.d(TAG, "solveForCoordinatesFromBearing: Converted Az: " + hzAzimuth);
+        Log.d(TAG, "solveForCoordinatesFromAzimuth: Converted Az: " + hzAzimuth);
         hzDistance = convertSlopeDistanceToHorizontalDistanceByZenith(sDistance,znAngle);
-        Log.d(TAG, "solveForCoordinatesFromBearing: Converted Hd:" + hzDistance);
+        Log.d(TAG, "solveForCoordinatesFromAzimuth: Converted Hd:" + hzDistance);
 
         dNorth = hzDistance * Math.cos(hzAzimuth);
         dEast = hzDistance * Math.sin(hzAzimuth);
@@ -688,11 +731,14 @@ public class MathHelper {
         double northing, easting;
 
         //determine Azimuth
-        double baseAzimuth = MathHelper.inverseAzimuthFromPoint(occupyPoint,backsightPoint);
+        double baseAzimuth = MathHelper.inverseAzimuthFromPoint(backsightPoint,occupyPoint);
 
         observedAzimuth = baseAzimuth + hzAngle;
-        observedAzimuth = (Math.PI/180) * observedAzimuth;
+        Log.d(TAG, "toDelete: Observed Azimuth: (Pre Radians): " + observedAzimuth);
 
+        observedAzimuth = (Math.PI/180) * observedAzimuth;
+        Log.d(TAG, "toDelete: Observed Azimuth: (Post Radians): " + observedAzimuth);
+        Log.d(TAG, "toDelete: Chord Bearing: ");
         Log.d(TAG, "solveForCoordinatesFromTurnedAngleAndDistance: Observed Azimith: " + observedAzimuth);
 
         hzDistance = convertSlopeDistanceToHorizontalDistanceByZenith(sDistance,znAngle);
@@ -784,6 +830,105 @@ public class MathHelper {
         results.setElevation(elevation);
 
         return results;
+
+    }
+
+    public static double solveForCurveDeltaAngle(double radius, double length){
+        Log.d(TAG, "solveForCurveDeltaAngle: Started");
+
+        return (180*length)/(Math.PI * radius);
+
+
+    }
+    
+    public static double solveForCurveRadius(double deltaDEC, double length){
+        Log.d(TAG, "solveForCurveRadius: Started");
+        
+        return ((180 * length)/(Math.PI * deltaDEC));
+        
+        
+    }
+
+    public static double solveForCurveLength(double deltaDEC, double radius){
+        Log.d(TAG, "solveForCurveLength: Started");
+
+        return (deltaDEC/360) * (2*(Math.PI * radius));
+
+    }
+
+    public static double solveForCurveTangent(double deltaDEC, double radius){
+        Log.d(TAG, "solveForCurveTangent: Started");
+        double results = 0;
+
+        results = (Math.PI/180)*deltaDEC;
+        results = Math.tan(results/2);
+
+        return radius * results;
+
+    }
+
+    public static double solveForCurveChordDistance(double deltaDEC, double radius){
+        Log.d(TAG, "solveForCurveTangent: Started");
+        double results = 0;
+
+        results = (Math.PI/180)*deltaDEC;
+        results = Math.sin(results/2);
+
+        return (2*radius) * results;
+
+    }
+
+    public static double solveForCurveChordDirectionAzimuthDEC(Point backTangent, Point pcPoint, double deltaDEC, boolean isCurveToRight){
+        Log.d(TAG, "solveForCurveChordBearingDEC: Started");
+        double hzAzimuth, chordAzimuth;
+
+        Log.d(TAG, "solve: backTangent (n,e): " + backTangent.getNorthing() + ", " + backTangent.getEasting());
+        Log.d(TAG, "solve: pcPoint (n,e): " + pcPoint.getNorthing() + ", " + pcPoint.getEasting());
+
+        //Find azimuth of back tangent
+
+        hzAzimuth = inverseAzimuthFromPoint(backTangent, pcPoint);
+
+        Log.d(TAG, "solve: backTangent - radius:(DEC) " + hzAzimuth);
+
+        if(isCurveToRight){
+            chordAzimuth = hzAzimuth + (deltaDEC/2);
+        }else{
+            chordAzimuth = hzAzimuth - (deltaDEC/2);
+        }
+
+        Log.d(TAG, "solve: chord azimuth: " + chordAzimuth);
+        return  chordAzimuth;
+
+    }
+
+    public static Point solveForCurvePIForBackTangent(Point pcPoint, Point ptPoint, double deltaDEC, double radius, boolean isCurveToRight){
+        Log.d(TAG, "solveForCurvePIForBackTangent: Started");
+        double chordAzimuth, tangent, backTangentAzimuth;
+        Point piPoint;
+
+        Log.d(TAG, "solveForCurvePIForBackTangent: PC: " + pcPoint.getNorthing() + "," + pcPoint.getEasting());
+        Log.d(TAG, "solveForCurvePIForBackTangent: PT: " + ptPoint.getNorthing() + "," + ptPoint.getEasting());
+        Log.d(TAG, "solveForCurvePIForBackTangent: Delta/Radius: " + deltaDEC + "/" + radius);
+
+        chordAzimuth = inverseAzimuthFromPoint(pcPoint, ptPoint);
+        Log.d(TAG, "solveForCurvePIForBackTangent: Chord Azimuth: " + chordAzimuth);
+
+        if(isCurveToRight){
+            backTangentAzimuth = chordAzimuth - (deltaDEC/2);
+        }else{
+            backTangentAzimuth = chordAzimuth + (deltaDEC/2);
+        }
+
+        Log.d(TAG, "solveForCurvePIForBackTangent: Back Tangent Azimuth: " + backTangentAzimuth);
+
+        tangent = solveForCurveTangent(deltaDEC,radius);
+        Log.d(TAG, "solveForCurvePIForBackTangent: Chord Distance: " + tangent);
+
+        piPoint = solveForCoordinatesFromAzimuth(pcPoint,backTangentAzimuth,tangent,90d);
+
+        return piPoint;
+
 
     }
 

@@ -432,6 +432,16 @@
     <string name="cogo_mapcheck_results_closure_error">Closure Error</string>
     <string name="cogo_mapcheck_results_area">Area</string>
     <string name="cogo_mapcheck_results_closure">Closure Precision</string>
+    <string name="cogo_mapcheck_observation_northing_prefix">N: </string>
+    <string name="cogo_mapcheck_observation_easting_prefix">E: </string>
+
+    <string name="tools_curve_header">Curve Solution</string>
+    <string name="tools_curve_delta">Delta (\u0394):</string>
+    <string name="tools_curve_radius">Radius:</string>
+    <string name="tools_curve_length">Length:</string>
+    <string name="tools_curve_tangent">Tangent:</string>
+    <string name="tools_curve_chordDistance">Chord:</string>
+    <string name="tools_curve_chordDirection">Direction:</string>
 
     <!-- ******************************Strings related to Settings****************************** -->
 

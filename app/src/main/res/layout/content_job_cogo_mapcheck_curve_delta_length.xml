@@ -161,7 +161,7 @@
             android:gravity="center"
             android:hint="@string/cogo_hint_distance"
             android:inputType="numberDecimal"
-            android:nextFocusDown="@+id/dl_switch_direction"
+            android:nextFocusDown="@+id/point_Description_value"
             style="@style/InputField.EditText"
             android:background="@drawable/editbox_background_normal" />
 

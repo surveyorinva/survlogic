@@ -30,7 +30,7 @@
         <TextView
             android:id="@+id/closure_error_direction"
             android:textColor="@color/colorPrimary"
-            android:textSize="18sp"
+            android:textSize="15sp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 

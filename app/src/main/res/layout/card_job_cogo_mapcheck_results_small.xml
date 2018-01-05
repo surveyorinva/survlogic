@@ -1,0 +1,70 @@
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:style="http://schemas.android.com/tools"
+    android:clickable="false"
+    android:focusable="false"
+    android:elevation="0dp"
+    android:layout_width="match_parent"
+    android:layout_height="70dp">
+
+    <RelativeLayout
+        android:id="@+id/rl_layout_1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/pointNumber"
+            style="@style/Labels.Card.Header"
+            android:gravity="center"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="5dp"
+            android:padding="8dp"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent" />
+
+        <TextView
+            android:id="@+id/observation_Northing"
+            android:text="@string/general_loading_status"
+            android:textSize="18sp"
+            android:textColor="@color/colorPrimary"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_toEndOf="@id/pointNumber"
+            android:layout_toStartOf="@id/point_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/observation_Easting"
+            android:textSize="18sp"
+            android:textColor="@color/colorPrimary"
+            android:layout_marginStart="5dp"
+            android:layout_below="@id/observation_Northing"
+            android:layout_toEndOf="@id/pointNumber"
+            android:layout_toStartOf="@id/point_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/point_description"
+            android:text="COMP"
+            style="@style/Labels.Card.Header"
+            android:gravity="center"
+            android:layout_marginEnd="10dp"
+            android:layout_alignParentEnd="true"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent" />
+
+        <View
+            android:background="@color/gray_deep"
+            android:layout_marginBottom="2dp"
+            android:layout_alignParentBottom="true"
+            android:layout_width="match_parent"
+            android:layout_height="1dp" />
+
+
+    </RelativeLayout>
+
+
+
+</android.support.v7.widget.CardView>

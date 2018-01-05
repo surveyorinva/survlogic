@@ -21,12 +21,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.survlogic.survlogic.R;
-import com.survlogic.survlogic.background.BackgroundSurveyPointCheckPointNumber;
 import com.survlogic.survlogic.background.BackgroundSurveyPointExistInDatabase;
+import com.survlogic.survlogic.interf.CallCurveSolutionDialogListener;
 import com.survlogic.survlogic.interf.DatabaseDoesPointExistFromAsyncListener;
 import com.survlogic.survlogic.interf.MapcheckListener;
+import com.survlogic.survlogic.model.CurveSurvey;
 import com.survlogic.survlogic.model.PointMapCheck;
-import com.survlogic.survlogic.model.PointSurvey;
 import com.survlogic.survlogic.utils.MathHelper;
 import com.survlogic.survlogic.utils.StringUtilityHelper;
 
@@ -43,6 +43,8 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
     public View mCardView;
     private Context mContext;
     private MapcheckListener mapcheckListener;
+    private CallCurveSolutionDialogListener callCurveSolutionDialogListener;
+
     private String jobDatabaseName;
 
     //-Add New Observation-//
@@ -54,7 +56,6 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
 
     public CheckBox cbIsClosingPoint;
 
-    private Switch switchTypeOfObservation;
     private ImageButton ibSwapObservation;
     public Button btSaveObservation, btCancelObservation;
 
@@ -64,6 +65,8 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
     private boolean isHaAzimuthInit = false, isHaBearingInit = false, isHaTurnedInit = false;
     private boolean isCurveDARInit = false, isCurveDALInit = false, isCurveRLInit = false;
     private boolean isCurveCBCHInit = false;
+
+    private boolean formClosingPoint = false;
 
     private TextView tvIsClosingPoint, tvPointNumberHeader;
     private TextView tvCurveARight, tvCurveALeft;
@@ -107,12 +110,13 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
     private ArrayList<PointMapCheck> lstPointMapCheck = new ArrayList<>();
     private int listPosition = 0;
 
-    public Card_View_Holder_Job_Mapcheck_Add(View itemView, Context mContext, MapcheckListener mapcheckListener, String jobDatabaseName) {
+    public Card_View_Holder_Job_Mapcheck_Add(View itemView, Context mContext, MapcheckListener mapcheckListener, CallCurveSolutionDialogListener callCurveSolutionDialogListener, String jobDatabaseName) {
         super(itemView);
 
         this.mContext = mContext;
         this.mCardView = itemView;
         this.mapcheckListener = mapcheckListener;
+        this.callCurveSolutionDialogListener = callCurveSolutionDialogListener;
         this.jobDatabaseName = jobDatabaseName;
 
         initVewListAddNewObservation();
@@ -131,7 +135,6 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
         vListAdd_curve_r_l = itemView.findViewById(R.id.layout_curve_radius_length);
         vListAdd_curve_cb_ch = itemView.findViewById(R.id.layout_curve_bearing_chord);
 
-        switchTypeOfObservation = (Switch) itemView.findViewById(R.id.type_of_measurement_switch);
         ibSwapObservation = (ImageButton) itemView.findViewById(R.id.typeOfObservation);
 
 
@@ -159,20 +162,22 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
 
             @Override
             public void afterTextChanged(Editable s) {
+                if(!formClosingPoint){
+                    try{
+                        String pointNo = null;
+                        pointNo = etMapCheckPointNumber.getText().toString();
 
-                try{
-                    String pointNo = null;
-                    pointNo = etMapCheckPointNumber.getText().toString();
+                        if(!StringUtilityHelper.isStringNull(pointNo)){
+                            mValuePointNo = Integer.parseInt(pointNo);
+                            checkPointNumberFromDatabase(mValuePointNo);
+                        }
 
-                    if(!StringUtilityHelper.isStringNull(pointNo)){
-                        mValuePointNo = Integer.parseInt(pointNo);
-                        checkPointNumberFromDatabase(mValuePointNo);
+                    }catch(NumberFormatException ex){
+                        showToast("Error.  Check Number Format", true);
+
                     }
-
-                }catch(NumberFormatException ex){
-                    showToast("Error.  Check Number Format", true);
-
                 }
+
             }
         });
 
@@ -234,6 +239,7 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
                         int val = Integer.parseInt(s.toString());
                         if(val > 4){
                             etBearingQuadrant.setError(mContext.getResources().getString(R.string.cogo_mapcheck_quandarnt_out_of_range));
+                            Log.d(TAG, "btSaveObservation: Locked");
                             btSaveObservation.setClickable(false);
                         }else{
                             btSaveObservation.setClickable(true);
@@ -265,6 +271,7 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
                         int val = Integer.parseInt(s.toString());
                         if(val > 90){
                             etBearingDeg.setError(mContext.getResources().getString(R.string.cogo_angle_error_out_of_range));
+                            Log.d(TAG, "btSaveObservation: Locked");
                             btSaveObservation.setClickable(false);
                         }else{
                             btSaveObservation.setClickable(true);
@@ -296,6 +303,7 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
                         int val = Integer.parseInt(s.toString());
                         if(val > 59.999){
                             etBearingMin.setError(mContext.getResources().getString(R.string.cogo_angle_error_out_of_range));
+                            Log.d(TAG, "btSaveObservation: Locked");
                             btSaveObservation.setClickable(false);
                         }else{
                             btSaveObservation.setClickable(true);
@@ -325,6 +333,7 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
                         int val = Integer.parseInt(s.toString());
                         if(val > 59.999){
                             etBearingSec.setError(mContext.getString(R.string.cogo_angle_error_out_of_range));
+                            Log.d(TAG, "btSaveObservation: Locked");
                             btSaveObservation.setClickable(false);
                         }else{
                             btSaveObservation.setClickable(true);
@@ -381,6 +390,7 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
                         int val = Integer.parseInt(s.toString());
                         if(val > 359){
                             etAzimuthDeg.setError(mContext.getResources().getString(R.string.cogo_angle_circle_error_out_of_range));
+                            Log.d(TAG, "btSaveObservation: Locked");
                             btSaveObservation.setClickable(false);
                         }else{
                             btSaveObservation.setClickable(true);
@@ -412,6 +422,7 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
                         int val = Integer.parseInt(s.toString());
                         if(val > 59){
                             etAzimuthMin.setError(mContext.getResources().getString(R.string.cogo_angle_error_out_of_range));
+                            Log.d(TAG, "btSaveObservation: Locked");
                             btSaveObservation.setClickable(false);
                         }else{
                             btSaveObservation.setClickable(true);
@@ -458,6 +469,7 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
                         int val = Integer.parseInt(s.toString());
                         if(val > 59.999){
                             etAzimuthSec.setError(mContext.getString(R.string.cogo_angle_error_out_of_range));
+                            Log.d(TAG, "btSaveObservation: Locked");
                             btSaveObservation.setClickable(false);
                         }else{
                             btSaveObservation.setClickable(true);
@@ -513,6 +525,7 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
                         int val = Integer.parseInt(s.toString());
                         if(val > 359){
                             etTurnedDeg.setError(mContext.getString(R.string.cogo_angle_circle_error_out_of_range));
+                            Log.d(TAG, "btSaveObservation: Locked");
                             btSaveObservation.setClickable(false);
                         }else{
                             btSaveObservation.setClickable(true);
@@ -544,6 +557,7 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
                         int val = Integer.parseInt(s.toString());
                         if(val > 59){
                             etTurnedMin.setError(mContext.getString(R.string.cogo_angle_error_out_of_range));
+                            Log.d(TAG, "btSaveObservation: Locked");
                             btSaveObservation.setClickable(false);
                         }else{
                             btSaveObservation.setClickable(true);
@@ -573,6 +587,7 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
                         int val = Integer.parseInt(s.toString());
                         if(val > 59.999){
                             etTurnedSec.setError(mContext.getString(R.string.cogo_angle_error_out_of_range));
+                            Log.d(TAG, "btSaveObservation: Locked");
                             btSaveObservation.setClickable(false);
                         }else{
                             btSaveObservation.setClickable(true);
@@ -611,6 +626,15 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
             tvCurveALeft = (TextView) itemView.findViewById(R.id.switch_curve_a_left);
 
             btCurveASolve = (Button) itemView.findViewById(R.id.curve_delta_radius_solve);
+            btCurveASolve.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    solveCurve();
+                }
+            });
+
+
+
             isCurveDARInit = true;
 
             etCurveADeltaDeg.addTextChangedListener(new TextWatcher() {
@@ -632,6 +656,7 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
                         int val = Integer.parseInt(s.toString());
                         if(val > 359){
                             etCurveADeltaDeg.setError(mContext.getString(R.string.cogo_angle_circle_error_out_of_range));
+                            Log.d(TAG, "btSaveObservation: Locked");
                             btSaveObservation.setClickable(false);
                         }else{
                             btSaveObservation.setClickable(true);
@@ -663,6 +688,7 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
                         int val = Integer.parseInt(s.toString());
                         if(val > 59){
                             etCurveADeltaMin.setError(mContext.getString(R.string.cogo_angle_error_out_of_range));
+                            Log.d(TAG, "btSaveObservation: Locked");
                             btSaveObservation.setClickable(false);
                         }else{
                             btSaveObservation.setClickable(true);
@@ -692,8 +718,10 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
                         int val = Integer.parseInt(s.toString());
                         if(val > 59.999){
                             etCurveADeltaSec.setError(mContext.getString(R.string.cogo_angle_error_out_of_range));
+                            Log.d(TAG, "btSaveObservation: Locked");
                             btSaveObservation.setClickable(false);
                         }else{
+                            Log.d(TAG, "btSaveObservation: UnLocked");
                             btSaveObservation.setClickable(true);
                         }
 
@@ -747,6 +775,15 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
             tvCurveBLeft = (TextView) itemView.findViewById(R.id.switch_curve_b_left);
 
             btCurveBSolve = (Button) itemView.findViewById(R.id.curve_delta_length_solve);
+            btCurveBSolve.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    solveCurve();
+                }
+            });
+
+
+
             isCurveDALInit = true;
 
             etCurveBDeltaDeg.addTextChangedListener(new TextWatcher() {
@@ -768,8 +805,10 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
                         int val = Integer.parseInt(s.toString());
                         if(val > 359){
                             etCurveBDeltaDeg.setError(mContext.getString(R.string.cogo_angle_circle_error_out_of_range));
+                            Log.d(TAG, "btSaveObservation: Locked");
                             btSaveObservation.setClickable(false);
                         }else{
+                            Log.d(TAG, "btSaveObservation: UnLocked");
                             btSaveObservation.setClickable(true);
                         }
 
@@ -799,8 +838,10 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
                         int val = Integer.parseInt(s.toString());
                         if(val > 59){
                             etCurveBDeltaMin.setError(mContext.getString(R.string.cogo_angle_error_out_of_range));
+                            Log.d(TAG, "btSaveObservation: Locked");
                             btSaveObservation.setClickable(false);
                         }else{
+                            Log.d(TAG, "btSaveObservation: UnLocked");
                             btSaveObservation.setClickable(true);
                         }
 
@@ -828,8 +869,10 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
                         int val = Integer.parseInt(s.toString());
                         if(val > 59.999){
                             etCurveBDeltaSec.setError(mContext.getString(R.string.cogo_angle_error_out_of_range));
+                            Log.d(TAG, "btSaveObservation: Locked");
                             btSaveObservation.setClickable(false);
                         }else{
+                            Log.d(TAG, "btSaveObservation: UnLocked");
                             btSaveObservation.setClickable(true);
                         }
 
@@ -876,6 +919,12 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
             tvCurveCLeft = (TextView) itemView.findViewById(R.id.switch_curve_c_left);
 
             btCurveCSolve = (Button) itemView.findViewById(R.id.curve_radius_length_solve);
+            btCurveCSolve.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    solveCurve();
+                }
+            });
             isCurveRLInit = true;
 
 
@@ -1159,6 +1208,10 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
             tvPointNumberHeader.setVisibility(View.GONE);
             etMapCheckPointNumber.setText(String.valueOf(falsePointNumber));
             mValuePointNo = 0;
+            formClosingPoint = true;
+
+            Log.d(TAG, "btSaveObservation: UnLocked");
+            btSaveObservation.setClickable(true);
 
 
 
@@ -1170,6 +1223,9 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
             etMapCheckPointNumber.setVisibility(View.VISIBLE);
 
             etMapCheckPointNumber.setText("");
+            formClosingPoint = false;
+            Log.d(TAG, "btSaveObservation: Locked");
+            btSaveObservation.setClickable(false);
 
         }
 
@@ -1183,7 +1239,7 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
 
         clearCurveADaR();
         clearCurveBDaL();
-        clearCurveBRL();
+        clearCurveCRL();
 
         clearPointData();
         clearMethodVariables();
@@ -1263,14 +1319,14 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
 
     }
 
-    private void clearCurveBRL(){
+    private void clearCurveCRL(){
         Log.d(TAG, "clearCurvebDaL: Clearing Text");
 
         if(isCurveRLInit){
             etCurveCRadius.setText("");
             etCurveCLength.setText("");
 
-            etCurveBDeltaDeg.requestFocus();
+            etCurveCRadius.requestFocus();
         }
 
     }
@@ -1378,21 +1434,165 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
         }
     }
 
+    public void solveCurve(){
+        Log.d(TAG, "solveCurve: Started");
+        boolean isCurveReady = false;
+        boolean isCurveFormInError = validateCurveForNull();
+
+        Log.d(TAG, "solveCurve: isCurveFormInError: " + isCurveFormInError);
+
+        if(!isCurveFormInError){
+            showDialogCurveSolution(solveForCurve());
+        }
+
+
+    }
+
+    private boolean validateCurveForNull(){
+        Log.d(TAG, "validateCurveForNull: Started");
+        boolean isThereAnError = false;
+
+        switch(viewCurrentTypeToDisplay){
+            case 3:  //Delta - Radius
+                String dCurveA, mCurveA, sCurveA;
+
+                dCurveA = etCurveADeltaDeg.getText().toString();
+                mCurveA = etCurveADeltaMin.getText().toString();
+                sCurveA = etCurveADeltaSec.getText().toString();
+
+                if(!StringUtilityHelper.isStringNull(dCurveA) && !StringUtilityHelper.isStringNull(mCurveA) && !StringUtilityHelper.isStringNull(sCurveA)){
+                    //Save horizontal angle as a decimal degree
+                    mValueCurveDelta = MathHelper.convertPartsToDEC(dCurveA,mCurveA,sCurveA);
+
+                }else {
+                    if(StringUtilityHelper.isStringNull(dCurveA)) {
+                        etCurveADeltaDeg.setError(mContext.getResources().getString(R.string.cogo_ha_deg_not_entered));
+                        isThereAnError = true;
+                    }
+
+                    if(StringUtilityHelper.isStringNull(mCurveA)) {
+                        etCurveADeltaMin.setError(mContext.getResources().getString(R.string.cogo_ha_min_not_entered));
+                        isThereAnError = true;
+
+                    }
+                    if(StringUtilityHelper.isStringNull(sCurveA)) {
+                        etCurveADeltaSec.setError(mContext.getResources().getString(R.string.cogo_ha_sec_not_entered));
+                        isThereAnError = true;
+                    }
+                }
+
+                String hCurveARadius;
+                hCurveARadius = etCurveARadius.getText().toString();
+
+                if(!StringUtilityHelper.isStringNull(hCurveARadius)){
+                    //Save horizontal angle as a decimal degree
+                    mValueCurveRadius = Double.parseDouble(hCurveARadius);
+                }else{
+                    etCurveARadius.setError(mContext.getResources().getString(R.string.cogo_distance_not_entered));
+                    isThereAnError = true;
+                }
+
+                break;
+
+            case 4:  //Delta - Length
+                String dCurveB, mCurveB, sCurveB;
+
+                dCurveB = etCurveBDeltaDeg.getText().toString();
+                mCurveB = etCurveBDeltaMin.getText().toString();
+                sCurveB = etCurveBDeltaSec.getText().toString();
+
+                if(!StringUtilityHelper.isStringNull(dCurveB) && !StringUtilityHelper.isStringNull(mCurveB) && !StringUtilityHelper.isStringNull(sCurveB)){
+                    //Save horizontal angle as a decimal degree
+                    mValueCurveDelta = MathHelper.convertPartsToDEC(dCurveB,mCurveB,sCurveB);
+
+                }else {
+                    if(StringUtilityHelper.isStringNull(dCurveB)) {
+                        etCurveBDeltaDeg.setError(mContext.getResources().getString(R.string.cogo_ha_deg_not_entered));
+                        isThereAnError = true;
+                    }
+
+                    if(StringUtilityHelper.isStringNull(mCurveB)) {
+                        etCurveBDeltaMin.setError(mContext.getResources().getString(R.string.cogo_ha_min_not_entered));
+                        isThereAnError = true;
+
+                    }
+                    if(StringUtilityHelper.isStringNull(sCurveB)) {
+                        etCurveBDeltaSec.setError(mContext.getResources().getString(R.string.cogo_ha_sec_not_entered));
+                        isThereAnError = true;
+                    }
+                }
+
+                String hCurveBLength;
+                hCurveBLength = etCurveBLength.getText().toString();
+
+                if(!StringUtilityHelper.isStringNull(hCurveBLength)){
+                    //Save horizontal angle as a decimal degree
+                    mValueCurveLength = Double.parseDouble(hCurveBLength);
+                }else{
+                    etCurveBLength.setError(mContext.getResources().getString(R.string.cogo_distance_not_entered));
+                    isThereAnError = true;
+                }
+                break;
+
+            case 5:  //Curve - Radius and Length
+
+                String hCurveCRadius;
+                hCurveCRadius = etCurveCRadius.getText().toString();
+
+                if(!StringUtilityHelper.isStringNull(hCurveCRadius)){
+                    //Save horizontal angle as a decimal degree
+                    mValueCurveRadius = Double.parseDouble(hCurveCRadius);
+                }else{
+                    etCurveCRadius.setError(mContext.getResources().getString(R.string.cogo_distance_not_entered));
+                    isThereAnError = true;
+                }
+
+                String hCurveCLength;
+                hCurveCLength = etCurveCLength.getText().toString();
+
+                if(!StringUtilityHelper.isStringNull(hCurveCLength)){
+                    //Save horizontal angle as a decimal degree
+                    mValueCurveLength = Double.parseDouble(hCurveCLength);
+                }else{
+                    etCurveCLength.setError(mContext.getResources().getString(R.string.cogo_distance_not_entered));
+                    isThereAnError = true;
+                }
+
+                break;
+
+            case 6:
+
+                break;
+
+            default:
+                break;
+
+        }
+
+        Log.d(TAG, "validateFormForNull: Results: " + isThereAnError);
+
+        return isThereAnError;
+    }
+
     private boolean validateFormForNull() {
         Log.d(TAG, "validateForm: Started...");
         boolean isThereAnError = false;
 
         //Point No.
-        String pointNo = null;
-        pointNo = etMapCheckPointNumber.getText().toString();
+        
+        if(!formClosingPoint){
+            Log.d(TAG, "validateFormForNull: Closing Point False");
+            String pointNo = null;
+            pointNo = etMapCheckPointNumber.getText().toString();
 
-        if(!StringUtilityHelper.isStringNull(pointNo)){
-            mValuePointNo = Integer.parseInt(pointNo);
-        }else{
-            etMapCheckPointNumber.setError(mContext.getResources().getString(R.string.cogo_point_no_not_entered));
-            isThereAnError = true;
+            if(!StringUtilityHelper.isStringNull(pointNo)){
+                mValuePointNo = Integer.parseInt(pointNo);
+            }else{
+                etMapCheckPointNumber.setError(mContext.getResources().getString(R.string.cogo_point_no_not_entered));
+                isThereAnError = true;
+            }
         }
-
+        
         //Description
         String pointDescription = null;
         pointDescription = etMapCheckPointDescription.getText().toString();
@@ -1654,7 +1854,7 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
 
         }
 
-
+        Log.d(TAG, "validateFormForNull: Results: " + isThereAnError);
         return isThereAnError;
     }
 
@@ -1684,20 +1884,42 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
 
             case 3: //Curve Delta/Radius
                 mapCheck.setObservationType(3);
+                mapCheck.setCurveToRight(isSwitchCurveAIsRight);
                 mapCheck.setCurveDelta(mValueCurveDelta);
                 mapCheck.setCurveRadius(mValueCurveRadius);
+
+                mapCheck.setCurveLength(MathHelper.solveForCurveLength(mValueCurveDelta,mValueCurveRadius));
+                mapCheck.setCurveChord(MathHelper.solveForCurveChordDistance(mValueCurveDelta,mValueCurveRadius));
+
                 break;
 
             case 4: //Curve Delta/Length
                 mapCheck.setObservationType(4);
+                mapCheck.setCurveToRight(isSwitchCurveBIsRight);
+
                 mapCheck.setCurveDelta(mValueCurveDelta);
+                mValueCurveRadius = MathHelper.solveForCurveRadius(mValueCurveDelta,mValueCurveLength);
+
+                mapCheck.setCurveRadius(mValueCurveRadius);
                 mapCheck.setCurveLength(mValueCurveLength);
+
+                mapCheck.setCurveChord(MathHelper.solveForCurveChordDistance(mValueCurveDelta,mValueCurveRadius));
+
+
                 break;
 
             case 5: //Curve Radius/Length
                 mapCheck.setObservationType(5);
+                mapCheck.setCurveToRight(isSwitchCurveCIsRight);
+
+                mValueCurveDelta = MathHelper.solveForCurveDeltaAngle(mValueCurveRadius, mValueCurveLength);
+                mapCheck.setCurveDelta(mValueCurveDelta);
+
                 mapCheck.setCurveRadius(mValueCurveRadius);
                 mapCheck.setCurveLength(mValueCurveLength);
+
+                mapCheck.setCurveChord(MathHelper.solveForCurveChordDistance(mValueCurveDelta,mValueCurveRadius));
+
                 break;
 
             default:
@@ -1707,6 +1929,9 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
 
         mapCheck.setPointDescription(mValuePointDesc);
         mapCheck.setToPointNo(mValuePointNo);
+        mapCheck.setToPointNorth(0d);
+        mapCheck.setToPointEast(0d);
+        mapCheck.setClosingPoint(formClosingPoint);
 
         mapcheckListener.sendNewMapcheckToActivity(mapCheck, position);
         clearAllViews();
@@ -1815,12 +2040,67 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
         if(isPointFoundInDatabase || isPointFoundInArray){
             //point exists in either the database or array, throw flag
                 etMapCheckPointNumber.setError(mContext.getResources().getString(R.string.cogo_point_no_exists));
+            Log.d(TAG, "does point exist:btSaveObservation: Locked");
                 btSaveObservation.setClickable(false);
             }else{
             etMapCheckPointNumber.setError(null);
+            Log.d(TAG, "does point exist:btSaveObservation: UnLocked");
             btSaveObservation.setClickable(true);
 
         }
+
+        if(formClosingPoint){
+            Log.d(TAG, "does point exist:btSaveObservation: UnLocked");
+            btSaveObservation.setClickable(true);
+        }
+
+    }
+
+    //----------------------------------------------------------------------------------------------//
+    private CurveSurvey solveForCurve(){
+        CurveSurvey curveSurvey = new CurveSurvey();
+
+        switch (viewCurrentTypeToDisplay){
+            case 3: //delta-radius
+                curveSurvey.setDeltaDEC(mValueCurveDelta);
+                curveSurvey.setRadius(mValueCurveRadius);
+                curveSurvey.setLength(MathHelper.solveForCurveLength(mValueCurveDelta,mValueCurveRadius));
+                curveSurvey.setTangent(MathHelper.solveForCurveTangent(mValueCurveDelta,mValueCurveRadius));
+                curveSurvey.setChord(MathHelper.solveForCurveChordDistance(mValueCurveDelta,mValueCurveRadius));
+
+                break;
+
+            case 4: //delta-length
+                mValueCurveRadius = MathHelper.solveForCurveRadius(mValueCurveDelta,mValueCurveLength);
+
+                curveSurvey.setDeltaDEC(mValueCurveDelta);
+                curveSurvey.setRadius(mValueCurveRadius);
+                curveSurvey.setLength(mValueCurveLength);
+                curveSurvey.setTangent(MathHelper.solveForCurveTangent(mValueCurveDelta,mValueCurveRadius));
+                curveSurvey.setChord(MathHelper.solveForCurveChordDistance(mValueCurveDelta,mValueCurveRadius));
+
+                break;
+
+            case 5: //radius-length
+                mValueCurveDelta = MathHelper.solveForCurveDeltaAngle(mValueCurveRadius, mValueCurveLength);
+                curveSurvey.setDeltaDEC(mValueCurveDelta);
+                curveSurvey.setRadius(mValueCurveRadius);
+                curveSurvey.setLength(mValueCurveLength);
+                curveSurvey.setTangent(MathHelper.solveForCurveTangent(mValueCurveDelta,mValueCurveRadius));
+                curveSurvey.setChord(MathHelper.solveForCurveChordDistance(mValueCurveDelta,mValueCurveRadius));
+
+                break;
+
+        }
+
+        return curveSurvey;
+
+    }
+
+    private void showDialogCurveSolution(CurveSurvey curveSurvey){
+        Log.d(TAG, "showToolsCurveDialog: Started...");
+
+        callCurveSolutionDialogListener.showCurveSolutionDialog(curveSurvey);
 
     }
 

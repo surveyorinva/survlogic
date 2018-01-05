@@ -4,17 +4,25 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import com.survlogic.survlogic.R;
+import com.survlogic.survlogic.adapter.JobMapCheckObservationsAdaptor;
+import com.survlogic.survlogic.adapter.JobMapCheckResultsAdaptor;
 import com.survlogic.survlogic.model.Point;
 import com.survlogic.survlogic.model.PointMapCheck;
 import com.survlogic.survlogic.model.PointSurvey;
 import com.survlogic.survlogic.utils.MathHelper;
 import com.survlogic.survlogic.utils.PreferenceLoaderHelper;
+import com.survlogic.survlogic.utils.SwipeAndDragHelper;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 /**
@@ -29,11 +37,24 @@ public class JobCogoMapCheckResultsActivity extends AppCompatActivity {
 
     private int project_id, job_id;
     private String jobDatabaseName;
+
     private ArrayList<PointSurvey> lstPointSurvey = new ArrayList<>();
     private ArrayList<PointMapCheck> lstPointMapCheck = new ArrayList<>();
+    private ArrayList<PointMapCheck> lstPointMapCheckResults = new ArrayList<>();
     private PointSurvey occupyPoint;
+    private PointSurvey closingPoint = new PointSurvey();
 
-    ImageButton ibBack, ibSave;
+    private double distanceTraveled = 0;
+
+    private RecyclerView.LayoutManager layoutManagerMapCheck;
+    private JobMapCheckResultsAdaptor adaptorJobMapCheckResults;
+
+    private RecyclerView mRecyclerViewMapCheck;
+    private TextView tvDistanceTraveled, tvClosingErrorDirection, tvClosingErrorDistance,
+                    tvClosingPrecision, tvCloseAreaA, tvCloseAreaB;
+    private ImageButton ibBack, ibSave;
+
+    private static DecimalFormat COORDINATE_FORMATTER, DISTANCE_PRECISION_FORMATTER;
 
 
     @Override
@@ -46,8 +67,20 @@ public class JobCogoMapCheckResultsActivity extends AppCompatActivity {
         preferenceLoaderHelper = new PreferenceLoaderHelper(mContext);
 
         initViewWidget();
+        loadPreferences();
         setOnClickListeners();
+        initViewList();
+
         populateListWithCoordinates();
+
+
+    }
+
+    private void loadPreferences(){
+        Log.d(TAG, "loadPreferences: Started...");
+
+        COORDINATE_FORMATTER = new DecimalFormat(preferenceLoaderHelper.getValueSystemCoordinatesPrecisionDisplay());
+        DISTANCE_PRECISION_FORMATTER = new DecimalFormat(preferenceLoaderHelper.getValueSystemDistancePrecisionDisplay());
 
     }
 
@@ -60,6 +93,8 @@ public class JobCogoMapCheckResultsActivity extends AppCompatActivity {
         jobDatabaseName = extras.getString(getString(R.string.KEY_JOB_DATABASE));
 
         lstPointMapCheck = extras.getParcelableArrayList(getString(R.string.KEY_ARRAY_LIST_MAPCHECK));
+        lstPointMapCheckResults = new ArrayList<>();
+
         Log.d(TAG, "initViewWidget: lstPointMapCheck Size: " + lstPointMapCheck.size());
 
         occupyPoint = extras.getParcelable(getString(R.string.KEY_SETUP_OCCUPY_PT));
@@ -67,7 +102,13 @@ public class JobCogoMapCheckResultsActivity extends AppCompatActivity {
         ibBack = (ImageButton) findViewById(R.id.button_back);
         ibSave = (ImageButton) findViewById(R.id.button_save);
 
+        tvDistanceTraveled = (TextView) findViewById(R.id.closure_distance_traveled);
+        tvClosingErrorDirection = (TextView) findViewById(R.id.closure_error_direction);
+        tvClosingErrorDistance = (TextView) findViewById(R.id.closure_error_distance);
+        tvClosingPrecision = (TextView) findViewById(R.id.closure_error_precision);
 
+        tvCloseAreaA = (TextView) findViewById(R.id.closure_area_1);
+        tvCloseAreaB = (TextView) findViewById(R.id.closure_area_2);
     }
 
     private void setOnClickListeners(){
@@ -81,19 +122,46 @@ public class JobCogoMapCheckResultsActivity extends AppCompatActivity {
     }
 
     //----------------------------------------------------------------------------------------------//
+    private void initViewList(){
+        Log.d(TAG, "initViewList: Started...");
+
+        mRecyclerViewMapCheck = (RecyclerView) findViewById(R.id.mapcheck_items_list);
+        setMapCheckAdapter();
+
+    }
+
+    private void setMapCheckAdapter(){
+        Log.d(TAG, "setMapCheckAdapter: Started");
+        layoutManagerMapCheck = new LinearLayoutManager(mContext);
+        mRecyclerViewMapCheck.setLayoutManager(layoutManagerMapCheck);
+        mRecyclerViewMapCheck.setHasFixedSize(false);
+
+        adaptorJobMapCheckResults = new JobMapCheckResultsAdaptor(mContext,lstPointMapCheckResults, COORDINATE_FORMATTER);
+
+        mRecyclerViewMapCheck.setAdapter(adaptorJobMapCheckResults);
+
+
+        Log.e(TAG,"Complete: setMapCheckAdapter");
+    }
+    //----------------------------------------------------------------------------------------------//
 
     private void populateListWithCoordinates(){
         for(int i=0; i<lstPointMapCheck.size(); i++) {
             PointMapCheck pointMapCheck = lstPointMapCheck.get(i);
-
             calculateCoordinates(i,pointMapCheck);
+
         }
+
+
     }
 
     private void calculateCoordinates(int position, PointMapCheck currentItem){
         Log.d(TAG, "calculateCoordinates: Started...");
         double startNorthing, startEasting, backAzNorthing, backAzEasting;
         double mValueAngle, mValueDistance;
+        double deltaAngle, radius, arcLength;
+        boolean isCurveToRight;
+
         Point startPoint = new Point(), backAzPoint = new Point(), endPoint;
         PointMapCheck mapCheck;
 
@@ -125,8 +193,36 @@ public class JobCogoMapCheckResultsActivity extends AppCompatActivity {
             startNorthing = lstPointMapCheck.get(position-1).getToPointNorth();
             startEasting = lstPointMapCheck.get(position-1).getToPointEast();
 
-            backAzNorthing = lstPointMapCheck.get(position-2).getToPointNorth();
-            backAzEasting = lstPointMapCheck.get(position-2).getToPointEast();
+            int previousPositionObservationType = lstPointMapCheck.get(position-1).getObservationType();
+
+            if(previousPositionObservationType == 0 | previousPositionObservationType == 1 | previousPositionObservationType == 2){
+                Log.d(TAG, "calculateCoordinates: Previous Position is a Line!");
+                //if previous observation was a line then:
+                backAzNorthing = lstPointMapCheck.get(position-2).getToPointNorth();
+                backAzEasting = lstPointMapCheck.get(position-2).getToPointEast();
+
+            }else if(previousPositionObservationType == 3 | previousPositionObservationType == 4 | previousPositionObservationType == 5){
+                //else if previous observation was a curve, need to calculate the PI
+                //determine if it is right or left to use PI
+                Log.d(TAG, "calculateCoordinates: Previous Position is a Curve!");
+                double previousCurveDeltaDEC = lstPointMapCheck.get(position-1).getCurveDelta();
+                double previousCurveRadius = lstPointMapCheck.get(position-1).getCurveRadius();
+                boolean isPreviousCurveToRight = lstPointMapCheck.get(position - 1).isCurveToRight();
+
+                double pcCoordNorth = lstPointMapCheck.get(position-2).getToPointNorth();
+                double pcCoordEast = lstPointMapCheck.get(position-2).getToPointEast();
+
+                Point previousCurvePC = new Point(pcCoordNorth,pcCoordEast);
+                Point previousCurvePT = new Point(startNorthing,startEasting);
+                Point previousCurvePI = MathHelper.solveForCurvePIForBackTangent(previousCurvePC,previousCurvePT,previousCurveDeltaDEC,previousCurveRadius, isPreviousCurveToRight);
+
+                backAzNorthing = previousCurvePI.getNorthing();
+                backAzEasting = previousCurvePI.getEasting();
+            }else{
+                backAzNorthing = 0;
+                backAzEasting = 0;
+            }
+
 
             backAzPoint.setNorthing(backAzNorthing);
             backAzPoint.setEasting(backAzEasting);
@@ -141,6 +237,7 @@ public class JobCogoMapCheckResultsActivity extends AppCompatActivity {
         mapCheck = lstPointMapCheck.get(position);
 
         int observationType = mapCheck.getObservationType();
+        Log.d(TAG, "calculateCoordinates: observation Type: " + observationType);
 
         switch (observationType){
             case 0://Bearing
@@ -149,6 +246,7 @@ public class JobCogoMapCheckResultsActivity extends AppCompatActivity {
                 mValueDistance = mapCheck.getLineDistance();
 
                 endPoint = MathHelper.solveForCoordinatesFromBearing(startPoint,mValueAngle,mValueDistance,90d);
+                distanceTraveled = distanceTraveled + mValueDistance;
 
                 break;
 
@@ -158,6 +256,8 @@ public class JobCogoMapCheckResultsActivity extends AppCompatActivity {
                 mValueDistance = mapCheck.getLineDistance();
 
                 endPoint = MathHelper.solveForCoordinatesFromAzimuth(startPoint,mValueAngle,mValueDistance,90d);
+                distanceTraveled = distanceTraveled + mValueDistance;
+
                 break;
 
             case 2: //Turned Angle
@@ -166,7 +266,60 @@ public class JobCogoMapCheckResultsActivity extends AppCompatActivity {
                 mValueDistance = mapCheck.getLineDistance();
 
                 endPoint = MathHelper.solveForCoordinatesFromTurnedAngleAndDistance(startPoint, backAzPoint, mValueAngle,mValueDistance,90d);
+                distanceTraveled = distanceTraveled + mValueDistance;
                 break;
+
+            case 3: //Delta-Radius
+                Log.d(TAG, "calculateCoordinates: Curve: Delta and Radius");
+                deltaAngle = mapCheck.getCurveDelta();
+                radius = mapCheck.getCurveRadius();
+                isCurveToRight = mapCheck.isCurveToRight();
+
+                mValueDistance = MathHelper.solveForCurveChordDistance(deltaAngle,radius);
+                mValueAngle = MathHelper.solveForCurveChordDirectionAzimuthDEC(backAzPoint,startPoint,deltaAngle,isCurveToRight);
+
+                Log.d(TAG, "calculateCoordinates: Delta Angle: " + deltaAngle);
+                Log.d(TAG, "calculateCoordinates: Radius: " + radius);
+                Log.d(TAG, "calculateCoordinates: Chord Distance: " + mValueDistance);
+                Log.d(TAG, "calculateCoordinates: Chord Azimuth: " + mValueAngle);
+
+                endPoint = MathHelper.solveForCoordinatesFromAzimuth(startPoint,mValueAngle,mValueDistance,90d);
+
+                arcLength = MathHelper.solveForCurveLength(deltaAngle,radius);
+                distanceTraveled = distanceTraveled + arcLength;
+
+                break;
+
+
+            case 4: //Delta-Length
+                deltaAngle = mapCheck.getCurveDelta();
+                arcLength = mapCheck.getCurveLength();
+                isCurveToRight = mapCheck.isCurveToRight();
+
+                radius = MathHelper.solveForCurveRadius(deltaAngle,arcLength);
+
+                mValueDistance = MathHelper.solveForCurveChordDistance(deltaAngle,radius);
+                mValueAngle = MathHelper.solveForCurveChordDirectionAzimuthDEC(backAzPoint,startPoint,deltaAngle,isCurveToRight);
+
+                endPoint = MathHelper.solveForCoordinatesFromAzimuth(startPoint,mValueAngle,mValueDistance,90d);
+
+                distanceTraveled = distanceTraveled + arcLength;
+                break;
+
+            case 5: //Radius-Length
+                radius = mapCheck.getCurveRadius();
+                arcLength = mapCheck.getCurveLength();
+                isCurveToRight = mapCheck.isCurveToRight();
+
+                deltaAngle = MathHelper.solveForCurveDeltaAngle(radius,arcLength);
+
+                mValueDistance = MathHelper.solveForCurveChordDistance(deltaAngle,radius);
+                mValueAngle = MathHelper.solveForCurveChordDirectionAzimuthDEC(backAzPoint,startPoint,deltaAngle,isCurveToRight);
+
+                endPoint = MathHelper.solveForCoordinatesFromAzimuth(startPoint,mValueAngle,mValueDistance,90d);
+                distanceTraveled = distanceTraveled + arcLength;
+                break;
+
 
             default:
                 Log.d(TAG, "calculateCoordinates: Bearing");
@@ -174,12 +327,108 @@ public class JobCogoMapCheckResultsActivity extends AppCompatActivity {
                 mValueDistance = mapCheck.getLineDistance();
 
                 endPoint = MathHelper.solveForCoordinatesFromBearing(startPoint,mValueAngle,mValueDistance,90d);
+                distanceTraveled = distanceTraveled + mValueDistance;
                 break;
         }
 
         lstPointMapCheck.get(position).setToPointNorth(endPoint.getNorthing());
         lstPointMapCheck.get(position).setToPointEast(endPoint.getEasting());
 
+        if(!mapCheck.isClosingPoint()){
+            Log.d(TAG, "calculateCoordinates: Add Point to Results");
+            lstPointMapCheckResults.add(mapCheck);
+            adaptorJobMapCheckResults.notifyDataSetChanged();
+        }
+
+        if(mapCheck.isClosingPoint()){
+            Log.d(TAG, "Closing Point: " + endPoint.getNorthing() + ", " + endPoint.getEasting());
+            closingPoint.setNorthing(endPoint.getNorthing());
+            closingPoint.setEasting(endPoint.getEasting());
+            prepareClosingReport();
+
+        }else{
+            prepareOpenEndedReport();
+        }
+
+
+
+        Log.d(TAG, "calculateCoordinates: Point Northing: " + endPoint.getNorthing());
+        Log.d(TAG, "calculateCoordinates: Point Easting: " + endPoint.getEasting());
+
+
+    }
+
+    private void prepareClosingReport(){
+        Log.d(TAG, "prepareClosingReport: Started");
+
+        // Closing Error module
+        solveClosingPoint();
+        // Distance Traveled Module
+        tvDistanceTraveled.setText(DISTANCE_PRECISION_FORMATTER.format(distanceTraveled));
+
+        // Area Module
+        tvCloseAreaA.setText(DISTANCE_PRECISION_FORMATTER.format(solveAreaofPolygon()));
+
+    }
+
+    private void prepareOpenEndedReport(){
+        Log.d(TAG, "prepareOpenEndedReport: Started");
+
+        //Distance Traveled Module
+        tvDistanceTraveled.setText(DISTANCE_PRECISION_FORMATTER.format(distanceTraveled));
+
+    }
+
+    private void solveClosingPoint(){
+        Log.d(TAG, "solveClosingPoint: Started");
+
+
+        double inverseDirection = MathHelper.inverseBearingFromPointSurvey(occupyPoint,closingPoint);
+        String inverseBearing = MathHelper.convertDECtoDMSBearing(inverseDirection,0);
+
+        double inverseDistance = MathHelper.inverseDistanceFromPointSurvey(occupyPoint,closingPoint);
+
+        tvClosingErrorDirection.setText(inverseBearing);
+        tvClosingErrorDistance.setText(DISTANCE_PRECISION_FORMATTER.format(inverseDistance));
+
+        //precision
+        double  closingPrecision = (int)(distanceTraveled/inverseDistance);
+        String precision = String.valueOf(closingPrecision);
+        String closingPrecisionPrefix = "1:";
+
+        precision = closingPrecisionPrefix + String.valueOf(closingPrecision);
+
+        tvClosingPrecision.setText(precision);
+    }
+
+    private double solveAreaofPolygon(){
+        ArrayList<Double> northings = new ArrayList<>();
+        ArrayList<Double> eastings = new ArrayList<>();
+
+        northings.add(occupyPoint.getNorthing());
+        eastings.add(occupyPoint.getEasting());
+
+        for(int i=0; i<lstPointMapCheck.size(); i++) {
+            PointMapCheck occupy = lstPointMapCheck.get(i);
+
+            northings.add(occupy.getToPointNorth());
+            eastings.add(occupy.getToPointEast());
+
+        }
+
+        double area = 0;
+        int numPoints = northings.size();
+        int j = numPoints - 1;
+
+        Log.d(TAG, "solveAreaofPolygon: num of points:" + numPoints + " j=" + j);
+
+        for(int k=0;k<numPoints;k++){
+            area = area + (eastings.get(j) + eastings.get(k)) *(northings.get(j) - northings.get(k));
+            j = k;
+        }
+
+        Log.d(TAG, "solveAreaofPolygon: Area: " + area/2);
+        return area/2;
     }
 
 }

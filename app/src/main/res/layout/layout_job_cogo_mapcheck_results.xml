@@ -33,6 +33,18 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"/>
 
+        <TextView
+            android:text="Results"
+            style="@style/Labels.Card.Header"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <View
+            android:background="@android:color/darker_gray"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"/>
+
         <android.support.v7.widget.RecyclerView
             android:layout_marginTop="5dp"
             android:id="@+id/mapcheck_items_list"
