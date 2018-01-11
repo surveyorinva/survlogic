@@ -578,11 +578,26 @@ public class JobCogoMapCheckActivity extends AppCompatActivity implements Databa
         Log.d(TAG, "saveObservationToArray: Size: " + lstPointMapCheck.size());
     }
 
+    private void saveObservationToArrayFromEdit(PointMapCheck mapCheck, int position){
+
+        lstPointMapCheck.set(position,mapCheck);
+        adapterMapCheckListAdd.notifyDataSetChanged();
+
+
+
+    }
+
     private void cancelObservationFromArrayThatExists(int position){
 
         lstPointMapCheck.remove(position);
         adapterMapCheckListAdd.notifyDataSetChanged();
 
+    }
+
+    private void cancelObservationFromEditMode(PointMapCheck mapCheck, int position){
+        mapCheck.setEdit(false);
+        lstPointMapCheck.set(position,mapCheck);
+        adapterMapCheckListAdd.notifyDataSetChanged();
     }
 
 
@@ -626,10 +641,19 @@ public class JobCogoMapCheckActivity extends AppCompatActivity implements Databa
     }
 
     @Override
+    public void sendEditModeMapcheckToActivity(PointMapCheck pointMapCheck, int position) {
+        saveObservationToArrayFromEdit(pointMapCheck, position);
+    }
+
+    @Override
     public void deleteNewMapcheckUserCancel(int position) {
         cancelObservationFromArrayThatExists(position);
     }
 
+    @Override
+    public void editModeMapcheckCancel(PointMapCheck pointMapCheck, int position) {
+        cancelObservationFromEditMode(pointMapCheck, position);
+    }
 
     @Override
     public void hideKeyboard() {

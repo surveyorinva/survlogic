@@ -343,6 +343,26 @@ public class MathHelper {
 
     }
 
+    public static double convertDECAzimuthtToDECBearing(double azimuth){
+        Log.d(TAG, "convertDECAzimuthtToDECBearing: Started");
+
+        double angle = 0;
+
+        if(azimuth >0 && angle < 90){
+            angle = azimuth + 100;
+        }else if(azimuth > 90 && azimuth < 180){
+            angle = (180 - azimuth) + 200;
+        }else if(azimuth > 180 && azimuth < 270){
+            angle = (azimuth - 180) + 300;
+        }else if(azimuth > 270 && azimuth < 360){
+            angle = (azimuth - 360) + 400;
+        }
+
+        return angle;
+
+
+    }
+
     public static String convertDECtoDMSBearing(double angle, int decimalPlace){
         Log.d(TAG, "convertDECtoDMSBearing: Started...");
         Log.d(TAG, "convertDECtoDMSBearing: Angle: " + angle);
@@ -441,6 +461,95 @@ public class MathHelper {
         return myAngleDMS;
     }
 
+    public static String convertDECBearingToParts(double angle, int partNo){
+        Log.d(TAG, "convertDECtoDMSBearing: Started...");
+        Log.d(TAG, "convertDECtoDMSBearing: Angle: " + angle);
+        String sDeg, sMin, sSec;
+
+        int decimalPlace = 0;
+
+        //TODO Deal with 0 for decimal place.  right now returns with "."  need to return " "
+
+        angle = Math.abs(angle);
+
+
+        int quadrant = Integer.parseInt(Integer.toString((int) angle).substring(0, 1));
+        String sQuadrant = String.valueOf(quadrant);
+
+        switch(quadrant){
+            case 1:
+                angle = angle - 100;
+
+                break;
+            case 2:
+                angle = angle - 200;
+
+                break;
+            case 3:
+                angle = angle - 300;
+
+                break;
+            case 4:
+                angle = angle - 400;
+
+                break;
+            default:
+
+        }
+
+
+        if (angle ==0){
+            sDeg = "00";
+            sMin = "00";
+            sSec = "00";
+
+        }else {
+            double deg = Math.floor(angle);                  // Round down
+            double minutes = Math.floor((angle * 60) % 60);  // This is an integer in the range [0, 60)
+            double seconds = (angle * 3600) % 60;            // This is a decimal in the range [0, 60)
+
+            if(deg <10){
+                sDeg = "0" + (int)deg;
+            }else{
+                sDeg = String.valueOf((int) deg);
+            }
+            if(minutes <10){
+                sMin = "0" + (int)minutes;
+            }else{
+                sMin = String.valueOf((int) minutes);
+            }
+
+            if(seconds <10){
+                sSec = "0" + (int) seconds;
+            }else{
+                sSec = String.valueOf((int) seconds);
+            }
+
+        }
+
+        String myPart;
+
+        switch (partNo){
+            case 0:
+                myPart = sQuadrant;
+                break;
+            case 1:
+                myPart = sDeg;
+                break;
+            case 2:
+                myPart = sMin;
+                break;
+            case 3:
+                myPart = sSec;
+                break;
+
+            default:
+                myPart = "";
+        }
+
+
+        return myPart;
+    }
 
     /**
      * Convert a DEC to the individual parts
@@ -451,39 +560,59 @@ public class MathHelper {
 
 
     public static String convertDECToParts(double angle, int partNo){
-        String results;
-        double degrees, minutes, seconds;
+        String sDeg, sMin, sSec;
+        int decimalPlace = 0;
+
+        angle = Math.abs(angle);
 
         if (angle ==0){
-            results = "0";
+            sDeg = "00";
+            sMin = "00";
+            sSec = "00";
+
         }else {
-            degrees = Math.floor(angle);                  // Round down
-            minutes = Math.abs(Math.floor((angle * 60) % 60));  // This is an integer in the range [0, 60)
-            seconds = Math.abs((angle * 3600) % 60);            // This is a decimal in the range [0, 60)
+            double deg = Math.floor(angle);                  // Round down
+            double minutes = Math.floor((angle * 60) % 60);  // This is an integer in the range [0, 60)
+            double seconds = (angle * 3600) % 60;            // This is a decimal in the range [0, 60)
 
-            switch (partNo) {
-                case 1: //degree
-                    results = String.valueOf((int)degrees);
-                    Log.d(TAG, "convertDECToParts: Degrees: " + results);
-                    break;
-
-                case 2: //minutes
-                    results = String.valueOf((int)minutes);
-                    Log.d(TAG, "convertDECToParts: Minutes: " + results);
-
-                    break;
-
-
-                case 3://seconds
-                    results = String.valueOf(seconds);
-                    Log.d(TAG, "convertDECToParts: Seconds: " + results);
-                    break;
-
-                default:
-                    results = "0";
+            if(deg <10){
+                sDeg = "0" + (int)deg;
+            }else{
+                sDeg = String.valueOf((int) deg);
             }
+            if(minutes <10){
+                sMin = "0" + (int)minutes;
+            }else{
+                sMin = String.valueOf((int) minutes);
+            }
+
+            if(seconds <10){
+                sSec = "0" + (int) seconds;
+            }else{
+                sSec = String.valueOf((int) seconds);
+            }
+
         }
-        return results;
+
+        String myPart;
+
+        switch (partNo){
+            case 1:
+                myPart = sDeg;
+                break;
+            case 2:
+                myPart = sMin;
+                break;
+            case 3:
+                myPart = sSec;
+                break;
+
+            default:
+                myPart = "";
+        }
+
+
+        return myPart;
     }
 
     public static double inverseAzimuthFromPoint(Point pointSurvey1, Point pointSurvey2){
@@ -928,6 +1057,20 @@ public class MathHelper {
         piPoint = solveForCoordinatesFromAzimuth(pcPoint,backTangentAzimuth,tangent,90d);
 
         return piPoint;
+
+
+    }
+
+    public static double solveForCurveSegmentArea(double deltaAngleDEC, double radius){
+        Log.d(TAG, "solveForCurveSegmentArea: Started...");
+        double results, radianAngle;
+
+        results = (Math.pow(radius,2))/2;
+        radianAngle = ((Math.PI * deltaAngleDEC)/180) - (Math.sin((Math.PI * deltaAngleDEC)/180));
+
+        results = results * radianAngle;
+        Log.d(TAG, "solveForCurveSegmentArea: Area: " + results);
+        return results;
 
 
     }

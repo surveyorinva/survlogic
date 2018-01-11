@@ -14,6 +14,10 @@ public interface MapcheckListener {
 
     void deleteNewMapcheckUserCancel(int position);
 
+    void editModeMapcheckCancel(PointMapCheck pointMapCheck, int position);
+
+    void sendEditModeMapcheckToActivity(PointMapCheck pointMapCheck, int position);
+
     void hideKeyboard();
 
     ArrayList<PointMapCheck> getPointMapCheck();

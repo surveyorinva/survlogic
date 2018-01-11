@@ -27,19 +27,9 @@
                     android:id="@+id/typeOfObservation"
                     android:background="@drawable/vc_circle_green"
                     android:layout_marginStart="5dp"
-                    android:layout_marginTop="30dp"
+                    android:layout_marginTop="10dp"
                     android:layout_width="40dp"
                     android:layout_height="40dp" />
-
-                <TextView
-                    android:id="@+id/hAngle_header"
-                    android:text="HA"
-                    android:textSize="18sp"
-                    android:layout_toEndOf="@+id/typeOfObservation"
-                    android:layout_marginTop="40dp"
-                    android:layout_marginStart="5dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
 
                 <ImageButton
                     android:id="@+id/distance_action"
@@ -50,18 +40,6 @@
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:visibility="invisible"/>
-
-                <TextView
-                    android:id="@+id/distance_header"
-                    android:text="HD"
-                    android:textSize="18sp"
-                    android:layout_toEndOf="@+id/typeOfObservation"
-                    android:layout_alignTop="@+id/distance_action"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginStart="5dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-
 
                 <LinearLayout
                     android:orientation="vertical"
@@ -103,8 +81,6 @@
                         layout="@layout/content_job_cogo_mapcheck_curve_cb_cd"
                         android:visibility="gone" />
 
-
-
                 </LinearLayout>
             </RelativeLayout>
 
@@ -116,7 +92,7 @@
                     android:id="@+id/point_Description_action"
                     android:background="@drawable/vc_circle_blue"
                     android:layout_marginStart="5dp"
-                    android:layout_marginTop="15dp"
+                    android:layout_marginTop="20dp"
                     android:layout_marginBottom="10dp"
                     android:layout_width="40dp"
                     android:layout_height="40dp" />

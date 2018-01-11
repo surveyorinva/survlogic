@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.inputmethod.EditorInfo;
 import android.widget.CompoundButton;
 import android.widget.PopupMenu;
@@ -20,6 +21,7 @@ import android.widget.Toast;
 import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.interf.CallCurveSolutionDialogListener;
 import com.survlogic.survlogic.interf.MapcheckListener;
+import com.survlogic.survlogic.model.Point;
 import com.survlogic.survlogic.model.PointMapCheck;
 import com.survlogic.survlogic.utils.AnimateHelper;
 import com.survlogic.survlogic.utils.MathHelper;
@@ -44,7 +46,7 @@ public class JobMapCheckObservationsAdaptor extends RecyclerView.Adapter<Recycle
     private CallCurveSolutionDialogListener callCurveSolutionDialogListener;
 
     private ArrayList<PointMapCheck> pointMapChecks = new ArrayList<>();
-    private final int LIST = 0, ADD = 1;
+
 
     private int lastPosition = 0;
 
@@ -52,7 +54,7 @@ public class JobMapCheckObservationsAdaptor extends RecyclerView.Adapter<Recycle
     private String jobDatabaseName;
 
     private DecimalFormat COORDINATE_FORMATTER, DISTANCE_PRECISION_FORMATTER;
-
+    private final int LIST = 0, ADD = 1, EDIT = 2;
     private ItemTouchHelper touchHelper;
 
 //    CONSTRUCTOR!!!!!
@@ -80,7 +82,12 @@ public class JobMapCheckObservationsAdaptor extends RecyclerView.Adapter<Recycle
 
             case ADD:
                 View v2 = mInflater.inflate(R.layout.card_job_cogo_mapcheck_add,parent,false);
-                viewHolder = new Card_View_Holder_Job_Mapcheck_Add(v2, mContext, mapcheckListener, callCurveSolutionDialogListener, jobDatabaseName);
+                viewHolder = new Card_View_Holder_Job_Mapcheck_Add(v2, mContext, mapcheckListener, callCurveSolutionDialogListener, jobDatabaseName, DISTANCE_PRECISION_FORMATTER);
+                break;
+
+            case EDIT:
+                View v3 = mInflater.inflate(R.layout.card_job_cogo_mapcheck_add,parent,false);
+                viewHolder = new Card_View_Holder_Job_Mapcheck_Add(v3, mContext, mapcheckListener, callCurveSolutionDialogListener, jobDatabaseName, DISTANCE_PRECISION_FORMATTER);
                 break;
 
             default:
@@ -99,13 +106,20 @@ public class JobMapCheckObservationsAdaptor extends RecyclerView.Adapter<Recycle
         PointMapCheck pointMapCheck = pointMapChecks.get(position);
         
         int observationType = pointMapCheck.getObservationType();
+        boolean isEdit = pointMapCheck.isEdit();
+
+
         Log.d(TAG, "getItemViewType: observationType: " + observationType);
-        if(observationType == 99){
+        if(observationType == 99) {
             Log.d(TAG, "getItemViewType: Returning ADD");
             return ADD;
         }else{
             Log.d(TAG, "getItemViewType: Returning LIST");
-            return LIST;
+            if(isEdit){
+                return EDIT;
+            }else {
+                return LIST;
+            }
         }
     
     }
@@ -124,6 +138,12 @@ public class JobMapCheckObservationsAdaptor extends RecyclerView.Adapter<Recycle
            case ADD:
                Card_View_Holder_Job_Mapcheck_Add vh2 = (Card_View_Holder_Job_Mapcheck_Add) holder;
                configureViewHolderAdd(vh2,position);
+               break;
+
+            case EDIT:
+                Card_View_Holder_Job_Mapcheck_Add vh3 = (Card_View_Holder_Job_Mapcheck_Add) holder;
+                configureViewHolderEdit(vh3,position);
+                break;
 
         }
 
@@ -135,6 +155,8 @@ public class JobMapCheckObservationsAdaptor extends RecyclerView.Adapter<Recycle
     }
 
     private void configureViewHolderList(final Card_View_Holder_Job_Mapcheck_List vh1, int position) {
+        float deg;
+        int quadrant;
 
         final PointMapCheck pointMapCheck = pointMapChecks.get(position);
         int recordPosition = position + 1;
@@ -154,6 +176,26 @@ public class JobMapCheckObservationsAdaptor extends RecyclerView.Adapter<Recycle
 
                 vh1.ivObservation_Type.setImageDrawable(mContext.getResources().getDrawable(R.drawable.vd_mapcheck_line));
 
+                deg = 0f;
+                quadrant = Integer.parseInt(MathHelper.convertDECBearingToParts(pointMapCheck.getLineAngle(),0));
+                Log.i(TAG, "configureViewHolderList: Quadrant: " + quadrant + " - " + position);
+                Log.i(TAG, "configureViewHolderList: position: ----------" );
+                switch (quadrant){
+                    case 2:
+                        deg = deg + 90f;
+                        break;
+
+                    case 3:
+                        deg = deg + 180f;
+                        break;
+
+                    case 4:
+                        deg = deg + 270f;
+                        break;
+                }
+
+                vh1.ivObservation_Type.animate().rotation(deg).setInterpolator(new AccelerateDecelerateInterpolator());
+
                 break;
 
             case 1: //Azimuth
@@ -164,6 +206,29 @@ public class JobMapCheckObservationsAdaptor extends RecyclerView.Adapter<Recycle
                 observation = String.valueOf("Az " + azimuthAngle + " " + azimuthDistance);
 
                 vh1.ivObservation_Type.setImageDrawable(mContext.getResources().getDrawable(R.drawable.vd_mapcheck_line));
+
+                deg = 0f;
+                double bearingAngle = MathHelper.convertDECAzimuthtToDECBearing(pointMapCheck.getLineAngle());
+                quadrant = Integer.parseInt(MathHelper.convertDECBearingToParts(bearingAngle,0));
+                Log.i(TAG, "configureViewHolderList: Quadrant: " + quadrant + " - " + position);
+                Log.i(TAG, "configureViewHolderList: position: ----------" );
+                switch (quadrant){
+                    case 2:
+                        deg = deg + 90f;
+                        break;
+
+                    case 3:
+                        deg = deg + 180f;
+                        break;
+
+                    case 4:
+                        deg = deg + 270f;
+                        break;
+                }
+
+                vh1.ivObservation_Type.animate().rotation(deg).setInterpolator(new AccelerateDecelerateInterpolator());
+
+
 
                 break;
 
@@ -229,11 +294,18 @@ public class JobMapCheckObservationsAdaptor extends RecyclerView.Adapter<Recycle
 
                         switch (item.getItemId()){
                             case R.id.mapcheck_item_1:
-                                showToast("Edit Position " + myPosition, true);
+                                final PointMapCheck pointMapCheckEdit = pointMapChecks.get(myPosition);
+                                pointMapCheckEdit.setEdit(true);
+
+                                pointMapChecks.set(myPosition, pointMapCheckEdit);
+                                notifyDataSetChanged();
+
                                 break;
 
                             case R.id.mapcheck_item_2:
-                                showToast("Delete Position " + myPosition, true);
+                                pointMapChecks.remove(myPosition);
+                                notifyItemRemoved(myPosition);
+                                notifyDataSetChanged();
                                 break;
 
                         }
@@ -261,42 +333,42 @@ public class JobMapCheckObservationsAdaptor extends RecyclerView.Adapter<Recycle
 
 
     }
-    private void configureViewHolderAdd(final Card_View_Holder_Job_Mapcheck_Add vh2, final int position) {
+    private void configureViewHolderAdd(final Card_View_Holder_Job_Mapcheck_Add view, final int position) {
         Log.d(TAG, "configureViewHolderAdd: Started...");
 
 
-        vh2.setPopupMenuForObservationType(position);
+        view.setPopupMenuForObservationType(position);
 
         Log.d(TAG, "configureViewHolderAdd: Position: " + position);
 
         if(position > 1) {
-            vh2.swapPointClosingCheckBox(true);
-            vh2.cbIsClosingPoint.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            view.swapPointClosingCheckBox(true);
+            view.cbIsClosingPoint.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                     if (isChecked) {
-                        vh2.swapPointClosing(true);
+                        view.swapPointClosing(true);
                     } else {
-                        vh2.swapPointClosing(false);
+                        view.swapPointClosing(false);
                     }
                 }
             });
         }else{
-            vh2.swapPointClosingCheckBox(false);
+            view.swapPointClosingCheckBox(false);
         }
 
-        vh2.btSaveObservation.setOnClickListener(new View.OnClickListener() {
+        view.btSaveObservation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                vh2.saveObservation(position,true);
+                view.saveObservation(position,true);
             }
         });
 
-       vh2.etMapCheckPointNumber.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        view.etMapCheckPointNumber.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if(actionId == EditorInfo.IME_ACTION_DONE){
-                    vh2.saveObservation(position,false);
+                    view.saveObservation(position,false);
 
                 }
 
@@ -304,12 +376,24 @@ public class JobMapCheckObservationsAdaptor extends RecyclerView.Adapter<Recycle
             }
         });
 
-        vh2.btCancelObservation.setOnClickListener(new View.OnClickListener() {
+        view.btCancelObservation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                vh2.cancelObservation(position);
+                view.cancelObservation(position);
             }
         });
+
+    }
+
+    private void configureViewHolderEdit(final Card_View_Holder_Job_Mapcheck_Add view, final int position){
+        Log.d(TAG, "configureViewHolderEdit: Started...");
+        configureViewHolderAdd(view,position);
+
+        final PointMapCheck pointMapCheck = pointMapChecks.get(position);
+
+        view.populateForEdit(pointMapCheck,position);
+
+        
 
     }
 

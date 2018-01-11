@@ -18,6 +18,8 @@ public class PointMapCheck implements Parcelable{
     private boolean isCurveToRight, isClosingPoint;
     private double toPointNorth, toPointEast;
 
+    private boolean isEdit;
+
     public PointMapCheck() {
     }
 
@@ -36,6 +38,9 @@ public class PointMapCheck implements Parcelable{
         this.curveChord = pointMapCheck.getCurveChord();
 
         this.isClosingPoint = pointMapCheck.isClosingPoint();
+
+        this.isEdit = pointMapCheck.isEdit();
+
     }
 
     private PointMapCheck(Parcel in){
@@ -54,6 +59,8 @@ public class PointMapCheck implements Parcelable{
         this.curveChord = in.readDouble();
 
         this.isClosingPoint = in.readByte() !=0;
+
+        this.isEdit = in.readByte() !=0;
     }
 
     public PointMapCheck(int observationType, int toPointNo, String pointDescription, double lineAngle, double lineDistance, boolean isClosingPoint) {
@@ -198,6 +205,14 @@ public class PointMapCheck implements Parcelable{
         isClosingPoint = closingPoint;
     }
 
+    public boolean isEdit() {
+        return isEdit;
+    }
+
+    public void setEdit(boolean edit) {
+        isEdit = edit;
+    }
+
 
     //-----------------------------------------------------------------------------------------------//Parceable Functionality
 
@@ -225,6 +240,8 @@ public class PointMapCheck implements Parcelable{
         dest.writeDouble(curveChord);
 
         dest.writeByte((byte) (isClosingPoint ? 1: 0 ));
+
+        dest.writeByte((byte) (isEdit ? 1:0));
     }
 
     public static final Parcelable.Creator<PointMapCheck> CREATOR = new Parcelable.Creator<PointMapCheck>() {

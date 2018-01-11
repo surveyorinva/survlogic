@@ -45,6 +45,7 @@ public class JobCogoMapCheckResultsActivity extends AppCompatActivity {
     private PointSurvey closingPoint = new PointSurvey();
 
     private double distanceTraveled = 0;
+    private double areaCurveToRight = 0, areaCurveToLeft = 0;
 
     private RecyclerView.LayoutManager layoutManagerMapCheck;
     private JobMapCheckResultsAdaptor adaptorJobMapCheckResults;
@@ -288,6 +289,12 @@ public class JobCogoMapCheckResultsActivity extends AppCompatActivity {
                 arcLength = MathHelper.solveForCurveLength(deltaAngle,radius);
                 distanceTraveled = distanceTraveled + arcLength;
 
+                if(isCurveToRight){
+                    areaCurveToRight = areaCurveToRight + MathHelper.solveForCurveSegmentArea(deltaAngle,radius);
+                }else{
+                    areaCurveToLeft = areaCurveToLeft + MathHelper.solveForCurveSegmentArea(deltaAngle,radius);
+                }
+
                 break;
 
 
@@ -304,6 +311,12 @@ public class JobCogoMapCheckResultsActivity extends AppCompatActivity {
                 endPoint = MathHelper.solveForCoordinatesFromAzimuth(startPoint,mValueAngle,mValueDistance,90d);
 
                 distanceTraveled = distanceTraveled + arcLength;
+                if(isCurveToRight){
+                    areaCurveToRight = areaCurveToRight + MathHelper.solveForCurveSegmentArea(deltaAngle,radius);
+                }else{
+                    areaCurveToLeft = areaCurveToLeft + MathHelper.solveForCurveSegmentArea(deltaAngle,radius);
+                }
+
                 break;
 
             case 5: //Radius-Length
@@ -318,6 +331,11 @@ public class JobCogoMapCheckResultsActivity extends AppCompatActivity {
 
                 endPoint = MathHelper.solveForCoordinatesFromAzimuth(startPoint,mValueAngle,mValueDistance,90d);
                 distanceTraveled = distanceTraveled + arcLength;
+                if(isCurveToRight){
+                    areaCurveToRight = areaCurveToRight + MathHelper.solveForCurveSegmentArea(deltaAngle,radius);
+                }else{
+                    areaCurveToLeft = areaCurveToLeft + MathHelper.solveForCurveSegmentArea(deltaAngle,radius);
+                }
                 break;
 
 
@@ -427,8 +445,25 @@ public class JobCogoMapCheckResultsActivity extends AppCompatActivity {
             j = k;
         }
 
-        Log.d(TAG, "solveAreaofPolygon: Area: " + area/2);
-        return area/2;
+        area = area/2;
+
+        //area above is point to point and does not include area of segment curve.
+        //if area is positive, clockwise, if area is negative, counterclockwise
+
+        Log.d(TAG, "solveAreaofPolygon: Area of Polygon: " + area);
+        Log.d(TAG, "solveAreaofPolygon: Sum of Area to Right: " + areaCurveToRight);
+        Log.d(TAG, "solveAreaofPolygon: Sum of Area to Left: " + areaCurveToLeft);
+
+
+        if(area > 0){
+            area = Math.abs(area) + areaCurveToRight - areaCurveToLeft;
+        }else{
+            area = Math.abs(area) - areaCurveToRight + areaCurveToLeft;
+        }
+
+
+        Log.d(TAG, "solveAreaofPolygon: Area: " + area);
+        return area;
     }
 
 }

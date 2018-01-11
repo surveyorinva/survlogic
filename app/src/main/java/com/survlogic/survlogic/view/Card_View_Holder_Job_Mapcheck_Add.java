@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
+import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.util.TypedValue;
@@ -27,9 +28,11 @@ import com.survlogic.survlogic.interf.DatabaseDoesPointExistFromAsyncListener;
 import com.survlogic.survlogic.interf.MapcheckListener;
 import com.survlogic.survlogic.model.CurveSurvey;
 import com.survlogic.survlogic.model.PointMapCheck;
+import com.survlogic.survlogic.utils.DecimalDigitsInputFilter;
 import com.survlogic.survlogic.utils.MathHelper;
 import com.survlogic.survlogic.utils.StringUtilityHelper;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -103,6 +106,11 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
     private double mValueBearing, mValueAzimuth, mValueTurnedAngle;
     private double mValueCurveDelta, mValueCurveRadius, mValueCurveLength, mValueCurveCB, mValueCurveCH;
 
+    //-In Edit Mode-//
+    private boolean isEditMode = false;
+    private int editPosition;
+    private PointMapCheck editMapCheck;
+
     //-Helpers-//
     private static final int textValidationOne = 0, textValidationTwo = 1, textValidationThree = 2, textValidationFour = 4;
 
@@ -110,7 +118,11 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
     private ArrayList<PointMapCheck> lstPointMapCheck = new ArrayList<>();
     private int listPosition = 0;
 
-    public Card_View_Holder_Job_Mapcheck_Add(View itemView, Context mContext, MapcheckListener mapcheckListener, CallCurveSolutionDialogListener callCurveSolutionDialogListener, String jobDatabaseName) {
+    //-Constants-//
+    private static final int OT_BEARING = 0, OT_AZIMUTH = 1, OT_TURNED = 2, OC_CURVE_Da_R = 3, OC_CURVE_Da_L = 4, OC_CURVE_R_L = 5;
+    private DecimalFormat COORDINATE_FORMATTER, DISTANCE_PRECISION_FORMATTER;
+
+    public Card_View_Holder_Job_Mapcheck_Add(View itemView, Context mContext, MapcheckListener mapcheckListener, CallCurveSolutionDialogListener callCurveSolutionDialogListener, String jobDatabaseName, DecimalFormat DISTANCE_PRECISION_FORMATTER) {
         super(itemView);
 
         this.mContext = mContext;
@@ -118,6 +130,7 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
         this.mapcheckListener = mapcheckListener;
         this.callCurveSolutionDialogListener = callCurveSolutionDialogListener;
         this.jobDatabaseName = jobDatabaseName;
+        this.DISTANCE_PRECISION_FORMATTER = DISTANCE_PRECISION_FORMATTER;
 
         initVewListAddNewObservation();
 
@@ -169,7 +182,16 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
 
                         if(!StringUtilityHelper.isStringNull(pointNo)){
                             mValuePointNo = Integer.parseInt(pointNo);
-                            checkPointNumberFromDatabase(mValuePointNo);
+
+                            if(!isEditMode) {
+                                checkPointNumberFromDatabase(mValuePointNo);
+                            }else{
+                                if(editMapCheck.getToPointNo() == mValuePointNo){
+                                    btSaveObservation.setClickable(true);
+                                }else{
+                                    checkPointNumberFromDatabase(mValuePointNo);
+                                }
+                            }
                         }
 
                     }catch(NumberFormatException ex){
@@ -217,6 +239,8 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
             etBearingDistance = (EditText) itemView.findViewById(R.id.ha_bearing_distance);
             etBearingDistance.setNextFocusDownId(R.id.point_Description_value);
             etBearingDistance.setSelectAllOnFocus(true);
+
+            //etBearingDistance.setFilters(new InputFilter[] {new DecimalDigitsInputFilter(2)});
 
             isHaBearingInit = true;
 
@@ -350,6 +374,27 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
 
         }
 
+        etBearingDistance.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(!hasFocus){
+                    try{
+                        String bearingDistance = null;
+                        bearingDistance = etBearingDistance.getText().toString();
+
+                        if(!StringUtilityHelper.isStringNull(bearingDistance)){
+                            double myDistance = Double.parseDouble(bearingDistance);
+
+                            etBearingDistance.setText(DISTANCE_PRECISION_FORMATTER.format(myDistance));
+                        }
+
+                    }catch(NumberFormatException ex){
+                        showToast("Error.  Check Number Format", true);
+
+                    }
+                }
+            }
+        });
 
     }
 
@@ -483,6 +528,28 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
 
             });
 
+            etAzimuthDistance.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View v, boolean hasFocus) {
+                    if(!hasFocus){
+                        try{
+                            String distance = null;
+                            distance = etAzimuthDistance.getText().toString();
+
+                            if(!StringUtilityHelper.isStringNull(distance)){
+                                double myDistance = Double.parseDouble(distance);
+
+                                etAzimuthDistance.setText(DISTANCE_PRECISION_FORMATTER.format(myDistance));
+                            }
+
+                        }catch(NumberFormatException ex){
+                            showToast("Error.  Check Number Format", true);
+
+                        }
+                    }
+                }
+            });
+
 
         }
 
@@ -596,6 +663,28 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
 
                     }catch (NumberFormatException ex){
 
+                    }
+                }
+            });
+
+            etTurnedDistance.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View v, boolean hasFocus) {
+                    if(!hasFocus){
+                        try{
+                            String distance = null;
+                            distance = etTurnedDistance.getText().toString();
+
+                            if(!StringUtilityHelper.isStringNull(distance)){
+                                double myDistance = Double.parseDouble(distance);
+
+                                etTurnedDistance.setText(DISTANCE_PRECISION_FORMATTER.format(myDistance));
+                            }
+
+                        }catch(NumberFormatException ex){
+                            showToast("Error.  Check Number Format", true);
+
+                        }
                     }
                 }
             });
@@ -751,6 +840,28 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
                 }
             });
 
+            etCurveARadius.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View v, boolean hasFocus) {
+                    if(!hasFocus){
+                        try{
+                            String distance = null;
+                            distance = etCurveARadius.getText().toString();
+
+                            if(!StringUtilityHelper.isStringNull(distance)){
+                                double myDistance = Double.parseDouble(distance);
+
+                                etCurveARadius.setText(DISTANCE_PRECISION_FORMATTER.format(myDistance));
+                            }
+
+                        }catch(NumberFormatException ex){
+                            showToast("Error.  Check Number Format", true);
+
+                        }
+                    }
+                }
+            });
+
         }
 
     }
@@ -901,6 +1012,29 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
                     }
                 }
             });
+
+            etCurveBLength.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View v, boolean hasFocus) {
+                    if(!hasFocus){
+                        try{
+                            String distance = null;
+                            distance = etCurveBLength.getText().toString();
+
+                            if(!StringUtilityHelper.isStringNull(distance)){
+                                double myDistance = Double.parseDouble(distance);
+
+                                etCurveBLength.setText(DISTANCE_PRECISION_FORMATTER.format(myDistance));
+                            }
+
+                        }catch(NumberFormatException ex){
+                            showToast("Error.  Check Number Format", true);
+
+                        }
+                    }
+                }
+            });
+
         }
 
     }
@@ -943,6 +1077,50 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
                         setTextSizeCurveDirection(false,CURVE_C);
                         isSwitchCurveCIsRight = false;
 
+                    }
+                }
+            });
+
+            etCurveCRadius.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View v, boolean hasFocus) {
+                    if(!hasFocus){
+                        try{
+                            String distance = null;
+                            distance = etCurveCRadius.getText().toString();
+
+                            if(!StringUtilityHelper.isStringNull(distance)){
+                                double myDistance = Double.parseDouble(distance);
+
+                                etCurveCRadius.setText(DISTANCE_PRECISION_FORMATTER.format(myDistance));
+                            }
+
+                        }catch(NumberFormatException ex){
+                            showToast("Error.  Check Number Format", true);
+
+                        }
+                    }
+                }
+            });
+
+            etCurveCLength.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View v, boolean hasFocus) {
+                    if(!hasFocus){
+                        try{
+                            String distance = null;
+                            distance = etCurveCLength.getText().toString();
+
+                            if(!StringUtilityHelper.isStringNull(distance)){
+                                double myDistance = Double.parseDouble(distance);
+
+                                etCurveCLength.setText(DISTANCE_PRECISION_FORMATTER.format(myDistance));
+                            }
+
+                        }catch(NumberFormatException ex){
+                            showToast("Error.  Check Number Format", true);
+
+                        }
                     }
                 }
             });
@@ -1424,14 +1602,17 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
 
         Log.d(TAG, "btSave_onClick:isFormInError: " + isFormInError);
 
-        if(!isFormInError){
-            if(isFromButton) {
-                saveObservationToArray(position);
-            }else{
-                saveObservationToArray(position);
 
+            if(!isFormInError){
+                if(isFromButton) {
+                    saveObservationToArray(position);
+                }else{
+                    saveObservationToArray(position);
+
+                }
             }
-        }
+
+
     }
 
     public void solveCurve(){
@@ -1864,7 +2045,7 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
         PointMapCheck mapCheck = new PointMapCheck();
 
         switch(viewCurrentTypeToDisplay) {
-            case 0: // Bearing:
+            case OT_BEARING: // Bearing:
                 mapCheck.setObservationType(0);
                 mapCheck.setLineAngle(mValueBearing);
                 mapCheck.setLineDistance(mValueDistance);
@@ -1932,6 +2113,7 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
         mapCheck.setToPointNorth(0d);
         mapCheck.setToPointEast(0d);
         mapCheck.setClosingPoint(formClosingPoint);
+        mapCheck.setEdit(false);
 
         mapcheckListener.sendNewMapcheckToActivity(mapCheck, position);
         clearAllViews();
@@ -1941,7 +2123,12 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
     }
 
     public void cancelObservation(int position){
-        mapcheckListener.deleteNewMapcheckUserCancel(position);
+        if(!isEditMode){
+            mapcheckListener.deleteNewMapcheckUserCancel(position);
+        }else{
+            mapcheckListener.editModeMapcheckCancel(editMapCheck, position);
+        }
+
     }
 
     //----------------------------------------------------------------------------------------------//
@@ -1982,6 +2169,168 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
         Log.d(TAG, "checkPointNumber: Started...");
         BackgroundSurveyPointExistInDatabase backgroundSurveyPointExistInDatabase = new BackgroundSurveyPointExistInDatabase(mContext,jobDatabaseName,this,pointNumber);
         backgroundSurveyPointExistInDatabase.execute();
+
+    }
+
+    //----------------------------------------------------------------------------------------------//
+
+    public void populateForEdit(PointMapCheck exMapCheck, int position){
+        Log.d(TAG, "populateForEdit: Started");
+        String distance, radius, length;
+
+        this.editMapCheck = new PointMapCheck(exMapCheck);
+        this.isEditMode = true;
+        this.editPosition = position;
+
+        int exObservationType = exMapCheck.getObservationType();
+
+        switch(exObservationType){
+            case OT_BEARING:
+                viewCurrentTypeToDisplay = 0;
+                swapTypeOfObservation(0);
+
+                double bearing = exMapCheck.getLineAngle();
+
+                etBearingQuadrant.setText(MathHelper.convertDECBearingToParts(bearing,0));
+                etBearingDeg.setText(MathHelper.convertDECBearingToParts(bearing,1));
+                etBearingMin.setText(MathHelper.convertDECBearingToParts(bearing,2));
+                etBearingSec.setText(MathHelper.convertDECBearingToParts(bearing,3));
+
+                distance = DISTANCE_PRECISION_FORMATTER.format(exMapCheck.getLineDistance());
+                etBearingDistance.setText(distance);
+
+                mValueBearing = bearing;
+                mValueDistance = exMapCheck.getLineDistance();
+
+                break;
+
+            case OT_AZIMUTH:
+                viewCurrentTypeToDisplay = 1;
+                swapTypeOfObservation(1);
+
+                double azimuth = exMapCheck.getLineAngle();
+                etAzimuthDeg.setText(MathHelper.convertDECToParts(azimuth,1));
+                etAzimuthMin.setText(MathHelper.convertDECToParts(azimuth,2));
+                etAzimuthSec.setText(MathHelper.convertDECToParts(azimuth,3));
+
+                distance = DISTANCE_PRECISION_FORMATTER.format(exMapCheck.getLineDistance());
+                etBearingDistance.setText(distance);
+
+                mValueBearing = azimuth;
+                mValueDistance = exMapCheck.getLineDistance();
+
+                break;
+
+            case OT_TURNED:
+                viewCurrentTypeToDisplay = 2;
+                swapTypeOfObservation(2);
+
+                double turnedAngle = exMapCheck.getLineAngle();
+                etTurnedDeg.setText(MathHelper.convertDECToParts(turnedAngle,1));
+                etTurnedMin.setText(MathHelper.convertDECToParts(turnedAngle,2));
+                etTurnedSec.setText(MathHelper.convertDECToParts(turnedAngle,3));
+
+                distance = DISTANCE_PRECISION_FORMATTER.format(exMapCheck.getLineDistance());
+                etBearingDistance.setText(distance);
+
+                mValueBearing = turnedAngle;
+                mValueDistance = exMapCheck.getLineDistance();
+
+                break;
+
+            case OC_CURVE_Da_R:
+                viewCurrentTypeToDisplay = 3;
+                swapTypeOfObservation(3);
+
+                double deltaCurveA = exMapCheck.getCurveDelta();
+                etCurveADeltaDeg.setText(MathHelper.convertDECToParts(deltaCurveA,1));
+                etCurveADeltaMin.setText(MathHelper.convertDECToParts(deltaCurveA,2));
+                etCurveADeltaSec.setText(MathHelper.convertDECToParts(deltaCurveA,3));
+
+                radius = DISTANCE_PRECISION_FORMATTER.format(exMapCheck.getCurveRadius());
+                etCurveARadius.setText(radius);
+
+                isSwitchCurveAIsRight = exMapCheck.isCurveToRight();
+
+                if(isSwitchCurveAIsRight){
+                    switchCurveAIsRight.setChecked(true);
+                }else{
+                    switchCurveAIsRight.setChecked(false);
+                }
+
+                mValueCurveDelta = exMapCheck.getCurveDelta();
+                mValueCurveRadius = exMapCheck.getCurveRadius();
+
+                break;
+
+            case OC_CURVE_Da_L:
+                viewCurrentTypeToDisplay = 4;
+                swapTypeOfObservation(4);
+
+                double deltaCurveB = exMapCheck.getCurveDelta();
+                etCurveADeltaDeg.setText(MathHelper.convertDECToParts(deltaCurveB,1));
+                etCurveADeltaMin.setText(MathHelper.convertDECToParts(deltaCurveB,2));
+                etCurveADeltaSec.setText(MathHelper.convertDECToParts(deltaCurveB,3));
+
+                length = DISTANCE_PRECISION_FORMATTER.format(exMapCheck.getCurveLength());
+                etCurveARadius.setText(length);
+
+                isSwitchCurveBIsRight = exMapCheck.isCurveToRight();
+
+                if(isSwitchCurveBIsRight){
+                    switchCurveBIsRight.setChecked(true);
+                }else{
+                    switchCurveBIsRight.setChecked(false);
+                }
+
+                mValueCurveDelta = exMapCheck.getCurveDelta();
+                mValueCurveRadius = exMapCheck.getCurveRadius();
+                mValueCurveLength = exMapCheck.getCurveLength();
+
+                break;
+
+            case OC_CURVE_R_L:
+                viewCurrentTypeToDisplay = 5;
+                swapTypeOfObservation(5);
+
+                radius = DISTANCE_PRECISION_FORMATTER.format(exMapCheck.getCurveRadius());
+                etCurveARadius.setText(radius);
+
+                length = DISTANCE_PRECISION_FORMATTER.format(exMapCheck.getCurveLength());
+                etCurveARadius.setText(length);
+
+                isSwitchCurveCIsRight = exMapCheck.isCurveToRight();
+
+                if(isSwitchCurveCIsRight){
+                    switchCurveCIsRight.setChecked(true);
+                }else{
+                    switchCurveCIsRight.setChecked(false);
+                }
+
+                mValueCurveDelta = exMapCheck.getCurveDelta();
+                mValueCurveRadius = exMapCheck.getCurveRadius();
+                mValueCurveLength = exMapCheck.getCurveLength();
+
+                break;
+
+        }
+
+        if(exMapCheck.isClosingPoint()){
+            cbIsClosingPoint.setChecked(true);
+
+            swapPointClosing(true);
+
+        }else{
+            cbIsClosingPoint.setChecked(false);
+
+            swapPointClosing(false);
+            mValuePointNo = exMapCheck.getToPointNo();
+            etMapCheckPointNumber.setText(String.valueOf(mValuePointNo));
+        }
+
+        etMapCheckPointDescription.setText(exMapCheck.getPointDescription());
+
+
 
     }
 
