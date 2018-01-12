@@ -12,8 +12,9 @@
         android:layout_height="wrap_content">
 
         <TextView
-            android:text="Summary"
+            android:text="@string/cogo_mapcheck_header_summary"
             style="@style/Labels.Card.Header"
+            android:gravity="center"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
@@ -34,7 +35,7 @@
             android:layout_height="1dp"/>
 
         <TextView
-            android:text="Results"
+            android:text="@string/cogo_mapcheck_header_results"
             style="@style/Labels.Card.Header"
             android:gravity="center"
             android:layout_width="match_parent"

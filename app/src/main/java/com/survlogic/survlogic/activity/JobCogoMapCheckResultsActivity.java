@@ -15,6 +15,8 @@ import android.widget.TextView;
 import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.adapter.JobMapCheckObservationsAdaptor;
 import com.survlogic.survlogic.adapter.JobMapCheckResultsAdaptor;
+import com.survlogic.survlogic.background.BackgroundPointSurveyNew;
+import com.survlogic.survlogic.background.BackgroundPointSurveyNewMultiple;
 import com.survlogic.survlogic.model.Point;
 import com.survlogic.survlogic.model.PointMapCheck;
 import com.survlogic.survlogic.model.PointSurvey;
@@ -23,7 +25,9 @@ import com.survlogic.survlogic.utils.PreferenceLoaderHelper;
 import com.survlogic.survlogic.utils.SwipeAndDragHelper;
 
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Locale;
 
 /**
  * Created by chrisfillmore on 12/29/2017.
@@ -120,6 +124,14 @@ public class JobCogoMapCheckResultsActivity extends AppCompatActivity {
                 finish();
             }
         });
+
+        ibSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                saveToDatabase();
+            }
+        });
+
     }
 
     //----------------------------------------------------------------------------------------------//
@@ -381,6 +393,7 @@ public class JobCogoMapCheckResultsActivity extends AppCompatActivity {
 
         // Closing Error module
         solveClosingPoint();
+
         // Distance Traveled Module
         tvDistanceTraveled.setText(DISTANCE_PRECISION_FORMATTER.format(distanceTraveled));
 
@@ -411,12 +424,15 @@ public class JobCogoMapCheckResultsActivity extends AppCompatActivity {
 
         //precision
         double  closingPrecision = (int)(distanceTraveled/inverseDistance);
-        String precision = String.valueOf(closingPrecision);
+        String precision = NumberFormat.getNumberInstance(Locale.getDefault()).format(closingPrecision);
+
         String closingPrecisionPrefix = "1:";
 
-        precision = closingPrecisionPrefix + String.valueOf(closingPrecision);
+        precision = closingPrecisionPrefix + "" + precision;
 
         tvClosingPrecision.setText(precision);
+
+
     }
 
     private double solveAreaofPolygon(){
@@ -464,6 +480,34 @@ public class JobCogoMapCheckResultsActivity extends AppCompatActivity {
 
         Log.d(TAG, "solveAreaofPolygon: Area: " + area);
         return area;
+    }
+
+    private void saveToDatabase(){
+        Log.d(TAG, "saveToDatabase: Started...");
+        for(int i=0; i<lstPointMapCheckResults.size(); i++) {
+            PointMapCheck pointMapCheck = lstPointMapCheckResults.get(i);
+            PointSurvey pointSurvey = new PointSurvey();
+
+            pointSurvey.setPoint_no(pointMapCheck.getToPointNo());
+            pointSurvey.setNorthing(pointMapCheck.getToPointNorth());
+            pointSurvey.setEasting(pointMapCheck.getToPointEast());
+            pointSurvey.setElevation(0);
+            pointSurvey.setDescription(pointMapCheck.getPointDescription());
+            pointSurvey.setPointType(1);
+
+            lstPointSurvey.add(pointSurvey);
+        }
+
+        Log.d(TAG, "saveToDatabase: Size: " + lstPointSurvey.size());
+        if (lstPointSurvey.size() > 0){
+            BackgroundPointSurveyNewMultiple backgroundPointSurveyNew = new BackgroundPointSurveyNewMultiple(mContext, jobDatabaseName);
+            backgroundPointSurveyNew.execute(lstPointSurvey);
+
+        }
+
+        finish();
+
+
     }
 
 }

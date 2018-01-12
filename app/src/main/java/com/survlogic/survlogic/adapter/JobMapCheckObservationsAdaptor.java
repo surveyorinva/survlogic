@@ -1,6 +1,5 @@
 package com.survlogic.survlogic.adapter;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -21,7 +20,6 @@ import android.widget.Toast;
 import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.interf.CallCurveSolutionDialogListener;
 import com.survlogic.survlogic.interf.MapcheckListener;
-import com.survlogic.survlogic.model.Point;
 import com.survlogic.survlogic.model.PointMapCheck;
 import com.survlogic.survlogic.utils.AnimateHelper;
 import com.survlogic.survlogic.utils.MathHelper;
@@ -31,8 +29,6 @@ import com.survlogic.survlogic.view.Card_View_Holder_Job_Mapcheck_List;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-
-import de.codecrafters.tableview.listeners.SwipeToRefreshListener;
 
 /**
  * Created by chrisfillmore on 6/30/2017.
@@ -174,7 +170,11 @@ public class JobMapCheckObservationsAdaptor extends RecyclerView.Adapter<Recycle
 
                 observation = String.valueOf(bearing + " " + distance);
 
-                vh1.ivObservation_Type.setImageDrawable(mContext.getResources().getDrawable(R.drawable.vd_mapcheck_line));
+                if(pointMapCheck.isClosingPoint()){
+                    vh1.ivObservation_Type.setImageDrawable(mContext.getResources().getDrawable(R.drawable.vd_mapcheck_line_close));
+                }else{
+                    vh1.ivObservation_Type.setImageDrawable(mContext.getResources().getDrawable(R.drawable.vd_mapcheck_line));
+                }
 
                 deg = 0f;
                 quadrant = Integer.parseInt(MathHelper.convertDECBearingToParts(pointMapCheck.getLineAngle(),0));
@@ -205,7 +205,11 @@ public class JobMapCheckObservationsAdaptor extends RecyclerView.Adapter<Recycle
 
                 observation = String.valueOf("Az " + azimuthAngle + " " + azimuthDistance);
 
-                vh1.ivObservation_Type.setImageDrawable(mContext.getResources().getDrawable(R.drawable.vd_mapcheck_line));
+                if(pointMapCheck.isClosingPoint()){
+                    vh1.ivObservation_Type.setImageDrawable(mContext.getResources().getDrawable(R.drawable.vd_mapcheck_line_close));
+                }else{
+                    vh1.ivObservation_Type.setImageDrawable(mContext.getResources().getDrawable(R.drawable.vd_mapcheck_line));
+                }
 
                 deg = 0f;
                 double bearingAngle = MathHelper.convertDECAzimuthtToDECBearing(pointMapCheck.getLineAngle());
@@ -238,7 +242,12 @@ public class JobMapCheckObservationsAdaptor extends RecyclerView.Adapter<Recycle
 
                 observation = String.valueOf("< " + turnedAngle + " " + turnedDistance);
 
-                vh1.ivObservation_Type.setImageDrawable(mContext.getResources().getDrawable(R.drawable.vd_mapcheck_line));
+                if(pointMapCheck.isClosingPoint()){
+                    vh1.ivObservation_Type.setImageDrawable(mContext.getResources().getDrawable(R.drawable.vd_mapcheck_line_close));
+                }else{
+                    vh1.ivObservation_Type.setImageDrawable(mContext.getResources().getDrawable(R.drawable.vd_mapcheck_line));
+                }
+
                 break;
 
             case 3: //Curve: Delta and Radius
@@ -247,7 +256,18 @@ public class JobMapCheckObservationsAdaptor extends RecyclerView.Adapter<Recycle
 
                 observation = String.valueOf("Da: " + curveADeltaAngle + " R: " + curveARadius);
 
-                vh1.ivObservation_Type.setImageDrawable(mContext.getResources().getDrawable(R.drawable.vd_mapcheck_curve));
+                if(pointMapCheck.isClosingPoint()){
+                    vh1.ivObservation_Type.setImageDrawable(mContext.getResources().getDrawable(R.drawable.vd_mapcheck_curve_close));
+                }else{
+                    vh1.ivObservation_Type.setImageDrawable(mContext.getResources().getDrawable(R.drawable.vd_mapcheck_curve));
+                }
+
+                deg = 0f;
+                if(!pointMapCheck.isCurveToRight()){
+                    deg = deg + 90f;
+                }
+
+                vh1.ivObservation_Type.animate().rotation(deg).setInterpolator(new AccelerateDecelerateInterpolator());
 
                 break;
 
@@ -257,7 +277,18 @@ public class JobMapCheckObservationsAdaptor extends RecyclerView.Adapter<Recycle
 
                 observation = String.valueOf("Da: " + curveBDeltaAngle + " L: " + curveBLength);
 
-                vh1.ivObservation_Type.setImageDrawable(mContext.getResources().getDrawable(R.drawable.vd_mapcheck_curve));
+                if(pointMapCheck.isClosingPoint()){
+                    vh1.ivObservation_Type.setImageDrawable(mContext.getResources().getDrawable(R.drawable.vd_mapcheck_curve_close));
+                }else{
+                    vh1.ivObservation_Type.setImageDrawable(mContext.getResources().getDrawable(R.drawable.vd_mapcheck_curve));
+                }
+
+                deg = 0f;
+                if(!pointMapCheck.isCurveToRight()){
+                    deg = deg + 90f;
+                }
+
+                vh1.ivObservation_Type.animate().rotation(deg).setInterpolator(new AccelerateDecelerateInterpolator());
 
                 break;
 
@@ -267,7 +298,19 @@ public class JobMapCheckObservationsAdaptor extends RecyclerView.Adapter<Recycle
 
                 observation = String.valueOf("R: " + curveCRadius + " L: " + curveCLength);
 
-                vh1.ivObservation_Type.setImageDrawable(mContext.getResources().getDrawable(R.drawable.vd_mapcheck_curve));
+                if(pointMapCheck.isClosingPoint()){
+                    vh1.ivObservation_Type.setImageDrawable(mContext.getResources().getDrawable(R.drawable.vd_mapcheck_curve_close));
+                }else{
+                    vh1.ivObservation_Type.setImageDrawable(mContext.getResources().getDrawable(R.drawable.vd_mapcheck_curve));
+                }
+
+                deg = 0f;
+                if(!pointMapCheck.isCurveToRight()){
+                    deg = deg + 90f;
+                }
+
+                vh1.ivObservation_Type.animate().rotation(deg).setInterpolator(new AccelerateDecelerateInterpolator());
+
                 break;
 
             default:

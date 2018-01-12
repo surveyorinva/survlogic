@@ -424,6 +424,12 @@
     <string name="cogo_traverse_time_to_move_title">Traverse</string>
     <string name="cogo_traverse_time_to_move_message">Are you Ready to Move to Next Station</string>
 
+
+    <string name="cogo_mapcheck_finish_title">Exit from Mapcheck?</string>
+    <string name="cogo_mapcheck_finish_message">Existing will remove all data that has been logged for this map entry.  Continue to Exit?</string>
+
+    <string name="cogo_mapcheck_header_summary">Summary</string>
+    <string name="cogo_mapcheck_header_results">Results</string>
     <string name="cogo_mapcheck_starting_point_not_set">"Starting Point Not Set"</string>
     <string name="cogo_mapcheck_list_not_added">Please add observation legs before clicking Finish</string>
     <string name="cogo_mapcheck_quandarnt_out_of_range">1=NE, 2=SE, 3=SW, 4=NW</string>

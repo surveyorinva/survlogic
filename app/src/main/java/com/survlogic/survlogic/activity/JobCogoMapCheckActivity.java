@@ -1,7 +1,9 @@
 package com.survlogic.survlogic.activity;
 
+import android.app.AlertDialog;
 import android.app.DialogFragment;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -309,7 +311,27 @@ public class JobCogoMapCheckActivity extends AppCompatActivity implements Databa
     //----------------------------------------------------------------------------------------------//
 
     private void closeActivity(){
-        finish();
+        if(lstPointMapCheck.size() > 0){
+            //Call confirm
+            new AlertDialog.Builder(this)
+                    .setTitle(getResources().getString(R.string.cogo_mapcheck_finish_title))
+                    .setMessage(getResources().getString(R.string.cogo_mapcheck_finish_message))
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            finish();
+                        }})
+                    .setNegativeButton(android.R.string.no, null).show();
+
+        }else{
+            finish();
+        }
+
+    }
+
+    @Override
+    public void onBackPressed() {
+        closeActivity();
     }
 
     private void loadPreferences(){

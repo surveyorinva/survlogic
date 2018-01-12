@@ -132,11 +132,12 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
         this.jobDatabaseName = jobDatabaseName;
         this.DISTANCE_PRECISION_FORMATTER = DISTANCE_PRECISION_FORMATTER;
 
-        initVewListAddNewObservation();
+
+        initViewListAddNewObservation();
 
     }
 
-    private void initVewListAddNewObservation(){
+    private void initViewListAddNewObservation(){
         Log.d(TAG, "initVewListAddNewObservation: Started");
 
         vListAdd_ha_bearing = itemView.findViewById(R.id.layout_ha_bearing);
@@ -204,8 +205,6 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
         });
 
 
-
-
         cbIsClosingPoint = (CheckBox) itemView.findViewById(R.id.is_closing_point);
         tvIsClosingPoint = (TextView) itemView.findViewById(R.id.is_closing_point_desc);
 
@@ -217,9 +216,13 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
 
         swapTypeOfObservation(0);
 
-
     }
 
+
+    private void initDataFromActivityList(){
+        lstPointMapCheck = mapcheckListener.getPointMapCheck();
+
+    }
 
     private void initLayoutHaBearing(){
 
@@ -396,6 +399,47 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
             }
         });
 
+
+        etBearingMin.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(!hasFocus){
+                    try{
+                        String angle = null;
+                        angle = etBearingMin.getText().toString();
+
+                        if(StringUtilityHelper.isStringNull(angle)){
+                            etBearingMin.setText("00");
+                        }
+
+                    }catch(NumberFormatException ex){
+                        showToast("Error.  Check Number Format", true);
+
+                    }
+                }
+            }
+        });
+
+        etBearingSec.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(!hasFocus){
+                    try{
+                        String angle = null;
+                        angle = etBearingSec.getText().toString();
+
+                        if(StringUtilityHelper.isStringNull(angle)){
+                            etBearingSec.setText("00");
+                        }
+
+                    }catch(NumberFormatException ex){
+                        showToast("Error.  Check Number Format", true);
+
+                    }
+                }
+            }
+        });
+
     }
 
     private void initLayoutHaAzimuth(){
@@ -550,6 +594,46 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
                 }
             });
 
+            etAzimuthMin.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View v, boolean hasFocus) {
+                    if(!hasFocus){
+                        try{
+                            String angle = null;
+                            angle = etAzimuthMin.getText().toString();
+
+                            if(StringUtilityHelper.isStringNull(angle)){
+                                etAzimuthMin.setText("00");
+                            }
+
+                        }catch(NumberFormatException ex){
+                            showToast("Error.  Check Number Format", true);
+
+                        }
+                    }
+                }
+            });
+
+            etAzimuthSec.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View v, boolean hasFocus) {
+                    if(!hasFocus){
+                        try{
+                            String angle = null;
+                            angle = etAzimuthSec.getText().toString();
+
+                            if(StringUtilityHelper.isStringNull(angle)){
+                                etAzimuthSec.setText("00");
+                            }
+
+                        }catch(NumberFormatException ex){
+                            showToast("Error.  Check Number Format", true);
+
+                        }
+                    }
+                }
+            });
+
 
         }
 
@@ -679,6 +763,46 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
                                 double myDistance = Double.parseDouble(distance);
 
                                 etTurnedDistance.setText(DISTANCE_PRECISION_FORMATTER.format(myDistance));
+                            }
+
+                        }catch(NumberFormatException ex){
+                            showToast("Error.  Check Number Format", true);
+
+                        }
+                    }
+                }
+            });
+
+            etTurnedMin.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View v, boolean hasFocus) {
+                    if(!hasFocus){
+                        try{
+                            String angle = null;
+                            angle = etTurnedMin.getText().toString();
+
+                            if(StringUtilityHelper.isStringNull(angle)){
+                                etTurnedMin.setText("00");
+                            }
+
+                        }catch(NumberFormatException ex){
+                            showToast("Error.  Check Number Format", true);
+
+                        }
+                    }
+                }
+            });
+
+            etTurnedSec.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View v, boolean hasFocus) {
+                    if(!hasFocus){
+                        try{
+                            String angle = null;
+                            angle = etTurnedSec.getText().toString();
+
+                            if(StringUtilityHelper.isStringNull(angle)){
+                                etTurnedSec.setText("00");
                             }
 
                         }catch(NumberFormatException ex){
@@ -862,6 +986,48 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
                 }
             });
 
+
+            etCurveADeltaMin.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View v, boolean hasFocus) {
+                    if(!hasFocus){
+                        try{
+                            String angle = null;
+                            angle = etCurveADeltaMin.getText().toString();
+
+                            if(StringUtilityHelper.isStringNull(angle)){
+                                etCurveADeltaMin.setText("00");
+                            }
+
+                        }catch(NumberFormatException ex){
+                            showToast("Error.  Check Number Format", true);
+
+                        }
+                    }
+                }
+            });
+
+            etCurveADeltaSec.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View v, boolean hasFocus) {
+                    if(!hasFocus){
+                        try{
+                            String angle = null;
+                            angle = etCurveADeltaSec.getText().toString();
+
+                            if(StringUtilityHelper.isStringNull(angle)){
+                                etCurveADeltaSec.setText("00");
+                            }
+
+                        }catch(NumberFormatException ex){
+                            showToast("Error.  Check Number Format", true);
+
+                        }
+                    }
+                }
+            });
+
+
         }
 
     }
@@ -1025,6 +1191,46 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
                                 double myDistance = Double.parseDouble(distance);
 
                                 etCurveBLength.setText(DISTANCE_PRECISION_FORMATTER.format(myDistance));
+                            }
+
+                        }catch(NumberFormatException ex){
+                            showToast("Error.  Check Number Format", true);
+
+                        }
+                    }
+                }
+            });
+
+            etCurveBDeltaMin.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View v, boolean hasFocus) {
+                    if(!hasFocus){
+                        try{
+                            String angle = null;
+                            angle = etCurveBDeltaMin.getText().toString();
+
+                            if(StringUtilityHelper.isStringNull(angle)){
+                                etCurveBDeltaMin.setText("00");
+                            }
+
+                        }catch(NumberFormatException ex){
+                            showToast("Error.  Check Number Format", true);
+
+                        }
+                    }
+                }
+            });
+
+            etCurveBDeltaSec.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View v, boolean hasFocus) {
+                    if(!hasFocus){
+                        try{
+                            String angle = null;
+                            angle = etCurveBDeltaSec.getText().toString();
+
+                            if(StringUtilityHelper.isStringNull(angle)){
+                                etCurveBDeltaSec.setText("00");
                             }
 
                         }catch(NumberFormatException ex){
@@ -1406,6 +1612,19 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
             btSaveObservation.setClickable(false);
 
         }
+
+    }
+
+    private void autoPopulateDescription(){
+        Log.d(TAG, "autoPopulateDescription: Started");
+        Log.d(TAG, "autoPopulateDescription: Size: " + lstPointMapCheck.size());
+        if(lstPointMapCheck.size() > 1){
+            PointMapCheck previousMapcheck = lstPointMapCheck.get(0);
+            String previousDescription = previousMapcheck.getPointDescription();
+
+            etMapCheckPointDescription.setText(previousDescription);
+        }
+
 
     }
 
@@ -2142,7 +2361,7 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
         boolean doesPointExist;
         HashMap pointMap = new HashMap();
 
-        lstPointMapCheck = mapcheckListener.getPointMapCheck();
+        initDataFromActivityList();
 
         for(int i=0; i<lstPointMapCheck.size(); i++) {
             PointMapCheck pointMapCheck = lstPointMapCheck.get(i);
