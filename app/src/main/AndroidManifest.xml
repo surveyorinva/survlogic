@@ -152,6 +152,11 @@
             android:screenOrientation="portrait"
             android:theme="@style/SuperMaterialTheme"/>
 
+        <activity
+            android:name=".activity.TestActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/SuperMaterialTheme"/>
+
     </application>
 
 </manifest>

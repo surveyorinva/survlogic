@@ -55,6 +55,9 @@ dependencies {
     //Vector Master (https://github.com/harjot-oberai/VectorMaster)
     compile 'com.sdsmdg.harjot:vectormaster:1.0.9'
 
+    //https://github.com/orbisgis/cts  FROM https://jitpack.io/
+    compile 'com.github.orbisgis:cts:v1.5.1'
+    compile 'sk.baka.slf4j:slf4j-handroid:1.7.26'
 
     testCompile 'junit:junit:4.12'
 

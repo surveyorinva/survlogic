@@ -141,7 +141,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
 
             case R.id.menu_item3_id:
-                intent.setClass(this, GpsSurveyActivity.class);
+                intent.setClass(this, TestActivity.class);
                 startActivity(intent);
                 break;
 
