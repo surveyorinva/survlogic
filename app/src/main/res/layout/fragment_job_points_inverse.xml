@@ -70,14 +70,18 @@
 
                     <AutoCompleteTextView
                         android:id="@+id/left_item1_value"
-                        style="@style/Labels.Card.ProjectValues"
+                        android:transitionName="occupy_animation"
                         android:inputType="number"
-                        android:gravity="center_horizontal"
+                        android:gravity="center"
+                        android:layout_marginEnd="5dp"
+                        android:layout_marginBottom="5dp"
                         android:layout_alignStart="@id/left_item1_header"
                         android:layout_toStartOf="@+id/inverse_from_list"
                         android:layout_below="@id/left_item1_header"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="45dp"
+                        style="@style/InputField.EditText"
+                        android:background="@drawable/editbox_background_normal"/>
 
                     <ImageButton
                         android:id="@+id/inverse_from_list"
@@ -119,15 +123,18 @@
                         android:layout_height="wrap_content" />
 
                     <AutoCompleteTextView
-                        android:id="@+id/right_item1_value"
+                        android:id="@+id/left_item2_value"
                         android:inputType="number"
-                        android:gravity="center_horizontal"
-                        style="@style/Labels.Card.ProjectValues"
+                        android:gravity="center"
+                        android:layout_marginEnd="5dp"
                         android:layout_alignStart="@id/right_item1_header"
+                        android:layout_marginBottom="10dp"
                         android:layout_toStartOf="@+id/inverse_to_list"
                         android:layout_below="@id/right_item1_header"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="45dp"
+                        style="@style/InputField.EditText"
+                        android:background="@drawable/editbox_background_normal"/>
 
                     <ImageButton
                         android:id="@+id/inverse_to_list"
@@ -164,6 +171,7 @@
             android:layout_height="match_parent" />
 
         <Button
+            android:id="@+id/calculate_inverse"
             android:text="Calculate"
             style="@style/Button.Flat.Primary.Save"
             android:layout_weight="40"
@@ -259,7 +267,7 @@
 
                     <TextView
                         android:id="@+id/left_results4_header"
-                        android:text="Slope Distance"
+                        android:text="Vertical Delta"
                         style="@style/Labels.Card.ProjectHeader"
                         android:layout_below="@id/left_results3_value"
                         android:layout_marginStart="5dp"
@@ -275,23 +283,6 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
 
-                    <TextView
-                        android:id="@+id/left_results5_header"
-                        android:text="Vertical Distance"
-                        style="@style/Labels.Card.ProjectHeader"
-                        android:layout_below="@id/left_results4_value"
-                        android:layout_marginStart="5dp"
-                        android:layout_marginTop="5dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
-
-                    <TextView
-                        android:id="@+id/left_results5_value"
-                        style="@style/Labels.Card.ProjectValues"
-                        android:layout_alignStart="@id/left_results5_header"
-                        android:layout_below="@id/left_results5_header"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
 
                 </RelativeLayout>
 
@@ -347,7 +338,7 @@
                         android:weightSum="100"
                         android:layout_below="@id/llFromCoordinatesHeader"
                         android:layout_marginStart="5dp"
-                        android:layout_marginTop="5dp"
+                        android:layout_marginTop="0dp"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
@@ -416,7 +407,7 @@
                         android:weightSum="100"
                         android:layout_below="@id/llToCoordinatesHeader"
                         android:layout_marginStart="5dp"
-                        android:layout_marginTop="5dp"
+                        android:layout_marginTop="0dp"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
@@ -445,7 +436,7 @@
                         android:weightSum="100"
                         android:layout_below="@id/llToCoordinatesValue"
                         android:layout_marginStart="5dp"
-                        android:layout_marginTop="25dp"
+                        android:layout_marginTop="15dp"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
@@ -475,7 +466,7 @@
                         android:weightSum="100"
                         android:layout_below="@id/llDeltaCoordinatesHeader"
                         android:layout_marginStart="5dp"
-                        android:layout_marginTop="5dp"
+                        android:layout_marginTop="0dp"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 

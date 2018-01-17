@@ -1,28 +1,26 @@
 package com.survlogic.survlogic.activity;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.survlogic.survlogic.R;
-import com.survlogic.survlogic.adapter.JobMapCheckObservationsAdaptor;
 import com.survlogic.survlogic.adapter.JobMapCheckResultsAdaptor;
-import com.survlogic.survlogic.background.BackgroundPointSurveyNew;
 import com.survlogic.survlogic.background.BackgroundPointSurveyNewMultiple;
 import com.survlogic.survlogic.model.Point;
 import com.survlogic.survlogic.model.PointMapCheck;
 import com.survlogic.survlogic.model.PointSurvey;
 import com.survlogic.survlogic.utils.MathHelper;
 import com.survlogic.survlogic.utils.PreferenceLoaderHelper;
-import com.survlogic.survlogic.utils.SwipeAndDragHelper;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -417,7 +415,7 @@ public class JobCogoMapCheckResultsActivity extends AppCompatActivity {
         double inverseDirection = MathHelper.inverseBearingFromPointSurvey(occupyPoint,closingPoint);
         String inverseBearing = MathHelper.convertDECtoDMSBearing(inverseDirection,0);
 
-        double inverseDistance = MathHelper.inverseDistanceFromPointSurvey(occupyPoint,closingPoint);
+        double inverseDistance = MathHelper.inverseHzDistanceFromPointSurvey(occupyPoint,closingPoint);
 
         tvClosingErrorDirection.setText(inverseBearing);
         tvClosingErrorDistance.setText(DISTANCE_PRECISION_FORMATTER.format(inverseDistance));
@@ -505,8 +503,9 @@ public class JobCogoMapCheckResultsActivity extends AppCompatActivity {
 
         }
 
+        Intent returnActivity = new Intent();
+        setResult(Activity.RESULT_OK,returnActivity);
         finish();
-
 
     }
 

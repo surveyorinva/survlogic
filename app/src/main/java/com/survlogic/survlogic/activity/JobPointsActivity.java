@@ -32,6 +32,7 @@ import com.survlogic.survlogic.fragment.JobPointsListFragment;
 import com.survlogic.survlogic.fragment.JobPointsMapFragment;
 import com.survlogic.survlogic.interf.JobMapOptionsListener;
 import com.survlogic.survlogic.interf.JobPointsActivityListener;
+import com.survlogic.survlogic.interf.JobPointsInversePointListListener;
 import com.survlogic.survlogic.interf.JobPointsMapListener;
 import com.survlogic.survlogic.model.PointGeodetic;
 import com.survlogic.survlogic.model.PointSurvey;
@@ -44,7 +45,7 @@ import java.util.ArrayList;
  * Created by chrisfillmore on 8/8/2017.
  */
 
-public class JobPointsActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, JobPointsMapListener, JobMapOptionsListener, JobPointsActivityListener{
+public class JobPointsActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, JobPointsMapListener, JobMapOptionsListener, JobPointsActivityListener, JobPointsInversePointListListener{
     private static final String TAG = "JobPointsActivity";
 
     private static Context mContext;
@@ -438,6 +439,19 @@ public class JobPointsActivity extends AppCompatActivity implements NavigationVi
     @Override
     public void refreshPointArrays() {
         initPointDataInBackground();
+
+    }
+
+    @Override
+    public void onReturnValuesInverseFrom(PointSurvey pointSurvey) {
+        Log.d(TAG, "onReturnValuesInverseFrom: Started");
+        jobPointsInverseFragment.setPointSurveyFromPointSurvey(pointSurvey,true);
+    }
+
+    @Override
+    public void onReturnValuesInverseTo(PointSurvey pointSurvey) {
+        Log.d(TAG, "onReturnValuesInverseTo: Started");
+        jobPointsInverseFragment.setPointSurveyFromPointSurvey(pointSurvey,false);
 
     }
 }

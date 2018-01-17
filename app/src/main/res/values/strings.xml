@@ -351,6 +351,10 @@
     <string name="point_home_action_3_4">Swap \nN and E</string>
     <string name="point_home_action_3_5">Change \nUnits</string>
 
+    <!--Points - Inverse -->
+    <string name="points_inverse_to_error_same_as_from">To and Occupy points are the Same. \nPlease check."</string>
+    <string name="points_inverse_from_error_not_entered">From Point Not entered.  \nEnter to continue</string>
+    <string name="points_inverse_to_error_not_entered">To Point Not entered.  \nEnter to continue</string>
     <!--Cogo - Home -->
     <string name="cogo_home_header_1">Coordinate Geometry</string>
     <string name="cogo_home_action_1_1">Setup</string>

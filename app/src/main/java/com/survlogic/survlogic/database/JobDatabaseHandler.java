@@ -128,9 +128,9 @@ public class JobDatabaseHandler extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         Log.d(TAG, "onUpgrade: Updating Tables to new Version...");
 
-        db.execSQL("DROP IF TABLE EXISTS " + JobContract.JobSettingsEntry.TABLE_NAME);
-        db.execSQL("DROP IF TABLE EXISTS " + JobContract.PointEntry.TABLE_NAME);
-        db.execSQL("DROP IF TABLE EXISTS " + JobContract.SketchEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + JobContract.JobSettingsEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + JobContract.PointEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + JobContract.SketchEntry.TABLE_NAME);
         onCreate(db);
 
     }
@@ -241,6 +241,43 @@ public class JobDatabaseHandler extends SQLiteOpenHelper {
         }
     }
 
+
+    public long addMultiplePointSurveyToDB(SQLiteDatabase db, ArrayList<PointSurvey> lstPointSurvey){
+        Log.d(TAG, "addMultiplePointSurveyToDB: Started");
+
+        Long result = 0L;
+
+        for(int i=0; i<lstPointSurvey.size(); i++) {
+            Log.d(TAG, "addMultiplePointSurveyToDB: i: " + i);
+            PointSurvey pointSurvey = lstPointSurvey.get(i);
+
+            ContentValues contentValues = new ContentValues();
+
+            //Required
+            contentValues.put(JobContract.PointEntry.KEY_POINT_NO, pointSurvey.getPoint_no());
+            contentValues.put(JobContract.PointEntry.KEY_NORTHING, pointSurvey.getNorthing());
+            contentValues.put(JobContract.PointEntry.KEY_EASTING, pointSurvey.getEasting());
+            contentValues.put(JobContract.PointEntry.KEY_ELEVATION, pointSurvey.getElevation());
+            contentValues.put(JobContract.PointEntry.KEY_DESCRIPTION, pointSurvey.getDescription());
+            contentValues.put(JobContract.PointEntry.KEY_POINT_TYPE, pointSurvey.getPointType());
+
+            contentValues.put(JobContract.PointEntry.KEY_DATE_CREATED,(int) (new Date().getTime()/1000));
+
+            Log.d(TAG, "addData: Adding Survey Point No. " + pointSurvey.getPoint_no() + " to " + JobContract.PointEntry.TABLE_NAME);
+
+            result = result + db.insert(JobContract.PointEntry.TABLE_NAME, null, contentValues);
+
+        }
+
+        if (result==-1){
+            Log.d(TAG,"Error, Something went wrong...");
+            return -1;
+        } else {
+            Log.d(TAG,"Success," + result + " Rows inserted into Table...");
+            return result;
+        }
+
+    }
 
     public long addPointGeodeticToDB(SQLiteDatabase db, PointGeodetic pointGeodetic){
         Log.d(TAG, "addPointGeodeticToDB: Starting...");

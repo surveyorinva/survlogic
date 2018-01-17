@@ -765,8 +765,8 @@ public class MathHelper {
         return results;
     }
 
-    public static double inverseDistanceFromPointSurvey(PointSurvey pointSurvey1, PointSurvey pointSurvey2){
-        Log.d(TAG, "inverseDistanceFromPointSurvey: Started");
+    public static double inverseHzDistanceFromPointSurvey(PointSurvey pointSurvey1, PointSurvey pointSurvey2){
+        Log.d(TAG, "inverseHzDistanceFromPointSurvey: Started");
 
         double n1,e1,n2,e2;
         double results;
@@ -780,10 +780,63 @@ public class MathHelper {
         results = Math.pow((n1-n2),2) + Math.pow((e1-e2),2);
         results = Math.sqrt(results);
 
-        Log.d(TAG, "inverseDistanceFromPointSurvey: Dist: " + results);
+        Log.d(TAG, "inverseHzDistanceFromPointSurvey: Dist: " + results);
         return results;
 
     }
+
+    public static double inverseSlDistanceFromPointSurvey(PointSurvey pointSurvey1, PointSurvey pointSurvey2){
+        Log.d(TAG, "inverseSlDistanceFromPointSurvey: Started");
+
+        double n1,e1,n2,e2, el1, el2;
+        double hzDistance, vtDelta;
+        double verticalAngle;
+
+        n1 = pointSurvey1.getNorthing();
+        e1 = pointSurvey1.getEasting();
+        el1 = pointSurvey1.getElevation();
+
+        n2 = pointSurvey2.getNorthing();
+        e2 = pointSurvey2.getEasting();
+        el2 = pointSurvey2.getElevation();
+
+        hzDistance = Math.pow((n1-n2),2) + Math.pow((e1-e2),2);
+        hzDistance = Math.sqrt(hzDistance);
+
+        vtDelta = el2 - el1;
+
+        verticalAngle = Math.atan(vtDelta/hzDistance);
+
+        return vtDelta/Math.sin(verticalAngle);
+
+    }
+
+    public static double inverseCoordinateDeltas(PointSurvey pointSurvey1, PointSurvey pointSurvey2, int partNo){
+        Log.d(TAG, "inverseCoordinateDeltas: Started");
+        //part No: 1 = Northing, 2 = Easting, 3 = Elev.
+
+        double n1,e1,n2,e2, el1, el2;
+
+        n1 = pointSurvey1.getNorthing();
+        e1 = pointSurvey1.getEasting();
+        el1 = pointSurvey1.getElevation();
+
+        n2 = pointSurvey2.getNorthing();
+        e2 = pointSurvey2.getEasting();
+        el2 = pointSurvey2.getElevation();
+
+        switch(partNo) {
+            case 1: //northing
+                return n2 - n1;
+            case 2: //easting
+                return e2 - e1;
+            case 3: //elev
+                return el2 - el1;
+            default:
+                return 0;
+        }
+    }
+
 
     public static double convertSlopeDistanceToHorizontalDistanceByZenith(double slopeDistance, double zenithAngle){
         double results=0;

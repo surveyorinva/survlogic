@@ -31,8 +31,10 @@ import com.survlogic.survlogic.background.BackgroundGeodeticPointGet;
 import com.survlogic.survlogic.background.BackgroundSurveyPointGet;
 import com.survlogic.survlogic.fragment.JobCogoHomeFragment;
 import com.survlogic.survlogic.fragment.JobCogoSideshotFragment;
+import com.survlogic.survlogic.fragment.JobPointsInverseFragment;
 import com.survlogic.survlogic.interf.JobCogoFragmentListener;
 import com.survlogic.survlogic.interf.JobCogoHomeFragmentListener;
+import com.survlogic.survlogic.interf.JobPointsInversePointListListener;
 import com.survlogic.survlogic.interf.JobPointsMapListener;
 import com.survlogic.survlogic.model.JobInformation;
 import com.survlogic.survlogic.model.PointGeodetic;
@@ -48,7 +50,7 @@ import java.util.HashMap;
  * Created by chrisfillmore on 8/2/2017.
  */
 
-public class JobCogoActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, JobPointsMapListener, JobCogoHomeFragmentListener, JobCogoFragmentListener {
+public class JobCogoActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, JobPointsMapListener, JobCogoHomeFragmentListener, JobCogoFragmentListener, JobPointsInversePointListListener {
     private static final String TAG = "JobHomeActivity";
 
     private Context mContext;
@@ -85,6 +87,7 @@ public class JobCogoActivity extends AppCompatActivity implements NavigationView
     private TextView tvPointOccupy, tvPointBacksight, tvPointDirection, tvOccupyHeight, tvBacksightHeight;
 
     private PreferenceLoaderHelper preferenceLoaderHelper;
+    private JobPointsInverseFragment jobPointsInverseFragment;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -330,7 +333,14 @@ public class JobCogoActivity extends AppCompatActivity implements NavigationView
                         menuItem = menu.getItem(ACTIVITY_NUM);
                         menuItem.setChecked(false);
 
+                        JobPointsInverseFragment containerFragment4 = new JobPointsInverseFragment();
+                        containerFragment4.setArguments(getIntent().getExtras());
 
+                        swapFragment(containerFragment4, false, "INVERSE_VIEW");
+                        jobPointsInverseFragment = containerFragment4;
+
+                        jobPointsInverseFragment.setArrayListPointSurvey(lstPointSurvey);
+                        jobPointsInverseFragment.setArrayListPointGeodetic(lstPointGeodetic);
 
                         break;
                 }
@@ -752,6 +762,19 @@ public class JobCogoActivity extends AppCompatActivity implements NavigationView
     public void invalidatePointSurveyList() {
         Log.d(TAG, "invalidatePointSurveyList: Started...");
         updatePointList();
+
+    }
+
+    @Override
+    public void onReturnValuesInverseFrom(PointSurvey pointSurvey) {
+        Log.d(TAG, "onReturnValuesInverseFrom: Started");
+        jobPointsInverseFragment.setPointSurveyFromPointSurvey(pointSurvey,true);
+    }
+
+    @Override
+    public void onReturnValuesInverseTo(PointSurvey pointSurvey) {
+        Log.d(TAG, "onReturnValuesInverseTo: Started");
+        jobPointsInverseFragment.setPointSurveyFromPointSurvey(pointSurvey,false);
 
     }
 }

@@ -300,4 +300,9 @@ public class PreferenceLoaderHelper {
         editor.apply();
     }
 
+    public int getFormatAngleHzDisplay(){
+        return format_angle_hz_display;
+    }
+
+
 }

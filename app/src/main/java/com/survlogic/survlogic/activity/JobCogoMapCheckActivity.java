@@ -1,10 +1,13 @@
 package com.survlogic.survlogic.activity;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DialogFragment;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -52,6 +55,7 @@ import java.util.HashMap;
 public class JobCogoMapCheckActivity extends AppCompatActivity implements DatabasePointsFromAsyncListener, JobCogoMapCheckPointListListener, MapcheckListener, CallCurveSolutionDialogListener{
     private static final String TAG = "JobCogoMapCheckActivity";
     private Context mContext;
+    private BroadcastReceiver broadcastReceiver;
 
     private int project_id, job_id;
     private String jobDatabaseName;
@@ -114,6 +118,14 @@ public class JobCogoMapCheckActivity extends AppCompatActivity implements Databa
 
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == 1){
+            if(resultCode == Activity.RESULT_OK){
+                finish();
+            }
+        }
+    }
 
     private void initViewWidgets() {
         Log.d(TAG, "initViewWidgets: Started...");
@@ -384,6 +396,7 @@ public class JobCogoMapCheckActivity extends AppCompatActivity implements Databa
 
     private void openFinishActivity(){
         Log.d(TAG, "openFinishActivity: Started");
+
         Intent intentFinish = new Intent(this,JobCogoMapCheckResultsActivity.class);
 
         intentFinish.putExtra(getString(R.string.KEY_SETUP_OCCUPY_PT),occupyPoint);
@@ -392,10 +405,40 @@ public class JobCogoMapCheckActivity extends AppCompatActivity implements Databa
         intentFinish.putExtra(getString(R.string.KEY_JOB_ID), job_id);
         intentFinish.putExtra(getString(R.string.KEY_JOB_DATABASE), jobDatabaseName);
 
-        startActivity(intentFinish);
+        startActivityForResult(intentFinish,1);
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+
     }
+
+
+    private void registerBroadcastReceiver(){
+        Log.d(TAG, "setupBroadcastReceiver: Register");
+
+        broadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Log.d(TAG, "BroadcastReceiver-onReceive: Heard something");
+                String action = intent.getAction();
+
+                Log.d(TAG, "BroadcastReceiver-onReceive: I heard: " + action);
+                if(action.equals("finish_activity")){
+                    finish();
+                }
+            }
+        };
+
+    }
+
+    private void unregisterBroadcastReceiver(){
+        Log.d(TAG, "unregisterBroadcastReceiver: Started");
+
+        unregisterReceiver(broadcastReceiver);
+
+    }
+
     //----------------------------------------------------------------------------------------------//
+
+
 
     private void addFirstLegView(){
         vInstructions.setVisibility(View.GONE);

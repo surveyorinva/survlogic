@@ -49,22 +49,15 @@ public class BackgroundPointSurveyNewMultiple extends AsyncTask <ArrayList<Point
 
         Log.d(TAG, "doInBackground: Size: " + lstPoints.size());
 
-        for(int i=0; i<lstPoints.size(); i++) {
-            Log.d(TAG, "doInBackground: i: " + i);
-            PointSurvey pointSurvey = lstPoints.get(i);
+        try{
+            Log.d(TAG, "doInBackground: trying to save");
+            //Saving Job Settings
+            Log.d(TAG, "doInBackground: Saving Point to " + jobDbName);
+            point_id = jobDb.addMultiplePointSurveyToDB(dbJob, lstPoints);
 
-            try{
-                Log.d(TAG, "doInBackground: trying to save");
-                //Saving Job Settings
-                Log.d(TAG, "doInBackground: Saving Point to " + jobDbName);
-                point_id = jobDb.addPointSurveyToDB(dbJob, pointSurvey);
-                recordCount = recordCount + 1;
-
-                Log.d(TAG, "doInBackground: record count: " + recordCount);
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-
+            Log.d(TAG, "doInBackground: record count: " + point_id);
+        }catch (Exception e){
+            e.printStackTrace();
         }
 
         Log.d(TAG, "doInBackground: Closing Database Connection");

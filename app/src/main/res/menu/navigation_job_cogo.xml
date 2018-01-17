@@ -21,7 +21,7 @@
 
     <item
         android:id="@+id/navigation_item_4"
-        android:icon="@drawable/ic_action_map"
+        android:icon="@drawable/ic_bottom_inverse"
         android:title="">
     </item>
 
