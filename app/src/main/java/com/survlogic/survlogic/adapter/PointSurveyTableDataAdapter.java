@@ -1,169 +1,206 @@
 package com.survlogic.survlogic.adapter;
 
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
-import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.LayoutInflater;
+import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.widget.CompoundButton;
+import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.survlogic.survlogic.R;
+import com.survlogic.survlogic.interf.CallCurveSolutionDialogListener;
+import com.survlogic.survlogic.interf.MapcheckListener;
+import com.survlogic.survlogic.model.PointMapCheck;
 import com.survlogic.survlogic.model.PointSurvey;
-import com.survlogic.survlogic.utils.PreferenceLoaderHelper;
+import com.survlogic.survlogic.utils.AnimateHelper;
+import com.survlogic.survlogic.utils.MathHelper;
+import com.survlogic.survlogic.utils.SwipeAndDragHelper;
+import com.survlogic.survlogic.view.Card_View_Holder_Job_Mapcheck_Add;
+import com.survlogic.survlogic.view.Card_View_Holder_Job_Mapcheck_List;
+import com.survlogic.survlogic.view.Card_View_Holder_Job_Points_List;
 
 import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.util.List;
-
-import de.codecrafters.tableview.TableView;
-import de.codecrafters.tableview.toolkit.LongPressAwareTableDataAdapter;
-
-import static android.view.View.TEXT_ALIGNMENT_CENTER;
+import java.util.ArrayList;
 
 /**
- * Created by chrisfillmore on 8/10/2017.
+ * Created by chrisfillmore on 6/30/2017.
  */
 
-public class PointSurveyTableDataAdapter extends LongPressAwareTableDataAdapter<PointSurvey> {
+public class PointSurveyTableDataAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private static final String TAG = "PointSurveyTableDataAda";
 
+    private ArrayList<PointSurvey> pointSurveys = new ArrayList<>();
+    private final int LIST = 0;
+
+    private int lastPosition = 0;
+
     private Context mContext;
-    private SharedPreferences sharedPreferences;
-    PreferenceLoaderHelper preferenceLoaderHelper;
+    private String jobDatabaseName;
 
-    private int TEXT_SIZE = 10;
+    private DecimalFormat COORDINATE_FORMATTER, DISTANCE_PRECISION_FORMATTER;
 
-    private static DecimalFormat COORDINATE_FORMATTER;
+    private ItemTouchHelper touchHelper;
 
-    public PointSurveyTableDataAdapter(final Context context, final List<PointSurvey> data, final TableView<PointSurvey> tableView, int textSize) {
-        super(context, data, tableView);
-
+    //    CONSTRUCTOR!!!!!
+    public PointSurveyTableDataAdapter(Context context, ArrayList<PointSurvey> pointSurvey, DecimalFormat COORDINATE_FORMATTER){
+        this.pointSurveys = pointSurvey;
         this.mContext = context;
-        this.TEXT_SIZE = textSize;
+        this.COORDINATE_FORMATTER = COORDINATE_FORMATTER;
+    }
 
-        preferenceLoaderHelper = new PreferenceLoaderHelper(mContext);
-        loadPreferences();
+    @Override
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        Log.d(TAG, "onCreateViewHolder: Started...");
+        Log.d(TAG, "onCreateViewHolder: ViewType: " + viewType);
+        RecyclerView.ViewHolder viewHolder;
+        LayoutInflater mInflater = LayoutInflater.from(parent.getContext());
+
+        switch (viewType){
+            case LIST:
+                View v1 = mInflater.inflate(R.layout.card_job_cogo_point_view_small,parent,false);
+                viewHolder = new Card_View_Holder_Job_Points_List(v1,mContext);
+                break;
+
+            default:
+                View v = mInflater.inflate(R.layout.card_job_cogo_point_view_small,parent,false);
+                viewHolder = new Card_View_Holder_Job_Points_List(v,mContext);
+                break;
+        }
+
+        return viewHolder;
 
     }
 
+    @Override
+    public int getItemViewType(int position) {
+        Log.d(TAG, "getItemViewType: Started");
+        return LIST;
+
+    }
 
     @Override
-    public View getDefaultCellView(int rowIndex, int columnIndex, ViewGroup parentView) {
-        final PointSurvey pointSurvey = getRowData(rowIndex);
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        Log.d(TAG, "onBindViewHolder: Started...");
+        Log.d(TAG, "onBindViewHolder: ItemViewType: " + holder.getItemViewType());
+        switch (holder.getItemViewType()){
 
-        View renderedView = null;
-
-        switch (columnIndex){
-            case 0:  //Point No
-                renderedView = renderPointNo(pointSurvey);
-                break;
-
-            case 1:  //Northing
-                if (preferenceLoaderHelper.getValueFormatCoordinateEntry())
-                    renderedView = renderNorthing(pointSurvey);
-                else{
-                    renderedView = renderEasting(pointSurvey);
-                }
-                break;
-
-            case 2:  //Easting
-                if (preferenceLoaderHelper.getValueFormatCoordinateEntry())
-                    renderedView = renderEasting(pointSurvey);
-                else{
-                    renderedView = renderNorthing(pointSurvey);
-                }
-
-                break;
-
-            case 3:  //Elevation
-                renderedView = renderElevation(pointSurvey);
-                break;
-
-            case 4:  //Description
-                renderedView = renderDescription(pointSurvey);
+            case LIST:
+                Card_View_Holder_Job_Points_List vh1 = (Card_View_Holder_Job_Points_List) holder;
+                configureViewHolderList(vh1,position);
                 break;
 
         }
 
-        return renderedView;
     }
 
     @Override
-    public View getLongPressCellView(int rowIndex, int columnIndex, ViewGroup parentView) {
-        //possibly used for occupy and backsight commands
-        return null;
+    public int getItemCount() {
+        return pointSurveys == null ? 0 : pointSurveys.size();
     }
 
-    private View renderPointNo(final PointSurvey pointSurvey){
-        return renderString(String.valueOf(pointSurvey.getPoint_no()));
+    private void configureViewHolderList(final Card_View_Holder_Job_Points_List vh1, int position) {
+        final PointSurvey pointSurvey = pointSurveys.get(position);
+        String pointNumber, pointNorthing, pointEasting, pointElevation, pointDescription;
+        String northingPrefix, eastingPrefix, elevationPrefix;
+
+        pointNumber = String.valueOf(pointSurvey.getPoint_no());
+        Log.d(TAG, "configureViewHolderList: Point No: " + pointNumber + ": at position " + position);
+        pointDescription = pointSurvey.getDescription();
+
+        northingPrefix = mContext.getResources().getString(R.string.cogo_mapcheck_observation_northing_prefix);
+        eastingPrefix = mContext.getResources().getString(R.string.cogo_mapcheck_observation_easting_prefix);
+        elevationPrefix =  mContext.getResources().getString(R.string.cogo_mapcheck_observation_easting_prefix);
+
+        if(pointSurvey.getNorthing() != 0){
+            pointNorthing = COORDINATE_FORMATTER.format(pointSurvey.getNorthing());
+        }else{
+            pointNorthing = String.valueOf(0d);
+
+        }
+        if(pointSurvey.getEasting() != 0){
+            pointEasting = COORDINATE_FORMATTER.format(pointSurvey.getEasting());
+        }else{
+            pointEasting = String.valueOf(0d);
+
+        }
+
+        if(pointSurvey.getElevation() != 0){
+            pointElevation = COORDINATE_FORMATTER.format(pointSurvey.getElevation());
+        }else{
+            pointElevation = String.valueOf(0d);
+
+        }
+
+        pointNorthing = northingPrefix + " " + pointNorthing;
+        pointEasting = eastingPrefix + " " + pointEasting;
+        pointElevation = elevationPrefix + " " + pointElevation;
+
+        vh1.tvPointNumber.setText(pointNumber);
+        vh1.tvPointDesc.setText(pointDescription);
+        vh1.tvPointNorthing.setText(pointNorthing);
+        vh1.tvPointEasting.setText(pointEasting);
+        vh1.tvPointElevation.setText(pointElevation);
+
+        vh1.mCardView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showToast("hello",true);
+            }
+        });
+
+    }
+
+    //----------------------------------------------------------------------------------------------//
+    public void insert(int position, PointSurvey data){
+        pointSurveys.add(position,data);
+        notifyItemInserted(position);
+    }
+
+    public void remove (PointSurvey data){
+        int position = pointSurveys.indexOf(data);
+        pointSurveys.remove(position);
+        notifyItemRemoved(position);
+    }
+
+    public void swapDataSet (ArrayList<PointSurvey> newData){
+        this.pointSurveys = newData;
+
+        notifyDataSetChanged();
     }
 
 
-    private View renderNorthing(final  PointSurvey pointSurvey){
-        final String coordinateString = COORDINATE_FORMATTER.format(pointSurvey.getNorthing());
+    private void setAnimationbyHelper(RecyclerView.ViewHolder holder, int position){
 
-        final TextView textView = new TextView(getContext());
+        if(position > lastPosition){ // We are scrolling DOWN
+            AnimateHelper.animateRecyclerView(holder, true);
 
-        textView.setText(coordinateString);
-        textView.setPadding(20, 10, 20, 10);
-        textView.setTextSize(TEXT_SIZE);
-        textView.setTextAlignment(TEXT_ALIGNMENT_CENTER);
+        }else{ // We are scrolling UP
+            AnimateHelper.animateRecyclerView(holder, false);
 
-        return textView;
+        }
 
+        lastPosition = position;
     }
 
-    private View renderEasting(final  PointSurvey pointSurvey){
-        final String coordinateString = COORDINATE_FORMATTER.format(pointSurvey.getEasting());
+    //----------------------------------------------------------------------------------------------//
+    private void showToast(String data, boolean shortTime) {
 
-        final TextView textView = new TextView(getContext());
+        if (shortTime) {
+            Toast.makeText(mContext, data, Toast.LENGTH_SHORT).show();
 
-        textView.setText(coordinateString);
-        textView.setPadding(20, 10, 20, 10);
-        textView.setTextSize(TEXT_SIZE);
-        textView.setTextAlignment(TEXT_ALIGNMENT_CENTER);
-        return textView;
+        } else{
+            Toast.makeText(mContext, data, Toast.LENGTH_LONG).show();
 
-    }
-
-    private View renderElevation(final  PointSurvey pointSurvey){
-        final String coordinateString = COORDINATE_FORMATTER.format(pointSurvey.getElevation());
-
-        Log.d(TAG, "renderElevation: " + coordinateString);
-        final TextView textView = new TextView(getContext());
-
-        textView.setText(coordinateString);
-        textView.setPadding(20, 10, 20, 10);
-        textView.setTextSize(TEXT_SIZE);
-        textView.setTextAlignment(TEXT_ALIGNMENT_CENTER);
-        return textView;
-
-    }
-
-    private View renderDescription(final PointSurvey pointSurvey){
-        return renderString(pointSurvey.getDescription());
-    }
-
-    private View renderString(final String value) {
-        final TextView textView = new TextView(getContext());
-        textView.setText(value);
-        textView.setPadding(20, 10, 20, 10);
-        textView.setTextAlignment(TEXT_ALIGNMENT_CENTER);
-        textView.setTextSize(TEXT_SIZE);
-        return textView;
-    }
-
-
-
-    private void loadPreferences(){
-        Log.d(TAG, "loadPreferences: Started...");
-
-
-        COORDINATE_FORMATTER = new DecimalFormat(preferenceLoaderHelper.getValueSystemCoordinatesPrecisionDisplay());
-
-
+        }
     }
 
 

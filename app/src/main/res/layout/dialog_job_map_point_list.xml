@@ -76,7 +76,18 @@
         android:layout_marginEnd="5dp"
         android:layout_height="250dp">
 
-        <include layout="@layout/content_point_table_survey_list" />
+        <include
+            android:id="@+id/table_layout_header"
+            layout="@layout/content_point_table_survey_header"
+            android:layout_height="25dp"
+            android:layout_width="match_parent"/>
+
+        <include
+            android:id="@+id/table_layout_list"
+            android:layout_below="@id/table_layout_header"
+            layout="@layout/content_point_table_survey_list"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"/>
 
 
         <ProgressBar

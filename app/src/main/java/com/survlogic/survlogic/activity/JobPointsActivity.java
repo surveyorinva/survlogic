@@ -26,6 +26,7 @@ import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.background.BackgroundGeodeticPointGet;
 import com.survlogic.survlogic.background.BackgroundSurveyPointGet;
+import com.survlogic.survlogic.dialog.DialogProjectDescriptionAdd;
 import com.survlogic.survlogic.fragment.JobPointsHomeFragment;
 import com.survlogic.survlogic.fragment.JobPointsInverseFragment;
 import com.survlogic.survlogic.fragment.JobPointsListFragment;
@@ -357,7 +358,7 @@ public class JobPointsActivity extends AppCompatActivity implements NavigationVi
         loadPointSurveyInBackground();
 
         //Point Geodetic Load
-        loadPointGeodeticInBackground();
+        //loadPointGeodeticInBackground();
 
     }
 
@@ -425,20 +426,50 @@ public class JobPointsActivity extends AppCompatActivity implements NavigationVi
 
     @Override
     public void getPointsGeodetic(ArrayList<PointGeodetic> lstPointGeodetics) {
+        Log.d(TAG, "getPointsGeodetic: Started");
+        Log.d(TAG, "getPointsGeodetic: Before Size: " + this.lstPointGeodetic.size());
+
         this.lstPointGeodetic = lstPointGeodetics;
+
+        if(jobPointsListFragment != null){
+            jobPointsListFragment.setArrayListPointGeodetic(lstPointGeodetics);
+        }
+
+
+        Log.d(TAG, "getPointsGeodetic: After Size: " + this.lstPointGeodetic.size());
 
     }
 
     @Override
     public void getPointsSurvey(ArrayList<PointSurvey> lstPointSurvey) {
-        this.lstPointSurvey = lstPointSurvey;
+        Log.d(TAG, "getPointsSurvey: Started");
+        Log.d(TAG, "getPointsSurvey: Before Size: " + this.lstPointSurvey.size());
 
+        this.lstPointSurvey = lstPointSurvey;
+        if(jobPointsListFragment !=null){
+            jobPointsListFragment.setArrayListPointSurvey(lstPointSurvey);
+        }
+
+
+        Log.d(TAG, "getPointsSurvey: After Size: " + this.lstPointSurvey.size());
+        loadPointGeodeticInBackground();
     }
 
 
     @Override
     public void refreshPointArrays() {
+        Log.d(TAG, "refreshPointArrays: Started");
         initPointDataInBackground();
+
+    }
+
+    @Override
+    public void requestPointSurveyArray() {
+        loadPointSurveyInBackground();
+    }
+
+    @Override
+    public void requestPointGeodeticArray() {
 
     }
 

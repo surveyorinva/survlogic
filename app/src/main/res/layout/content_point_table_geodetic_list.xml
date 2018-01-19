@@ -2,21 +2,23 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/iew_in_content_point_table_list"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.survlogic.survlogic.view.SortablePointGeodeticTableView
-        android:id="@+id/tableView_for_Points_Geodetic"
-        app:tableView_columnCount="5"
-        app:tableView_headerColor="@color/tableHeaderBackground"
-        app:tableView_headerElevation="10"
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/point_geodetic_swipe_to_refresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-    </com.survlogic.survlogic.view.SortablePointGeodeticTableView>
-    
-    
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/tableView_for_Points_Geodetic"
+            android:clickable="true"
+            android:focusable="true"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
+        </android.support.v7.widget.RecyclerView>
+
+    </android.support.v4.widget.SwipeRefreshLayout>
 
 </RelativeLayout>

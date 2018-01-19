@@ -169,9 +169,7 @@ public class DialogJobMapPointList extends DialogFragment {
 //        BackgroundSurveyPointListFromMap backgroundSurveyPointList = new BackgroundSurveyPointListFromMap(mContext, pointList);
 //        backgroundSurveyPointList.execute();
 
-
-        final PointSurveyTableDataAdapter adapter = new PointSurveyTableDataAdapter(mContext, pointList, pointSurveyTableView,10);
-        pointSurveyTableView.setDataAdapter(adapter);
+        // new adapter here
 
         progressBar.setVisibility(View.GONE);
     }

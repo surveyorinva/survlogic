@@ -8,5 +8,7 @@ public interface JobPointsActivityListener {
 
     void refreshPointArrays();
 
+    void requestPointSurveyArray();
 
+    void requestPointGeodeticArray();
 }

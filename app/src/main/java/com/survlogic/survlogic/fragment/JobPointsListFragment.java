@@ -8,13 +8,15 @@ import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -29,12 +31,10 @@ import com.survlogic.survlogic.interf.JobPointsActivityListener;
 import com.survlogic.survlogic.model.PointGeodetic;
 import com.survlogic.survlogic.model.PointSurvey;
 import com.survlogic.survlogic.utils.PreferenceLoaderHelper;
-import com.survlogic.survlogic.view.SortablePointGeodeticTableView;
-import com.survlogic.survlogic.view.SortablePointSurveyTableView;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
-import de.codecrafters.tableview.listeners.SwipeToRefreshListener;
 import de.codecrafters.tableview.listeners.TableDataClickListener;
 
 /**
@@ -63,12 +63,12 @@ public class JobPointsListFragment extends Fragment {
 
     private PointSurveyTableDataAdapter adapterSurvey;
     private PointGeodeticTableDataAdapter adapterGeodetic;
+    private RecyclerView.LayoutManager layoutManagerPointSurvey, layoutManagerPointGeodetic;
+    private SwipeRefreshLayout swipeRefreshPointSurvey, swipeRefreshPointGeodetic;
+    private RecyclerView mRecyclerViewPointSurvey, mRecyclerViewPointGeodetic;
 
     private ArrayList<PointSurvey> lstPointSurvey = new ArrayList<>();
     private ArrayList<PointGeodetic> lstPointGeodetic = new ArrayList<>();
-
-    private SortablePointSurveyTableView pointSurveyTableView;
-    private SortablePointGeodeticTableView pointGeodeticTableView;
 
     private FloatingActionButton fabNewPoint, fabFilter;
 
@@ -87,17 +87,24 @@ public class JobPointsListFragment extends Fragment {
 
     private boolean fabExpanded = false;
     private boolean isPointSurveyTableSetup = false, isPointGeodeticTableSetup = false;
+    private static DecimalFormat COORDINATE_FORMATTER, DISTANCE_PRECISION_FORMATTER;
+
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        Log.i(TAG, "onCreateView: Started");
         v = inflater.inflate(R.layout.fragment_job_points_list, container, false);
 
         mContext = getActivity();
+        preferenceLoaderHelper = new PreferenceLoaderHelper(mContext);
+        jobPointsActivityListener = (JobPointsActivityListener) getActivity();
 
         initViewWidgets(v);
+        loadPreferences();
         setOnClickListener(v);
 
+        initViewList();
 
         return v;
     }
@@ -105,7 +112,7 @@ public class JobPointsListFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        Log.d(TAG, "onResume: Started...");
+        Log.i(TAG, "onResume: Started...");
 
         showPointsLocal();
 
@@ -120,18 +127,13 @@ public class JobPointsListFragment extends Fragment {
         jobDatabaseName = extras.getString(getString(R.string.KEY_JOB_DATABASE));
         Log.d(TAG, "Database in Point List: " + jobDatabaseName);
 
-
-        preferenceLoaderHelper = new PreferenceLoaderHelper(mContext);
-        jobPointsActivityListener = (JobPointsActivityListener) getActivity();
-
-
+        //------------------------------------------------------------------------------------------//
         rlViewTablePlanar = (RelativeLayout) v.findViewById(R.id.rl_layout_point_survey_table);
         rlViewTableWorld = (RelativeLayout) v.findViewById(R.id.rl_layout_point_geodetic_table);
 
         linearLayout_Filter_Search = (LinearLayout) v.findViewById(R.id.linearLayout_Touch);
         linearLayout_Filter_Group = (LinearLayout) v.findViewById(R.id.linearLayout_Fence);
         linearLayout_Filter_Options = (LinearLayout) v.findViewById(R.id.linearLayout_Search);
-
 
         fabNewPoint = (FloatingActionButton) v.findViewById(R.id.fab_in_job_points);
         fabFilter = (FloatingActionButton) v.findViewById(R.id.fabSelect);
@@ -143,14 +145,20 @@ public class JobPointsListFragment extends Fragment {
         ibSelectByTouch = (ImageButton) v.findViewById(R.id.btSelectByTouch);
         ibSelectByFence = (ImageButton) v.findViewById(R.id.btSelectByFence);
         ibSelectByZoom = (ImageButton) v.findViewById(R.id.btSelectByZoom);
+        //------------------------------------------------------------------------------------------//
+        swipeRefreshPointSurvey = (SwipeRefreshLayout) v.findViewById(R.id.point_survey_swipe_to_refresh);
+        swipeRefreshPointGeodetic = (SwipeRefreshLayout) v.findViewById(R.id.point_geodetic_swipe_to_refresh);
 
-
+        mRecyclerViewPointSurvey = (RecyclerView) v.findViewById(R.id.tableView_for_Points_Survey);
+        mRecyclerViewPointGeodetic = (RecyclerView) v.findViewById(R.id.tableView_for_Points_Geodetic);
+        layoutManagerPointSurvey = new LinearLayoutManager(mContext);
+        layoutManagerPointGeodetic = new LinearLayoutManager(mContext);
+        //------------------------------------------------------------------------------------------//
         animExitStageLeftPointSurvey = AnimationUtils.loadAnimation(mContext,R.anim.anim_transition_to_left_hide);
         animEnterStageRightPointSurvey = AnimationUtils.loadAnimation(mContext,R.anim.anim_transition_from_right_show);
 
         animExitStageLeftPointGeodetic = AnimationUtils.loadAnimation(mContext,R.anim.anim_transition_to_left_hide);
         animEnterStageRightPointGeodetic = AnimationUtils.loadAnimation(mContext,R.anim.anim_transition_from_right_show);
-
 
         animOpen_1 = AnimationUtils.loadAnimation(mContext,R.anim.anim_fab_open_1);
         animOpen_2 = AnimationUtils.loadAnimation(mContext,R.anim.anim_fab_open_2);
@@ -165,6 +173,73 @@ public class JobPointsListFragment extends Fragment {
 
     }
 
+
+    private void loadPreferences(){
+        Log.d(TAG, "loadPreferences: Started...");
+
+        COORDINATE_FORMATTER = new DecimalFormat(preferenceLoaderHelper.getValueSystemCoordinatesPrecisionDisplay());
+        DISTANCE_PRECISION_FORMATTER = new DecimalFormat(preferenceLoaderHelper.getValueSystemDistancePrecisionDisplay());
+
+    }
+
+    private void initSwipeToRefreshPointSurvey(){
+        Log.d(TAG, "initSwipeToRefreshPointSurvey: Started");
+
+        if(!isPointSurveyTableSetup){
+            try{
+                Log.d(TAG, "initSwipeToRefreshPointSurvey: Set");
+                swipeRefreshPointSurvey.setColorSchemeResources(R.color.google_blue, R.color.google_green, R.color.google_red, R.color.google_yellow);
+
+                swipeRefreshPointSurvey.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                    @Override
+                    public void onRefresh() {
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                showPointSurveyRefresh();
+
+                            }
+                        }, 1000);
+                    }
+                });
+            }catch (Exception e){
+                System.out.println("Error " + e.getMessage());
+            }
+            
+        }
+
+        isPointSurveyTableSetup = true;
+
+    }
+
+    private void initSwipeToRefreshPointGeodetic(){
+        Log.d(TAG, "initSwipeToRefreshPointGeodetic: Started");
+
+        if(!isPointGeodeticTableSetup){
+            try{
+                swipeRefreshPointGeodetic.setColorSchemeResources(R.color.google_blue, R.color.google_green, R.color.google_red, R.color.google_yellow);
+
+                swipeRefreshPointGeodetic.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                    @Override
+                    public void onRefresh() {
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                showPointGeodeticRefresh();
+
+                            }
+                        }, 1000);
+                    }
+                });
+            }catch (Exception e){
+                System.out.println("Error " + e.getMessage());
+            }
+            
+        }
+
+        isPointGeodeticTableSetup = true;
+
+    }
 
     private void setOnClickListener(View v){
         Log.d(TAG, "setOnClickListener: Starting...");
@@ -222,6 +297,11 @@ public class JobPointsListFragment extends Fragment {
             @Override
             public void onAnimationEnd(Animation animation) {
                 rlViewTablePlanar.setClickable(true);
+                rlViewTablePlanar.setFocusable(true);
+
+                if(!isPointSurveyTableSetup){
+                    initSwipeToRefreshPointSurvey();
+                }
             }
 
             @Override
@@ -260,7 +340,12 @@ public class JobPointsListFragment extends Fragment {
 
             @Override
             public void onAnimationEnd(Animation animation) {
+                Log.d(TAG, "onAnimationEnd: PointSurveySwipe going to start");
                 rlViewTableWorld.setClickable(true);
+
+                if(!isPointGeodeticTableSetup){
+                    initSwipeToRefreshPointGeodetic();
+                }
             }
 
             @Override
@@ -283,48 +368,62 @@ public class JobPointsListFragment extends Fragment {
 
     }
 
-    private void setPointSurveyTableListener(){
-        Log.d(TAG, "setPointSurveyTableListener: Started...");
-        pointSurveyTableView.setSwipeToRefreshEnabled(true);
-        pointSurveyTableView.setSwipeToRefreshListener(new SwipeToRefreshListener() {
-            @Override
-            public void onRefresh(final RefreshIndicator refreshIndicator) {
-                pointSurveyTableView.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        refreshIndicator.hide();
-                        refreshPointArray();
-                    }
-                }, DELAY_TO_REFRESH);
-            }
-        });
+    //----------------------------------------------------------------------------------------------//
 
-        pointSurveyTableView.addDataClickListener(new PointClickListenerPointSurvey());
-
-        isPointSurveyTableSetup = true;
+    private void initViewList(){
+        setPointSurveyAdapter();
+        setPointGeodeticAdapter();
     }
 
-    private void setPointGeodeticTableListener(){
-        Log.d(TAG, "setPointSurveyTableListener: Started...");
-        pointGeodeticTableView.setSwipeToRefreshEnabled(true);
-        pointGeodeticTableView.setSwipeToRefreshListener(new SwipeToRefreshListener() {
-            @Override
-            public void onRefresh(final RefreshIndicator refreshIndicator) {
-                pointGeodeticTableView.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        refreshIndicator.hide();
-                        showToast("I am Geodetic", true);
+    private void setPointSurveyAdapter(){
+        Log.d(TAG, "setPointSurveyAdapter: Started");
 
-                    }
-                }, DELAY_TO_REFRESH);
-            }
-        });
+        mRecyclerViewPointSurvey.setLayoutManager(layoutManagerPointSurvey);
+        mRecyclerViewPointSurvey.setHasFixedSize(false);
 
+        adapterSurvey = new PointSurveyTableDataAdapter(mContext, lstPointSurvey,COORDINATE_FORMATTER);
 
-        isPointGeodeticTableSetup = true;
+        mRecyclerViewPointSurvey.setAdapter(adapterSurvey);
+
     }
 
+    private void setPointGeodeticAdapter(){
+        Log.d(TAG, "setPointGeodeticAdapter: Started");
+
+
+        mRecyclerViewPointGeodetic.setLayoutManager(layoutManagerPointGeodetic);
+        mRecyclerViewPointGeodetic.setHasFixedSize(false);
+
+        adapterGeodetic = new PointGeodeticTableDataAdapter(mContext, lstPointGeodetic,COORDINATE_FORMATTER);
+
+        mRecyclerViewPointGeodetic.setAdapter(adapterGeodetic);
+
+
+    }
+
+    private void showPointSurveyRefresh(){
+        Log.d(TAG, "showPointSurveyRefresh: Started");
+
+        jobPointsActivityListener.requestPointSurveyArray();
+
+        if(swipeRefreshPointSurvey.isRefreshing()){
+            swipeRefreshPointSurvey.setRefreshing(false);
+        }
+
+    }
+
+    private void showPointGeodeticRefresh(){
+        Log.d(TAG, "showPointGeodeticRefresh: Started");
+
+
+        if(swipeRefreshPointGeodetic.isRefreshing()){
+            swipeRefreshPointGeodetic.setRefreshing(false);
+        }
+    }
+
+
+
+    //----------------------------------------------------------------------------------------------//
     private void createPointEntry(int project_id, int job_id, String databaseName){
         Log.d(TAG, "createPointEntry: Starting...");
         android.support.v4.app.DialogFragment pointDialog = DialogJobPointEntryAdd.newInstance(R.string.dialog_job_point_name, project_id, job_id, databaseName);
@@ -344,18 +443,6 @@ public class JobPointsListFragment extends Fragment {
 
     }
 
-
-    private void setTableAdapterPointSurvey(){
-        adapterSurvey = new PointSurveyTableDataAdapter(mContext, lstPointSurvey, pointSurveyTableView,12);
-        pointSurveyTableView.setDataAdapter(adapterSurvey);
-
-    }
-
-
-    private void setTableAdapterPointGeodetic(){
-        adapterGeodetic = new PointGeodeticTableDataAdapter(mContext, lstPointGeodetic, pointGeodeticTableView, 12);
-        pointGeodeticTableView.setDataAdapter(adapterGeodetic);
-    }
 
 
     public void setArrayListPointSurvey(ArrayList<PointSurvey> lstArray){
@@ -381,7 +468,7 @@ public class JobPointsListFragment extends Fragment {
         setTableViewButtons(PLAN);
 
         if(!isFirstLoad) {
-            rlViewTableWorld.startAnimation(animExitStageLeftPointGeodetic);
+            //rlViewTableWorld.startAnimation(animExitStageLeftPointGeodetic);
 
             new Handler().postDelayed(new Runnable() {
                 @Override
@@ -391,20 +478,10 @@ public class JobPointsListFragment extends Fragment {
             },200);
 
         }
-        
-        pointSurveyTableView = (SortablePointSurveyTableView) v.findViewById(R.id.tableView_for_Points_Survey);
 
 
-        if (pointSurveyTableView != null) {
 
-            setTableAdapterPointSurvey();
-            //Add Click and Long Click here
 
-        }
-
-        if(!isPointSurveyTableSetup) {
-            setPointSurveyTableListener();
-        }
 
     }
 
@@ -413,7 +490,7 @@ public class JobPointsListFragment extends Fragment {
 
         setTableViewButtons(WORLD);
 
-        rlViewTablePlanar.startAnimation(animExitStageLeftPointSurvey);
+        //rlViewTablePlanar.startAnimation(animExitStageLeftPointSurvey);
 
         new Handler().postDelayed(new Runnable() {
             @Override
@@ -421,21 +498,7 @@ public class JobPointsListFragment extends Fragment {
                 rlViewTableWorld.startAnimation(animEnterStageRightPointGeodetic);
             }
         },200);
-
-
-        pointGeodeticTableView = (SortablePointGeodeticTableView) v.findViewById(R.id.tableView_for_Points_Geodetic);
-
-        if (pointSurveyTableView != null) {
-
-            setTableAdapterPointGeodetic();
-            //Add Click and Long Click here
-
-        }
-
-        if(!isPointGeodeticTableSetup) {
-            setPointGeodeticTableListener();
-        }
-
+        
     }
 
 
@@ -578,13 +641,5 @@ public class JobPointsListFragment extends Fragment {
         fabExpanded = false;
     }
 
-    private void refreshPointArray(){
-        jobPointsActivityListener.refreshPointArrays();
-
-        adapterGeodetic.notifyDataSetChanged();
-        adapterSurvey.notifyDataSetChanged();
-
-
-    }
 
 }

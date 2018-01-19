@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/point_survey_swipe_to_refresh"
+    android:orientation="horizontal"
+    android:weightSum="100"
+    android:layout_width="match_parent"
+    android:layout_height="25dp">
+
+        <TextView
+            android:id="@+id/pointNumber"
+            android:text="@string/dialog_job_point_item_header_pointno"
+            style="@style/Labels.Card.TableValues"
+            android:gravity="center"
+            android:layout_weight="20"
+            android:layout_width="0dp"
+            android:layout_height="match_parent" />
+
+        <View
+            android:layout_weight=".25"
+            android:background="@color/gray_deep"
+            android:layout_width="0dp"
+            android:layout_height="match_parent" />
+
+        <TextView
+            android:id="@+id/observation_Northing"
+            android:text="@string/dialog_job_point_item_header_northing"
+            style="@style/Labels.Card.TableValues"
+            android:gravity="center"
+            android:layout_weight="20"
+            android:layout_width="0dp"
+            android:layout_height="match_parent" />
+
+        <View
+            android:layout_weight=".25"
+            android:background="@color/gray_deep"
+            android:layout_width="0dp"
+            android:layout_height="match_parent" />
+
+        <TextView
+            android:id="@+id/observation_Easting"
+            android:text="@string/dialog_job_point_item_header_easting"
+            style="@style/Labels.Card.TableValues"
+            android:gravity="center"
+            android:layout_weight="20"
+            android:layout_width="0dp"
+            android:layout_height="match_parent" />
+
+        <View
+            android:layout_weight=".25"
+            android:background="@color/gray_deep"
+            android:layout_width="0dp"
+            android:layout_height="match_parent" />
+
+        <TextView
+            android:id="@+id/observation_Elevation"
+            android:text="@string/dialog_job_point_item_header_elevation"
+            style="@style/Labels.Card.TableValues"
+            android:gravity="center"
+            android:layout_weight="20"
+            android:layout_width="0dp"
+            android:layout_height="match_parent" />
+
+        <View
+            android:layout_weight=".25"
+            android:background="@color/gray_deep"
+            android:layout_width="0dp"
+            android:layout_height="match_parent" />
+
+        <TextView
+            android:id="@+id/point_description"
+            android:text="@string/dialog_job_point_item_header_description_short"
+            style="@style/Labels.Card.TableValues"
+            android:gravity="center"
+            android:layout_weight="20"
+            android:layout_width="0dp"
+            android:layout_height="match_parent" />
+
+</LinearLayout>

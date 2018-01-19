@@ -228,6 +228,7 @@
     <string name="dialog_job_point_item_header_easting">EASTING</string>
     <string name="dialog_job_point_item_header_elevation">ELEVATION</string>
     <string name="dialog_job_point_item_header_description">DESCRIPTION</string>
+    <string name="dialog_job_point_item_header_description_short">DESC.</string>
     <string name="dialog_job_point_button_advanced_settings">Advanced Settings</string>
     <string name="job_point_header_add_photos">Add Photos for this Point</string>
 
@@ -444,6 +445,9 @@
     <string name="cogo_mapcheck_results_closure">Closure Precision</string>
     <string name="cogo_mapcheck_observation_northing_prefix">N: </string>
     <string name="cogo_mapcheck_observation_easting_prefix">E: </string>
+    <string name="cogo_mapcheck_observation_elevation_prefix">El: </string>
+    <string name="cogo_mapcheck_observation_latitude_prefix">Lat: </string>
+    <string name="cogo_mapcheck_observation_longitude_prefix">Long: </string>
 
     <string name="tools_curve_header">Curve Solution</string>
     <string name="tools_curve_delta">Delta (\u0394):</string>

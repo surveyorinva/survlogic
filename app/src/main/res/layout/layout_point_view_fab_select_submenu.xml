@@ -11,22 +11,8 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:clipChildren="false"
-    android:orientation="vertical">
-
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fabSelect"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_action_filter_dark"
-        android:scaleType="center"
-        app:elevation="2dp"
-        app:fabSize="normal"
-        android:layout_marginBottom="1dp"
-        android:layout_marginStart="1dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"/>
-
+    android:orientation="vertical"
+    android:background="@color/transparent">
 
     <RelativeLayout
         android:layout_width="match_parent"
