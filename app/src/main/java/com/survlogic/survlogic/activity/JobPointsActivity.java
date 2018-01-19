@@ -465,6 +465,7 @@ public class JobPointsActivity extends AppCompatActivity implements NavigationVi
 
     @Override
     public void requestPointSurveyArray() {
+        Log.d(TAG, "requestPointSurveyArray: Listener: Request PointSurveyArray Started");
         loadPointSurveyInBackground();
     }
 

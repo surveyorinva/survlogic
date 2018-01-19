@@ -87,18 +87,9 @@
 
     </RelativeLayout>
 
-    <include
-        android:id="@+id/table_layout_list_point_survey"
-        layout="@layout/content_point_table_survey_list"
-        android:layout_below="@id/rl_layout_1_header"
-        android:layout_above="@+id/rl_layout_3_footer"
-        android:layout_height="match_parent"
-        android:layout_width="match_parent"/>
-
-
     <RelativeLayout
         android:id="@+id/rl_layout_point_survey_table"
-        android:visibility="gone"
+        android:visibility="visible"
         android:layout_below="@id/rl_layout_1_header"
         android:layout_above="@+id/rl_layout_3_footer"
         android:focusable="true"
@@ -106,27 +97,47 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <include
-            android:id="@+id/table_layout_list_point_survey"
-            layout="@layout/content_point_table_survey_list"
-            android:layout_height="match_parent"
-            android:layout_width="match_parent"/>
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:id="@+id/point_survey_swipe_to_refresh"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/tableView_for_Points_Survey"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                </android.support.v7.widget.RecyclerView>
+
+        </android.support.v4.widget.SwipeRefreshLayout>
 
     </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/rl_layout_point_geodetic_table"
-        android:visibility="gone"
+        android:visibility="invisible"
+        android:focusable="true"
+        android:clickable="true"
         android:layout_below="@id/rl_layout_1_header"
         android:layout_above="@+id/rl_layout_3_footer"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <include
-            android:id="@+id/table_layout_list_point_geodetic"
-            layout="@layout/content_point_table_geodetic_list"
-            android:layout_height="match_parent"
-            android:layout_width="match_parent"/>
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:id="@+id/point_geodetic_swipe_to_refresh"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/tableView_for_Points_Geodetic"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+            </android.support.v7.widget.RecyclerView>
+
+        </android.support.v4.widget.SwipeRefreshLayout>
 
     </RelativeLayout>
 
@@ -168,7 +179,7 @@
 
     <include
         android:id="@+id/fab_select_submenu"
-        android:visibility="gone"
+        android:visibility="visible"
         layout="@layout/layout_point_view_fab_select_submenu"/>
 
 </RelativeLayout>

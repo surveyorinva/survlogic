@@ -153,6 +153,13 @@ public class PointGeodeticTableDataAdapter extends RecyclerView.Adapter<Recycler
         vh1.tvPointEasting.setText(pointLongitude);
         vh1.tvPointElevation.setText(pointElevation);
 
+        vh1.mCardView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showToast("Geodetic",true);
+            }
+        });
+
     }
 
     //----------------------------------------------------------------------------------------------//

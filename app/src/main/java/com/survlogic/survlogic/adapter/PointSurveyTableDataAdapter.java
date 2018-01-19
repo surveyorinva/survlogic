@@ -153,7 +153,7 @@ public class PointSurveyTableDataAdapter extends RecyclerView.Adapter<RecyclerVi
         vh1.mCardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showToast("hello",true);
+                showToast("planar",true);
             }
         });
 

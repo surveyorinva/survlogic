@@ -116,6 +116,21 @@ public class JobPointsListFragment extends Fragment {
 
         showPointsLocal();
 
+        if(adapterSurvey != null){
+            if(!swipeRefreshPointSurvey.isRefreshing()){
+                swipeRefreshPointSurvey.setRefreshing(true);
+            }
+
+            adapterSurvey.swapDataSet(lstPointSurvey);
+
+            if(swipeRefreshPointSurvey.isRefreshing()){
+                swipeRefreshPointSurvey.setRefreshing(false);
+            }
+        }
+
+        if(adapterGeodetic !=null){
+            adapterGeodetic.swapDataSet(lstPointGeodetic);
+        }
 
     }
 
@@ -148,6 +163,9 @@ public class JobPointsListFragment extends Fragment {
         //------------------------------------------------------------------------------------------//
         swipeRefreshPointSurvey = (SwipeRefreshLayout) v.findViewById(R.id.point_survey_swipe_to_refresh);
         swipeRefreshPointGeodetic = (SwipeRefreshLayout) v.findViewById(R.id.point_geodetic_swipe_to_refresh);
+
+        initSwipeToRefreshPointSurvey();
+        initSwipeToRefreshPointGeodetic();
 
         mRecyclerViewPointSurvey = (RecyclerView) v.findViewById(R.id.tableView_for_Points_Survey);
         mRecyclerViewPointGeodetic = (RecyclerView) v.findViewById(R.id.tableView_for_Points_Geodetic);
@@ -299,9 +317,6 @@ public class JobPointsListFragment extends Fragment {
                 rlViewTablePlanar.setClickable(true);
                 rlViewTablePlanar.setFocusable(true);
 
-                if(!isPointSurveyTableSetup){
-                    initSwipeToRefreshPointSurvey();
-                }
             }
 
             @Override
@@ -343,9 +358,6 @@ public class JobPointsListFragment extends Fragment {
                 Log.d(TAG, "onAnimationEnd: PointSurveySwipe going to start");
                 rlViewTableWorld.setClickable(true);
 
-                if(!isPointGeodeticTableSetup){
-                    initSwipeToRefreshPointGeodetic();
-                }
             }
 
             @Override
@@ -447,18 +459,27 @@ public class JobPointsListFragment extends Fragment {
 
     public void setArrayListPointSurvey(ArrayList<PointSurvey> lstArray){
         Log.d(TAG, "setArrayListPointGeodetic: Started...");
-        lstPointSurvey.clear();
+        lstPointSurvey = lstArray;
 
-        this.lstPointSurvey = lstArray;
-        Log.d(TAG, "setArrayListPointGeodetic: Listen: " + lstPointSurvey.size());
+        Log.d(TAG, "setArrayListPointSurvey: Listen: " + lstPointSurvey.size());
+
+        if(adapterSurvey != null){
+            Log.d(TAG, "setArrayListPointSurvey: Not Null");
+            adapterSurvey.swapDataSet(lstPointSurvey);
+
+        }
     }
 
     public void setArrayListPointGeodetic(ArrayList<PointGeodetic> lstArray){
         Log.d(TAG, "setArrayListPointGeodetic: Started...");
-        lstPointGeodetic.clear();
 
         this.lstPointGeodetic = lstArray;
         Log.d(TAG, "setArrayListPointGeodetic: Listen: " + lstPointGeodetic.size());
+
+        if(adapterGeodetic !=null){
+            Log.d(TAG, "setArrayListPointGeodetic: Not Null");
+            adapterGeodetic.swapDataSet(lstPointGeodetic);
+        }
     }
 
 
@@ -468,7 +489,7 @@ public class JobPointsListFragment extends Fragment {
         setTableViewButtons(PLAN);
 
         if(!isFirstLoad) {
-            //rlViewTableWorld.startAnimation(animExitStageLeftPointGeodetic);
+            rlViewTableWorld.startAnimation(animExitStageLeftPointGeodetic);
 
             new Handler().postDelayed(new Runnable() {
                 @Override
@@ -480,9 +501,6 @@ public class JobPointsListFragment extends Fragment {
         }
 
 
-
-
-
     }
 
     private void showPointGeodetic(boolean isFirstLoad){
@@ -490,7 +508,7 @@ public class JobPointsListFragment extends Fragment {
 
         setTableViewButtons(WORLD);
 
-        //rlViewTablePlanar.startAnimation(animExitStageLeftPointSurvey);
+        rlViewTablePlanar.startAnimation(animExitStageLeftPointSurvey);
 
         new Handler().postDelayed(new Runnable() {
             @Override
