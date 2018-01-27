@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
-import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.util.TypedValue;
@@ -28,8 +27,7 @@ import com.survlogic.survlogic.interf.DatabaseDoesPointExistFromAsyncListener;
 import com.survlogic.survlogic.interf.MapcheckListener;
 import com.survlogic.survlogic.model.CurveSurvey;
 import com.survlogic.survlogic.model.PointMapCheck;
-import com.survlogic.survlogic.utils.DecimalDigitsInputFilter;
-import com.survlogic.survlogic.utils.MathHelper;
+import com.survlogic.survlogic.utils.SurveyMathHelper;
 import com.survlogic.survlogic.utils.StringUtilityHelper;
 
 import java.text.DecimalFormat;
@@ -1862,7 +1860,7 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
 
                 if(!StringUtilityHelper.isStringNull(dCurveA) && !StringUtilityHelper.isStringNull(mCurveA) && !StringUtilityHelper.isStringNull(sCurveA)){
                     //Save horizontal angle as a decimal degree
-                    mValueCurveDelta = MathHelper.convertPartsToDEC(dCurveA,mCurveA,sCurveA);
+                    mValueCurveDelta = SurveyMathHelper.convertPartsToDEC(dCurveA,mCurveA,sCurveA);
 
                 }else {
                     if(StringUtilityHelper.isStringNull(dCurveA)) {
@@ -1903,7 +1901,7 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
 
                 if(!StringUtilityHelper.isStringNull(dCurveB) && !StringUtilityHelper.isStringNull(mCurveB) && !StringUtilityHelper.isStringNull(sCurveB)){
                     //Save horizontal angle as a decimal degree
-                    mValueCurveDelta = MathHelper.convertPartsToDEC(dCurveB,mCurveB,sCurveB);
+                    mValueCurveDelta = SurveyMathHelper.convertPartsToDEC(dCurveB,mCurveB,sCurveB);
 
                 }else {
                     if(StringUtilityHelper.isStringNull(dCurveB)) {
@@ -2017,7 +2015,7 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
 
                 if(!StringUtilityHelper.isStringNull(d) && !StringUtilityHelper.isStringNull(m) && !StringUtilityHelper.isStringNull(s)){
                     //Save horizontal angle as a decimal degree
-                    mValueBearing = MathHelper.convertPartsToDEC(d,m,s);
+                    mValueBearing = SurveyMathHelper.convertPartsToDEC(d,m,s);
                     mValueBearing = mValueBearing + (Double.parseDouble(q) * 100);
 
                 }else {
@@ -2065,7 +2063,7 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
 
                 if(!StringUtilityHelper.isStringNull(dAz) && !StringUtilityHelper.isStringNull(mAz) && !StringUtilityHelper.isStringNull(sAz)){
                     //Save horizontal angle as a decimal degree
-                    mValueAzimuth = MathHelper.convertPartsToDEC(dAz,mAz,sAz);
+                    mValueAzimuth = SurveyMathHelper.convertPartsToDEC(dAz,mAz,sAz);
 
                 }else {
                     if(StringUtilityHelper.isStringNull(dAz)) {
@@ -2106,7 +2104,7 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
 
                 if(!StringUtilityHelper.isStringNull(dTurn) && !StringUtilityHelper.isStringNull(mTurn) && !StringUtilityHelper.isStringNull(sTurn)){
                     //Save horizontal angle as a decimal degree
-                    mValueTurnedAngle = MathHelper.convertPartsToDEC(dTurn,mTurn,sTurn);
+                    mValueTurnedAngle = SurveyMathHelper.convertPartsToDEC(dTurn,mTurn,sTurn);
 
                 }else {
                     if(StringUtilityHelper.isStringNull(dTurn)) {
@@ -2147,7 +2145,7 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
 
                 if(!StringUtilityHelper.isStringNull(dCurveA) && !StringUtilityHelper.isStringNull(mCurveA) && !StringUtilityHelper.isStringNull(sCurveA)){
                     //Save horizontal angle as a decimal degree
-                    mValueCurveDelta = MathHelper.convertPartsToDEC(dCurveA,mCurveA,sCurveA);
+                    mValueCurveDelta = SurveyMathHelper.convertPartsToDEC(dCurveA,mCurveA,sCurveA);
 
                 }else {
                     if(StringUtilityHelper.isStringNull(dCurveA)) {
@@ -2188,7 +2186,7 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
 
                 if(!StringUtilityHelper.isStringNull(dCurveB) && !StringUtilityHelper.isStringNull(mCurveB) && !StringUtilityHelper.isStringNull(sCurveB)){
                     //Save horizontal angle as a decimal degree
-                    mValueCurveDelta = MathHelper.convertPartsToDEC(dCurveB,mCurveB,sCurveB);
+                    mValueCurveDelta = SurveyMathHelper.convertPartsToDEC(dCurveB,mCurveB,sCurveB);
 
                 }else {
                     if(StringUtilityHelper.isStringNull(dCurveB)) {
@@ -2288,8 +2286,8 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
                 mapCheck.setCurveDelta(mValueCurveDelta);
                 mapCheck.setCurveRadius(mValueCurveRadius);
 
-                mapCheck.setCurveLength(MathHelper.solveForCurveLength(mValueCurveDelta,mValueCurveRadius));
-                mapCheck.setCurveChord(MathHelper.solveForCurveChordDistance(mValueCurveDelta,mValueCurveRadius));
+                mapCheck.setCurveLength(SurveyMathHelper.solveForCurveLength(mValueCurveDelta,mValueCurveRadius));
+                mapCheck.setCurveChord(SurveyMathHelper.solveForCurveChordDistance(mValueCurveDelta,mValueCurveRadius));
 
                 break;
 
@@ -2298,12 +2296,12 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
                 mapCheck.setCurveToRight(isSwitchCurveBIsRight);
 
                 mapCheck.setCurveDelta(mValueCurveDelta);
-                mValueCurveRadius = MathHelper.solveForCurveRadius(mValueCurveDelta,mValueCurveLength);
+                mValueCurveRadius = SurveyMathHelper.solveForCurveRadius(mValueCurveDelta,mValueCurveLength);
 
                 mapCheck.setCurveRadius(mValueCurveRadius);
                 mapCheck.setCurveLength(mValueCurveLength);
 
-                mapCheck.setCurveChord(MathHelper.solveForCurveChordDistance(mValueCurveDelta,mValueCurveRadius));
+                mapCheck.setCurveChord(SurveyMathHelper.solveForCurveChordDistance(mValueCurveDelta,mValueCurveRadius));
 
 
                 break;
@@ -2312,13 +2310,13 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
                 mapCheck.setObservationType(5);
                 mapCheck.setCurveToRight(isSwitchCurveCIsRight);
 
-                mValueCurveDelta = MathHelper.solveForCurveDeltaAngle(mValueCurveRadius, mValueCurveLength);
+                mValueCurveDelta = SurveyMathHelper.solveForCurveDeltaAngle(mValueCurveRadius, mValueCurveLength);
                 mapCheck.setCurveDelta(mValueCurveDelta);
 
                 mapCheck.setCurveRadius(mValueCurveRadius);
                 mapCheck.setCurveLength(mValueCurveLength);
 
-                mapCheck.setCurveChord(MathHelper.solveForCurveChordDistance(mValueCurveDelta,mValueCurveRadius));
+                mapCheck.setCurveChord(SurveyMathHelper.solveForCurveChordDistance(mValueCurveDelta,mValueCurveRadius));
 
                 break;
 
@@ -2410,10 +2408,10 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
 
                 double bearing = exMapCheck.getLineAngle();
 
-                etBearingQuadrant.setText(MathHelper.convertDECBearingToParts(bearing,0));
-                etBearingDeg.setText(MathHelper.convertDECBearingToParts(bearing,1));
-                etBearingMin.setText(MathHelper.convertDECBearingToParts(bearing,2));
-                etBearingSec.setText(MathHelper.convertDECBearingToParts(bearing,3));
+                etBearingQuadrant.setText(SurveyMathHelper.convertDECBearingToParts(bearing,0));
+                etBearingDeg.setText(SurveyMathHelper.convertDECBearingToParts(bearing,1));
+                etBearingMin.setText(SurveyMathHelper.convertDECBearingToParts(bearing,2));
+                etBearingSec.setText(SurveyMathHelper.convertDECBearingToParts(bearing,3));
 
                 distance = DISTANCE_PRECISION_FORMATTER.format(exMapCheck.getLineDistance());
                 etBearingDistance.setText(distance);
@@ -2428,9 +2426,9 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
                 swapTypeOfObservation(1);
 
                 double azimuth = exMapCheck.getLineAngle();
-                etAzimuthDeg.setText(MathHelper.convertDECToParts(azimuth,1));
-                etAzimuthMin.setText(MathHelper.convertDECToParts(azimuth,2));
-                etAzimuthSec.setText(MathHelper.convertDECToParts(azimuth,3));
+                etAzimuthDeg.setText(SurveyMathHelper.convertDECToParts(azimuth,1));
+                etAzimuthMin.setText(SurveyMathHelper.convertDECToParts(azimuth,2));
+                etAzimuthSec.setText(SurveyMathHelper.convertDECToParts(azimuth,3));
 
                 distance = DISTANCE_PRECISION_FORMATTER.format(exMapCheck.getLineDistance());
                 etBearingDistance.setText(distance);
@@ -2445,9 +2443,9 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
                 swapTypeOfObservation(2);
 
                 double turnedAngle = exMapCheck.getLineAngle();
-                etTurnedDeg.setText(MathHelper.convertDECToParts(turnedAngle,1));
-                etTurnedMin.setText(MathHelper.convertDECToParts(turnedAngle,2));
-                etTurnedSec.setText(MathHelper.convertDECToParts(turnedAngle,3));
+                etTurnedDeg.setText(SurveyMathHelper.convertDECToParts(turnedAngle,1));
+                etTurnedMin.setText(SurveyMathHelper.convertDECToParts(turnedAngle,2));
+                etTurnedSec.setText(SurveyMathHelper.convertDECToParts(turnedAngle,3));
 
                 distance = DISTANCE_PRECISION_FORMATTER.format(exMapCheck.getLineDistance());
                 etBearingDistance.setText(distance);
@@ -2462,9 +2460,9 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
                 swapTypeOfObservation(3);
 
                 double deltaCurveA = exMapCheck.getCurveDelta();
-                etCurveADeltaDeg.setText(MathHelper.convertDECToParts(deltaCurveA,1));
-                etCurveADeltaMin.setText(MathHelper.convertDECToParts(deltaCurveA,2));
-                etCurveADeltaSec.setText(MathHelper.convertDECToParts(deltaCurveA,3));
+                etCurveADeltaDeg.setText(SurveyMathHelper.convertDECToParts(deltaCurveA,1));
+                etCurveADeltaMin.setText(SurveyMathHelper.convertDECToParts(deltaCurveA,2));
+                etCurveADeltaSec.setText(SurveyMathHelper.convertDECToParts(deltaCurveA,3));
 
                 radius = DISTANCE_PRECISION_FORMATTER.format(exMapCheck.getCurveRadius());
                 etCurveARadius.setText(radius);
@@ -2487,9 +2485,9 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
                 swapTypeOfObservation(4);
 
                 double deltaCurveB = exMapCheck.getCurveDelta();
-                etCurveADeltaDeg.setText(MathHelper.convertDECToParts(deltaCurveB,1));
-                etCurveADeltaMin.setText(MathHelper.convertDECToParts(deltaCurveB,2));
-                etCurveADeltaSec.setText(MathHelper.convertDECToParts(deltaCurveB,3));
+                etCurveADeltaDeg.setText(SurveyMathHelper.convertDECToParts(deltaCurveB,1));
+                etCurveADeltaMin.setText(SurveyMathHelper.convertDECToParts(deltaCurveB,2));
+                etCurveADeltaSec.setText(SurveyMathHelper.convertDECToParts(deltaCurveB,3));
 
                 length = DISTANCE_PRECISION_FORMATTER.format(exMapCheck.getCurveLength());
                 etCurveARadius.setText(length);
@@ -2632,30 +2630,30 @@ public class Card_View_Holder_Job_Mapcheck_Add extends RecyclerView.ViewHolder i
             case 3: //delta-radius
                 curveSurvey.setDeltaDEC(mValueCurveDelta);
                 curveSurvey.setRadius(mValueCurveRadius);
-                curveSurvey.setLength(MathHelper.solveForCurveLength(mValueCurveDelta,mValueCurveRadius));
-                curveSurvey.setTangent(MathHelper.solveForCurveTangent(mValueCurveDelta,mValueCurveRadius));
-                curveSurvey.setChord(MathHelper.solveForCurveChordDistance(mValueCurveDelta,mValueCurveRadius));
+                curveSurvey.setLength(SurveyMathHelper.solveForCurveLength(mValueCurveDelta,mValueCurveRadius));
+                curveSurvey.setTangent(SurveyMathHelper.solveForCurveTangent(mValueCurveDelta,mValueCurveRadius));
+                curveSurvey.setChord(SurveyMathHelper.solveForCurveChordDistance(mValueCurveDelta,mValueCurveRadius));
 
                 break;
 
             case 4: //delta-length
-                mValueCurveRadius = MathHelper.solveForCurveRadius(mValueCurveDelta,mValueCurveLength);
+                mValueCurveRadius = SurveyMathHelper.solveForCurveRadius(mValueCurveDelta,mValueCurveLength);
 
                 curveSurvey.setDeltaDEC(mValueCurveDelta);
                 curveSurvey.setRadius(mValueCurveRadius);
                 curveSurvey.setLength(mValueCurveLength);
-                curveSurvey.setTangent(MathHelper.solveForCurveTangent(mValueCurveDelta,mValueCurveRadius));
-                curveSurvey.setChord(MathHelper.solveForCurveChordDistance(mValueCurveDelta,mValueCurveRadius));
+                curveSurvey.setTangent(SurveyMathHelper.solveForCurveTangent(mValueCurveDelta,mValueCurveRadius));
+                curveSurvey.setChord(SurveyMathHelper.solveForCurveChordDistance(mValueCurveDelta,mValueCurveRadius));
 
                 break;
 
             case 5: //radius-length
-                mValueCurveDelta = MathHelper.solveForCurveDeltaAngle(mValueCurveRadius, mValueCurveLength);
+                mValueCurveDelta = SurveyMathHelper.solveForCurveDeltaAngle(mValueCurveRadius, mValueCurveLength);
                 curveSurvey.setDeltaDEC(mValueCurveDelta);
                 curveSurvey.setRadius(mValueCurveRadius);
                 curveSurvey.setLength(mValueCurveLength);
-                curveSurvey.setTangent(MathHelper.solveForCurveTangent(mValueCurveDelta,mValueCurveRadius));
-                curveSurvey.setChord(MathHelper.solveForCurveChordDistance(mValueCurveDelta,mValueCurveRadius));
+                curveSurvey.setTangent(SurveyMathHelper.solveForCurveTangent(mValueCurveDelta,mValueCurveRadius));
+                curveSurvey.setChord(SurveyMathHelper.solveForCurveChordDistance(mValueCurveDelta,mValueCurveRadius));
 
                 break;
 

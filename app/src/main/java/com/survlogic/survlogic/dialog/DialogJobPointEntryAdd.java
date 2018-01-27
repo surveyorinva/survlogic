@@ -1,5 +1,6 @@
 package com.survlogic.survlogic.dialog;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -22,6 +23,7 @@ import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.activity.JobPointsAddAdvancedActivity;
 import com.survlogic.survlogic.background.BackgroundPointSurveyNew;
 import com.survlogic.survlogic.database.JobDatabaseHandler;
+import com.survlogic.survlogic.interf.JobPointsActivityListener;
 import com.survlogic.survlogic.model.PointSurvey;
 
 /**
@@ -46,6 +48,8 @@ public class DialogJobPointEntryAdd extends DialogFragment {
     private int pointNumber, pointType;
     private double pointNorthing,pointEasting,pointElevation;
     private String pointDescription;
+
+    private JobPointsActivityListener jobPointsActivityListener;
 
 
     public static DialogJobPointEntryAdd newInstance(int title, int project_id, int job_id, String databaseName) {
@@ -295,13 +299,17 @@ public class DialogJobPointEntryAdd extends DialogFragment {
 
     private void submitForm(View v){
 
+        JobPointsActivityListener jobPointsActivityListener = (JobPointsActivityListener) getActivity();
+
+
         if (validateEntry()){
             Log.d(TAG, "submitForm: Validation Approved, Saving...");
             // Setup Background Task
-            BackgroundPointSurveyNew backgroundPointSurveyNew = new BackgroundPointSurveyNew(mContext, databaseName);
+            BackgroundPointSurveyNew backgroundPointSurveyNew = new BackgroundPointSurveyNew(mContext, databaseName, jobPointsActivityListener);
 
             // Execute background task
             backgroundPointSurveyNew.execute(populateValues());
+
 
             getDialog().dismiss();
         }
@@ -322,13 +330,14 @@ public class DialogJobPointEntryAdd extends DialogFragment {
         b.putParcelable("POINT_ENTRY", pointSurvey);
         i.putExtras(b);
 
-        startActivity(i);
+        startActivityForResult(i,1);
         getActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
 
         dismiss();
 
-
     }
+
+
 
     private void showToast(String data, boolean shortTime) {
         Log.d(TAG, "showToast: Started...");

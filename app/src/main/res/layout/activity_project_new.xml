@@ -37,7 +37,7 @@
                 android:id="@+id/project_name_in_project_new"
                 android:hint="@string/project_new_name_hint"
                 style="@style/InputField.ProjectNewActivity.ProjectName"
-                android:background="@drawable/editbox_dropdown_background"
+                android:background="@drawable/editbox_background_normal"
                 android:layout_gravity="center"
                 android:layout_weight="1"
                 android:layout_width="match_parent"
@@ -72,7 +72,7 @@
                     android:layout_height="0dp" />
 
                 <RelativeLayout
-                    android:background="@drawable/editbox_dropdown_background"
+                    android:background="@drawable/editbox_background_normal"
                     android:layout_weight="1"
                     android:layout_width="match_parent"
                     android:layout_height="0dp">
@@ -108,7 +108,7 @@
                     android:layout_height="0dp" />
 
                 <RelativeLayout
-                    android:background="@drawable/editbox_dropdown_background"
+                    android:background="@drawable/editbox_background_normal"
                     android:layout_weight="1"
                     android:layout_width="match_parent"
                     android:layout_height="0dp">
@@ -234,15 +234,13 @@
                     android:layout_height="0dp" />
 
                 <RelativeLayout
-                    android:background="@drawable/editbox_dropdown_background"
+                    android:background="@drawable/editbox_background_normal"
                     android:layout_weight="1"
                     android:layout_width="match_parent"
                     android:layout_height="0dp">
 
                     <Spinner
                         android:id="@+id/projection_prompt_in_project_new"
-                        android:entries="@array/project_projection_titles"
-                        android:entryValues="@array/project_projection_values"
                         android:prompt="@string/project_new_projection_prompt"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"/>
@@ -258,7 +256,8 @@
                 android:layout_marginStart="8dp"
                 android:layout_marginEnd="10dp"
                 android:layout_width="0dp"
-                android:layout_height="70dp">
+                android:layout_height="70dp"
+                android:visibility="gone">
 
                 <TextView
                     android:text="@string/project_new_header_7"
@@ -271,7 +270,7 @@
                     android:visibility="visible"/>
 
                 <RelativeLayout
-                    android:background="@drawable/editbox_dropdown_background"
+                    android:background="@drawable/editbox_background_normal"
                     android:layout_weight="1"
                     android:layout_width="match_parent"
                     android:layout_height="0dp">

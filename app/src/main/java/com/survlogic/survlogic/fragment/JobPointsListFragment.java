@@ -393,7 +393,7 @@ public class JobPointsListFragment extends Fragment {
         mRecyclerViewPointSurvey.setLayoutManager(layoutManagerPointSurvey);
         mRecyclerViewPointSurvey.setHasFixedSize(false);
 
-        adapterSurvey = new PointSurveyTableDataAdapter(mContext, lstPointSurvey,COORDINATE_FORMATTER);
+        adapterSurvey = new PointSurveyTableDataAdapter(mContext, lstPointSurvey,COORDINATE_FORMATTER, jobPointsActivityListener);
 
         mRecyclerViewPointSurvey.setAdapter(adapterSurvey);
 
@@ -578,19 +578,11 @@ public class JobPointsListFragment extends Fragment {
         }
     }
 
-    private class PointClickListenerPointSurvey implements TableDataClickListener<PointSurvey>{
-        @Override
-        public void onDataClicked(int rowIndex, PointSurvey clickedData) {
-            Log.d(TAG, "onDataClicked: Started...");
-            long point_id = clickedData.getId();
-            int pointNo = clickedData.getPoint_no();
+    //----------------------------------------------------------------------------------------------//
 
-            Log.d(TAG, "onDataClicked: Point_id: " + point_id);
 
-            android.support.v4.app.DialogFragment pointDialog = DialogJobPointView.newInstance(project_id, job_id, point_id, pointNo, jobDatabaseName);
-            pointDialog.show(getFragmentManager(),"dialog");
-        }
-    }
+    //----------------------------------------------------------------------------------------------//
+
     private void showToast(String data, boolean shortTime) {
 
         if (shortTime) {

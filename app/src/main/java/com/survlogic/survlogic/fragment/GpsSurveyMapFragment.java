@@ -22,7 +22,6 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.TextViewCompat;
 import android.text.InputType;
@@ -40,11 +39,9 @@ import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.LocationSource;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -54,8 +51,8 @@ import com.survlogic.survlogic.interf.GpsSurveyListener;
 import com.survlogic.survlogic.model.Dop;
 import com.survlogic.survlogic.model.PointGeodetic;
 import com.survlogic.survlogic.utils.GpsHelper;
-import com.survlogic.survlogic.utils.LocationConverter;
-import com.survlogic.survlogic.utils.MathHelper;
+import com.survlogic.survlogic.utils.GPSLocationConverter;
+import com.survlogic.survlogic.utils.SurveyMathHelper;
 
 
 import java.text.DecimalFormat;
@@ -63,7 +60,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import static com.survlogic.survlogic.utils.LocationConverter.convertMetersToValue;
+import static com.survlogic.survlogic.utils.GPSLocationConverter.convertMetersToValue;
 
 /**
  * Created by chrisfillmore on 5/2/2017.
@@ -326,11 +323,11 @@ public class GpsSurveyMapFragment extends Fragment implements GpsSurveyListener,
 
         onPause();
 
-        double averageLat = MathHelper.createAverageValueFromArray(mArrayLat);
-        double averageLong = MathHelper.createAverageValueFromArray(mArrayLong);
-        double averageEllipsoid = MathHelper.createAverageValueFromArray(mArrayEllipsoid);
-        double averageOrtho = MathHelper.createAverageValueFromArray(mArrayOrtho);
-        double averageAccuracy = MathHelper.createAverageValueFromArray(mArrayAccuracy);
+        double averageLat = SurveyMathHelper.createAverageValueFromArray(mArrayLat);
+        double averageLong = SurveyMathHelper.createAverageValueFromArray(mArrayLong);
+        double averageEllipsoid = SurveyMathHelper.createAverageValueFromArray(mArrayEllipsoid);
+        double averageOrtho = SurveyMathHelper.createAverageValueFromArray(mArrayOrtho);
+        double averageAccuracy = SurveyMathHelper.createAverageValueFromArray(mArrayAccuracy);
 
         int pointGeodeticType = 3; //Measured
 
@@ -575,13 +572,13 @@ public class GpsSurveyMapFragment extends Fragment implements GpsSurveyListener,
         //mLatitudeView.setText(getString(R.string.gps_latitude_value, location.getLatitude()));
 
 //        DMS Latitude
-        mLatitudeView.setText(getString(R.string.gps_latitude_value_string, LocationConverter.getLatitudeAsDMS(location, 3)));
+        mLatitudeView.setText(getString(R.string.gps_latitude_value_string, GPSLocationConverter.getLatitudeAsDMS(location, 3)));
 
 //        Decimal Longitude
         //mLongitudeView.setText(getString(R.string.gps_longitude_value, location.getLongitude()));
 
 //        DMS Longitude
-        mLongitudeView.setText(getString(R.string.gps_longitude_value_string, LocationConverter.getLongitudeAsDMS(location, 3)));
+        mLongitudeView.setText(getString(R.string.gps_longitude_value_string, GPSLocationConverter.getLongitudeAsDMS(location, 3)));
 
 
 //        Altitude = Ellipsoid Height

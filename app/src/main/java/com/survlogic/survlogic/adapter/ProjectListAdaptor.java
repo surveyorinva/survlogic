@@ -24,7 +24,7 @@ import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.activity.ProjectDetailsActivity;
 import com.survlogic.survlogic.model.Project;
 import com.survlogic.survlogic.utils.AnimateHelper;
-import com.survlogic.survlogic.utils.MathHelper;
+import com.survlogic.survlogic.utils.SurveyMathHelper;
 import com.survlogic.survlogic.utils.TimeHelper;
 import com.survlogic.survlogic.view.Card_View_Holder_Project_Small;
 
@@ -155,8 +155,8 @@ public class ProjectListAdaptor extends RecyclerView.Adapter<RecyclerView.ViewHo
 //        Location
         if(project.getmLocationLat() != 0){
             vh1.txtLocation.setText(mContext.getString(R.string.project_card_location_geo,
-                    MathHelper.convertDECtoDMSGeodetic(project.getmLocationLat(),1,true),
-                    MathHelper.convertDECtoDMSGeodetic(project.getmLocationLong(),1,true)));
+                    SurveyMathHelper.convertDECtoDMSGeodetic(project.getmLocationLat(),1,true),
+                    SurveyMathHelper.convertDECtoDMSGeodetic(project.getmLocationLong(),1,true)));
         }
 
 //        Image

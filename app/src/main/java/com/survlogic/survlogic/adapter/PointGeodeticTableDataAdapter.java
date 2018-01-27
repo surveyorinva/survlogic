@@ -4,30 +4,15 @@ import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.EditorInfo;
-import android.widget.CompoundButton;
-import android.widget.PopupMenu;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.survlogic.survlogic.R;
-import com.survlogic.survlogic.interf.CallCurveSolutionDialogListener;
-import com.survlogic.survlogic.interf.MapcheckListener;
 import com.survlogic.survlogic.model.PointGeodetic;
-import com.survlogic.survlogic.model.PointMapCheck;
-import com.survlogic.survlogic.model.PointSurvey;
 import com.survlogic.survlogic.utils.AnimateHelper;
-import com.survlogic.survlogic.utils.MathHelper;
-import com.survlogic.survlogic.utils.SwipeAndDragHelper;
-import com.survlogic.survlogic.view.Card_View_Holder_Job_Mapcheck_Add;
-import com.survlogic.survlogic.view.Card_View_Holder_Job_Mapcheck_List;
-import com.survlogic.survlogic.view.Card_View_Holder_Job_Mapcheck_Results;
+import com.survlogic.survlogic.utils.SurveyMathHelper;
 import com.survlogic.survlogic.view.Card_View_Holder_Job_Points_List;
 
 import java.text.DecimalFormat;
@@ -68,12 +53,12 @@ public class PointGeodeticTableDataAdapter extends RecyclerView.Adapter<Recycler
 
         switch (viewType){
             case LIST:
-                View v1 = mInflater.inflate(R.layout.card_job_point_view_small,parent,false);
+                View v1 = mInflater.inflate(R.layout.card_job_cogo_point_view_small,parent,false);
                 viewHolder = new Card_View_Holder_Job_Points_List(v1,mContext);
                 break;
 
             default:
-                View v = mInflater.inflate(R.layout.card_job_point_view_small,parent,false);
+                View v = mInflater.inflate(R.layout.card_job_cogo_point_view_small,parent,false);
                 viewHolder = new Card_View_Holder_Job_Points_List(v,mContext);
                 break;
         }
@@ -124,28 +109,28 @@ public class PointGeodeticTableDataAdapter extends RecyclerView.Adapter<Recycler
         elevationPrefix =  mContext.getResources().getString(R.string.cogo_mapcheck_observation_easting_prefix);
 
         if(pointGeodetic.getNorthing() != 0){
-            pointLatitude = COORDINATE_FORMATTER.format(pointGeodetic.getNorthing());
+            pointLatitude = SurveyMathHelper.convertDECtoDMSGeodetic(pointGeodetic.getLatitude(),0,true);
         }else{
-            pointLatitude = String.valueOf(0d);
+            pointLatitude = COORDINATE_FORMATTER.format(0d);
 
         }
         if(pointGeodetic.getEasting() != 0){
-            pointLongitude = COORDINATE_FORMATTER.format(pointGeodetic.getEasting());
+            pointLongitude = SurveyMathHelper.convertDECtoDMSGeodetic(pointGeodetic.getLongitude(),0,true);
         }else{
-            pointLongitude = String.valueOf(0d);
+            pointLongitude = COORDINATE_FORMATTER.format(0d);
 
         }
 
         if(pointGeodetic.getElevation() != 0){
             pointElevation = COORDINATE_FORMATTER.format(pointGeodetic.getElevation());
         }else{
-            pointElevation = String.valueOf(0d);
+            pointElevation = COORDINATE_FORMATTER.format(0d);
 
         }
 
-        pointLatitude = latPrefix + " " + pointLatitude;
-        pointLongitude = longPrefix + " " + pointLongitude;
-        pointElevation = elevationPrefix + " " + pointElevation;
+//        pointLatitude = latPrefix + " " + pointLatitude;
+//        pointLongitude = longPrefix + " " + pointLongitude;
+//        pointElevation = elevationPrefix + " " + pointElevation;
 
         vh1.tvPointNumber.setText(pointNumber);
         vh1.tvPointDesc.setText(pointDescription);

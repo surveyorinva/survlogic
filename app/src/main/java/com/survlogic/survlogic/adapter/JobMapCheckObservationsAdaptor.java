@@ -22,7 +22,7 @@ import com.survlogic.survlogic.interf.CallCurveSolutionDialogListener;
 import com.survlogic.survlogic.interf.MapcheckListener;
 import com.survlogic.survlogic.model.PointMapCheck;
 import com.survlogic.survlogic.utils.AnimateHelper;
-import com.survlogic.survlogic.utils.MathHelper;
+import com.survlogic.survlogic.utils.SurveyMathHelper;
 import com.survlogic.survlogic.utils.SwipeAndDragHelper;
 import com.survlogic.survlogic.view.Card_View_Holder_Job_Mapcheck_Add;
 import com.survlogic.survlogic.view.Card_View_Holder_Job_Mapcheck_List;
@@ -165,7 +165,7 @@ public class JobMapCheckObservationsAdaptor extends RecyclerView.Adapter<Recycle
         switch(pointMapCheck.getObservationType()){
             case 0:  //Bearing
 
-                String bearing = MathHelper.convertDECtoDMSBearing(pointMapCheck.getLineAngle(),0);
+                String bearing = SurveyMathHelper.convertDECtoDMSBearing(pointMapCheck.getLineAngle(),0);
                 String distance = DISTANCE_PRECISION_FORMATTER.format(pointMapCheck.getLineDistance());
 
                 observation = String.valueOf(bearing + " " + distance);
@@ -177,7 +177,7 @@ public class JobMapCheckObservationsAdaptor extends RecyclerView.Adapter<Recycle
                 }
 
                 deg = 0f;
-                quadrant = Integer.parseInt(MathHelper.convertDECBearingToParts(pointMapCheck.getLineAngle(),0));
+                quadrant = Integer.parseInt(SurveyMathHelper.convertDECBearingToParts(pointMapCheck.getLineAngle(),0));
                 Log.i(TAG, "configureViewHolderList: Quadrant: " + quadrant + " - " + position);
                 Log.i(TAG, "configureViewHolderList: position: ----------" );
                 switch (quadrant){
@@ -200,7 +200,7 @@ public class JobMapCheckObservationsAdaptor extends RecyclerView.Adapter<Recycle
 
             case 1: //Azimuth
 
-                String azimuthAngle = MathHelper.convertDECtoDMSAzimuth(pointMapCheck.getLineAngle(),0);
+                String azimuthAngle = SurveyMathHelper.convertDECtoDMSAzimuth(pointMapCheck.getLineAngle(),0);
                 String azimuthDistance = DISTANCE_PRECISION_FORMATTER.format(pointMapCheck.getLineDistance());
 
                 observation = String.valueOf("Az " + azimuthAngle + " " + azimuthDistance);
@@ -212,8 +212,8 @@ public class JobMapCheckObservationsAdaptor extends RecyclerView.Adapter<Recycle
                 }
 
                 deg = 0f;
-                double bearingAngle = MathHelper.convertDECAzimuthtToDECBearing(pointMapCheck.getLineAngle());
-                quadrant = Integer.parseInt(MathHelper.convertDECBearingToParts(bearingAngle,0));
+                double bearingAngle = SurveyMathHelper.convertDECAzimuthtToDECBearing(pointMapCheck.getLineAngle());
+                quadrant = Integer.parseInt(SurveyMathHelper.convertDECBearingToParts(bearingAngle,0));
                 Log.i(TAG, "configureViewHolderList: Quadrant: " + quadrant + " - " + position);
                 Log.i(TAG, "configureViewHolderList: position: ----------" );
                 switch (quadrant){
@@ -237,7 +237,7 @@ public class JobMapCheckObservationsAdaptor extends RecyclerView.Adapter<Recycle
                 break;
 
             case 2: //Turned Angle
-                String turnedAngle = MathHelper.convertDECtoDMS(pointMapCheck.getLineAngle(),0);
+                String turnedAngle = SurveyMathHelper.convertDECtoDMS(pointMapCheck.getLineAngle(),0);
                 String turnedDistance = DISTANCE_PRECISION_FORMATTER.format(pointMapCheck.getLineDistance());
 
                 observation = String.valueOf("< " + turnedAngle + " " + turnedDistance);
@@ -251,7 +251,7 @@ public class JobMapCheckObservationsAdaptor extends RecyclerView.Adapter<Recycle
                 break;
 
             case 3: //Curve: Delta and Radius
-                String curveADeltaAngle = MathHelper.convertDECtoDMS(pointMapCheck.getCurveDelta(),0);
+                String curveADeltaAngle = SurveyMathHelper.convertDECtoDMS(pointMapCheck.getCurveDelta(),0);
                 String curveARadius = DISTANCE_PRECISION_FORMATTER.format(pointMapCheck.getCurveRadius());
 
                 observation = String.valueOf("Da: " + curveADeltaAngle + " R: " + curveARadius);
@@ -272,7 +272,7 @@ public class JobMapCheckObservationsAdaptor extends RecyclerView.Adapter<Recycle
                 break;
 
             case 4: //Curve: Delta and Length
-                String curveBDeltaAngle = MathHelper.convertDECtoDMS(pointMapCheck.getCurveDelta(),0);
+                String curveBDeltaAngle = SurveyMathHelper.convertDECtoDMS(pointMapCheck.getCurveDelta(),0);
                 String curveBLength = DISTANCE_PRECISION_FORMATTER.format(pointMapCheck.getCurveLength());
 
                 observation = String.valueOf("Da: " + curveBDeltaAngle + " L: " + curveBLength);

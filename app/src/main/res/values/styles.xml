@@ -85,6 +85,14 @@
         <item name="android:windowAnimationStyle">@style/TranslateDialogAnimation</item>
     </style>
 
+    <style name="DialogExplodeInStyle" parent="@android:style/Theme.Material.Light.Dialog.Alert">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowCloseOnTouchOutside">true</item>
+        <item name="android:windowBackground">@color/transparent</item>
+        <item name="android:statusBarColor">@color/colorPrimaryDark</item>
+        <item name="android:windowAnimationStyle">@style/TranslateDialogAnimationExplode</item>
+    </style>
+
     <style name="DialogPointViewStyle" parent="@android:style/Theme.Material.Light.Dialog.Alert">
         <item name="android:windowAnimationStyle">@style/MyAnimation.Window</item>
         <item name="android:windowIsFloating">true</item>
@@ -107,6 +115,11 @@
     <style name="TranslateDialogAnimation">
         <item name="android:windowEnterAnimation">@anim/anim_dialog_translate_left_side</item>
         <item name="android:windowExitAnimation">@anim/anim_dialog_translate_right_side</item>
+    </style>
+
+    <style name="TranslateDialogAnimationExplode">
+        <item name="android:windowEnterAnimation">@anim/anim_dialog_explode_from_back</item>
+        <item name="android:windowExitAnimation">@anim/anim_dialog_explode_to_front</item>
     </style>
     
     <style name="Theme.DialogActivity" parent="Theme.AppCompat.Dialog">

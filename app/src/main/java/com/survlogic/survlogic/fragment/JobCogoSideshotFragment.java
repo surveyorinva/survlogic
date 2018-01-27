@@ -32,7 +32,7 @@ import com.survlogic.survlogic.interf.JobCogoFragmentListener;
 import com.survlogic.survlogic.interf.JobCogoSideshotPointListener;
 import com.survlogic.survlogic.model.Point;
 import com.survlogic.survlogic.model.PointSurvey;
-import com.survlogic.survlogic.utils.MathHelper;
+import com.survlogic.survlogic.utils.SurveyMathHelper;
 import com.survlogic.survlogic.utils.PreferenceLoaderHelper;
 import com.survlogic.survlogic.utils.StringUtilityHelper;
 
@@ -512,7 +512,7 @@ public class JobCogoSideshotFragment extends Fragment implements JobCogoSideshot
                     String resultsSec = etHASec.getText().toString();
 
                     if(!StringUtilityHelper.isStringNull(resultsDeg) && !StringUtilityHelper.isStringNull(resultsMin) && !StringUtilityHelper.isStringNull(resultsSec)){
-                        mValueHAngleDec = MathHelper.convertPartsToDEC(resultsDeg,resultsMin,resultsSec);
+                        mValueHAngleDec = SurveyMathHelper.convertPartsToDEC(resultsDeg,resultsMin,resultsSec);
                         Log.d(TAG, "swapHAngleItems: mValueHAngleDec: " + mValueHAngleDec);
 
                     }
@@ -1084,10 +1084,10 @@ public class JobCogoSideshotFragment extends Fragment implements JobCogoSideshot
         switch(itemToShow){
             case 1:
                 if(mValueHAngleDec !=0){
-                    etHADeg.setText(String.valueOf(MathHelper.convertDECToDegree(mValueHAngleDec)));
-                    etHAMin.setText(String.valueOf(MathHelper.convertDECToMinute(mValueHAngleDec)));
+                    etHADeg.setText(String.valueOf(SurveyMathHelper.convertDECToDegree(mValueHAngleDec)));
+                    etHAMin.setText(String.valueOf(SurveyMathHelper.convertDECToMinute(mValueHAngleDec)));
 
-                    double resultsSeconds = MathHelper.convertDECToSeconds(mValueHAngleDec);
+                    double resultsSeconds = SurveyMathHelper.convertDECToSeconds(mValueHAngleDec);
 
                     int decimalPlaces = 0;
 
@@ -1095,7 +1095,7 @@ public class JobCogoSideshotFragment extends Fragment implements JobCogoSideshot
                         String mResultSeconds = String.valueOf((int) resultsSeconds);
                         etHASec.setText(mResultSeconds);
                     }else {
-                        etHASec.setText(String.valueOf(MathHelper.convertDECToSeconds(mValueHAngleDec, decimalPlaces)));
+                        etHASec.setText(String.valueOf(SurveyMathHelper.convertDECToSeconds(mValueHAngleDec, decimalPlaces)));
                     }
                 }
                 break;
@@ -1242,7 +1242,7 @@ public class JobCogoSideshotFragment extends Fragment implements JobCogoSideshot
 
                 if(!StringUtilityHelper.isStringNull(d) && !StringUtilityHelper.isStringNull(m) && !StringUtilityHelper.isStringNull(s)){
                     //Save horizontal angle as a decimal degree
-                    mValueHAngleDec = MathHelper.convertPartsToDEC(d,m,s);
+                    mValueHAngleDec = SurveyMathHelper.convertPartsToDEC(d,m,s);
 
                 }else {
                     if(StringUtilityHelper.isStringNull(d)) {
@@ -1315,7 +1315,7 @@ public class JobCogoSideshotFragment extends Fragment implements JobCogoSideshot
 
                 if(!StringUtilityHelper.isStringNull(zenithDeg) && !StringUtilityHelper.isStringNull(zenithMin) && !StringUtilityHelper.isStringNull(zenithSec)){
                     //Save horizontal angle as a decimal degree
-                    mValueVAngleDec = MathHelper.convertPartsToDEC(zenithDeg,zenithMin,zenithSec);
+                    mValueVAngleDec = SurveyMathHelper.convertPartsToDEC(zenithDeg,zenithMin,zenithSec);
 
                 }else{
 
@@ -1356,7 +1356,7 @@ public class JobCogoSideshotFragment extends Fragment implements JobCogoSideshot
 
                 if(!StringUtilityHelper.isStringNull(verticalDeg) && !StringUtilityHelper.isStringNull(verticalMin) && !StringUtilityHelper.isStringNull(verticalSec)){
                     //Save horizontal angle as a decimal degree
-                    mValueVAngleDec = MathHelper.convertPartsToDEC(verticalDeg,verticalMin,verticalSec);
+                    mValueVAngleDec = SurveyMathHelper.convertPartsToDEC(verticalDeg,verticalMin,verticalSec);
 
                 }else {
 
@@ -1476,9 +1476,9 @@ public class JobCogoSideshotFragment extends Fragment implements JobCogoSideshot
         double instrumentHeight = jobCogoFragmentListener.sendOccupyHeightToFragment();
 
         if(is2dSurvey && targetHeight == 0){
-            mObservedCoordinates = MathHelper.solveForCoordinatesFromTurnedAngleAndDistance(occupyPointSurvey,backsightPointSurvey,mValueHAngleDec,mValueDistance,mValueVAngleDec);
+            mObservedCoordinates = SurveyMathHelper.solveForCoordinatesFromTurnedAngleAndDistance(occupyPointSurvey,backsightPointSurvey,mValueHAngleDec,mValueDistance,mValueVAngleDec);
         }else{
-            mObservedCoordinates = MathHelper.solveForCoordinatesFromTurnedAngleAndDistance(occupyPointSurvey,backsightPointSurvey,mValueHAngleDec,mValueDistance,mValueVAngleDec,instrumentHeight, targetHeight);
+            mObservedCoordinates = SurveyMathHelper.solveForCoordinatesFromTurnedAngleAndDistance(occupyPointSurvey,backsightPointSurvey,mValueHAngleDec,mValueDistance,mValueVAngleDec,instrumentHeight, targetHeight);
         }
 
 

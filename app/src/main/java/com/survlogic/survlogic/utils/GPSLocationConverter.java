@@ -7,7 +7,7 @@ package com.survlogic.survlogic.utils;
 import android.location.Location;
 import android.support.annotation.NonNull;
 
-public class LocationConverter {
+public class GPSLocationConverter {
 
     public static String getLatitudeAsDMS(Location location, int decimalPlace){
         String strLatitude = Location.convert(location.getLatitude(), Location.FORMAT_SECONDS);

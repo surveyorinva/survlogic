@@ -4,6 +4,7 @@
     android:clickable="true"
     android:focusable="true"
     android:elevation="0dp"
+    android:foreground="?android:selectableItemBackgroundBorderless"
     android:layout_width="match_parent"
     android:layout_height="30dp">
 

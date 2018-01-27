@@ -23,7 +23,7 @@ import com.survlogic.survlogic.dialog.DialogJobPointGeodeticEntryAdd;
 import com.survlogic.survlogic.interf.PointGeodeticEntryListener;
 import com.survlogic.survlogic.model.PointGeodetic;
 import com.survlogic.survlogic.model.PointSurvey;
-import com.survlogic.survlogic.utils.MathHelper;
+import com.survlogic.survlogic.utils.SurveyMathHelper;
 import com.survlogic.survlogic.utils.PreferenceLoaderHelper;
 import com.survlogic.survlogic.utils.StringUtilityHelper;
 
@@ -219,13 +219,13 @@ public class JobPointsAddAdvancedActivity extends AppCompatActivity implements P
             mLocationOrtho = data.getDoubleExtra(getString(R.string.KEY_POSITION_ORTHO), 0);
             String heightOrtho = DISTANCE_PRECISION_FORMATTER.format(mLocationOrtho);
 
-            String strLatitude = MathHelper.convertDECtoDMSGeodetic(mLocationLat, 3, false);
+            String strLatitude = SurveyMathHelper.convertDECtoDMSGeodetic(mLocationLat, 3, false);
 
             tvLocation_latitude.setText(getString(R.string.project_new_location_latitude_title));
             tvLocation_latitude_value.setText(strLatitude);
             tvLocation_latitude_value.setVisibility(View.VISIBLE);
 
-            String strLongitude = MathHelper.convertDECtoDMSGeodetic(mLocationLong, 3, true);
+            String strLongitude = SurveyMathHelper.convertDECtoDMSGeodetic(mLocationLong, 3, true);
 
             tvLocation_longitude.setText(getString(R.string.project_new_location_longitude_title));
             tvLocation_longitude_value.setText(strLongitude);
@@ -259,7 +259,7 @@ public class JobPointsAddAdvancedActivity extends AppCompatActivity implements P
         Log.d(TAG, "onReturnValues: Starting...");
         if (latOut != 0) {
             mLocationLat = latOut;
-            String strLatitude = MathHelper.convertDECtoDMSGeodetic(latOut, 3, false);
+            String strLatitude = SurveyMathHelper.convertDECtoDMSGeodetic(latOut, 3, false);
 
             tvLocation_latitude.setText(getString(R.string.project_new_location_latitude_title));
             tvLocation_latitude_value.setText(strLatitude);
@@ -270,7 +270,7 @@ public class JobPointsAddAdvancedActivity extends AppCompatActivity implements P
 
         if (longOut !=0){
             mLocationLong = longOut;
-            String strLongitude = MathHelper.convertDECtoDMSGeodetic(longOut,3,true);
+            String strLongitude = SurveyMathHelper.convertDECtoDMSGeodetic(longOut,3,true);
 
             tvLocation_longitude.setText(getString(R.string.project_new_location_longitude_title));
             tvLocation_longitude_value.setText(strLongitude);

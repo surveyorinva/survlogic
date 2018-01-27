@@ -26,6 +26,7 @@ import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.background.BackgroundGeodeticPointGet;
 import com.survlogic.survlogic.background.BackgroundSurveyPointGet;
+import com.survlogic.survlogic.dialog.DialogJobPointView;
 import com.survlogic.survlogic.dialog.DialogProjectDescriptionAdd;
 import com.survlogic.survlogic.fragment.JobPointsHomeFragment;
 import com.survlogic.survlogic.fragment.JobPointsInverseFragment;
@@ -376,6 +377,15 @@ public class JobPointsActivity extends AppCompatActivity implements NavigationVi
         backgroundSurveyPointGet.execute();
     }
 
+    //----------------------------------------------------------------------------------------------//
+    public void openPointEdit(long point_id, int pointNo){
+        Log.d(TAG, "onDataClicked: Point_id: " + point_id);
+
+        FragmentManager fm = getSupportFragmentManager();
+        android.support.v4.app.DialogFragment pointDialog = DialogJobPointView.newInstance(project_id, job_id, point_id, pointNo, jobDatabaseName);
+        pointDialog.show(fm,"dialog");
+    }
+
 
     //-------------------------------------------------------------------------------------------------------------------------//
 
@@ -471,6 +481,12 @@ public class JobPointsActivity extends AppCompatActivity implements NavigationVi
 
     @Override
     public void requestPointGeodeticArray() {
+
+    }
+
+    @Override
+    public void callPointViewDialogBox(long point_id, int pointNo) {
+        openPointEdit(point_id, pointNo);
 
     }
 

@@ -6,7 +6,6 @@ import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.location.Location;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -20,7 +19,7 @@ import android.widget.Toast;
 
 import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.interf.PointGeodeticEntryListener;
-import com.survlogic.survlogic.utils.MathHelper;
+import com.survlogic.survlogic.utils.SurveyMathHelper;
 import com.survlogic.survlogic.utils.PreferenceLoaderHelper;
 import com.survlogic.survlogic.utils.StringUtilityHelper;
 
@@ -265,9 +264,9 @@ public class DialogJobPointGeodeticEntryAdd extends DialogFragment {
 
         if(latitudeValue !=0){
             Log.d(TAG, "Latitude Values: Started: " + latitudeValue);
-            String degValue = String.valueOf(MathHelper.convertDECToDegree(latitudeValue));
-            String minuteValue = String.valueOf(MathHelper.convertDECToMinute(latitudeValue));
-            String secondValue = String.valueOf(COORDINATE_FORMATTER.format(MathHelper.convertDECToSeconds(latitudeValue)));
+            String degValue = String.valueOf(SurveyMathHelper.convertDECToDegree(latitudeValue));
+            String minuteValue = String.valueOf(SurveyMathHelper.convertDECToMinute(latitudeValue));
+            String secondValue = String.valueOf(COORDINATE_FORMATTER.format(SurveyMathHelper.convertDECToSeconds(latitudeValue)));
 
             etLatDegree.setText(degValue);
             etLatMinute.setText(minuteValue);
@@ -278,9 +277,9 @@ public class DialogJobPointGeodeticEntryAdd extends DialogFragment {
 
         if(longitudeValue !=0){
             Log.d(TAG, "Longitude Values: Started:  " + longitudeValue);
-            String degValue = String.valueOf(MathHelper.convertDECToDegree(longitudeValue));
-            String minuteValue = String.valueOf(MathHelper.convertDECToMinute(longitudeValue));
-            String secondValue = String.valueOf(COORDINATE_FORMATTER.format(MathHelper.convertDECToSeconds(longitudeValue)));
+            String degValue = String.valueOf(SurveyMathHelper.convertDECToDegree(longitudeValue));
+            String minuteValue = String.valueOf(SurveyMathHelper.convertDECToMinute(longitudeValue));
+            String secondValue = String.valueOf(COORDINATE_FORMATTER.format(SurveyMathHelper.convertDECToSeconds(longitudeValue)));
 
             etLongDegree.setText(degValue);
             etLongMinute.setText(minuteValue);
@@ -374,10 +373,10 @@ public class DialogJobPointGeodeticEntryAdd extends DialogFragment {
 
 
         if(!StringUtilityHelper.isStringNull(latDegreeIn)) {
-            latitudeDEC = MathHelper.convertPartsToDEC(latDegreeIn, latMinuteIn, latSecondIn);
+            latitudeDEC = SurveyMathHelper.convertPartsToDEC(latDegreeIn, latMinuteIn, latSecondIn);
             Log.d(TAG, "Latitude to DEC: " + latitudeDEC);
 
-            longitudeDEC = MathHelper.convertPartsToDEC(longDegreeIn, longMinuteIn, longSecondIn);
+            longitudeDEC = SurveyMathHelper.convertPartsToDEC(longDegreeIn, longMinuteIn, longSecondIn);
             Log.d(TAG, "Longitude D-M-S: " + longDegreeIn + ":" + longMinuteIn + ":" + longSecondIn );
             Log.d(TAG, "Longitude to DEC: " + longitudeDEC);
 

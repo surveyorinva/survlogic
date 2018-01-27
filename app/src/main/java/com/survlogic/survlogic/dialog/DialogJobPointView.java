@@ -45,7 +45,7 @@ import com.survlogic.survlogic.database.ProjectDatabaseHandler;
 import com.survlogic.survlogic.model.JobSketch;
 import com.survlogic.survlogic.model.PointGeodetic;
 import com.survlogic.survlogic.model.ProjectImages;
-import com.survlogic.survlogic.utils.MathHelper;
+import com.survlogic.survlogic.utils.SurveyMathHelper;
 import com.survlogic.survlogic.utils.PreferenceLoaderHelper;
 
 import java.io.File;
@@ -72,7 +72,7 @@ public class DialogJobPointView extends DialogFragment {
     private static final int REQUEST_SELECT_PICTURE = 3;
 
     private static final int DELAY_TO_SHOW_DATA = 1500;
-    private static final int DELAY_TO_DIALOG = 1500;
+    private static final int DELAY_TO_DIALOG = 1;
     private static final int DELAY_TO_GRID = 1000;
 
     private Handler showDataHandler, dialogHandler, gridHandler, sketchHandler;
@@ -132,7 +132,7 @@ public class DialogJobPointView extends DialogFragment {
 
         Log.d(TAG, "onCreateDialog: Database Name:" + databaseName + " Loaded...");
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.DialogGalleryStyle);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.DialogExplodeInStyle);
         LayoutInflater inflater = getActivity().getLayoutInflater();
 
         View v = inflater.inflate(R.layout.dialog_job_point_view,null);
@@ -367,8 +367,8 @@ public class DialogJobPointView extends DialogFragment {
                 tvPointLatHeader.setText(getString(R.string.dialog_point_view_pointLatitude_header));
                 tvPointLongHeader.setText(getString(R.string.dialog_point_view_pointLongitude_header));
 
-                tvPointLat.setText(MathHelper.convertDECtoDMSGeodetic(pointLatitude,3,true));
-                tvPointLong.setText(MathHelper.convertDECtoDMSGeodetic(pointLongitude,3,true));
+                tvPointLat.setText(SurveyMathHelper.convertDECtoDMSGeodetic(pointLatitude,3,true));
+                tvPointLong.setText(SurveyMathHelper.convertDECtoDMSGeodetic(pointLongitude,3,true));
 
                 tvPointLat.setVisibility(View.VISIBLE);
                 tvPointLong.setVisibility(View.VISIBLE);
@@ -418,7 +418,7 @@ public class DialogJobPointView extends DialogFragment {
                 int width = getResources().getDisplayMetrics().widthPixels;
                 int height = getResources().getDisplayMetrics().heightPixels;
 
-                width = width - 20;
+                width = width - 10;
                 height = height - 100;
 
                 getDialog().getWindow().setLayout(width,height);

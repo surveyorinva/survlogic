@@ -1,7 +1,6 @@
 package com.survlogic.survlogic.utils;
 
 import android.content.Context;
-import android.location.Location;
 import android.util.Log;
 
 import com.survlogic.survlogic.model.Point;
@@ -9,7 +8,6 @@ import com.survlogic.survlogic.model.PointSurvey;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -17,13 +15,13 @@ import java.util.Random;
  * Created by chrisfillmore on 6/17/2017.
  */
 
-public class MathHelper {
+public class SurveyMathHelper {
 
-    private static final String TAG = "MathHelper";
+    private static final String TAG = "SurveyMathHelper";
     private Context mContext;
     private static final String ALLOWED_CHARACTERS ="0123456789qwertyuiopasdfghjklzxcvbnm";
 
-    public MathHelper(Context mContext) {
+    public SurveyMathHelper(Context mContext) {
         this.mContext = mContext;
     }
 
@@ -913,7 +911,7 @@ public class MathHelper {
         double northing, easting;
 
         //determine Azimuth
-        double baseAzimuth = MathHelper.inverseAzimuthFromPoint(backsightPoint,occupyPoint);
+        double baseAzimuth = SurveyMathHelper.inverseAzimuthFromPoint(backsightPoint,occupyPoint);
 
         observedAzimuth = baseAzimuth + hzAngle;
         Log.d(TAG, "toDelete: Observed Azimuth: (Pre Radians): " + observedAzimuth);
@@ -928,7 +926,7 @@ public class MathHelper {
         dNorth = hzDistance * Math.cos(observedAzimuth);
         dEast = hzDistance * Math.sin(observedAzimuth);
 
-        Log.d(TAG, "MathHelper: dN: " + dNorth + " dEast: " + dEast);
+        Log.d(TAG, "SurveyMathHelper: dN: " + dNorth + " dEast: " + dEast);
 
         northing = occupyPoint.getNorthing() + dNorth;
         easting = occupyPoint.getEasting() + dEast;
@@ -949,7 +947,7 @@ public class MathHelper {
         double northing, easting;
 
         //determine Azimuth
-        double baseAzimuth = MathHelper.inverseAzimuthFromPointSurvey(occupyPointSurvey,backsightPointSurvey);
+        double baseAzimuth = SurveyMathHelper.inverseAzimuthFromPointSurvey(occupyPointSurvey,backsightPointSurvey);
 
         observedAzimuth = baseAzimuth + hzAngle;
         observedAzimuth = (Math.PI/180) * observedAzimuth;
@@ -961,7 +959,7 @@ public class MathHelper {
         dNorth = hzDistance * Math.cos(observedAzimuth);
         dEast = hzDistance * Math.sin(observedAzimuth);
 
-        Log.d(TAG, "MathHelper: dN: " + dNorth + " dEast: " + dEast);
+        Log.d(TAG, "SurveyMathHelper: dN: " + dNorth + " dEast: " + dEast);
 
         northing = occupyPointSurvey.getNorthing() + dNorth;
         easting = occupyPointSurvey.getEasting() + dEast;
@@ -983,7 +981,7 @@ public class MathHelper {
         double northing, easting, elevation;
 
         //determine Azimuth
-        double baseAzimuth = MathHelper.inverseAzimuthFromPointSurvey(occupyPointSurvey,backsightPointSurvey);
+        double baseAzimuth = SurveyMathHelper.inverseAzimuthFromPointSurvey(occupyPointSurvey,backsightPointSurvey);
 
         observedAzimuth = baseAzimuth + hzAngle;
         observedAzimuth = (Math.PI/180) * observedAzimuth;
@@ -995,7 +993,7 @@ public class MathHelper {
         dNorth = hzDistance * Math.cos(observedAzimuth);
         dEast = hzDistance * Math.sin(observedAzimuth);
 
-        Log.i(TAG, "MathHelper: dN: " + dNorth + " dEast: " + dEast);
+        Log.i(TAG, "SurveyMathHelper: dN: " + dNorth + " dEast: " + dEast);
 
         northing = occupyPointSurvey.getNorthing() + dNorth;
         easting = occupyPointSurvey.getEasting() + dEast;

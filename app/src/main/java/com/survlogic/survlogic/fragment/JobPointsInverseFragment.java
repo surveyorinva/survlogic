@@ -22,7 +22,7 @@ import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.dialog.DialogJobInversePointList;
 import com.survlogic.survlogic.model.PointGeodetic;
 import com.survlogic.survlogic.model.PointSurvey;
-import com.survlogic.survlogic.utils.MathHelper;
+import com.survlogic.survlogic.utils.SurveyMathHelper;
 import com.survlogic.survlogic.utils.PreferenceLoaderHelper;
 
 import java.text.DecimalFormat;
@@ -363,24 +363,24 @@ public class JobPointsInverseFragment extends Fragment {
     private void calculateInverse(){
         Log.d(TAG, "calculateInverse: Started");
 
-        double inverseAzimuth = MathHelper.inverseAzimuthFromPointSurvey(storedFromPoint,storedToPoint);
-        double inverseBearing = MathHelper.inverseBearingFromPointSurvey(storedFromPoint,storedToPoint);
+        double inverseAzimuth = SurveyMathHelper.inverseAzimuthFromPointSurvey(storedFromPoint,storedToPoint);
+        double inverseBearing = SurveyMathHelper.inverseBearingFromPointSurvey(storedFromPoint,storedToPoint);
 
         if(DISPLAY_DIRECTION == display_type_bearing){
-            tvDirection.setText(MathHelper.convertDECtoDMSBearing(inverseBearing,0));
+            tvDirection.setText(SurveyMathHelper.convertDECtoDMSBearing(inverseBearing,0));
         }else {
-            tvDirection.setText(MathHelper.convertDECtoDMSAzimuth(inverseAzimuth,0));
+            tvDirection.setText(SurveyMathHelper.convertDECtoDMSAzimuth(inverseAzimuth,0));
         }
 
-        double inverseHzDistance = MathHelper.inverseHzDistanceFromPointSurvey(storedFromPoint, storedToPoint);
+        double inverseHzDistance = SurveyMathHelper.inverseHzDistanceFromPointSurvey(storedFromPoint, storedToPoint);
         tvHzDistance.setText(DISTANCE_PRECISION_FORMATTER.format(inverseHzDistance));
 
-        double inverseSlDistance = MathHelper.inverseSlDistanceFromPointSurvey(storedFromPoint, storedToPoint);
+        double inverseSlDistance = SurveyMathHelper.inverseSlDistanceFromPointSurvey(storedFromPoint, storedToPoint);
         tvSlDistance.setText(DISTANCE_PRECISION_FORMATTER.format(inverseSlDistance));
 
-        tvDeltaNorth.setText(DISTANCE_PRECISION_FORMATTER.format(MathHelper.inverseCoordinateDeltas(storedFromPoint,storedToPoint,1)));
-        tvDeltaEast.setText(DISTANCE_PRECISION_FORMATTER.format(MathHelper.inverseCoordinateDeltas(storedFromPoint,storedToPoint,2)));
-        tvVtDelta.setText(DISTANCE_PRECISION_FORMATTER.format(MathHelper.inverseCoordinateDeltas(storedFromPoint,storedToPoint,3)));
+        tvDeltaNorth.setText(DISTANCE_PRECISION_FORMATTER.format(SurveyMathHelper.inverseCoordinateDeltas(storedFromPoint,storedToPoint,1)));
+        tvDeltaEast.setText(DISTANCE_PRECISION_FORMATTER.format(SurveyMathHelper.inverseCoordinateDeltas(storedFromPoint,storedToPoint,2)));
+        tvVtDelta.setText(DISTANCE_PRECISION_FORMATTER.format(SurveyMathHelper.inverseCoordinateDeltas(storedFromPoint,storedToPoint,3)));
 
         viewResults(true);
 

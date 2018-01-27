@@ -26,15 +26,18 @@ public class BackgroundPointSurveyNew extends AsyncTask <PointSurvey,PointSurvey
     private static final String TAG = "BackgroundProjectJobNew";
     private ProgressDialog dialog;
 
+    private JobPointsActivityListener jobPointsActivityListener;
+
     private Context context;
     private Activity activity;
     private String jobDbName;
     private long point_id;
 
-    public BackgroundPointSurveyNew(Context context, String jobDbName) {
+    public BackgroundPointSurveyNew(Context context, String jobDbName, JobPointsActivityListener jobPointsActivityListener) {
         this.context = context;
         this.dialog = new ProgressDialog(context);
         this.jobDbName = jobDbName;
+        this.jobPointsActivityListener = jobPointsActivityListener;
 
         activity = (Activity) context;
     }
@@ -101,8 +104,7 @@ public class BackgroundPointSurveyNew extends AsyncTask <PointSurvey,PointSurvey
             showToast(context.getString(R.string.job_new_validation_point_save_failed),true);
         }
 
-
-
+        jobPointsActivityListener.refreshPointArrays();
     }
 
     @Override

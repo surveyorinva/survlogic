@@ -9,23 +9,14 @@ import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.survlogic.survlogic.R;
-import com.survlogic.survlogic.background.BackgroundProjectJobNew;
 import com.survlogic.survlogic.model.CurveSurvey;
-import com.survlogic.survlogic.model.PointSurvey;
-import com.survlogic.survlogic.model.ProjectJobs;
-import com.survlogic.survlogic.utils.MathHelper;
+import com.survlogic.survlogic.utils.SurveyMathHelper;
 import com.survlogic.survlogic.utils.PreferenceLoaderHelper;
 
-import org.w3c.dom.Text;
-
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 
 /**
  * Created by chrisfillmore on 7/22/2017.
@@ -95,7 +86,7 @@ public class DialogToolsCurveSolve extends DialogFragment {
         tvTangent = (TextView) getDialog().findViewById(R.id.curve_tangent);
         tvChordDistance = (TextView) getDialog().findViewById(R.id.curve_chord_distance);
 
-        tvDelta.setText(MathHelper.convertDECtoDMS(curveSurvey.getDeltaDEC(),0));
+        tvDelta.setText(SurveyMathHelper.convertDECtoDMS(curveSurvey.getDeltaDEC(),0));
         tvRadius.setText(DISTANCE_PRECISION_FORMATTER.format(curveSurvey.getRadius()));
         tvLength.setText(DISTANCE_PRECISION_FORMATTER.format(curveSurvey.getLength()));
         tvTangent.setText(DISTANCE_PRECISION_FORMATTER.format(curveSurvey.getTangent()));

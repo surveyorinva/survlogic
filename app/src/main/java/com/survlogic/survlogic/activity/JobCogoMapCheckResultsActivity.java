@@ -19,7 +19,7 @@ import com.survlogic.survlogic.background.BackgroundPointSurveyNewMultiple;
 import com.survlogic.survlogic.model.Point;
 import com.survlogic.survlogic.model.PointMapCheck;
 import com.survlogic.survlogic.model.PointSurvey;
-import com.survlogic.survlogic.utils.MathHelper;
+import com.survlogic.survlogic.utils.SurveyMathHelper;
 import com.survlogic.survlogic.utils.PreferenceLoaderHelper;
 
 import java.text.DecimalFormat;
@@ -225,7 +225,7 @@ public class JobCogoMapCheckResultsActivity extends AppCompatActivity {
 
                 Point previousCurvePC = new Point(pcCoordNorth,pcCoordEast);
                 Point previousCurvePT = new Point(startNorthing,startEasting);
-                Point previousCurvePI = MathHelper.solveForCurvePIForBackTangent(previousCurvePC,previousCurvePT,previousCurveDeltaDEC,previousCurveRadius, isPreviousCurveToRight);
+                Point previousCurvePI = SurveyMathHelper.solveForCurvePIForBackTangent(previousCurvePC,previousCurvePT,previousCurveDeltaDEC,previousCurveRadius, isPreviousCurveToRight);
 
                 backAzNorthing = previousCurvePI.getNorthing();
                 backAzEasting = previousCurvePI.getEasting();
@@ -256,7 +256,7 @@ public class JobCogoMapCheckResultsActivity extends AppCompatActivity {
                 mValueAngle = mapCheck.getLineAngle();
                 mValueDistance = mapCheck.getLineDistance();
 
-                endPoint = MathHelper.solveForCoordinatesFromBearing(startPoint,mValueAngle,mValueDistance,90d);
+                endPoint = SurveyMathHelper.solveForCoordinatesFromBearing(startPoint,mValueAngle,mValueDistance,90d);
                 distanceTraveled = distanceTraveled + mValueDistance;
 
                 break;
@@ -266,7 +266,7 @@ public class JobCogoMapCheckResultsActivity extends AppCompatActivity {
                 mValueAngle = mapCheck.getLineAngle();
                 mValueDistance = mapCheck.getLineDistance();
 
-                endPoint = MathHelper.solveForCoordinatesFromAzimuth(startPoint,mValueAngle,mValueDistance,90d);
+                endPoint = SurveyMathHelper.solveForCoordinatesFromAzimuth(startPoint,mValueAngle,mValueDistance,90d);
                 distanceTraveled = distanceTraveled + mValueDistance;
 
                 break;
@@ -276,7 +276,7 @@ public class JobCogoMapCheckResultsActivity extends AppCompatActivity {
                 mValueAngle = mapCheck.getLineAngle();
                 mValueDistance = mapCheck.getLineDistance();
 
-                endPoint = MathHelper.solveForCoordinatesFromTurnedAngleAndDistance(startPoint, backAzPoint, mValueAngle,mValueDistance,90d);
+                endPoint = SurveyMathHelper.solveForCoordinatesFromTurnedAngleAndDistance(startPoint, backAzPoint, mValueAngle,mValueDistance,90d);
                 distanceTraveled = distanceTraveled + mValueDistance;
                 break;
 
@@ -286,23 +286,23 @@ public class JobCogoMapCheckResultsActivity extends AppCompatActivity {
                 radius = mapCheck.getCurveRadius();
                 isCurveToRight = mapCheck.isCurveToRight();
 
-                mValueDistance = MathHelper.solveForCurveChordDistance(deltaAngle,radius);
-                mValueAngle = MathHelper.solveForCurveChordDirectionAzimuthDEC(backAzPoint,startPoint,deltaAngle,isCurveToRight);
+                mValueDistance = SurveyMathHelper.solveForCurveChordDistance(deltaAngle,radius);
+                mValueAngle = SurveyMathHelper.solveForCurveChordDirectionAzimuthDEC(backAzPoint,startPoint,deltaAngle,isCurveToRight);
 
                 Log.d(TAG, "calculateCoordinates: Delta Angle: " + deltaAngle);
                 Log.d(TAG, "calculateCoordinates: Radius: " + radius);
                 Log.d(TAG, "calculateCoordinates: Chord Distance: " + mValueDistance);
                 Log.d(TAG, "calculateCoordinates: Chord Azimuth: " + mValueAngle);
 
-                endPoint = MathHelper.solveForCoordinatesFromAzimuth(startPoint,mValueAngle,mValueDistance,90d);
+                endPoint = SurveyMathHelper.solveForCoordinatesFromAzimuth(startPoint,mValueAngle,mValueDistance,90d);
 
-                arcLength = MathHelper.solveForCurveLength(deltaAngle,radius);
+                arcLength = SurveyMathHelper.solveForCurveLength(deltaAngle,radius);
                 distanceTraveled = distanceTraveled + arcLength;
 
                 if(isCurveToRight){
-                    areaCurveToRight = areaCurveToRight + MathHelper.solveForCurveSegmentArea(deltaAngle,radius);
+                    areaCurveToRight = areaCurveToRight + SurveyMathHelper.solveForCurveSegmentArea(deltaAngle,radius);
                 }else{
-                    areaCurveToLeft = areaCurveToLeft + MathHelper.solveForCurveSegmentArea(deltaAngle,radius);
+                    areaCurveToLeft = areaCurveToLeft + SurveyMathHelper.solveForCurveSegmentArea(deltaAngle,radius);
                 }
 
                 break;
@@ -313,18 +313,18 @@ public class JobCogoMapCheckResultsActivity extends AppCompatActivity {
                 arcLength = mapCheck.getCurveLength();
                 isCurveToRight = mapCheck.isCurveToRight();
 
-                radius = MathHelper.solveForCurveRadius(deltaAngle,arcLength);
+                radius = SurveyMathHelper.solveForCurveRadius(deltaAngle,arcLength);
 
-                mValueDistance = MathHelper.solveForCurveChordDistance(deltaAngle,radius);
-                mValueAngle = MathHelper.solveForCurveChordDirectionAzimuthDEC(backAzPoint,startPoint,deltaAngle,isCurveToRight);
+                mValueDistance = SurveyMathHelper.solveForCurveChordDistance(deltaAngle,radius);
+                mValueAngle = SurveyMathHelper.solveForCurveChordDirectionAzimuthDEC(backAzPoint,startPoint,deltaAngle,isCurveToRight);
 
-                endPoint = MathHelper.solveForCoordinatesFromAzimuth(startPoint,mValueAngle,mValueDistance,90d);
+                endPoint = SurveyMathHelper.solveForCoordinatesFromAzimuth(startPoint,mValueAngle,mValueDistance,90d);
 
                 distanceTraveled = distanceTraveled + arcLength;
                 if(isCurveToRight){
-                    areaCurveToRight = areaCurveToRight + MathHelper.solveForCurveSegmentArea(deltaAngle,radius);
+                    areaCurveToRight = areaCurveToRight + SurveyMathHelper.solveForCurveSegmentArea(deltaAngle,radius);
                 }else{
-                    areaCurveToLeft = areaCurveToLeft + MathHelper.solveForCurveSegmentArea(deltaAngle,radius);
+                    areaCurveToLeft = areaCurveToLeft + SurveyMathHelper.solveForCurveSegmentArea(deltaAngle,radius);
                 }
 
                 break;
@@ -334,17 +334,17 @@ public class JobCogoMapCheckResultsActivity extends AppCompatActivity {
                 arcLength = mapCheck.getCurveLength();
                 isCurveToRight = mapCheck.isCurveToRight();
 
-                deltaAngle = MathHelper.solveForCurveDeltaAngle(radius,arcLength);
+                deltaAngle = SurveyMathHelper.solveForCurveDeltaAngle(radius,arcLength);
 
-                mValueDistance = MathHelper.solveForCurveChordDistance(deltaAngle,radius);
-                mValueAngle = MathHelper.solveForCurveChordDirectionAzimuthDEC(backAzPoint,startPoint,deltaAngle,isCurveToRight);
+                mValueDistance = SurveyMathHelper.solveForCurveChordDistance(deltaAngle,radius);
+                mValueAngle = SurveyMathHelper.solveForCurveChordDirectionAzimuthDEC(backAzPoint,startPoint,deltaAngle,isCurveToRight);
 
-                endPoint = MathHelper.solveForCoordinatesFromAzimuth(startPoint,mValueAngle,mValueDistance,90d);
+                endPoint = SurveyMathHelper.solveForCoordinatesFromAzimuth(startPoint,mValueAngle,mValueDistance,90d);
                 distanceTraveled = distanceTraveled + arcLength;
                 if(isCurveToRight){
-                    areaCurveToRight = areaCurveToRight + MathHelper.solveForCurveSegmentArea(deltaAngle,radius);
+                    areaCurveToRight = areaCurveToRight + SurveyMathHelper.solveForCurveSegmentArea(deltaAngle,radius);
                 }else{
-                    areaCurveToLeft = areaCurveToLeft + MathHelper.solveForCurveSegmentArea(deltaAngle,radius);
+                    areaCurveToLeft = areaCurveToLeft + SurveyMathHelper.solveForCurveSegmentArea(deltaAngle,radius);
                 }
                 break;
 
@@ -354,7 +354,7 @@ public class JobCogoMapCheckResultsActivity extends AppCompatActivity {
                 mValueAngle = mapCheck.getLineAngle();
                 mValueDistance = mapCheck.getLineDistance();
 
-                endPoint = MathHelper.solveForCoordinatesFromBearing(startPoint,mValueAngle,mValueDistance,90d);
+                endPoint = SurveyMathHelper.solveForCoordinatesFromBearing(startPoint,mValueAngle,mValueDistance,90d);
                 distanceTraveled = distanceTraveled + mValueDistance;
                 break;
         }
@@ -412,10 +412,10 @@ public class JobCogoMapCheckResultsActivity extends AppCompatActivity {
         Log.d(TAG, "solveClosingPoint: Started");
 
 
-        double inverseDirection = MathHelper.inverseBearingFromPointSurvey(occupyPoint,closingPoint);
-        String inverseBearing = MathHelper.convertDECtoDMSBearing(inverseDirection,0);
+        double inverseDirection = SurveyMathHelper.inverseBearingFromPointSurvey(occupyPoint,closingPoint);
+        String inverseBearing = SurveyMathHelper.convertDECtoDMSBearing(inverseDirection,0);
 
-        double inverseDistance = MathHelper.inverseHzDistanceFromPointSurvey(occupyPoint,closingPoint);
+        double inverseDistance = SurveyMathHelper.inverseHzDistanceFromPointSurvey(occupyPoint,closingPoint);
 
         tvClosingErrorDirection.setText(inverseBearing);
         tvClosingErrorDistance.setText(DISTANCE_PRECISION_FORMATTER.format(inverseDistance));

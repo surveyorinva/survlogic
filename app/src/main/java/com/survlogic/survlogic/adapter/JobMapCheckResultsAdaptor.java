@@ -4,27 +4,14 @@ import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.EditorInfo;
-import android.widget.CompoundButton;
-import android.widget.PopupMenu;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.survlogic.survlogic.R;
-import com.survlogic.survlogic.interf.CallCurveSolutionDialogListener;
-import com.survlogic.survlogic.interf.MapcheckListener;
 import com.survlogic.survlogic.model.PointMapCheck;
 import com.survlogic.survlogic.utils.AnimateHelper;
-import com.survlogic.survlogic.utils.MathHelper;
-import com.survlogic.survlogic.utils.SwipeAndDragHelper;
-import com.survlogic.survlogic.view.Card_View_Holder_Job_Mapcheck_Add;
-import com.survlogic.survlogic.view.Card_View_Holder_Job_Mapcheck_List;
 import com.survlogic.survlogic.view.Card_View_Holder_Job_Mapcheck_Results;
 
 import java.text.DecimalFormat;

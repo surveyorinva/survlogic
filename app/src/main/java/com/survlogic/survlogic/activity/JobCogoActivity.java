@@ -40,7 +40,7 @@ import com.survlogic.survlogic.model.JobInformation;
 import com.survlogic.survlogic.model.PointGeodetic;
 import com.survlogic.survlogic.model.PointSurvey;
 import com.survlogic.survlogic.utils.BottomNavigationViewHelper;
-import com.survlogic.survlogic.utils.MathHelper;
+import com.survlogic.survlogic.utils.SurveyMathHelper;
 import com.survlogic.survlogic.utils.PreferenceLoaderHelper;
 
 import java.util.ArrayList;
@@ -490,8 +490,8 @@ public class JobCogoActivity extends AppCompatActivity implements NavigationView
         //Determine azimuth
         if(isPointListValid){
             Log.d(TAG, "loadSetup: Point Valid");
-            double inverseAzimuth = MathHelper.inverseAzimuthFromPointSurvey(occupyPointSurvey,backsightPointSurvey);
-            double inverseBearing = MathHelper.inverseBearingFromPointSurvey(occupyPointSurvey,backsightPointSurvey);
+            double inverseAzimuth = SurveyMathHelper.inverseAzimuthFromPointSurvey(occupyPointSurvey,backsightPointSurvey);
+            double inverseBearing = SurveyMathHelper.inverseBearingFromPointSurvey(occupyPointSurvey,backsightPointSurvey);
 
             Log.d(TAG, "loadSetup: Azimuth: " + inverseAzimuth);
             Log.d(TAG, "loadSetup: Bearing: " + inverseBearing);
@@ -503,7 +503,7 @@ public class JobCogoActivity extends AppCompatActivity implements NavigationView
             //Azimuth
 
             //Bearing
-            tvPointDirection.setText(MathHelper.convertDECtoDMSBearing(inverseBearing,0));
+            tvPointDirection.setText(SurveyMathHelper.convertDECtoDMSBearing(inverseBearing,0));
 
             tvOccupyHeight.setText(String.valueOf(occupyHeight));
             tvBacksightHeight.setText(String.valueOf(backsightHeight));

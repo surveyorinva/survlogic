@@ -2,11 +2,13 @@ package com.survlogic.survlogic.view;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.survlogic.survlogic.R;
+import com.survlogic.survlogic.dialog.DialogJobPointView;
 
 /**
  * Created by chrisfillmore on 6/30/2017.
@@ -40,6 +42,7 @@ public class Card_View_Holder_Job_Points_List extends RecyclerView.ViewHolder  {
 
 
     //----------------------------------------------------------------------------------------------//
+
 
 
     //----------------------------------------------------------------------------------------------//

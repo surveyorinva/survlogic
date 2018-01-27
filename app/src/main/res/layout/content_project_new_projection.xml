@@ -1,0 +1,329 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+
+    <RelativeLayout
+        android:id="@+id/rlHeader_Grid"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/card_label_header_grid"
+            android:text="Grid Framework"
+            style="@style/Labels.Card.ProjectCategory"
+            android:layout_below="@id/card_label_summary_occupy"
+            android:layout_marginStart="10dp"
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/rlGridDatum"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/card_grid"
+            app:cardCornerRadius="3dp"
+            android:elevation="5dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/projection_header"
+                        android:text="Datum"
+                        style="@style/Labels.Card.ProjectHeader"
+                        android:layout_alignTop="@id/left_item1_img"
+                        android:layout_toEndOf="@id/left_item1_img"
+                        android:layout_marginStart="5dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:id="@+id/projection_value"
+                        android:gravity="center"
+                        android:layout_marginEnd="5dp"
+                        android:layout_marginBottom="5dp"
+                        android:layout_alignStart="@id/projection_header"
+                        android:layout_toStartOf="@+id/projection_from_list"
+                        android:layout_below="@id/projection_header"
+                        android:layout_width="wrap_content"
+                        android:layout_height="45dp"
+                        style="@style/InputField.EditText"
+                        android:background="@drawable/editbox_background_normal"/>
+
+                    <ImageButton
+                        android:id="@+id/projection_from_list"
+                        android:background="@null"
+                        android:src="@drawable/ic_bottom_list_add"
+                        android:layout_marginEnd="5dp"
+                        android:scaleType="centerCrop"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/rlGridFramework_Zone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:id="@+id/zone_header"
+                        android:text="Datum"
+                        style="@style/Labels.Card.ProjectHeader"
+                        android:layout_alignTop="@id/left_item1_img"
+                        android:layout_toEndOf="@id/left_item1_img"
+                        android:layout_marginStart="5dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:id="@+id/zone_value"
+                        android:gravity="center"
+                        android:layout_marginEnd="5dp"
+                        android:layout_marginBottom="5dp"
+                        android:layout_alignStart="@id/zone_header"
+                        android:layout_toStartOf="@+id/zone_from_list"
+                        android:layout_below="@id/zone_header"
+                        android:layout_width="wrap_content"
+                        android:layout_height="45dp"
+                        style="@style/InputField.EditText"
+                        android:background="@drawable/editbox_background_normal"/>
+
+                    <ImageButton
+                        android:id="@+id/zone_from_list"
+                        android:background="@null"
+                        android:src="@drawable/ic_bottom_list_add"
+                        android:layout_marginEnd="105dp"
+                        android:scaleType="centerCrop"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                </RelativeLayout>
+
+
+            </LinearLayout>
+
+        </android.support.v7.widget.CardView>
+
+    </RelativeLayout>
+
+
+    <!-- Space -->
+
+
+    <RelativeLayout
+        android:id="@+id/rlHeader_Ground"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/card_label_header_ground"
+            android:text="Ground Framework"
+            style="@style/Labels.Card.ProjectCategory"
+            android:layout_below="@id/card_label_summary_occupy"
+            android:layout_marginStart="10dp"
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/rlGroundDatum"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/card_ground"
+            app:cardCornerRadius="3dp"
+            android:elevation="5dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/planar_header"
+                        android:text="Strategy"
+                        style="@style/Labels.Card.ProjectHeader"
+                        android:layout_alignTop="@id/left_item1_img"
+                        android:layout_toEndOf="@id/left_item1_img"
+                        android:layout_marginStart="5dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <RelativeLayout
+                        android:background="@drawable/editbox_background_normal"
+                        android:layout_margin="5dp"
+                        android:layout_below="@id/planar_header"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:id="@+id/planar_value"
+                            android:gravity="center"
+                            android:layout_marginEnd="5dp"
+                            android:layout_marginBottom="5dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="45dp"/>
+
+                        <ImageButton
+                            android:id="@+id/planar_from_list"
+                            android:background="@null"
+                            android:src="@drawable/ic_keyboard_arrow_down"
+                            android:layout_marginEnd="5dp"
+                            android:scaleType="centerCrop"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+
+                    </RelativeLayout>
+
+                </RelativeLayout>
+
+
+                <RelativeLayout
+                    android:id="@+id/rl_Ground_Framework_Scale_Factor"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:id="@+id/scale_header"
+                        android:text="Grid to Ground Scale"
+                        style="@style/Labels.Card.ProjectHeader"
+                        android:layout_alignTop="@id/left_item1_img"
+                        android:layout_toEndOf="@id/left_item1_img"
+                        android:layout_marginStart="5dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:id="@+id/scale_value"
+                        android:gravity="center"
+                        android:layout_marginEnd="5dp"
+                        android:layout_marginBottom="5dp"
+                        android:layout_alignStart="@id/scale_header"
+                        android:layout_below="@id/scale_header"
+                        android:layout_width="200dp"
+                        android:layout_height="45dp"
+                        style="@style/InputField.EditText"
+                        android:background="@drawable/editbox_background_normal"/>
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/rl_Ground_Framework_Scale_Shift"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone">
+
+                    <LinearLayout
+                        android:id="@+id/llGround_modified_north"
+                        android:weightSum="100"
+                        android:orientation="horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:id="@+id/modified_north_header"
+                            android:text="Northing Shift"
+                            style="@style/Labels.Card.ProjectHeader"
+                            android:layout_marginStart="5dp"
+                            android:layout_weight="50"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content" />
+
+                        <TextView
+                            android:id="@+id/modified_easting_header"
+                            android:text="Easting Shift"
+                            style="@style/Labels.Card.ProjectHeader"
+                            android:layout_marginStart="5dp"
+                            android:layout_weight="50"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_below="@id/llGround_modified_north"
+                        android:orientation="horizontal"
+                        android:weightSum="100"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:id="@+id/modified_north_value"
+                            android:gravity="center"
+                            android:layout_marginEnd="5dp"
+                            android:layout_marginBottom="5dp"
+                            android:layout_marginStart="5dp"
+                            android:layout_weight="50"
+                            android:layout_width="0dp"
+                            android:layout_height="45dp"
+                            style="@style/InputField.EditText"
+                            android:background="@drawable/editbox_background_normal"/>
+
+                        <TextView
+                            android:id="@+id/modified_easting_value"
+                            android:gravity="center"
+                            android:layout_marginEnd="5dp"
+                            android:layout_marginBottom="5dp"
+                            android:layout_weight="50"
+                            android:layout_width="0dp"
+                            android:layout_height="45dp"
+                            style="@style/InputField.EditText"
+                            android:background="@drawable/editbox_background_normal"/>
+
+                    </LinearLayout>
+
+                </RelativeLayout>
+
+            </LinearLayout>
+
+        </android.support.v7.widget.CardView>
+
+    </RelativeLayout>
+
+</LinearLayout>

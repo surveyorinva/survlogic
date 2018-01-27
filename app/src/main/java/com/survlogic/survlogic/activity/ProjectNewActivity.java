@@ -22,6 +22,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -35,7 +37,7 @@ import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.background.BackgroundProjectNew;
 import com.survlogic.survlogic.model.Project;
 import com.survlogic.survlogic.utils.FileHelper;
-import com.survlogic.survlogic.utils.MathHelper;
+import com.survlogic.survlogic.utils.SurveyMathHelper;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -73,13 +75,15 @@ public class ProjectNewActivity extends AppCompatActivity {
     int mImageSystem = 0; //system generated value to determine if user took picture or use internal picture 0 = internal 1=user
     double mLocationLat = 0, mLocationLong = 0;
 
+    private String[] projectionChoices = {"None", "Select New Projection"};
+    private ArrayAdapter<String> projectionAdapter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_project_new);
 
-        Log.e(TAG, "Started onCreateView");
+        Log.d(TAG, "Started onCreateView");
 
         initView();
 
@@ -88,7 +92,7 @@ public class ProjectNewActivity extends AppCompatActivity {
 
 
     private void initView(){
-
+        Log.d(TAG, "initView: Started...");
         mContext = ProjectNewActivity.this;
         fileHelper = new FileHelper(mContext);
 
@@ -114,12 +118,14 @@ public class ProjectNewActivity extends AppCompatActivity {
         btnSave = (Button) findViewById(R.id.Save_button);
         btnCancel = (Button) findViewById(R.id.Cancel_button);
 
+
+        initProjectionAdapter();
         setOnClickListeners();
 
     }
 
     private void setOnClickListeners(){
-
+        Log.d(TAG, "setOnClickListeners: Started...");
         btnlocation_get_from_gps_survey.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -169,7 +175,60 @@ public class ProjectNewActivity extends AppCompatActivity {
             }
         });
 
+
+        spProjection.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                switch (projectionChoices[position]){
+
+                    case "None":
+
+                        break;
+
+                    case "Select New Projection":
+                        openNewProjectionActivity();
+
+                        break;
+
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
     }
+
+    private void initProjectionAdapter(){
+        Log.d(TAG, "initProjectionAdapter: ");
+        projectionAdapter = new ArrayAdapter<String>(ProjectNewActivity.this,android.R.layout.simple_spinner_item,projectionChoices);
+        projectionAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        spProjection.setAdapter(projectionAdapter);
+
+
+
+
+    }
+
+
+    private void openNewProjectionActivity(){
+        Log.d(TAG, "openNewProjectionActivity: ");
+
+        Intent i = new Intent(this, ProjectNewActivityProjection.class);
+//        i.putExtra(getString(R.string.KEY_PROJECT_ID),project_id);
+//        i.putExtra(getString(R.string.KEY_JOB_ID), job_id);
+//        i.putExtra(getString(R.string.KEY_JOB_DATABASE), jobDatabaseName);
+
+        startActivity(i);
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+
+
+
+    }
+
 
 
     private void callImageSelectionDialog(){
@@ -293,13 +352,13 @@ public class ProjectNewActivity extends AppCompatActivity {
                 mLocationLat = data.getDoubleExtra(getString(R.string.KEY_POSITION_LATITUDE),0);
                 mLocationLong = data.getDoubleExtra(getString(R.string.KEY_POSITION_LONGITUDE),0);
 
-                String strLatitude = MathHelper.convertDECtoDMSGeodetic(mLocationLat,3,false);
+                String strLatitude = SurveyMathHelper.convertDECtoDMSGeodetic(mLocationLat,3,false);
                 //tvLocation_latitude.setText(getString(R.string.project_new_location_latitude_value,strLatitude));
                 tvLocation_latitude.setText(getString(R.string.project_new_location_latitude_title));
                 tvLocation_latitude_value.setText(strLatitude);
                 tvLocation_latitude_value.setVisibility(View.VISIBLE);
 
-                String strLongitude = MathHelper.convertDECtoDMSGeodetic(mLocationLong,3,true);
+                String strLongitude = SurveyMathHelper.convertDECtoDMSGeodetic(mLocationLong,3,true);
                 //tvLocation_longitude.setText(getString(R.string.project_new_location_longitude_value,strLongitude));
                 tvLocation_longitude.setText(getString(R.string.project_new_location_longitude_title));
                 tvLocation_longitude_value.setText(strLongitude);

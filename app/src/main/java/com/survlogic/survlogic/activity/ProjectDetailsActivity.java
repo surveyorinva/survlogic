@@ -55,7 +55,7 @@ import com.survlogic.survlogic.model.Project;
 import com.survlogic.survlogic.model.ProjectImages;
 import com.survlogic.survlogic.model.ProjectJobs;
 import com.survlogic.survlogic.utils.ImageHelper;
-import com.survlogic.survlogic.utils.MathHelper;
+import com.survlogic.survlogic.utils.SurveyMathHelper;
 import com.survlogic.survlogic.utils.TimeHelper;
 import com.survlogic.survlogic.utils.UniversalImageLoader;
 import com.survlogic.survlogic.dialog.DialogProjectDescriptionAdd;
@@ -390,9 +390,9 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
             tvStorage.setText(storage_values[storage_pos]);
 
             tvLocationLat.setText(this.getString(R.string.gps_status_lat_value_string,
-                    MathHelper.convertDECtoDMSGeodetic(project.getmLocationLat(),3,true)));
+                    SurveyMathHelper.convertDECtoDMSGeodetic(project.getmLocationLat(),3,true)));
             tvLocationLong.setText(this.getString(R.string.gps_status_long_value_string,
-                    MathHelper.convertDECtoDMSGeodetic(project.getmLocationLong(),3,true)));
+                    SurveyMathHelper.convertDECtoDMSGeodetic(project.getmLocationLong(),3,true)));
 
             projectDescription = project.getmProjectDescription();
             if(!isStringEmpty(projectDescription)) {

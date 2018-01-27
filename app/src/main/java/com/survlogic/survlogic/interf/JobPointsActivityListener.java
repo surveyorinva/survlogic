@@ -11,4 +11,7 @@ public interface JobPointsActivityListener {
     void requestPointSurveyArray();
 
     void requestPointGeodeticArray();
+
+    void callPointViewDialogBox(long point_id, int pointNo);
+
 }

@@ -16,7 +16,7 @@ import android.widget.Toast;
 import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.background.BackgroundProjectJobNew;
 import com.survlogic.survlogic.model.ProjectJobs;
-import com.survlogic.survlogic.utils.MathHelper;
+import com.survlogic.survlogic.utils.SurveyMathHelper;
 
 /**
  * Created by chrisfillmore on 7/22/2017.
@@ -95,7 +95,7 @@ public class DialogProjectJobAdd extends DialogFragment {
 
         String jobName = etJobName.getText().toString();
         String description = etDescription.getText().toString();
-        String jobDatabaseName = MathHelper.getRandomString(8) + ".db";
+        String jobDatabaseName = SurveyMathHelper.getRandomString(8) + ".db";
 
 
         //Todo convert the isStringNull to the StringUtilityHelper class for more control

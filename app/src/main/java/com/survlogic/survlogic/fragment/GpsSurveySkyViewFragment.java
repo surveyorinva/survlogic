@@ -34,7 +34,7 @@ import com.survlogic.survlogic.interf.GpsSurveyListener;
 import com.survlogic.survlogic.model.Satellite;
 import com.survlogic.survlogic.utils.GnssType;
 import com.survlogic.survlogic.utils.GpsHelper;
-import com.survlogic.survlogic.utils.LocationConverter;
+import com.survlogic.survlogic.utils.GPSLocationConverter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -258,8 +258,8 @@ public class GpsSurveySkyViewFragment extends Fragment implements GpsSurveyListe
     @Override
     public void onLocationChanged(Location location) {
 
-        mLatitudeView.setText(getString(R.string.gps_status_lat_value_string, LocationConverter.getLatitudeAsDMS(location, 3)));
-        mLongitudeView.setText(getString(R.string.gps_status_long_value_string, LocationConverter.getLongitudeAsDMS(location, 3)));
+        mLatitudeView.setText(getString(R.string.gps_status_lat_value_string, GPSLocationConverter.getLatitudeAsDMS(location, 3)));
+        mLongitudeView.setText(getString(R.string.gps_status_long_value_string, GPSLocationConverter.getLongitudeAsDMS(location, 3)));
 
 
     }
