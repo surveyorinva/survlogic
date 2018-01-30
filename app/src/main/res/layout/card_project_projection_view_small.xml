@@ -1,0 +1,40 @@
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:style="http://schemas.android.com/tools"
+    android:id="@+id/card_project_job_view_small"
+    android:clickable="false"
+    android:focusable="false"
+    android:elevation="0dp"
+    android:layout_margin="0dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <RelativeLayout
+        android:id="@+id/rl_layout_1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/projection_name"
+            android:text="@string/general_loading_status"
+            style="@style/Labels.Card.Header"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+
+        <TextView
+            android:id="@+id/projection_country"
+            android:text="07/15/2015"
+            android:layout_below="@+id/projection_name"
+            android:layout_alignStart="@id/projection_name"
+            android:gravity="center_vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="25dp" />
+
+    </RelativeLayout>
+
+
+
+</android.support.v7.widget.CardView>

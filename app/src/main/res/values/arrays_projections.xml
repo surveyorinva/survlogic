@@ -18,26 +18,24 @@
     </string-array>
 
     <!-- Grid Projections ** ->
-    <!-******-Name of Datum, Required GeodeticCRS, Zone (Y/N), Zone Designation, Returned Units (0=Meters, 1=Int. Feet, 2=USFeet),this EPSG -->
+    <!-******-Name of Datum,Country of Origin, Required GeodeticCRS, Zone (Y/N), Zone Designation, Returned Units (0=Meters, 1=Int. Feet, 2=USFeet),this EPSG -->
     <string-array name="gridCRS_list_titles">
-        <item>US State Plane Coordinate System of 1983,EPSG:4269,true,SPCS,2,EPSG:0</item>
-        <item>US State Plane Coordinate System of 1983 (2011),EPSG:6318,true,SPCS_11,0,EPSG:0</item>
+        <item>SPCS 1983,USA,EPSG:4269,true,SPCS,2,EPSG:0</item>
     </string-array>
 
     <string-array name="gridCRS_list_values">
         <item>0</item>
-        <item>1</item>
     </string-array>
 
     <!-- Zone Projections ** ->
-    <!- ZONE**** Name of Zone, Required GeodeticCRS,this EPSG -->
+    <!- ZONE**** Name of Zone, Zone No, Required GeodeticCRS,this EPSG -->
     <string-array name="zone_SPCS_list_titles">
-        <item>Arizona-East (0201),EPSG:4269,EPSG:2222</item>
-        <item>Arizona-Central (0202),EPSG:4269,EPSG:2223</item>
-        <item>Arizona-West (0203),EPSG:4269,EPSG:2224</item>
-        <item>Maryland (1900),EPSG:4269,EPSG:2248</item>
-        <item>Virginia-North (4501),EPSG:4269,EPSG:2283</item>
-        <item>Virginia-South (4502),EPSG:4269,EPSG:2284</item>
+        <item>Arizona-East,(Az-E-0201),EPSG:4269,EPSG:2222</item>
+        <item>Arizona-Central,(Az-C-0202),EPSG:4269,EPSG:2223</item>
+        <item>Arizona-West,(Az-W-0203),EPSG:4269,EPSG:2224</item>
+        <item>Maryland,(MD-1900),EPSG:4269,EPSG:2248</item>
+        <item>Virginia-North,(VA-N-4501),EPSG:4269,EPSG:2283</item>
+        <item>Virginia-South,(VA-S-4502),EPSG:4269,EPSG:2284</item>
     </string-array>
 
     <string-array name="zone_SPCS_list_values">

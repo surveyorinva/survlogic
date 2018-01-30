@@ -80,7 +80,7 @@
             android:theme="@style/SuperMaterialTheme"/>
 
         <activity
-            android:name=".activity.ProjectNewActivityProjection"
+            android:name=".activity.ProjectNewProjectionActivity"
             android:screenOrientation="portrait"
             android:label="New Project"
             android:theme="@style/SuperMaterialTheme"/>

@@ -62,7 +62,7 @@
 
                     <TextView
                         android:id="@+id/projection_value"
-                        android:gravity="center"
+                        android:gravity="start|center_vertical"
                         android:layout_marginEnd="5dp"
                         android:layout_marginBottom="5dp"
                         android:layout_alignStart="@id/projection_header"
@@ -70,7 +70,7 @@
                         android:layout_below="@id/projection_header"
                         android:layout_width="wrap_content"
                         android:layout_height="45dp"
-                        style="@style/InputField.EditText"
+                        style="@style/InputField.SpinnerValue"
                         android:background="@drawable/editbox_background_normal"/>
 
                     <ImageButton
@@ -94,7 +94,7 @@
 
                     <TextView
                         android:id="@+id/zone_header"
-                        android:text="Datum"
+                        android:text="Zone"
                         style="@style/Labels.Card.ProjectHeader"
                         android:layout_alignTop="@id/left_item1_img"
                         android:layout_toEndOf="@id/left_item1_img"
@@ -104,7 +104,7 @@
 
                     <TextView
                         android:id="@+id/zone_value"
-                        android:gravity="center"
+                        android:gravity="start|center_vertical"
                         android:layout_marginEnd="5dp"
                         android:layout_marginBottom="5dp"
                         android:layout_alignStart="@id/zone_header"
@@ -112,7 +112,7 @@
                         android:layout_below="@id/zone_header"
                         android:layout_width="wrap_content"
                         android:layout_height="45dp"
-                        style="@style/InputField.EditText"
+                        style="@style/InputField.SpinnerValue"
                         android:background="@drawable/editbox_background_normal"/>
 
                     <ImageButton
@@ -199,7 +199,7 @@
                         android:layout_height="wrap_content">
 
                         <TextView
-                            android:id="@+id/planar_value"
+                            android:id="@+id/planar_strategy_value"
                             android:gravity="center"
                             android:layout_marginEnd="5dp"
                             android:layout_marginBottom="5dp"
@@ -209,7 +209,7 @@
                         <ImageButton
                             android:id="@+id/planar_from_list"
                             android:background="@null"
-                            android:src="@drawable/ic_keyboard_arrow_down"
+                            android:src="@drawable/ic_bottom_list_add"
                             android:layout_marginEnd="5dp"
                             android:scaleType="centerCrop"
                             android:layout_alignParentEnd="true"

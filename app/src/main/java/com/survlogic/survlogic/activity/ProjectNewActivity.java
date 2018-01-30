@@ -209,15 +209,13 @@ public class ProjectNewActivity extends AppCompatActivity {
         spProjection.setAdapter(projectionAdapter);
 
 
-
-
     }
 
 
     private void openNewProjectionActivity(){
         Log.d(TAG, "openNewProjectionActivity: ");
 
-        Intent i = new Intent(this, ProjectNewActivityProjection.class);
+        Intent i = new Intent(this, ProjectNewProjectionActivity.class);
 //        i.putExtra(getString(R.string.KEY_PROJECT_ID),project_id);
 //        i.putExtra(getString(R.string.KEY_JOB_ID), job_id);
 //        i.putExtra(getString(R.string.KEY_JOB_DATABASE), jobDatabaseName);
@@ -544,7 +542,7 @@ public class ProjectNewActivity extends AppCompatActivity {
 
         //3
         int units_pos = spUnits.getSelectedItemPosition();
-        String [] units_values = getResources().getStringArray(R.array.unit_measure_values);
+        String[] units_values = getResources().getStringArray(R.array.unit_measure_values);
         mUnits = Integer.valueOf(units_values[units_pos]);
 
         //4
