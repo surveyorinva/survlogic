@@ -1,13 +1,17 @@
 package com.survlogic.survlogic.activity;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.BounceInterpolator;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,6 +28,7 @@ import org.cts.op.CoordinateOperationException;
 import org.cts.op.CoordinateOperationFactory;
 import org.cts.registry.EPSGRegistry;
 import org.cts.registry.RegistryManager;
+import org.w3c.dom.Text;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
@@ -39,7 +44,7 @@ public class TestActivity extends AppCompatActivity {
     private static final String TAG = "Started";
     private Context mContext;
     private EditText latIn, longIn;
-    private TextView tvnorthingOut, tveastingOut;
+    private TextView tvnorthingOut, tveastingOut, tvTestAnimation;
     private Button btSolve;
 
     @Override
@@ -59,7 +64,8 @@ public class TestActivity extends AppCompatActivity {
 
         tvnorthingOut = (TextView) findViewById(R.id.northing_test);
         tveastingOut = (TextView) findViewById(R.id.easting_test);
-
+        tvTestAnimation = (TextView) findViewById(R.id.test_animation);
+        animateViewSlideVisible(tvTestAnimation,200);
 
         btSolve = (Button) findViewById(R.id.button_solve_test);
         btSolve.setOnClickListener(new View.OnClickListener() {
@@ -78,6 +84,8 @@ public class TestActivity extends AppCompatActivity {
         }catch (Exception e){
             Log.d(TAG, "solveFromGeodetic: Error");
         }
+
+        animateViewSlideVisible(tvTestAnimation, 300);
     }
     
     private void solveFromGeodetic()  throws IllegalCoordinateException, CoordinateOperationException, CRSException {
@@ -124,4 +132,62 @@ public class TestActivity extends AppCompatActivity {
         }
 
     }
+
+    private void animateViewSlideVisible(final TextView view, long duration){
+        if(view.getVisibility() == View.GONE){
+            view.setVisibility(View.VISIBLE);
+            view.setAlpha(0.0f);
+
+            view.animate()
+                    .translationY(view.getHeight())
+                    .alpha(1.0f)
+                    .setListener(null);
+        }else{
+            view.animate()
+                    .translationY(0)
+                    .alpha(0.0f)
+                    .setListener(new AnimatorListenerAdapter() {
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            super.onAnimationEnd(animation);
+                            view.setVisibility(View.GONE);
+                        }
+                    });
+        }
+
+
+    }
+
+
+    private void animateViewSlideVisibleOriginal(final View view, boolean toShowView, long duration){
+        if(toShowView){
+            view.setVisibility(View.VISIBLE);
+            view.setAlpha(0.0f);
+
+            view.animate()
+                    .setDuration(duration)
+                    .setInterpolator(new BounceInterpolator())
+                    .translationY(view.getHeight())
+                    .alpha(1.0f)
+                    .setListener(null);
+        }else{
+            view.animate()
+                    .setDuration(duration)
+                    .setInterpolator(new BounceInterpolator())
+                    .translationY(0)
+                    .alpha(0.0f)
+                    .setListener(new AnimatorListenerAdapter() {
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            super.onAnimationEnd(animation);
+                            view.setVisibility(View.GONE);
+                        }
+                    });
+        }
+
+    }
+
+
+
+
 }

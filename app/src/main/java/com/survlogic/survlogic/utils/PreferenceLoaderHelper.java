@@ -29,6 +29,7 @@ public class PreferenceLoaderHelper {
 
     private int cogoOccupyPoint, cogoBacksightPoint;
     private float cogoOccupyHeight, cogoBacksightHeight;
+    private float defaultProjectionScaleGridToGround, defaultProjectionOriginNorth, defaultProjectionOriginEast;
 
     private int cogoSurveySetHAngle, cogoSurveySetDistance;
 
@@ -116,6 +117,10 @@ public class PreferenceLoaderHelper {
 
         cogoSurveySetHAngle = sharedPreferences.getInt(mContext.getString(R.string.pref_key_current_job_cogo_sideshot_hAngle),1);
         cogoSurveySetDistance = sharedPreferences.getInt(mContext.getString(R.string.pref_key_current_job_cogo_sideshot_distance),1);
+
+        defaultProjectionScaleGridToGround = sharedPreferences.getFloat(mContext.getString(R.string.pref_key_default_project_projection_scale),1.00F);
+        defaultProjectionOriginNorth = sharedPreferences.getFloat(mContext.getString(R.string.pref_key_default_project_projection_origin_North),0.00F);
+        defaultProjectionOriginEast = sharedPreferences.getFloat(mContext.getString(R.string.pref_key_default_project_projection_origin_East),0.00F);
 
     }
 
@@ -302,6 +307,30 @@ public class PreferenceLoaderHelper {
 
     public int getFormatAngleHzDisplay(){
         return format_angle_hz_display;
+    }
+
+    public void setDefaultProjectProjectionScale(float scaleFactor){
+        this.defaultProjectionScaleGridToGround = scaleFactor;
+    }
+
+    public float getDefaultProjectProjectionScaleGridToGround(){
+        return defaultProjectionScaleGridToGround;
+    }
+
+    public void setDefaultProjectProjectionOriginNorth(float northing){
+        this.defaultProjectionOriginNorth = northing;
+    }
+
+    public float getDefaultProjectProjectionOriginNorth(){
+        return defaultProjectionOriginNorth;
+    }
+
+    public void setDefaultProjectProjectionOriginEast(float easting){
+        this.defaultProjectionOriginEast = easting;
+    }
+
+    public float getDefaultProjectProjectionOriginEast(){
+        return defaultProjectionOriginEast;
     }
 
 

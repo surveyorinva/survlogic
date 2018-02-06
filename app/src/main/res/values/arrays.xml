@@ -255,6 +255,20 @@
         <item>0</item>
         <item>1</item>
     </string-array>
+
+    <string-array name="project_projection_strategies_titles">
+        <item>Survey is on the Ground</item>
+        <item>GPS Hand Held Survey for GIS Purposes</item>
+    </string-array>
+
+    <string-array name="project_projection_strategies_values">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+
+
+
+
     <!--TO DELETE-->
     <string-array name="pref_sync_frequency_titles">
         <item>15 minutes</item>

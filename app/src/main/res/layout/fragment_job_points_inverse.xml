@@ -184,7 +184,7 @@
 
     <RelativeLayout
         android:id="@+id/rlResults"
-        android:visibility="gone"
+        android:visibility="visible"
         android:layout_below="@id/rlCalculations"
         android:layout_marginTop="10dp"
         android:layout_width="match_parent"

@@ -1,5 +1,7 @@
 package com.survlogic.survlogic.fragment;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -8,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.BounceInterpolator;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -95,6 +98,7 @@ public class JobPointsInverseFragment extends Fragment {
         Log.d(TAG, "Database in Point List: " + jobDatabaseName);
 
         rlResults = (RelativeLayout) v.findViewById(R.id.rlResults);
+        animateViewSlideVisible(rlResults,false,1);
 
         tvFromPointNo = (AutoCompleteTextView) v.findViewById(R.id.left_item1_value);
         tvFromPointNo.setSelectAllOnFocus(true);
@@ -114,7 +118,6 @@ public class JobPointsInverseFragment extends Fragment {
 
         ibtFromList = (ImageButton) v.findViewById(R.id.inverse_from_list);
         ibtToList = (ImageButton) v.findViewById(R.id.inverse_to_list);
-
 
         tvDirection = (TextView) v.findViewById(R.id.left_results1_value);
         tvHzDistance = (TextView) v.findViewById(R.id.left_results2_value);
@@ -220,9 +223,10 @@ public class JobPointsInverseFragment extends Fragment {
         Log.d(TAG, "viewResults: Started...");
 
         if(showResults){
-            rlResults.setVisibility(View.VISIBLE);
+            animateViewSlideVisible(rlResults,true,300);
+
         }else{
-            rlResults.setVisibility(View.GONE);
+            animateViewSlideVisible(rlResults,false,300);
         }
 
 
@@ -357,6 +361,33 @@ public class JobPointsInverseFragment extends Fragment {
             Toast.makeText(getActivity(), data, Toast.LENGTH_LONG).show();
 
         }
+    }
+
+    private void animateViewSlideVisible(final View view, boolean toShowView, long duration){
+        if(toShowView){
+            view.setVisibility(View.VISIBLE);
+            view.setAlpha(0.0f);
+
+            view.animate()
+                    .setDuration(duration)
+                    .setInterpolator(new BounceInterpolator())
+                    .translationY(0)
+                    .alpha(1.0f)
+                    .setListener(null);
+        }else{
+            view.animate()
+                    .setDuration(duration)
+                    .translationY(-view.getHeight())
+                    .alpha(0.0f)
+                    .setListener(new AnimatorListenerAdapter() {
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            super.onAnimationEnd(animation);
+                            view.setVisibility(View.GONE);
+                        }
+                    });
+        }
+
     }
 
     //----------------------------------------------------------------------------------------------//

@@ -24,7 +24,13 @@ public class ProjectContract {
         public static final String KEY_STORAGESPACE = "storage";
         public static final String KEY_UNITSMEASURE = "units";
         public static final String KEY_PROJECTION = "projection";
+        public static final String KEY_PROJECTION_STRING = "projectionString";
+        public static final String KEY_PROJECTION_STRATEGY = "projectionStrategy";
+        public static final String KEY_PROJECTION_SCALE = "projectionScale";
+        public static final String KEY_PROJECTION_ORIGIN_NORTH = "projectionOriginNorth";
+        public static final String KEY_PROJECTION_ORIGIN_EAST = "projectionOriginEast";
         public static final String KEY_ZONE = "zone";
+        public static final String KEY_ZONE_STRING = "zoneString";
         public static final String KEY_GEOLAT = "latitude";
         public static final String KEY_GEOLON = "longitude";
         public static final String KEY_IMAGE_SYSTEM = "systemImage";

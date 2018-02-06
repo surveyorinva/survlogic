@@ -13,6 +13,7 @@
     <string name="general_add">Add</string>
     <string name="general_post">Post</string>
     <string name="general_clear">Clear</string>
+    <string name="general_none">None</string>
     <string name="general_solve">Solve</string>
     <string name="general_delete">Delete</string>
     <string name="general_open">Open</string>
@@ -162,7 +163,6 @@
     <string name="project_new_location_ortho_default">Ortho Height:  (Not Defined)</string>
     <string name="project_new_location_ortho_value">Ortho Height:  %1$s</string>
 
-
     <string name="project_new_photo_button_label">Choose Picture</string>
     <string name="project_new_dialog_title">Get Project Site Photo</string>
     <string name="project_new_dialog_takePhoto">Take Photo</string>
@@ -172,6 +172,13 @@
     <string name="project_new_validation_project_save_success">Project Saved!</string>
     <string name="project_new_validation_project_update_success">Project Updated!</string>
     <string name="project_new_validation_project_save_failed">Error Saving Project.  Please try again.</string>
+
+    <string name="project_new_projection_spinner_Select_New_Projection">Select New Projection</string>
+    <string name="project_new_projection_validation_project_not_entered_for_strategy">Strategy set to collect GPS Data.  A Projection is Required.  \nPlease pick a Projection before continuing</string>
+    <string name="project_new_projection_validation_zone_not_entered">Projection has Zones.  \nPlease pick a Zone before continuing</string>
+    <string name="project_new_projection_validation_scale_factor_null">Scale Factor cannot be null.</string>
+    <string name="project_new_projection_validation_origin_northing_null">Origin Northing cannot be null.</string>
+    <string name="project_new_projection_validation_origin_easting_null">Origin Easting cannot be null.</string>
 
     <!--Project Details View-->
     <string name="project_details_category_summary">Summary</string>
@@ -409,7 +416,6 @@
     <string name="cogo_hint_distance">X,XXX.xx</string>
     <string name="cogo_hint_distance_font_small"><font size="15">X,XXX.xx</font></string>
 
-
     <string name="cogo_point_no_not_entered">Point Number Required</string>
     <string name="cogo_point_no_exists">Point Number Exists</string>
     <string name="cogo_point_height_not_entered">Target Height Required</string>
@@ -425,10 +431,8 @@
     <string name="cogo_description_not_entered">Point Description Required</string>
     <string name="cogo_setup_no_occupy_backsight">"Occupy and Backsight Not Set"</string>
 
-
     <string name="cogo_traverse_time_to_move_title">Traverse</string>
     <string name="cogo_traverse_time_to_move_message">Are you Ready to Move to Next Station</string>
-
 
     <string name="cogo_mapcheck_finish_title">Exit from Mapcheck?</string>
     <string name="cogo_mapcheck_finish_message">Existing will remove all data that has been logged for this map entry.  Continue to Exit?</string>
@@ -456,9 +460,6 @@
     <string name="tools_curve_tangent">Tangent:</string>
     <string name="tools_curve_chordDistance">Chord:</string>
     <string name="tools_curve_chordDirection">Direction:</string>
-
-
-
     <!-- ******************************Strings related to Settings****************************** -->
 
     <!--**************************Current Job Preferences**************************-->

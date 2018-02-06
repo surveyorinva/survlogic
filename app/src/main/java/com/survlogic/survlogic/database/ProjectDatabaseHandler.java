@@ -40,7 +40,13 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
             + ProjectContract.ProjectEntry.KEY_STORAGESPACE + " INTEGER,"
             + ProjectContract.ProjectEntry.KEY_UNITSMEASURE + " INTEGER,"
             + ProjectContract.ProjectEntry.KEY_PROJECTION + " INTEGER,"
+            + ProjectContract.ProjectEntry.KEY_PROJECTION_STRING + " TEXT,"
             + ProjectContract.ProjectEntry.KEY_ZONE + " INTEGER,"
+            + ProjectContract.ProjectEntry.KEY_ZONE_STRING + " TEXT,"
+            + ProjectContract.ProjectEntry.KEY_PROJECTION_STRATEGY + " INTEGER,"
+            + ProjectContract.ProjectEntry.KEY_PROJECTION_SCALE + " DOUBLE,"
+            + ProjectContract.ProjectEntry.KEY_PROJECTION_ORIGIN_NORTH + " DOUBLE,"
+            + ProjectContract.ProjectEntry.KEY_PROJECTION_ORIGIN_EAST + " DOUBLE,"
             + ProjectContract.ProjectEntry.KEY_GEOLAT + " DOUBLE,"
             + ProjectContract.ProjectEntry.KEY_GEOLON + " DOUBLE,"
             + ProjectContract.ProjectEntry.KEY_IMAGE_SYSTEM + " INTEGER,"
@@ -92,9 +98,9 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // Drop older table if existed
         Log.d(TAG, "onUpgrade: Updating Tables to new Version...");
-        db.execSQL("DROP IF TABLE EXISTS " + ProjectContract.ProjectEntry.TABLE_NAME);
-        db.execSQL("DROP IF TABLE EXISTS " + ProjectContract.ProjectImageEntry.TABLE_NAME);
-        db.execSQL("DROP IF TABLE EXISTS " + ProjectContract.ProjectJobEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + ProjectContract.ProjectEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + ProjectContract.ProjectImageEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + ProjectContract.ProjectJobEntry.TABLE_NAME);
 
         // Create tables again
         onCreate(db);
@@ -120,8 +126,18 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
         contentValues.put(ProjectContract.ProjectEntry.KEY_PROJECTNAME,project.getmProjectName());
         contentValues.put(ProjectContract.ProjectEntry.KEY_STORAGESPACE,project.getmStorage());
         contentValues.put(ProjectContract.ProjectEntry.KEY_UNITSMEASURE,project.getmUnits());
+
+        // Projection
         contentValues.put(ProjectContract.ProjectEntry.KEY_PROJECTION,project.getmProjection());
+        contentValues.put(ProjectContract.ProjectEntry.KEY_PROJECTION_STRING,project.getProjectionString());
+
         contentValues.put(ProjectContract.ProjectEntry.KEY_ZONE,project.getmZone());
+        contentValues.put(ProjectContract.ProjectEntry.KEY_ZONE_STRING,project.getZoneString());
+
+        contentValues.put(ProjectContract.ProjectEntry.KEY_PROJECTION_STRATEGY,project.getSurveyStrategy());
+        contentValues.put(ProjectContract.ProjectEntry.KEY_PROJECTION_SCALE,project.getProjectionScale());
+        contentValues.put(ProjectContract.ProjectEntry.KEY_PROJECTION_ORIGIN_NORTH,project.getProjectionOriginNorth());
+        contentValues.put(ProjectContract.ProjectEntry.KEY_PROJECTION_ORIGIN_EAST,project.getProjectionOriginEast());
 
         //  Optional Fields
         contentValues.put(ProjectContract.ProjectEntry.KEY_GEOLAT,project.getmLocationLat());

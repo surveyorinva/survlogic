@@ -73,6 +73,9 @@
     <string name="pref_key_current_job_cogo_sideshot_hAngle">pref_key_current_job_cogo_sideshot_hAngle</string>
     <string name="pref_key_current_job_cogo_sideshot_distance">pref_key_current_job_cogo_sideshot_distance</string>
 
+    <string name="pref_key_default_project_projection_scale">pref_key_default_project_projection_scale</string>
+    <string name="pref_key_default_project_projection_origin_North">pref_key_default_project_projection_origin_East</string>
+    <string name="pref_key_default_project_projection_origin_East">pref_key_default_project_projection_origin_East</string>
 
     <!-- Default preference values -->
     <string name="pref_gps_min_time_default_sec">1</string>
@@ -103,6 +106,14 @@
     <string name="KEY_SETUP_BACKSIGHT_HT">KEY_SETUP_BACKSIGHT_HT</string>
 
     <string name="KEY_ARRAY_LIST_MAPCHECK">KEY_ARRAY_LIST_MAPCHECK</string>
+
+    <string name="KEY_PROJECTION_ISEDIT">KEY_PROJECTION_ISEDIT</string>
+    <string name="KEY_PROJECTION_STRING">KEY_PROJECTION_STRING</string>
+    <string name="KEY_PROJECTION_ZONE_STRING">KEY_PROJECTION_ZONE_STRING</string>
+    <string name="KEY_PROJECTION_STRATEGY">KEY_PROJECTION_STRATEGY</string>
+    <string name="KEY_PROJECTION_STRATEGY_SCALE">KEY_PROJECTION_STRATEGY_SCALE</string>
+    <string name="KEY_PROJECTION_STRATEGY_ORIGIN_NORTHING">KEY_PROJECTION_STRATEGY_ORIGIN_NORTHING</string>
+    <string name="KEY_PROJECTION_STRATEGY_ORIGIN_EASTING">KEY_PROJECTION_STRATEGY_ORIGIN_EASTING</string>
 
     <!--Intent Answers-->
     <string name="ANSWER_Project_New">ANSWER_project_new</string>

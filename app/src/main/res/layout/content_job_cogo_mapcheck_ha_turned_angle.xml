@@ -81,7 +81,7 @@
             android:layout_weight="30"
             android:gravity="center"
             android:hint="@string/cogo_hint_degrees_three"
-            android:inputType="number"
+            android:inputType="numberSigned"
             android:nextFocusDown="@+id/hAngle_tangle_min"
             style="@style/InputField.EditText"
             android:background="@drawable/editbox_background_normal" />

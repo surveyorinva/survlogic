@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+
+    <string-array name="projection_new_titles">
+        <item>@string/general_none</item>
+        <item>Select New Projection</item>
+
+    </string-array>
+
+    <string-array name="projection_added_titles">
+        <item>(Projection)</item>
+        <item>@string/general_clear</item>
+        <item>@string/general_edit</item>
+    </string-array>
+
     <!-- ******************************Strings related to Projections****************************** -->
     <!--Look-up at: http://epsg.io/ -->
     <!--//2283  - NAD83(2011)  2924- NAD83(HARN) - VA North-->
@@ -20,12 +33,12 @@
     <!-- Grid Projections ** ->
     <!-******-Name of Datum,Country of Origin, Required GeodeticCRS, Zone (Y/N), Zone Designation, Returned Units (0=Meters, 1=Int. Feet, 2=USFeet),this EPSG -->
     <string-array name="gridCRS_list_titles">
+        <item>None, ,EPSG:0,false,,EPSG:0</item>
         <item>SPCS 1983,USA,EPSG:4269,true,SPCS,2,EPSG:0</item>
     </string-array>
 
-    <string-array name="gridCRS_list_values">
-        <item>0</item>
-    </string-array>
+    <string name="projection_none">None, ,EPSG:0,false,,EPSG:0</string>
+    <string name="projection_zone_none">None,0,EPSG:0,EPSG:0</string>
 
     <!-- Zone Projections ** ->
     <!- ZONE**** Name of Zone, Zone No, Required GeodeticCRS,this EPSG -->
@@ -38,13 +51,5 @@
         <item>Virginia-South,(VA-S-4502),EPSG:4269,EPSG:2284</item>
     </string-array>
 
-    <string-array name="zone_SPCS_list_values">
-        <item>2222</item>
-        <item>2223</item>
-        <item>2224</item>
-        <item>2248</item>
-        <item>2283</item>
-        <item>2284</item>
-    </string-array>
 
 </resources>

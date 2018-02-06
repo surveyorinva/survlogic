@@ -7,12 +7,15 @@ package com.survlogic.survlogic.model;
 
 public class Project {
 
-    String mProjectName, mProjectDescription, mImagePath;
-    int mId, mStorage, mUnits;
-    int mProjection, mZone, mSystemImage;
-    int mDateCreated, mDateAccessed, mDateModified;
-    double mLocationLat, mLocationLong;
-    byte[] mImage;
+    private String mProjectName, mProjectDescription, mImagePath;
+    private int mId, mStorage, mUnits;
+    private int mProjection, mZone, mSystemImage;
+    private String projectionString, zoneString;
+    private int surveyStrategy;
+    private double projectionScale, projectionOriginNorth, projectionOriginEast;
+    private int mDateCreated, mDateAccessed, mDateModified;
+    private double mLocationLat, mLocationLong;
+    private byte[] mImage;
 
 
     public Project() {
@@ -175,5 +178,53 @@ public class Project {
 
     public void setmImagePath(String mImagePath) {
         this.mImagePath = mImagePath;
+    }
+
+    public String getProjectionString() {
+        return projectionString;
+    }
+
+    public void setProjectionString(String projectionString) {
+        this.projectionString = projectionString;
+    }
+
+    public String getZoneString() {
+        return zoneString;
+    }
+
+    public void setZoneString(String zoneString) {
+        this.zoneString = zoneString;
+    }
+
+    public int getSurveyStrategy() {
+        return surveyStrategy;
+    }
+
+    public void setSurveyStrategy(int surveyStrategy) {
+        this.surveyStrategy = surveyStrategy;
+    }
+
+    public double getProjectionScale() {
+        return projectionScale;
+    }
+
+    public void setProjectionScale(double projectionScale) {
+        this.projectionScale = projectionScale;
+    }
+
+    public double getProjectionOriginNorth() {
+        return projectionOriginNorth;
+    }
+
+    public void setProjectionOriginNorth(double projectionOriginNorth) {
+        this.projectionOriginNorth = projectionOriginNorth;
+    }
+
+    public double getProjectionOriginEast() {
+        return projectionOriginEast;
+    }
+
+    public void setProjectionOriginEast(double projectionOriginEast) {
+        this.projectionOriginEast = projectionOriginEast;
     }
 }

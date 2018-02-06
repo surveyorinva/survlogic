@@ -56,8 +56,13 @@ public class ProjectNewActivity extends AppCompatActivity {
     private static final int ACTIVITY_KEY = 1;
     private static final int REQUEST_TAKE_PHOTO= 2;
     private static final int REQUEST_SELECT_PICTURE=3;
+    private static final int REQUEST_PROJECTION = 4;
+    private static final int KEY_PRJ_NEW = 0, KEY_PRJ_ADD = 1;
     private static Context mContext;
     private FileHelper fileHelper;
+
+    private Project project = new Project();
+
 
     private EditText etProjectName;
     private TextView tvLocation_latitude, tvLocation_longitude, tvLocation_latitude_value,tvLocation_longitude_value ;
@@ -70,34 +75,36 @@ public class ProjectNewActivity extends AppCompatActivity {
     private Bitmap mBitmap, mBitmapPolished, mBitmapRaw;
 
     String mProjectName;
-    int mId, mStorage, mUnits;
-    int mProjection, mZone;
-    int mImageSystem = 0; //system generated value to determine if user took picture or use internal picture 0 = internal 1=user
-    double mLocationLat = 0, mLocationLong = 0;
+    private int mId, mStorage, mUnits;
+    private int mProjection, mZone;
+    private int mImageSystem = 0; //system generated value to determine if user took picture or use internal picture 0 = internal 1=user
+    private double mLocationLat = 0, mLocationLong = 0;
 
-    private String[] projectionChoices = {"None", "Select New Projection"};
-    private ArrayAdapter<String> projectionAdapter;
+    private String mSelectedProjectionString, mSelectedZoneString;
+    private int mSelectedStrategy = 0;
+    private double mSelectedProjectionScale, mSelectedProjectionOriginNorthing, mSelectedProjectionOriginEasting;
+
+    private boolean isThereAProjection = false, isThereAZone = false;
+    private String[] projectionChoices, projectionAdded;
+    private ArrayAdapter<String> projectionAdapterNew, projectionAdapterAdded;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_project_new);
-
+        mContext = ProjectNewActivity.this;
+        fileHelper = new FileHelper(mContext);
         Log.d(TAG, "Started onCreateView");
 
         initView();
-
 
     }
 
 
     private void initView(){
         Log.d(TAG, "initView: Started...");
-        mContext = ProjectNewActivity.this;
-        fileHelper = new FileHelper(mContext);
-
-
         etProjectName = (EditText) findViewById(R.id.project_name_in_project_new);
+        etProjectName.setSelectAllOnFocus(true);
 
         spStorage = (Spinner) findViewById(R.id.storage_prompt_in_project_new);
         spUnits = (Spinner) findViewById(R.id.units_prompt_in_project_new);
@@ -119,8 +126,11 @@ public class ProjectNewActivity extends AppCompatActivity {
         btnCancel = (Button) findViewById(R.id.Cancel_button);
 
 
-        initProjectionAdapter();
+        initProjectionAdapterNew();
+        setProjectionSpinnerAdapter(KEY_PRJ_NEW);
+
         setOnClickListeners();
+        populateProjectWithProjection();
 
     }
 
@@ -162,7 +172,8 @@ public class ProjectNewActivity extends AppCompatActivity {
                     getValues();
 
                     // Create Project model
-                    Project project = new Project(mProjectName,mStorage,mUnits,mProjection,mZone,mLocationLat,mLocationLong,mImageSystem,mImagePath);
+                    project.setmSystemImage(mImageSystem);
+                    project.setmImagePath(mImagePath);
 
                     // Setup Background Task
                     BackgroundProjectNew backgroundProjectNew = new BackgroundProjectNew(ProjectNewActivity.this);
@@ -176,59 +187,262 @@ public class ProjectNewActivity extends AppCompatActivity {
         });
 
 
-        spProjection.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                switch (projectionChoices[position]){
+    }
 
-                    case "None":
 
-                        break;
+    private void dispatchPhotoFromGalleryIntent() throws IOException{
+        Intent intent = new Intent(Intent.ACTION_PICK,android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        intent.setType("image/*");
+        startActivityForResult(Intent.createChooser(intent, "Select Picture"),REQUEST_SELECT_PICTURE);
 
-                    case "Select New Projection":
-                        openNewProjectionActivity();
+    }
 
-                        break;
+    //----------------------------------------------------------------------------------------------//
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.d(TAG, "onActivityResult: RequestCode: " + requestCode + "ResultCode: " + resultCode);
+        if (ACTIVITY_KEY == requestCode) {
+            if(resultCode == Activity.RESULT_OK){
+
+                mLocationLat = data.getDoubleExtra(getString(R.string.KEY_POSITION_LATITUDE),0);
+                mLocationLong = data.getDoubleExtra(getString(R.string.KEY_POSITION_LONGITUDE),0);
+
+                project.setmLocationLat(mLocationLat);
+                project.setmLocationLong(mLocationLong);
+
+                String strLatitude = SurveyMathHelper.convertDECtoDMSGeodetic(mLocationLat,3,false);
+                //tvLocation_latitude.setText(getString(R.string.project_new_location_latitude_value,strLatitude));
+                tvLocation_latitude.setText(getString(R.string.project_new_location_latitude_title));
+                tvLocation_latitude_value.setText(strLatitude);
+                tvLocation_latitude_value.setVisibility(View.VISIBLE);
+
+                String strLongitude = SurveyMathHelper.convertDECtoDMSGeodetic(mLocationLong,3,true);
+                //tvLocation_longitude.setText(getString(R.string.project_new_location_longitude_value,strLongitude));
+                tvLocation_longitude.setText(getString(R.string.project_new_location_longitude_title));
+                tvLocation_longitude_value.setText(strLongitude);
+                tvLocation_longitude_value.setVisibility(View.VISIBLE);
+
+            }
+        }else if(REQUEST_TAKE_PHOTO == requestCode && resultCode == RESULT_OK){
+            Uri imageUri = Uri.parse(mCurrentPhotoPath);
+            File file = new File(imageUri.getPath());
+            try {
+                mBitmapRaw=decodeUri(imageUri,400);
+                mBitmap = rotateImageIfRequired(mBitmapRaw,imageUri);
+                ivPreview.setImageBitmap(mBitmap);
+
+                Uri uri = fileHelper.saveImageToExternal(mBitmap);
+                mImagePath = fileHelper.uriToString(uri);
+
+                mImageSystem = 1;
+
+            } catch (Exception e) {
+                showToast("Caught Error: Could not set Photo to Image from Camera",true);
+
+            }
+
+        }else if(REQUEST_SELECT_PICTURE == requestCode && resultCode == RESULT_OK){
+            if (data != null) {
+
+
+                try {
+                    final Uri imageUri = data.getData();
+                    File file = new File(imageUri.getPath());
+//                    final InputStream imageStream = getContentResolver().openInputStream(imageUri);
+//                    final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
+
+                    if (imageUri !=null){
+                        mBitmapRaw=decodeUri(imageUri,400);
+                        mBitmap = rotateImageIfRequired(mBitmapRaw,imageUri);
+                        ivPreview.setImageBitmap(mBitmap);
+
+                        Uri uri = fileHelper.saveImageToExternal(mBitmap);
+                        mImagePath = fileHelper.uriToString(uri);
+
+                        mImageSystem = 1;
+                        project.setmSystemImage(mImageSystem);
+                    }
+
+
+                } catch (Exception e) {
+                    showToast("Caught Error: Could not set Photo to Image from Gallery",true);
 
                 }
             }
+        }else if(REQUEST_PROJECTION == requestCode){
+            if(resultCode == RESULT_CANCELED){
+                Log.d(TAG, "onActivityResult: Canceled");
 
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
+                if(!isThereAProjection){
+                    setProjectionSpinnerAdapter(KEY_PRJ_NEW);
+                }else{
+                    spProjection.setSelection(0);
+                }
 
+
+            }else if(resultCode == RESULT_OK){
+                Log.d(TAG, "onActivityResult: Success");
+                String displayName;
+
+                mSelectedProjectionString = data.getStringExtra(getString(R.string.KEY_PROJECTION_STRING));
+                String[] separatedProjectionValue = mSelectedProjectionString.split(",");
+                String projectionName = separatedProjectionValue[0];
+                displayName = projectionName;
+
+                if(projectionName.equals(getResources().getString(R.string.general_none))){
+                    isThereAProjection = true;
+                }
+                Boolean isZone = Boolean.valueOf(separatedProjectionValue[3]);
+
+
+                if(isZone){
+                    mSelectedZoneString = data.getStringExtra(getString(R.string.KEY_PROJECTION_ZONE_STRING));
+                    String[] separatedZoneValue = mSelectedZoneString.split(",");
+                    String zoneName = separatedZoneValue[0];
+                    displayName = zoneName;
+
+                    isThereAZone = true;
+                }else{
+                    mSelectedZoneString = getResources().getString(R.string.projection_zone_none);
+
+                    isThereAZone = false;
+                }
+
+                mSelectedStrategy = data.getIntExtra(getString(R.string.KEY_PROJECTION_STRATEGY),0);
+                mSelectedProjectionScale = data.getDoubleExtra(getString(R.string.KEY_PROJECTION_STRATEGY_SCALE),0);
+                mSelectedProjectionOriginNorthing= data.getDoubleExtra(getString(R.string.KEY_PROJECTION_STRATEGY_ORIGIN_NORTHING),0);
+                mSelectedProjectionOriginEasting = data.getDoubleExtra(getString(R.string.KEY_PROJECTION_STRATEGY_ORIGIN_EASTING),0);
+
+                projectionAdded = getResources().getStringArray(R.array.projection_added_titles);
+                projectionAdded[0]=displayName;
+
+                initProjectionAdapterAdded();
+                setProjectionSpinnerAdapter(KEY_PRJ_ADD);
+                populateProjectWithProjection();
             }
-        });
+        }
+    }
+
+    //----------------------------------------------------------------------------------------------//
+
+    private void initProjectionAdapterNew(){
+        Log.d(TAG, "initProjectionAdapterNew: ");
+        projectionChoices = getResources().getStringArray(R.array.projection_new_titles);
+
+
+        projectionAdapterNew = new ArrayAdapter<String>(ProjectNewActivity.this,android.R.layout.simple_spinner_item,projectionChoices);
+        projectionAdapterNew.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        spProjection.setAdapter(projectionAdapterNew);
+        spProjection.setSelection(0);
+
 
     }
 
-    private void initProjectionAdapter(){
-        Log.d(TAG, "initProjectionAdapter: ");
-        projectionAdapter = new ArrayAdapter<String>(ProjectNewActivity.this,android.R.layout.simple_spinner_item,projectionChoices);
-        projectionAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+    private void initProjectionAdapterAdded(){
+        Log.d(TAG, "initProjectionAdapterAdded: ");
 
-        spProjection.setAdapter(projectionAdapter);
+        projectionAdapterAdded = new ArrayAdapter<String>(ProjectNewActivity.this,android.R.layout.simple_spinner_item,projectionAdded);
+        projectionAdapterAdded.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
 
     }
 
+    private void setProjectionSpinnerAdapter(int type){
+        Log.d(TAG, "setProjectionSpinnerAdapter: ");
+
+        spProjection.setOnItemSelectedListener(null);
+
+        switch (type){
+            case KEY_PRJ_NEW: //New
+                spProjection.setAdapter(projectionAdapterNew);
+
+                spProjection.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                        if(projectionChoices[position].equals(getResources().getString(R.string.general_none))){
+                            //Do something here
+
+
+                        }else if(projectionChoices[position].equals(getResources().getString(R.string.project_new_projection_spinner_Select_New_Projection))){
+                            openNewProjectionActivity();
+                        }
+
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
+                break;
+
+            case KEY_PRJ_ADD: //Added
+                spProjection.setAdapter(projectionAdapterAdded);
+
+                spProjection.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        if(projectionAdded[position].equals(getResources().getString(R.string.general_clear))){
+                            clearProjectionFromActivity();
+
+
+                        }else if(projectionAdded[position].equals(getResources().getString(R.string.general_edit))){
+                            openEditProjectionActivity();
+                        }
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
+
+        }
+    }
 
     private void openNewProjectionActivity(){
         Log.d(TAG, "openNewProjectionActivity: ");
 
         Intent i = new Intent(this, ProjectNewProjectionActivity.class);
-//        i.putExtra(getString(R.string.KEY_PROJECT_ID),project_id);
-//        i.putExtra(getString(R.string.KEY_JOB_ID), job_id);
-//        i.putExtra(getString(R.string.KEY_JOB_DATABASE), jobDatabaseName);
-
-        startActivity(i);
+        startActivityForResult(i,REQUEST_PROJECTION);
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
 
+    }
+
+    private void openEditProjectionActivity(){
+        Log.d(TAG, "openEditProjectionActivity: ");
+
+        Intent i = new Intent(this, ProjectNewProjectionActivity.class);
+        i.putExtra(getString(R.string.KEY_PROJECTION_ISEDIT), true);
+        i.putExtra(getString(R.string.KEY_PROJECTION_STRING),mSelectedProjectionString);
+        i.putExtra(getString(R.string.KEY_PROJECTION_ZONE_STRING),mSelectedZoneString);
+        i.putExtra(getString(R.string.KEY_PROJECTION_STRATEGY),mSelectedStrategy);
+        i.putExtra(getString(R.string.KEY_PROJECTION_STRATEGY_SCALE),mSelectedProjectionScale);
+        i.putExtra(getString(R.string.KEY_PROJECTION_STRATEGY_ORIGIN_NORTHING),mSelectedProjectionOriginNorthing);
+        i.putExtra(getString(R.string.KEY_PROJECTION_STRATEGY_ORIGIN_EASTING),mSelectedProjectionOriginEasting);
+
+        startActivityForResult(i,REQUEST_PROJECTION);
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
 
 
     }
 
 
+    private void clearProjectionFromActivity(){
+        Log.d(TAG, "clearProjectionFromActivity: Started");
 
+        setProjectionSpinnerAdapter(KEY_PRJ_NEW);
+        mSelectedProjectionString = getResources().getString(R.string.projection_none);
+        mSelectedZoneString = getResources().getString(R.string.projection_zone_none);
+
+
+    }
+
+    //----------------------------------------------------------------------------------------------//
     private void callImageSelectionDialog(){
         final CharSequence[] items = { getString(R.string.project_new_dialog_takePhoto), getString(R.string.project_new_dialog_getImage),
                 getString(R.string.general_cancel) };
@@ -334,82 +548,6 @@ public class ProjectNewActivity extends AppCompatActivity {
     }
 
 
-    private void dispatchPhotoFromGalleryIntent() throws IOException{
-        Intent intent = new Intent(Intent.ACTION_PICK,android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        intent.setType("image/*");
-        startActivityForResult(Intent.createChooser(intent, "Select Picture"),REQUEST_SELECT_PICTURE);
-
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (this.ACTIVITY_KEY == requestCode) {
-            if(resultCode == Activity.RESULT_OK){
-
-                mLocationLat = data.getDoubleExtra(getString(R.string.KEY_POSITION_LATITUDE),0);
-                mLocationLong = data.getDoubleExtra(getString(R.string.KEY_POSITION_LONGITUDE),0);
-
-                String strLatitude = SurveyMathHelper.convertDECtoDMSGeodetic(mLocationLat,3,false);
-                //tvLocation_latitude.setText(getString(R.string.project_new_location_latitude_value,strLatitude));
-                tvLocation_latitude.setText(getString(R.string.project_new_location_latitude_title));
-                tvLocation_latitude_value.setText(strLatitude);
-                tvLocation_latitude_value.setVisibility(View.VISIBLE);
-
-                String strLongitude = SurveyMathHelper.convertDECtoDMSGeodetic(mLocationLong,3,true);
-                //tvLocation_longitude.setText(getString(R.string.project_new_location_longitude_value,strLongitude));
-                tvLocation_longitude.setText(getString(R.string.project_new_location_longitude_title));
-                tvLocation_longitude_value.setText(strLongitude);
-                tvLocation_longitude_value.setVisibility(View.VISIBLE);
-
-            }
-        }else if(this.REQUEST_TAKE_PHOTO == requestCode && resultCode == RESULT_OK){
-            Uri imageUri = Uri.parse(mCurrentPhotoPath);
-            File file = new File(imageUri.getPath());
-            try {
-                mBitmapRaw=decodeUri(imageUri,400);
-                mBitmap = rotateImageIfRequired(mBitmapRaw,imageUri);
-                ivPreview.setImageBitmap(mBitmap);
-
-                Uri uri = fileHelper.saveImageToExternal(mBitmap);
-                mImagePath = fileHelper.uriToString(uri);
-
-                mImageSystem = 1;
-
-            } catch (Exception e) {
-                showToast("Caught Error: Could not set Photo to Image from Camera",true);
-
-            }
-
-        }else if(this.REQUEST_SELECT_PICTURE == requestCode && resultCode == RESULT_OK){
-            if (data != null) {
-
-
-                try {
-                    final Uri imageUri = data.getData();
-                    File file = new File(imageUri.getPath());
-//                    final InputStream imageStream = getContentResolver().openInputStream(imageUri);
-//                    final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
-
-                    if (imageUri !=null){
-                        mBitmapRaw=decodeUri(imageUri,400);
-                        mBitmap = rotateImageIfRequired(mBitmapRaw,imageUri);
-                        ivPreview.setImageBitmap(mBitmap);
-
-                        Uri uri = fileHelper.saveImageToExternal(mBitmap);
-                        mImagePath = fileHelper.uriToString(uri);
-
-                        mImageSystem = 1;
-                    }
-
-
-                } catch (Exception e) {
-                    showToast("Caught Error: Could not set Photo to Image from Gallery",true);
-
-                }
-            }
-        }
-    }
 
     protected Bitmap decodeUri(Uri selectedImage, int REQUIRED_SIZE) {
 
@@ -488,12 +626,22 @@ public class ProjectNewActivity extends AppCompatActivity {
 
     }
 
+
+
+
+    //----------------------------------------------------------------------------------------------//
+
     private void goToGpsSurveyActivity(){
         Intent intent = new Intent(this, GpsSurveyActivity.class);
         startActivityForResult(intent,ACTIVITY_KEY);
 
     }
 
+
+
+
+
+    //----------------------------------------------------------------------------------------------//
     private boolean verifyDataset(int controlValue){
         boolean results = false;
 
@@ -505,6 +653,7 @@ public class ProjectNewActivity extends AppCompatActivity {
                     showToast(txtVerification,true);
                 }else{
                     results = true;
+                    project.setmProjectName(etProjectName.getText().toString());
                 }
 
                 break;
@@ -530,6 +679,32 @@ public class ProjectNewActivity extends AppCompatActivity {
         return results;
     }
 
+    private void populateProjectWithProjection(){
+        Log.d(TAG, "populateProjectWithProjection: Started");
+
+        if(isThereAProjection){
+            project.setmProjection(1);
+        }else{
+            project.setmProjection(0);
+        }
+
+        project.setProjectionString(mSelectedProjectionString);
+
+        if(isThereAZone){
+            project.setmZone(1);
+        }else{
+            project.setmZone(0);
+        }
+
+        project.setZoneString(mSelectedZoneString);
+
+        project.setSurveyStrategy(mSelectedStrategy);
+        project.setProjectionScale(mSelectedProjectionScale);
+        project.setProjectionOriginNorth(mSelectedProjectionOriginNorthing);
+        project.setProjectionOriginEast(mSelectedProjectionOriginEasting);
+
+    }
+    
     private void getValues(){
 
         //1
@@ -539,21 +714,13 @@ public class ProjectNewActivity extends AppCompatActivity {
         int storage_pos = spStorage.getSelectedItemPosition();
         String [] storage_values = getResources().getStringArray(R.array.project_storage_values);
         mStorage = Integer.valueOf(storage_values[storage_pos]);
+        project.setmStorage(mStorage);
 
         //3
         int units_pos = spUnits.getSelectedItemPosition();
         String[] units_values = getResources().getStringArray(R.array.unit_measure_values);
         mUnits = Integer.valueOf(units_values[units_pos]);
-
-        //4
-        int projection_pos = spProjection.getSelectedItemPosition();
-        String [] projection_values = getResources().getStringArray(R.array.project_projection_values);
-        mProjection = Integer.valueOf(projection_values[projection_pos]);
-
-        //5
-        int zone_pos = spZone.getSelectedItemPosition();
-        String [] zone_values = getResources().getStringArray(R.array.project_projection_zones_values);
-        mZone = Integer.valueOf(zone_values[zone_pos]);
+        project.setmUnits(mUnits);
 
         //6
         if (mImageSystem == 1){
@@ -572,6 +739,8 @@ public class ProjectNewActivity extends AppCompatActivity {
 
     }
 
+
+    //----------------------------------------------------------------------------------------------//
 
     private void showToast(String data, boolean shortTime) {
 
