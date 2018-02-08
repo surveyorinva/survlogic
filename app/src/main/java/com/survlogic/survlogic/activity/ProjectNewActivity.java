@@ -180,12 +180,20 @@ public class ProjectNewActivity extends AppCompatActivity {
 
                     // Execute background task
                     backgroundProjectNew.execute(project);
-                    finish();
+                    returnResults();
                 }
 
             }
         });
+    }
 
+    private void returnResults(){
+        Log.d(TAG, "returnResults: Started");
+        Intent returnIntent = new Intent();
+        returnIntent.putExtra(getString(R.string.KEY_PROJECT_NAME),mProjectName);
+
+        setResult(Activity.RESULT_OK,returnIntent);
+        finish();
 
     }
 
@@ -291,7 +299,7 @@ public class ProjectNewActivity extends AppCompatActivity {
                 String projectionName = separatedProjectionValue[0];
                 displayName = projectionName;
 
-                if(projectionName.equals(getResources().getString(R.string.general_none))){
+                if(!projectionName.equals(getResources().getString(R.string.general_none))){
                     isThereAProjection = true;
                 }
                 Boolean isZone = Boolean.valueOf(separatedProjectionValue[3]);

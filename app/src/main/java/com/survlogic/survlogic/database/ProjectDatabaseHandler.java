@@ -284,6 +284,10 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
                 project.setmUnits(c.getInt(c.getColumnIndex(ProjectContract.ProjectEntry.KEY_UNITSMEASURE)));
                 project.setmProjection(c.getInt(c.getColumnIndex(ProjectContract.ProjectEntry.KEY_PROJECTION)));
                 project.setmZone(c.getInt(c.getColumnIndex(ProjectContract.ProjectEntry.KEY_ZONE)));
+
+                project.setProjectionString(c.getString(c.getColumnIndex(ProjectContract.ProjectEntry.KEY_PROJECTION_STRING)));
+                project.setZoneString(c.getString(c.getColumnIndex(ProjectContract.ProjectEntry.KEY_ZONE_STRING)));
+
                 project.setmLocationLat(c.getDouble(c.getColumnIndex(ProjectContract.ProjectEntry.KEY_GEOLAT)));
                 project.setmLocationLong(c.getDouble(c.getColumnIndex(ProjectContract.ProjectEntry.KEY_GEOLON)));
                 project.setmSystemImage(c.getInt(c.getColumnIndex(ProjectContract.ProjectEntry.KEY_IMAGE_SYSTEM)));
@@ -345,6 +349,11 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
             project.setmUnits(c.getInt(c.getColumnIndex(ProjectContract.ProjectEntry.KEY_UNITSMEASURE)));
             project.setmProjection(c.getInt(c.getColumnIndex(ProjectContract.ProjectEntry.KEY_PROJECTION)));
             project.setmZone(c.getInt(c.getColumnIndex(ProjectContract.ProjectEntry.KEY_ZONE)));
+        //------------------------------------------------------------------------------------------//
+            project.setProjectionString(c.getString(c.getColumnIndex(ProjectContract.ProjectEntry.KEY_PROJECTION_STRING)));
+            project.setZoneString(c.getString(c.getColumnIndex(ProjectContract.ProjectEntry.KEY_ZONE_STRING)));
+        //------------------------------------------------------------------------------------------//
+
             project.setmLocationLat(c.getDouble(c.getColumnIndex(ProjectContract.ProjectEntry.KEY_GEOLAT)));
             project.setmLocationLong(c.getDouble(c.getColumnIndex(ProjectContract.ProjectEntry.KEY_GEOLON)));
             project.setmSystemImage(c.getInt(c.getColumnIndex(ProjectContract.ProjectEntry.KEY_IMAGE_SYSTEM)));
@@ -371,6 +380,10 @@ public class ProjectDatabaseHandler extends SQLiteOpenHelper {
         values.put(ProjectContract.ProjectEntry.KEY_UNITSMEASURE, project.getmUnits());
         values.put(ProjectContract.ProjectEntry.KEY_PROJECTION, project.getmProjection());
         values.put(ProjectContract.ProjectEntry.KEY_ZONE, project.getmZone());
+
+        values.put(ProjectContract.ProjectEntry.KEY_PROJECTION_STRING,project.getProjectionString());
+        values.put(ProjectContract.ProjectEntry.KEY_ZONE_STRING,project.getZoneString());
+
         values.put(ProjectContract.ProjectEntry.KEY_GEOLAT, project.getmLocationLat());
         values.put(ProjectContract.ProjectEntry.KEY_GEOLON, project.getmLocationLong());
         values.put(ProjectContract.ProjectEntry.KEY_IMAGE_SYSTEM, project.getmSystemImage());

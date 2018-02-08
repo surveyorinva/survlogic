@@ -29,8 +29,11 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.adapter.ActivityViewPagerAdapter;
 import com.survlogic.survlogic.background.BackgroundProjectList;
+import com.survlogic.survlogic.background.BackgroundProjectListFromActivity;
 import com.survlogic.survlogic.fragment.MainHomeFragment;
 import com.survlogic.survlogic.fragment.MainToolsFragment;
+import com.survlogic.survlogic.interf.ProjectListListener;
+import com.survlogic.survlogic.model.Project;
 import com.survlogic.survlogic.utils.UniversalImageLoader;
 
 import java.util.ArrayList;
@@ -38,7 +41,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, ProjectListListener {
 
     private static final String TAG = "MainActivity";
 
@@ -52,6 +55,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private ActivityViewPagerAdapter viewPagerAdapter;
     public FloatingActionButton fab;
     private long previousTime;
+    //----------------------------------------------------------//
+    private ArrayList<Project> lstProjects = new ArrayList<>();
+    private MainHomeFragment mainHomeFragment;
+    //----------------------------------------------------------//
+    private static final int REQUEST_GET_NEW_PROJECT = 1;
 
 
 
@@ -67,7 +75,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         initViewNavigation();
         initImageLoader();
 
+        loadProjectsInBackground();
+
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.d(TAG, "onActivityResult: Started");
+        if (REQUEST_GET_NEW_PROJECT == requestCode) {
+            if (resultCode == RESULT_OK) {
+                loadProjectsInBackground();
+
+            }
+        }
+
+    }
+
+    //----------------------------------------------------------------------------------------------//
 
     private void initView(){
         toolbar = (Toolbar) findViewById(R.id.toolbar_in_app_bar_layout);
@@ -90,7 +115,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         viewPager = (ViewPager) findViewById(R.id.viewpager_in_app_bar_layout);
 
         viewPagerAdapter = new ActivityViewPagerAdapter(getSupportFragmentManager());
-        viewPagerAdapter.addFragments(new MainHomeFragment(),"Home");
+
+        //------------------------------------------------------------------------------------------//
+
+        mainHomeFragment = new MainHomeFragment();
+
+        //------------------------------------------------------------------------------------------//
+        viewPagerAdapter.addFragments(mainHomeFragment,"Home");
         viewPagerAdapter.addFragments(new MainToolsFragment(),"Tools");
 
         viewPager.setAdapter(viewPagerAdapter);
@@ -146,8 +177,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
 
             case R.id.menu_item4_id:
-                intent.setClass(this,ProjectDetailsActivity.class);
-                startActivity(intent);
+
                 break;
 
             case R.id.menu_item5_id:
@@ -206,7 +236,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void goToNewProjectForm(){
         Intent i = new Intent(this, ProjectNewActivity.class);
-        startActivity(i);
+        startActivityForResult(i,REQUEST_GET_NEW_PROJECT);
     }
 
     public FloatingActionButton getFloatingActionButton() {
@@ -232,4 +262,31 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         ImageLoader.getInstance().init(universalImageLoader.getConfig());
     }
 
+    //----------------------------------------------------------------------------------------------//
+    private void loadProjectsInBackground(){
+        Log.d(TAG, "loadProjectsInBackground: Started");
+
+        BackgroundProjectListFromActivity backgroundProjectList = new BackgroundProjectListFromActivity(mContext,this);
+        backgroundProjectList.execute();
+
+
+    }
+
+
+    //----------------------------------------------------------------------------------------------//
+    @Override
+    public void getProjectList(ArrayList<Project> lstProjects) {
+        Log.d(TAG, "getProjectList: Started");
+        this.lstProjects = lstProjects;
+
+        if(mainHomeFragment !=null){
+            mainHomeFragment.setArrayListProjects(lstProjects);
+        }
+
+    }
+
+    @Override
+    public void refreshProjectList() {
+        loadProjectsInBackground();
+    }
 }

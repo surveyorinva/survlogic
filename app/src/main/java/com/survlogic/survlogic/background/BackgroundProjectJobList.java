@@ -15,6 +15,7 @@ import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.adapter.ProjectJobListAdaptor;
 import com.survlogic.survlogic.adapter.ProjectListAdaptor;
 import com.survlogic.survlogic.database.ProjectDatabaseHandler;
+import com.survlogic.survlogic.interf.ProjectDetailsActivityListener;
 import com.survlogic.survlogic.model.Project;
 import com.survlogic.survlogic.model.ProjectJobs;
 
@@ -31,10 +32,6 @@ public class BackgroundProjectJobList extends AsyncTask <ProjectJobs,ProjectJobs
 
     private Context context;
     private Activity activity;
-
-    private RecyclerView recyclerView;
-    private ProjectJobListAdaptor adapter;
-    private RecyclerView.LayoutManager layoutManager;
 
     private ArrayList<ProjectJobs> arrayList = new ArrayList<ProjectJobs>();
 
@@ -79,15 +76,6 @@ public class BackgroundProjectJobList extends AsyncTask <ProjectJobs,ProjectJobs
 
     @Override
     protected void onPreExecute() {
-        dialog.setMessage("Retrieving ");
-        dialog.setIndeterminate(true);
-        dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        dialog.setCancelable(false);
-        dialog.show();
-
-        initProjectJobsListRecyclerView();
-
-
         super.onPreExecute();
 
     }
@@ -97,12 +85,14 @@ public class BackgroundProjectJobList extends AsyncTask <ProjectJobs,ProjectJobs
         super.onProgressUpdate(values);
 
         arrayList.add(values[0]);
-        adapter.notifyDataSetChanged();
     }
 
     @Override
     protected void onPostExecute(String result) {
         super.onPostExecute(result);
+
+        ProjectDetailsActivityListener listener = (ProjectDetailsActivityListener) activity;
+        listener.refreshJobBoard(arrayList);
 
         if (dialog.isShowing()) {
             dialog.dismiss();
@@ -126,23 +116,5 @@ public class BackgroundProjectJobList extends AsyncTask <ProjectJobs,ProjectJobs
 
     }
 
-
-    private void initProjectJobsListRecyclerView(){
-
-        Log.e(TAG,"Start: initProjectJobsListRecyclerView");
-
-        recyclerView = (RecyclerView) activity.findViewById(R.id.recycler_view_in_card_project_job_detail);
-
-        layoutManager = new LinearLayoutManager(context);
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setHasFixedSize(false);
-
-        adapter = new ProjectJobListAdaptor(context,arrayList);
-        recyclerView.setAdapter(adapter);
-        recyclerView.setVisibility(View.VISIBLE);
-
-        Log.e(TAG,"Complete: initProjectJobsListRecyclerView");
-
-    }
 
 }

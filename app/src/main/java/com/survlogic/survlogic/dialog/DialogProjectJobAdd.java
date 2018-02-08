@@ -112,7 +112,6 @@ public class DialogProjectJobAdd extends DialogFragment {
 
             saveJobInBackground();
 
-            //Todo Send User to Job Activity from Here or refresh list on Project Detail Activity
 
             Log.d(TAG, "submitForm: Closing Dialog");
             dismiss();

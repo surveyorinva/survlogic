@@ -5,14 +5,16 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.adapter.ProjectListAdaptor;
-import com.survlogic.survlogic.database.JobDatabaseHandler;
-import com.survlogic.survlogic.interf.JobPointsMapListener;
-import com.survlogic.survlogic.model.PointGeodetic;
+import com.survlogic.survlogic.database.ProjectDatabaseHandler;
+import com.survlogic.survlogic.interf.ProjectListListener;
+import com.survlogic.survlogic.model.Project;
 
 import java.util.ArrayList;
 
@@ -20,47 +22,40 @@ import java.util.ArrayList;
  * Created by chrisfillmore on 6/29/2017.
  */
 
-public class BackgroundGeodeticPointGet extends AsyncTask <PointGeodetic,PointGeodetic,ArrayList<PointGeodetic>> {
+public class BackgroundProjectListFromActivity extends AsyncTask <Project,Project,ArrayList<Project>> {
 
-    private static final String TAG = "BackgroundGeodeticPoint";
+    private static final String TAG = "BackgroundProjectList";
     private ProgressDialog dialog;
 
     private Context context;
     private Activity activity;
 
-    private String DB_NAME;
-
-    private final JobPointsMapListener mListener;
-
     RecyclerView recyclerView;
     ProjectListAdaptor adapter;
     RecyclerView.LayoutManager layoutManager;
 
-    ArrayList<PointGeodetic> arrayList = new ArrayList<PointGeodetic>();
+    ProjectListListener projectListListener;
+    ArrayList<Project> arrayList = new ArrayList<Project>();
 
-
-    public BackgroundGeodeticPointGet(Context context, String DB_NAME, JobPointsMapListener listener) {
+    public BackgroundProjectListFromActivity(Context context, ProjectListListener projectListListener) {
         this.context = context;
-        this.dialog = new ProgressDialog(context);
-        this.DB_NAME = DB_NAME;
 
-        mListener = listener;
         activity = (Activity) context;
+        this.projectListListener = projectListListener;
     }
 
 
     @Override
-    protected ArrayList<PointGeodetic> doInBackground(PointGeodetic... params) {
+    protected ArrayList<Project> doInBackground(Project... params) {
         try{
-            Log.d(TAG, "doInBackground: Started");
+            Log.d(TAG, "doInBackground: Connecting to db");
+            ProjectDatabaseHandler projectDb = new ProjectDatabaseHandler(context);
+            SQLiteDatabase db = projectDb.getReadableDatabase();
 
-            JobDatabaseHandler jobDb = new JobDatabaseHandler(context, DB_NAME);
-            SQLiteDatabase db = jobDb.getReadableDatabase();
+            final ArrayList<Project> projects = new ArrayList<Project>(projectDb.getProjectsAll(db));
 
-            final ArrayList<PointGeodetic> points = new ArrayList<PointGeodetic>(jobDb.getPointGeodeticAll(db));
-
-            for(PointGeodetic point:points){
-                publishProgress(point);
+            for(Project project:projects){
+                publishProgress(project);
             }
 
             Log.d(TAG, "doInBackground: Closing connection to DB");
@@ -84,20 +79,22 @@ public class BackgroundGeodeticPointGet extends AsyncTask <PointGeodetic,PointGe
     }
 
     @Override
-    protected void onProgressUpdate(PointGeodetic... values) {
+    protected void onProgressUpdate(Project... values) {
         super.onProgressUpdate(values);
 
         arrayList.add(values[0]);
+
     }
 
     @Override
-    protected void onPostExecute(ArrayList<PointGeodetic> result) {
+    protected void onPostExecute(ArrayList<Project> result) {
         super.onPostExecute(result);
 
-        if (mListener != null){
+        if (projectListListener != null){
             Log.d(TAG, "Points Geodetic Loaded: " + arrayList.size());
-            mListener.getPointsGeodetic(arrayList);
+            projectListListener.getProjectList(arrayList);
         }
+
     }
 
     private void showToast(String data, boolean shortTime) {

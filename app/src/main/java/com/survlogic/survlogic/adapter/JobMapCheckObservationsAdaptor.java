@@ -11,6 +11,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.view.inputmethod.EditorInfo;
 import android.widget.CompoundButton;
 import android.widget.PopupMenu;
@@ -139,6 +141,7 @@ public class JobMapCheckObservationsAdaptor extends RecyclerView.Adapter<Recycle
             case EDIT:
                 Card_View_Holder_Job_Mapcheck_Add vh3 = (Card_View_Holder_Job_Mapcheck_Add) holder;
                 configureViewHolderEdit(vh3,position);
+
                 break;
 
         }
@@ -375,6 +378,7 @@ public class JobMapCheckObservationsAdaptor extends RecyclerView.Adapter<Recycle
         });
 
 
+
     }
     private void configureViewHolderAdd(final Card_View_Holder_Job_Mapcheck_Add view, final int position) {
         Log.d(TAG, "configureViewHolderAdd: Started...");
@@ -459,17 +463,15 @@ public class JobMapCheckObservationsAdaptor extends RecyclerView.Adapter<Recycle
     }
 
 
-    private void setAnimationbyHelper(RecyclerView.ViewHolder holder, int position){
-
-        if(position > lastPosition){ // We are scrolling DOWN
-            AnimateHelper.animateRecyclerView(holder, true);
-
-        }else{ // We are scrolling UP
-            AnimateHelper.animateRecyclerView(holder, false);
-
+    private void setAnimation(View viewToAnimate, int position)
+    {
+        // If the bound view wasn't previously displayed on screen, it's animated
+        if (position > lastPosition)
+        {
+            Animation animation = AnimationUtils.loadAnimation(mContext, R.anim.anim_recycler_item_show);
+            viewToAnimate.startAnimation(animation);
+            lastPosition = position;
         }
-
-        lastPosition = position;
     }
 
     public void setTouchHelper(ItemTouchHelper touchHelper){

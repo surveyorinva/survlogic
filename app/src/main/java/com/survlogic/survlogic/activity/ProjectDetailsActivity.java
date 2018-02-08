@@ -25,6 +25,8 @@ import android.support.v4.content.FileProvider;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Gravity;
@@ -48,9 +50,11 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.survlogic.survlogic.BuildConfig;
 import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.adapter.ProjectGridImageAdapter;
+import com.survlogic.survlogic.adapter.ProjectJobListAdaptor;
 import com.survlogic.survlogic.background.BackgroundProjectDetails;
 import com.survlogic.survlogic.background.BackgroundProjectJobList;
 import com.survlogic.survlogic.database.ProjectDatabaseHandler;
+import com.survlogic.survlogic.interf.ProjectDetailsActivityListener;
 import com.survlogic.survlogic.model.Project;
 import com.survlogic.survlogic.model.ProjectImages;
 import com.survlogic.survlogic.model.ProjectJobs;
@@ -74,7 +78,7 @@ import java.util.Date;
  * Created by chrisfillmore on 7/2/2017.
  */
 
-public class ProjectDetailsActivity extends AppCompatActivity implements OnMapReadyCallback, AppBarLayout.OnOffsetChangedListener {
+public class ProjectDetailsActivity extends AppCompatActivity implements OnMapReadyCallback, AppBarLayout.OnOffsetChangedListener, ProjectDetailsActivityListener {
 
     private static final String TAG = "ProjectDetailsActivity";
     private static final int REQUEST_TAKE_PHOTO = 2;
@@ -84,11 +88,12 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
     private static final int DELAY_TO_GRID = 2000;
 
     private SwipeRefreshLayout swipeRefreshLayout;
-    private CoordinatorLayout rootLayout;
     private AppBarLayout appBarLayout;
     private Toolbar toolbar;
     private CollapsingToolbarLayout collapsingToolbar;
     private GoogleMap mMap;
+    private boolean isShowMapCommands = false;
+
 
     private static Context mContext;
     private ImageHelper imageHelper;
@@ -112,6 +117,14 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
 
     private GridView gridView;
     private ProjectGridImageAdapter gridAdapter;
+    private boolean isGridAdapterSetup = false;
+
+
+    private RecyclerView recyclerView;
+    private ProjectJobListAdaptor adapter;
+    private RecyclerView.LayoutManager layoutManager;
+
+    private ArrayList<ProjectJobs> lstProjectJobs = new ArrayList<>();
 
     private ProgressDialog progressDialog;
 
@@ -130,6 +143,7 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
 
         initViewNavigation();
         initView();
+        initJobAdapter();
         setOnClickListeners();
         showProgressBar();
 
@@ -158,12 +172,8 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
         boolean results = initValuesFromObject();
 
         if (results){
-            Log.d(TAG, "initView: Populated fields OK");
-            Log.d(TAG, "showMapView: Started");
             showMapView();
-            Log.d(TAG, "initGridView: Started");
             showGridView();
-            Log.d(TAG, "showRecyclerView: Started");
             showRecyclerView();
             showProgressBar();
 
@@ -179,7 +189,7 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (this.REQUEST_TAKE_PHOTO == requestCode && resultCode == RESULT_OK) {
+        if (REQUEST_TAKE_PHOTO == requestCode && resultCode == RESULT_OK) {
             Uri imageUri = Uri.parse(mCurrentPhotoPath);
             File file = new File(imageUri.getPath());
 
@@ -193,7 +203,7 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
                 showToast("Caught Error: Could not set Photo to Image from Camera",true);
 
             }
-        } else if (this.REQUEST_SELECT_PICTURE == requestCode && resultCode == RESULT_OK) {
+        } else if (REQUEST_SELECT_PICTURE == requestCode && resultCode == RESULT_OK) {
             if (data != null) {
 
 
@@ -288,6 +298,9 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
 
         gridView = (GridView) findViewById(R.id.photo_grid_view);
 
+        recyclerView = (RecyclerView) findViewById(R.id.recycler_view_in_card_project_job_detail);
+        layoutManager = new LinearLayoutManager(mContext);
+
         pbLoading = (ProgressBar) findViewById(R.id.progressBar_Loading);
 
         Log.e(TAG, "initView: Views formed");
@@ -357,7 +370,7 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
             ProjectDatabaseHandler projectDb = new ProjectDatabaseHandler(this);
             SQLiteDatabase db = projectDb.getReadableDatabase();
 
-            Project project = projectDb.getProjectById(db,projectID);
+            project = projectDb.getProjectById(db,projectID);
 
             locationLatitude = project.getmLocationLat();
             locationLongitude = project.getmLocationLong();
@@ -377,13 +390,13 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
             String [] units_values = getResources().getStringArray(R.array.unit_measure_entries);
             tvUnits.setText(units_values[units_pos]);
 
-            int projection_pos = project.getmProjection();
-            String [] projection_values = getResources().getStringArray(R.array.project_projection_titles);
-            tvProjection.setText(projection_values[projection_pos]);
 
-            int zone_pos = project.getmZone();
-            String [] zone_values = getResources().getStringArray(R.array.project_projection_zones_titles);
-            tvZone.setText(zone_values[zone_pos]);
+            //--------------------------------------------------------------------------------------//
+
+            initProjectionDetails();
+
+
+            //--------------------------------------------------------------------------------------//
 
             int storage_pos = project.getmStorage();
             String [] storage_values = getResources().getStringArray(R.array.project_storage_titles);
@@ -440,8 +453,45 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
     }
 
     //-------------------------------------------------------------------------------------------------------------------------//
+    private void initProjectionDetails(){
+        Log.d(TAG, "initProjectionDetails: Started");
+
+        boolean isThereAProjection = false, isThereAZone = false;
 
 
+        if (project.getmProjection() == 1){
+            isThereAProjection = true;
+            String projectionString = project.getProjectionString();
+            String[] separatedProjectionValue = projectionString.split(",");
+            String projectionName = separatedProjectionValue[0];
+
+            tvProjection.setText(projectionName);
+        }else{
+            tvProjection.setText(getResources().getString(R.string.general_none));
+        }
+
+        if (project.getmZone() == 1){
+            isThereAZone = true;
+            String zoneString = project.getZoneString();
+            String[] separatedProjectionValue = zoneString.split(",");
+            String zoneName = separatedProjectionValue[0];
+
+            tvZone.setText(zoneName);
+        }else{
+            tvZone.setText(getResources().getString(R.string.general_none));
+        }
+
+    }
+
+
+    private void initJobAdapter(){
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setHasFixedSize(false);
+
+        adapter = new ProjectJobListAdaptor(mContext,lstProjectJobs);
+        recyclerView.setAdapter(adapter);
+        recyclerView.setVisibility(View.VISIBLE);
+    }
 
     //-------------------------------------------------------------------------------------------------------------------------//
 
@@ -559,14 +609,28 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(project,15));
 
 
+
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
-                //do something here
+                if(isShowMapCommands){
+                    isShowMapCommands = false;
+                    mMap.getUiSettings().setMapToolbarEnabled(false);
+                }else{
+                    isShowMapCommands = true;
+                    mMap.getUiSettings().setMapToolbarEnabled(true);
+                }
             }
         });
 
+
+
     }
+
+
+
+
+
 
     //-------------------------------------------------------------------------------------------------------------------------//
 
@@ -590,6 +654,7 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
             gridAdapter = new ProjectGridImageAdapter(this, R.layout.layout_grid_imageview, mURLSyntex, getImageFromProjectData(projectID));
             gridView.setAdapter(gridAdapter);
             gridView.setVisibility(View.VISIBLE);
+            isGridAdapterSetup = true;
         }
     }
 
@@ -597,6 +662,10 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
         if(getImageCount(projectID)){
 
             //Todo GridAdapter on 1st run does not exist.  Need to check and see if gridAdapter has been created, if not, create
+
+            if(!isGridAdapterSetup){
+                initGridView();
+            }
 
             gridAdapter.clear();
 
@@ -649,6 +718,7 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
      */
 
     private void showProjectsDetailsLocalRefresh(){
+        initValuesFromObject();
         refreshGridView();
 
         if(swipeRefreshLayout.isRefreshing()){
@@ -681,16 +751,6 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
         BackgroundProjectJobList backgroundProjectJobList = new BackgroundProjectJobList(mContext, projectID);
         backgroundProjectJobList.execute();
     }
-
-    private void initRecyclerView(){
-
-    }
-
-
-    private void refreshRecyclerView(){
-
-    }
-
 
 
     //-------------------------------------------------------------------------------------------------------------------------//
@@ -920,6 +980,31 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
             return true;
         }
 
+
+    }
+
+    //----------------------------------------------------------------------------------------------//
+    @Override
+    public void refreshView() {
+        initValuesFromObject();
+    }
+
+
+    @Override
+    public void refreshJobBoardWithNewJob() {
+        showRecyclerView();
+    }
+
+    @Override
+    public void refreshJobBoard(ArrayList<ProjectJobs> lstJobs) {
+        lstProjectJobs = lstJobs;
+
+        if(adapter != null){
+            Log.d(TAG, "refreshJobBoard: Adapter Not Null");
+            adapter.swapDataSet(lstProjectJobs);
+        }else{
+            Log.d(TAG, "refreshJobBoard: Adapter Null");
+        }
 
     }
 

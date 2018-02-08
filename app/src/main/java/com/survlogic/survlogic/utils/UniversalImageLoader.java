@@ -2,6 +2,7 @@ package com.survlogic.survlogic.utils;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -22,15 +23,17 @@ import com.survlogic.survlogic.R;
 
 public class UniversalImageLoader {
 
-
+    private static final String TAG = "UniversalImageLoader";
     private static final int defaultImage = R.drawable.ic_default_image;
     private Context mContext;
 
     public UniversalImageLoader(Context mContext) {
+        Log.d(TAG, "UniversalImageLoader: Started");
         this.mContext = mContext;
     }
 
     public ImageLoaderConfiguration getConfig(){
+        Log.d(TAG, "getConfig: Started");
         DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder()
                 .showImageOnLoading(defaultImage)
                 .showImageForEmptyUri(defaultImage)
@@ -60,7 +63,7 @@ public class UniversalImageLoader {
      */
 
     public static void setImage(String imgURL, ImageView image, final ProgressBar mProgressBar, String append){
-
+        Log.d(TAG, "setImage: Started");
         ImageLoader imageLoader = ImageLoader.getInstance();
         imageLoader.displayImage(append + imgURL, image, new ImageLoadingListener() {
             @Override

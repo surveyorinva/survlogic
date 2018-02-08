@@ -11,6 +11,7 @@ import android.widget.Toast;
 import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.database.JobDatabaseHandler;
 import com.survlogic.survlogic.database.ProjectDatabaseHandler;
+import com.survlogic.survlogic.interf.ProjectDetailsActivityListener;
 import com.survlogic.survlogic.model.PointSurvey;
 import com.survlogic.survlogic.model.Project;
 import com.survlogic.survlogic.model.ProjectJobSettings;
@@ -104,6 +105,10 @@ public class BackgroundProjectJobNew extends AsyncTask <ProjectJobs,ProjectJobs,
     @Override
     protected void onPostExecute(String result) {
         super.onPostExecute(result);
+
+        ProjectDetailsActivityListener listener = (ProjectDetailsActivityListener) activity;
+        listener.refreshJobBoardWithNewJob();
+
 
         if (dialog.isShowing()) {
             dialog.dismiss();

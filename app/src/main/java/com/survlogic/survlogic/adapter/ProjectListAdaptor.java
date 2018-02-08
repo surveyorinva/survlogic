@@ -61,6 +61,7 @@ public class ProjectListAdaptor extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        Log.d(TAG, "onCreateViewHolder: Started");
         RecyclerView.ViewHolder viewHolder;
         LayoutInflater mInflater = LayoutInflater.from(parent.getContext());
 
@@ -117,7 +118,8 @@ public class ProjectListAdaptor extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-       switch (holder.getItemViewType()){
+        Log.d(TAG, "onBindViewHolder: Started");
+        switch (holder.getItemViewType()){
 
             case SMALL:
                 Card_View_Holder_Project_Small vh1 = (Card_View_Holder_Project_Small) holder;
@@ -136,13 +138,15 @@ public class ProjectListAdaptor extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     @Override
     public int getItemCount() {
+        Log.d(TAG, "getItemCount: Project Size: " + projects.size());
         return projects.size();
     }
 
     private void configureViewHolderSmall(final Card_View_Holder_Project_Small vh1, int position) {
-
+        Log.d(TAG, "configureViewHolderSmall: Started");
         final Project project = projects.get(position);
         final int projectID = project.getmId();
+        Log.d(TAG, "configureViewHolderSmall: Project ID:" + projectID);
 
 
 //        Project ID
@@ -150,17 +154,20 @@ public class ProjectListAdaptor extends RecyclerView.Adapter<RecyclerView.ViewHo
 
 
 //        Project Name
+        Log.d(TAG, "configureViewHolderSmall: Loading Project Name: " + project.getmProjectName());
+
         vh1.txtProjectName.setText(project.getmProjectName());
 
 //        Location
+        Log.d(TAG, "configureViewHolderSmall: Loading Location");
         if(project.getmLocationLat() != 0){
-            vh1.txtLocation.setText(mContext.getString(R.string.project_card_location_geo,
+            vh1.txtLocation.setText( mContext.getResources().getString(R.string.project_card_location_geo,
                     SurveyMathHelper.convertDECtoDMSGeodetic(project.getmLocationLat(),1,true),
                     SurveyMathHelper.convertDECtoDMSGeodetic(project.getmLocationLong(),1,true)));
         }
 
 //        Image
-
+        Log.d(TAG, "configureViewHolderSmall: Loading Image");
         ImageLoader imageLoader = ImageLoader.getInstance();
         imgURL = project.getmImagePath();
 
@@ -196,16 +203,21 @@ public class ProjectListAdaptor extends RecyclerView.Adapter<RecyclerView.ViewHo
                     }
                 });
 
+
+        Log.d(TAG, "configureViewHolderSmall: Loading Transition Animation");
         ViewCompat.setTransitionName(vh1.imgProjectImage, project.getmProjectName());
         Pair<View,String> pair1 = Pair.create((View)vh1.imgProjectImage,vh1.imgProjectImage.getTransitionName());
 
 //        Date
+        Log.d(TAG, "configureViewHolderSmall: Loading Date: " + project.getmDateCreated());
         int d = project.getmDateCreated();
         String stringDate = TimeHelper.getDateinFormat(d,dateFormat);
+        Log.d(TAG, "configureViewHolderSmall: Converted Date: " + stringDate);
 
-        vh1.txtLastModify.setText(mContext.getString(R.string.project_card_last_modified_date_create,
-                stringDate));
+        vh1.txtLastModify.setText(mContext.getResources().getString(R.string.project_card_last_modified_date_create,stringDate));
 
+
+        Log.d(TAG, "configureViewHolderSmall: Setting OnClick Buttons");
         vh1.mCardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -262,7 +274,7 @@ public class ProjectListAdaptor extends RecyclerView.Adapter<RecyclerView.ViewHo
         lastPosition = position;
     }
 
-    private void setXMLAnimation(View viewToAnimate, int position)
+    private void setAnimation(View viewToAnimate, int position)
     {
         // If the bound view wasn't previously displayed on screen, it's animated
         if (position > lastPosition)
@@ -272,6 +284,7 @@ public class ProjectListAdaptor extends RecyclerView.Adapter<RecyclerView.ViewHo
             lastPosition = position;
         }
     }
+
 
     private void setFadeAnimation(View view) {
         AlphaAnimation anim = new AlphaAnimation(0.0f, 1.0f);

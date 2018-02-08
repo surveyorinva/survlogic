@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.database.ProjectDatabaseHandler;
+import com.survlogic.survlogic.interf.ProjectDetailsActivityListener;
 import com.survlogic.survlogic.model.Project;
 
 /**
@@ -75,6 +76,9 @@ public class BackgroundProjectUpdate extends AsyncTask <Project,Project,String> 
     @Override
     protected void onPostExecute(String result) {
         super.onPostExecute(result);
+
+        ProjectDetailsActivityListener listener = (ProjectDetailsActivityListener) activity;
+        listener.refreshView();
 
         if (dialog.isShowing()) {
             dialog.dismiss();

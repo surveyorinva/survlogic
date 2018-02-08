@@ -3,30 +3,34 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <group android:id="@+id/grp1">
+        <item
+            android:id="@+id/toolbar_project_details_item1"
+            android:title="@string/project_details_menu_item_new_job"
+            android:orderInCategory="100"
+            app:showAsAction="never">
 
-    <item
-        android:id="@+id/toolbar_project_details_item1"
-        android:title="@string/project_details_menu_item_new_job"
-        android:orderInCategory="100"
-        app:showAsAction="never">
+        </item>
+    </group>
 
-    </item>
+    <group android:id="@+id/grp2">
+        <item
+            android:id="@+id/toolbar_project_details_item2"
+            android:title="@string/general_edit"
+            android:orderInCategory="100"
+            app:showAsAction="never">
 
-    <item
-        android:id="@+id/toolbar_project_details_item2"
-        android:title="@string/general_menu_settings"
-        android:orderInCategory="100"
-        app:showAsAction="never">
+        </item>
 
-    </item>
+        <item
+            android:id="@+id/toolbar_project_details_item3"
+            android:title="@string/general_delete"
+            android:orderInCategory="100"
+            app:showAsAction="never">
 
-    <item
-        android:id="@+id/toolbar_project_details_item3"
-        android:title="@string/general_delete"
-        android:orderInCategory="100"
-        app:showAsAction="never">
+        </item>
+    </group>
 
-    </item>
 
 
 </menu>

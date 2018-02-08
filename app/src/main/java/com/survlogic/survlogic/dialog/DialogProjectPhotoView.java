@@ -49,7 +49,9 @@ public class DialogProjectPhotoView extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.DialogGalleryStyle);
         LayoutInflater inflater = getActivity().getLayoutInflater();
 
-        View v = inflater.inflate(R.layout.dialog_gallery_photo_single,null);
+        //View v = inflater.inflate(R.layout.dialog_gallery_photo_single,null);
+        View v = inflater.inflate(R.layout.dialog_gallery_photo_single_zoomable,null);
+
         builder.setView(v);
 
         builder.create();

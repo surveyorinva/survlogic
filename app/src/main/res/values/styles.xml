@@ -28,6 +28,7 @@
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
     <style name="AppTheme.NoActionBar.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
     <style name="AppTheme.NoActionBar.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
@@ -51,9 +52,15 @@
     </style>
 
     <style name="MyToolbarTheme" parent="Theme.AppCompat.Light.NoActionBar">
-
-        <item name="android:textColorPrimary">@color/white</item>  <!-- Text color of Toolbar Title -->
+        <item name="android:textColorPrimary">@color/black</item>  <!-- Text color of Toolbar Title -->
         <item name="android:textColorSecondary">@color/white</item><!-- Color of Overflow Menu ( 3 dots icon ) and color of Navigation Drawer Icon-->
+    </style>
+
+    <style name="MyToolbarTheme.TabLayout">
+        <item name="android:textColorPrimary">@color/white</item>  <!-- Text color of Toolbar Title -->
+        <item name="android:textColorSecondary">@color/white</item>
+
+
     </style>
 
     <style name="MyPopupTheme" parent="ThemeOverlay.AppCompat.Light">

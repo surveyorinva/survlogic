@@ -26,7 +26,7 @@
             app:tabGravity="fill"
             app:tabIndicatorColor="@color/colorAccent"
             app:tabIndicatorHeight="@dimen/tab_indicator"
-            app:theme="@style/MyToolbarTheme"
+            app:theme="@style/MyToolbarTheme.TabLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 

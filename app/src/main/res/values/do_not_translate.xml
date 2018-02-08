@@ -90,6 +90,8 @@
     <string name="KEY_JOB_DATABASE">KEY_JOB_DATABASE</string>
     <string name="KEY_POINT_ID">KEY_POINT_ID</string>
     <string name="KEY_POINT_NO">KEY_POINT_NO</string>
+    <string name="KEY_PROJECT_NAME">KEY_PROJECT_NAME</string>
+
 
     <string name="KEY_Intent_FROM">KEY_Intent_FROM</string>
     <string name="KEY_POSITION_LATITUDE">KEY_LATITUDE</string>

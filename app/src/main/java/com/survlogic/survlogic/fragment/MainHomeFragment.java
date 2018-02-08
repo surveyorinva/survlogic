@@ -9,6 +9,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -23,9 +24,15 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.activity.MainActivity;
+import com.survlogic.survlogic.adapter.ProjectListAdaptor;
 import com.survlogic.survlogic.background.BackgroundProjectList;
 import com.survlogic.survlogic.background.BackgroundProjectListRefresh;
 import com.survlogic.survlogic.database.ProjectDatabaseHandler;
+import com.survlogic.survlogic.interf.ProjectListListener;
+import com.survlogic.survlogic.model.PointSurvey;
+import com.survlogic.survlogic.model.Project;
+
+import java.util.ArrayList;
 
 /**
  * Created by chrisfillmore on 5/2/2017.
@@ -38,18 +45,26 @@ public class MainHomeFragment extends Fragment implements OnMapReadyCallback{
 
     private SwipeRefreshLayout swipeRefreshLayout;
     private RecyclerView mRecyclerView;
+    private ProjectListAdaptor adapter;
+    private RecyclerView.LayoutManager layoutManager;
+
     private FloatingActionButton fab;
 
-    private Context mContext = getActivity();
+    private Context mContext;
     private SupportMapFragment supportMapFragment;
+
+    private ArrayList<Project> lstProjectsLocal = new ArrayList<>();
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView: Started--------------------->");
         v = inflater.inflate(R.layout.fragment_main_home,container,false);
+        mContext = getActivity();
 
         initView();
+        initProjectListRecyclerView();
+        setOnClickListeners();
         
         return v;
     }
@@ -61,38 +76,32 @@ public class MainHomeFragment extends Fragment implements OnMapReadyCallback{
         initMapView();
     }
 
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
 
-        showProjectsLocal();
-
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-
-    }
 
     private void initView(){
-
+        Log.d(TAG, "initView: Started");
         fab = ((MainActivity) getActivity()).getFloatingActionButton();
 
         mRecyclerView = (RecyclerView) v.findViewById(R.id.recycler_view_in_content_project_view);
+        layoutManager = new LinearLayoutManager(mContext);
 
         swipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.swipe_view_in_content_project_view);
         swipeRefreshLayout.setColorSchemeResources(R.color.google_blue, R.color.google_green, R.color.google_red, R.color.google_yellow);
 
+
+    }
+
+
+    private void setOnClickListeners(){
+        Log.d(TAG, "setOnClickListeners: Started");
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                    showProjectsLocalRefresh();
-
+                        showProjectsLocalRefresh();
+                        swipeRefreshLayout.setRefreshing(false);
                     }
                 }, 1000);
             }
@@ -115,20 +124,12 @@ public class MainHomeFragment extends Fragment implements OnMapReadyCallback{
                 super.onScrolled(recyclerView, dx, dy);
             }
         });
-
-    }
-
-    private void showProjectsLocal(){
-        BackgroundProjectList backgroundProjectList = new BackgroundProjectList(getActivity());
-        backgroundProjectList.execute();
-
-
     }
 
     private void showProjectsLocalRefresh(){
-        BackgroundProjectListRefresh backgroundProjectListRefresh = new BackgroundProjectListRefresh(getActivity(),swipeRefreshLayout);
-        backgroundProjectListRefresh.execute();
+        ProjectListListener listener = (ProjectListListener) getActivity();
 
+        listener.refreshProjectList();
 
     }
 
@@ -164,6 +165,35 @@ public class MainHomeFragment extends Fragment implements OnMapReadyCallback{
         }
 
     }
+
+    //----------------------------------------------------------------------------------------------//
+    private void initProjectListRecyclerView(){
+        Log.d(TAG,"Start: initProjectListRecyclerView");
+
+        mRecyclerView.setLayoutManager(layoutManager);
+        mRecyclerView.setHasFixedSize(false);
+
+        adapter = new ProjectListAdaptor(mContext,lstProjectsLocal);
+        mRecyclerView.setAdapter(adapter);
+
+        Log.d(TAG,"Complete: initProjectListRecyclerView");
+
+    }
+
+    public void setArrayListProjects(ArrayList<Project> lstArray){
+        Log.d(TAG, "setArrayListPointSurvey: Started...");
+        lstProjectsLocal = lstArray;
+
+        Log.d(TAG, "setArrayListPointSurvey: Listen: " + lstProjectsLocal.size());
+
+        if(adapter != null){
+            Log.d(TAG, "setArrayListPointSurvey: Adapter Not Null");
+            adapter.swapDataSet(lstArray);
+        }else{
+            Log.d(TAG, "setArrayListProjects: Adapter Null");
+        }
+    }
+
 
 
 }
