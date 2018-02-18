@@ -15,7 +15,9 @@ import android.widget.Toast;
 
 import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.background.BackgroundProjectJobNew;
+import com.survlogic.survlogic.model.Project;
 import com.survlogic.survlogic.model.ProjectJobs;
+import com.survlogic.survlogic.utils.StringUtilityHelper;
 import com.survlogic.survlogic.utils.SurveyMathHelper;
 
 /**
@@ -28,16 +30,19 @@ public class DialogProjectJobAdd extends DialogFragment {
     private AlertDialog alertDialog;
 
     private int project_id;
-    private ProjectJobs projectJobs;
+    private ProjectJobs projectJob;
 
     private EditText etJobName, etDescription;
 
-    public static DialogProjectJobAdd newInstance(Integer mProjectId) {
+    private Project mProject;
+
+    public static DialogProjectJobAdd newInstance(Integer mProjectId, Project project) {
 
         DialogProjectJobAdd frag = new DialogProjectJobAdd();
         Bundle args = new Bundle();
 
         args.putInt("project_id", mProjectId);
+        args.putParcelable("project", project);
 
         frag.setArguments(args);
         return frag;
@@ -48,6 +53,7 @@ public class DialogProjectJobAdd extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
         project_id = getArguments().getInt("project_id");
+        mProject = getArguments().getParcelable("project");
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(),R.style.DialogPopupStyle);
         LayoutInflater inflater = getActivity().getLayoutInflater();
@@ -98,28 +104,34 @@ public class DialogProjectJobAdd extends DialogFragment {
         String jobDatabaseName = SurveyMathHelper.getRandomString(8) + ".db";
 
 
-        //Todo convert the isStringNull to the StringUtilityHelper class for more control
-        if(!isStringNull(jobName)){
-            Log.d(TAG, "submitForm: Creating ProjectJobs with Description");
-            if(!isStringNull(description)){
-                projectJobs = new ProjectJobs(project_id,jobName,jobDatabaseName,description);
+        if(!StringUtilityHelper.isStringNull(jobName)){
 
-            }else{
-                Log.d(TAG, "submitForm: Creating ProjectJobs without a Description");
-                projectJobs = new ProjectJobs(project_id,jobName,jobDatabaseName);
+            projectJob = new ProjectJobs();
+            projectJob.setProjectId(project_id);
+            projectJob.setmJobName(jobName);
+            projectJob.setmJobDbName(jobDatabaseName);
 
+            projectJob.setProjection(mProject.getmProjection());
+            projectJob.setProjectionString(mProject.getProjectionString());
+
+            projectJob.setProjectionZone(mProject.getmZone());
+            projectJob.setZoneString(mProject.getZoneString());
+
+            if(!StringUtilityHelper.isStringNull(description)) {
+                projectJob.setmJobDescription(description);
             }
 
             saveJobInBackground();
-
-
-            Log.d(TAG, "submitForm: Closing Dialog");
             dismiss();
-        }else{
-            Log.d(TAG, "submitForm: Closing Dialog");
-            String txtVerification = getString(R.string.job_new_validation_job_name_error);
-            showToast(txtVerification,true);
+
+        }else {
+            if(StringUtilityHelper.isStringNull(jobName)) {
+                etJobName.setError(mContext.getResources().getString(R.string.job_new_validation_job_name_error));
+
+            }
+
         }
+
 
     }
 
@@ -129,7 +141,7 @@ public class DialogProjectJobAdd extends DialogFragment {
         BackgroundProjectJobNew backgroundProjectJobsNew = new BackgroundProjectJobNew(mContext);
 
         // Execute background task
-        backgroundProjectJobsNew.execute(projectJobs);
+        backgroundProjectJobsNew.execute(projectJob);
 
     }
 

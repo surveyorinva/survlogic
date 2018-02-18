@@ -1,11 +1,16 @@
 package com.survlogic.survlogic.model;
 
 
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.util.Log;
+
 /**
  * Created by chrisfillmore on 6/25/2017.
  */
 
-public class Project {
+public class Project implements Parcelable {
+    private static final String TAG = "Project";
 
     private String mProjectName, mProjectDescription, mImagePath;
     private int mId, mStorage, mUnits;
@@ -73,6 +78,22 @@ public class Project {
         this.mImage = mImage;
         this.mProjectDescription = mProjectDescription;
     }
+
+
+    private Project(Parcel in){
+        this.mId = in.readInt();
+        this.mProjectName = in.readString();
+        this.mStorage = in.readInt();
+        this.mUnits = in.readInt();
+        this.mProjection = in.readInt();
+        this.projectionString = in.readString();
+        this.mZone = in.readInt();
+        this.zoneString = in.readString();
+        this.mLocationLat = in.readDouble();
+        this.mLocationLong = in.readDouble();
+        this.mProjectDescription = in.readString();
+    }
+
 
     public int getmId() {
         return mId;
@@ -227,4 +248,44 @@ public class Project {
     public void setProjectionOriginEast(double projectionOriginEast) {
         this.projectionOriginEast = projectionOriginEast;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        Log.d(TAG, "writeToParcel: Started");
+
+        dest.writeInt(mId);
+        dest.writeString(mProjectName);
+        dest.writeInt(mStorage);
+        dest.writeInt(mUnits);
+        dest.writeInt(mProjection);
+        dest.writeString(projectionString);
+        dest.writeInt(mZone);
+        dest.writeString(zoneString);
+        dest.writeDouble(mLocationLat);
+        dest.writeDouble(mLocationLong);
+        dest.writeString(mProjectDescription);
+
+
+    }
+
+    public static final Parcelable.Creator<Project> CREATOR = new Parcelable.Creator<Project>() {
+        @Override
+        public Project createFromParcel(Parcel source) {
+            return new Project(source);
+
+        }
+
+        @Override
+        public Project[] newArray(int size) {
+            return new Project[size];
+        }
+    };
+
+
+
 }

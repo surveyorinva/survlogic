@@ -34,7 +34,9 @@
     <string name="pref_key_current_job_type">pref_key_current_job_type</string>
 
     <string name="pref_key_current_job_over_projection">pref_key_current_job_over_projection</string>
+    <string name="pref_key_current_job_over_projection_string">pref_key_current_job_over_projection_string</string>
     <string name="pref_key_current_job_over_zone">pref_key_current_job_over_zone</string>
+    <string name="pref_key_current_job_over_zone_string">pref_key_current_job_over_zone_string</string>
     <string name="pref_key_current_job_over_units">pref_key_current_job_over_units</string>
 
     <string name="pref_key_current_job_attr_client">pref_key_current_job_attr_client</string>
@@ -91,7 +93,7 @@
     <string name="KEY_POINT_ID">KEY_POINT_ID</string>
     <string name="KEY_POINT_NO">KEY_POINT_NO</string>
     <string name="KEY_PROJECT_NAME">KEY_PROJECT_NAME</string>
-
+    <string name="KEY_JOB_SETTINGS">KEY_JOB_SETTINGS</string>
 
     <string name="KEY_Intent_FROM">KEY_Intent_FROM</string>
     <string name="KEY_POSITION_LATITUDE">KEY_LATITUDE</string>

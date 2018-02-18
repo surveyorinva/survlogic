@@ -35,6 +35,7 @@ import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.database.JobDatabaseHandler;
 import com.survlogic.survlogic.fragment.JobHomeHomeFragment;
+import com.survlogic.survlogic.interf.JobHomeActivityListener;
 import com.survlogic.survlogic.model.ProjectJobSettings;
 import com.survlogic.survlogic.utils.BottomNavigationViewHelper;
 import com.survlogic.survlogic.utils.PreferenceLoaderHelper;
@@ -43,7 +44,7 @@ import com.survlogic.survlogic.utils.PreferenceLoaderHelper;
  * Created by chrisfillmore on 8/2/2017.
  */
 
-public class JobHomeActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class JobHomeActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, JobHomeActivityListener {
     private static final String TAG = "JobHomeActivity";
 
     private Context mContext;
@@ -78,6 +79,12 @@ public class JobHomeActivity extends AppCompatActivity implements NavigationView
 
     private FrameLayout container;
 
+    private JobHomeHomeFragment jobHomeFragment;
+
+    private String mJobName, mProjectionString, mProjectionZoneString;
+    private int mJobUnits, mIsProjection, mIsZone;
+
+
     public Handler mHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
@@ -106,7 +113,7 @@ public class JobHomeActivity extends AppCompatActivity implements NavigationView
         initBottomNavigationView();
         initFragmentContainer(savedInstanceState);
 
-        loadPreferences();
+        loadPreferencesFromDb();
         checkPreferences();
 
     }
@@ -118,6 +125,7 @@ public class JobHomeActivity extends AppCompatActivity implements NavigationView
 
         Log.d(TAG, "onResume: Saving Preferences...");
         savePreferences();
+
     }
 
     @Override
@@ -238,6 +246,24 @@ public class JobHomeActivity extends AppCompatActivity implements NavigationView
 
     //----------------------------------------------------------------------------------------------//
 
+    private void loadPreferencesFromDb(){
+
+        rlLayout2.setVisibility(View.VISIBLE);
+        initJobSettingsFromDb();
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+
+                if(jobHomeFragment != null){
+                    jobHomeFragment.setMetadata();
+                }
+
+                rlLayout2.setVisibility(View.GONE);
+            }
+        },DELAY_TO_LOAD_SETTINGS);
+    }
+
     private void loadPreferences(){
 
         rlLayout2.setVisibility(View.VISIBLE);
@@ -245,11 +271,16 @@ public class JobHomeActivity extends AppCompatActivity implements NavigationView
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                initJobSettingsFromDb();
+
+                if(jobHomeFragment != null){
+                    jobHomeFragment.setMetadata();
+                }
+
                 rlLayout2.setVisibility(View.GONE);
             }
         },DELAY_TO_LOAD_SETTINGS);
     }
+
 
 
     private void savePreferences(){
@@ -282,16 +313,28 @@ public class JobHomeActivity extends AppCompatActivity implements NavigationView
             Log.d(TAG, "initJobSettingsFromDb: Trying to get Job Settings from DB");
             jobSettings = jobDb.getJobSettingsById(db,job_settings_id);
 
-
+            Log.d(TAG, "initJobSettingsFromDb: Job Database: " + jobDatabaseName);
             editor = sharedPreferences.edit();
 
             Log.d(TAG, "initJobSettingsFromDb: Job Settings Loading, Populating General Preferences");
             //General
             editor.putString(getString(R.string.pref_key_current_job_name),jobSettings.getJobName());
+
+            mJobName = jobSettings.getJobName();
+            Log.d(TAG, "initJobSettingsFromDb: Job Name: " + jobSettings.getJobName());
+
             editor.putString(getString(R.string.pref_key_current_job_type), String.valueOf(jobSettings.getDefaultJobType()));
             editor.putString(getString(R.string.pref_key_current_job_over_projection), String.valueOf(jobSettings.getOverrideProjection()));
+            editor.putString(getString(R.string.pref_key_current_job_over_projection_string), String.valueOf(jobSettings.getOverrideProjectionString()));
             editor.putString(getString(R.string.pref_key_current_job_over_zone), String.valueOf(jobSettings.getOverrideZone()));
+            editor.putString(getString(R.string.pref_key_current_job_over_zone_string), String.valueOf(jobSettings.getOverrideZoneString()));
             editor.putString(getString(R.string.pref_key_current_job_over_units), String.valueOf(jobSettings.getOverrideUnits()));
+
+            mIsProjection = jobSettings.getOverrideProjection();
+            mIsZone = jobSettings.getOverrideZone();
+            mProjectionString = jobSettings.getOverrideProjectionString();
+            mProjectionZoneString = jobSettings.getOverrideZoneString();
+            mJobUnits = jobSettings.getOverrideUnits();
 
             Log.d(TAG, "initJobSettingsFromDb: Loading Notes Preferences");
             //Notes
@@ -380,7 +423,9 @@ public class JobHomeActivity extends AppCompatActivity implements NavigationView
             String general_name = sharedPreferences.getString(getString(R.string.pref_key_current_job_name),getString(R.string.general_default));
             int general_type = Integer.parseInt(sharedPreferences.getString(getString(R.string.pref_key_current_job_type),"0"));
             int general_over_projection = Integer.parseInt(sharedPreferences.getString(getString(R.string.pref_key_current_job_over_projection),"0"));
+            String general_over_projection_string = sharedPreferences.getString(getString(R.string.pref_key_current_job_over_projection_string),getString(R.string.general_blank));
             int general_over_zone = Integer.parseInt(sharedPreferences.getString(getString(R.string.pref_key_current_job_over_zone),"0"));
+            String general_over_zone_string = sharedPreferences.getString(getString(R.string.pref_key_current_job_over_zone_string),getString(R.string.general_blank));
             int general_over_units = Integer.parseInt(sharedPreferences.getString(getString(R.string.pref_key_current_job_over_units),"0"));
 
             Log.d(TAG, "initJobSettingsToDb: Saving Notes Data...");
@@ -450,6 +495,9 @@ public class JobHomeActivity extends AppCompatActivity implements NavigationView
                     attr_staff_chief, attr_staff_iman, attr_staff_rman, attr_staff_other);
 
 
+            settings.setOverrideProjectionString(general_over_projection_string);
+            settings.setOverrideZoneString(general_over_zone_string);
+
             Log.d(TAG, "initJobSettingsToDb: Options_Drawer_State: " + options_drawer_state);
             Log.d(TAG, "initJobSettingsToDb: Starting Database Exchange");
             JobDatabaseHandler jobDb  = new JobDatabaseHandler(mContext,jobDatabaseName);
@@ -487,7 +535,6 @@ public class JobHomeActivity extends AppCompatActivity implements NavigationView
                 Log.d(TAG, "checkPreferences: Drawer State = True");
                 mHandler.sendEmptyMessageDelayed(MESSAGE_SHOW_DRAWER_LAYOUT, DELAY_TO_SHOW_DRAWER_LAYOUT);
             }
-
 
         }
 
@@ -556,10 +603,11 @@ public class JobHomeActivity extends AppCompatActivity implements NavigationView
                         menuItem = menu.getItem(ACTIVITY_NUM);
                         menuItem.setChecked(false);
 
-                        JobHomeHomeFragment containerFragment1 = new JobHomeHomeFragment();
-                        containerFragment1.setArguments(getIntent().getExtras());
+                        jobHomeFragment = new JobHomeHomeFragment();
+                        jobHomeFragment.setArguments(getIntent().getExtras());
 
-                        swapFragment(containerFragment1,false,"HOME");
+                        swapFragment(jobHomeFragment,false,"HOME");
+                        loadPreferences();
 
                         break;
 
@@ -582,13 +630,13 @@ public class JobHomeActivity extends AppCompatActivity implements NavigationView
                 return;
             }
 
-            JobHomeHomeFragment containerFragment = new JobHomeHomeFragment();
-            containerFragment.setArguments(getIntent().getExtras());
+            jobHomeFragment = new JobHomeHomeFragment();
+            jobHomeFragment.setArguments(getIntent().getExtras());
 
             FragmentManager fm = getSupportFragmentManager();
             FragmentTransaction ft = fm.beginTransaction();
             ft.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
-            ft.add(R.id.container_in_job_home, containerFragment, "HOME");
+            ft.add(R.id.container_in_job_home, jobHomeFragment, "HOME");
             ft.commit();
 
 
@@ -617,7 +665,6 @@ public class JobHomeActivity extends AppCompatActivity implements NavigationView
      * Method Helpers
      */
 
-
     private void showToast(String data, boolean shortTime) {
 
         if (shortTime) {
@@ -629,5 +676,36 @@ public class JobHomeActivity extends AppCompatActivity implements NavigationView
         }
     }
 
+    //----------------------------------------------------------------------------------------------//
 
+
+    @Override
+    public String getJobMetadataJobName() {
+        return mJobName;
+    }
+
+    @Override
+    public int getJobMetadataJobUnits() {
+        return mJobUnits;
+    }
+
+    @Override
+    public int getJobMetadataIsJobProjection() {
+        return mIsProjection;
+    }
+
+    @Override
+    public int getJobMetadataIsJobZone() {
+        return mIsZone;
+    }
+
+    @Override
+    public String getJobMetadataJobProjection() {
+        return mProjectionString;
+    }
+
+    @Override
+    public String getJobMetadataJobZone() {
+        return mProjectionZoneString;
+    }
 }

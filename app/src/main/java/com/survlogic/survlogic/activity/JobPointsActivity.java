@@ -36,10 +36,13 @@ import com.survlogic.survlogic.interf.JobMapOptionsListener;
 import com.survlogic.survlogic.interf.JobPointsActivityListener;
 import com.survlogic.survlogic.interf.JobPointsInversePointListListener;
 import com.survlogic.survlogic.interf.JobPointsMapListener;
+import com.survlogic.survlogic.model.Point;
 import com.survlogic.survlogic.model.PointGeodetic;
 import com.survlogic.survlogic.model.PointSurvey;
 import com.survlogic.survlogic.model.ProjectJobSettings;
 import com.survlogic.survlogic.utils.BottomNavigationViewHelper;
+import com.survlogic.survlogic.utils.PreferenceLoaderHelper;
+import com.survlogic.survlogic.utils.SurveyProjectionHelper;
 
 import java.util.ArrayList;
 
@@ -77,6 +80,13 @@ public class JobPointsActivity extends AppCompatActivity implements NavigationVi
 
     private ArrayList<PointSurvey> lstPointSurvey = new ArrayList<>();
     private ArrayList<PointGeodetic> lstPointGeodetic = new ArrayList<>();
+    private ArrayList<PointSurvey> lstPointGrid = new ArrayList<>();
+
+    private boolean isJobWithProjection = false;
+
+    private PreferenceLoaderHelper preferenceLoaderHelper;
+    SurveyProjectionHelper surveyProjectionHelper;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -86,12 +96,16 @@ public class JobPointsActivity extends AppCompatActivity implements NavigationVi
         setContentView(R.layout.activity_job_points);
         mContext = JobPointsActivity.this;
 
+        preferenceLoaderHelper = new PreferenceLoaderHelper(mContext);
+        surveyProjectionHelper = new SurveyProjectionHelper(mContext);
+
         initViewToolbar();
         initViewNavigation();
         initViewWidgets();
         initBottomNavigationView();
         initFragmentContainer(savedInstanceState);
 
+        initProjection();
         initPointDataInBackground();
     }
 
@@ -270,6 +284,7 @@ public class JobPointsActivity extends AppCompatActivity implements NavigationVi
 
                         jobPointsListFragment.setArrayListPointSurvey(lstPointSurvey);
                         jobPointsListFragment.setArrayListPointGeodetic(lstPointGeodetic);
+                        jobPointsListFragment.setArrayListPointGrid(lstPointGrid);
 
                         break;
 
@@ -389,6 +404,38 @@ public class JobPointsActivity extends AppCompatActivity implements NavigationVi
 
     //-------------------------------------------------------------------------------------------------------------------------//
 
+
+    /**
+     * Projections
+     */
+
+
+    private void initProjection(){
+        Log.d(TAG, "initProjection: Started");
+        String projectionString, zoneString;
+
+        int isProjection = 0;
+
+        isProjection = preferenceLoaderHelper.getGeneral_over_projection();
+        projectionString = preferenceLoaderHelper.getGeneral_over_projection_string();
+        zoneString = preferenceLoaderHelper.getGeneral_over_zone_string();
+
+        if(isProjection == 1){
+            surveyProjectionHelper.setConfig(projectionString,zoneString);
+        }
+
+
+    }
+
+
+
+
+
+
+
+    //----------------------------------------------------------------------------------------------//
+
+
     /**
      * Method Helpers
      */
@@ -443,6 +490,7 @@ public class JobPointsActivity extends AppCompatActivity implements NavigationVi
 
         if(jobPointsListFragment != null){
             jobPointsListFragment.setArrayListPointGeodetic(lstPointGeodetics);
+            jobPointsListFragment.setArrayListPointGrid(surveyProjectionHelper.generateGridPoints(lstPointGeodetics));
         }
 
 
@@ -458,6 +506,7 @@ public class JobPointsActivity extends AppCompatActivity implements NavigationVi
         this.lstPointSurvey = lstPointSurvey;
         if(jobPointsListFragment !=null){
             jobPointsListFragment.setArrayListPointSurvey(lstPointSurvey);
+
         }
 
 

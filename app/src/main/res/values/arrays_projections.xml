@@ -31,10 +31,10 @@
     </string-array>
 
     <!-- Grid Projections ** ->
-    <!-******-Name of Datum,Country of Origin, Required GeodeticCRS, Zone (Y/N), Zone Designation, Returned Units (0=Meters, 1=Int. Feet, 2=USFeet),this EPSG -->
+    <!-******-Name of Datum,Country of Origin, Required GeodeticCRS, Zone (Y/N), Zone Designation, Returned Units (3=Meters, 2=Int. Feet, 1=USFeet),this EPSG -->
     <string-array name="gridCRS_list_titles">
         <item>None, ,EPSG:0,false,,EPSG:0</item>
-        <item>SPCS 1983,USA,EPSG:4269,true,SPCS,2,EPSG:0</item>
+        <item>SPCS 1983,USA,"EPSG:4269",true,SPCS,1,"EPSG:0"</item>
     </string-array>
 
     <string name="projection_none">None, ,EPSG:0,false,,EPSG:0</string>
@@ -46,8 +46,8 @@
         <item>Arizona-East,(Az-E-0201),EPSG:4269,EPSG:2222</item>
         <item>Arizona-Central,(Az-C-0202),EPSG:4269,EPSG:2223</item>
         <item>Arizona-West,(Az-W-0203),EPSG:4269,EPSG:2224</item>
-        <item>Maryland,(MD-1900),EPSG:4269,EPSG:2248</item>
-        <item>Virginia-North,(VA-N-4501),EPSG:4269,EPSG:2283</item>
+        <item>Maryland,(MD-1900),"EPSG:4269","EPSG:2248"</item>
+        <item>Virginia-North,(VA-N-4501),"EPSG:4269","EPSG:2283"</item>
         <item>Virginia-South,(VA-S-4502),EPSG:4269,EPSG:2284</item>
     </string-array>
 

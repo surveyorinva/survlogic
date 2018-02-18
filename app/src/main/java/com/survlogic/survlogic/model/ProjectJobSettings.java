@@ -15,6 +15,8 @@ public class ProjectJobSettings {
     // Override variable for job-centric organization
     private int overrideProjection, overrideZone, overrideUnits;
 
+    private String overrideProjectionString, overrideZoneString;
+
     //System defaults for Data being displayed on screen
     private int systemDistanceDisplay, systemDistancePrecisionDisplay, systemCoordinatesPrecisionDisplay, systemAngleDisplay,
             formatAngleHorizontalDisplay, formatAngleVerticalObsDisplay, formatDistanceHorizontalObsDisplay;
@@ -168,6 +170,23 @@ public class ProjectJobSettings {
 
     public void setOverrideZone(int overrideZone) {
         this.overrideZone = overrideZone;
+    }
+
+
+    public String getOverrideProjectionString() {
+        return overrideProjectionString;
+    }
+
+    public void setOverrideProjectionString(String overrideProjectionString) {
+        this.overrideProjectionString = overrideProjectionString;
+    }
+
+    public String getOverrideZoneString() {
+        return overrideZoneString;
+    }
+
+    public void setOverrideZoneString(String overrideZoneString) {
+        this.overrideZoneString = overrideZoneString;
     }
 
     public int getOverrideUnits() {

@@ -482,6 +482,10 @@ public class JobPointsListFragment extends Fragment {
         }
     }
 
+    public void setArrayListPointGrid(ArrayList<PointSurvey> lstArray){
+
+    }
+
 
     private void showPointSurvey(boolean isFirstLoad){
         Log.d(TAG, "setPointSurvey: Started...");

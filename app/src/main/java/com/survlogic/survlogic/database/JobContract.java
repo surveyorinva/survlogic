@@ -63,6 +63,8 @@ public class JobContract {
         public static final String KEY_DEFAULT_JOB_TYPE = "default_job_type";
         public static final String KEY_OVER_PROJECTION = "over_projection";
         public static final String KEY_OVER_ZONE = "over_zone";
+        public static final String KEY_OVER_PROJECTION_STRING = "over_projection_string";
+        public static final String KEY_OVER_PROJECTION_ZONE_STRING = "over_projection_zone_string";
         public static final String KEY_UNITS = "units";
         public static final String KEY_ATTR_CLIENT = "attr_client";
         public static final String KEY_ATTR_MISSION = "attr_mission";

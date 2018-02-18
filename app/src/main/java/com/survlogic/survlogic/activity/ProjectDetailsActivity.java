@@ -55,11 +55,14 @@ import com.survlogic.survlogic.background.BackgroundProjectDetails;
 import com.survlogic.survlogic.background.BackgroundProjectJobList;
 import com.survlogic.survlogic.database.ProjectDatabaseHandler;
 import com.survlogic.survlogic.interf.ProjectDetailsActivityListener;
+import com.survlogic.survlogic.model.Point;
 import com.survlogic.survlogic.model.Project;
 import com.survlogic.survlogic.model.ProjectImages;
 import com.survlogic.survlogic.model.ProjectJobs;
 import com.survlogic.survlogic.utils.ImageHelper;
+import com.survlogic.survlogic.utils.StringUtilityHelper;
 import com.survlogic.survlogic.utils.SurveyMathHelper;
+import com.survlogic.survlogic.utils.SurveyProjectionHelper;
 import com.survlogic.survlogic.utils.TimeHelper;
 import com.survlogic.survlogic.utils.UniversalImageLoader;
 import com.survlogic.survlogic.dialog.DialogProjectDescriptionAdd;
@@ -67,9 +70,12 @@ import com.survlogic.survlogic.dialog.DialogProjectJobAdd;
 import com.survlogic.survlogic.dialog.DialogProjectPhotoAdd;
 import com.survlogic.survlogic.dialog.DialogProjectPhotoView;
 
+import org.w3c.dom.Text;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -94,7 +100,6 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
     private GoogleMap mMap;
     private boolean isShowMapCommands = false;
 
-
     private static Context mContext;
     private ImageHelper imageHelper;
 
@@ -111,6 +116,7 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
 
     private TextView tvProjectName, tvProjectCreated, tvUnits, tvLocationLat, tvLocationLong,
             tvProjection, tvZone, tvStorage, tvDescription;
+    private TextView tvLocationProjNorth, tvLocationProjEast;
     private ImageView ivProjectImage, ivGridImage;
     private Button btTakePhoto, btPostDescription;
     private ProgressBar pbLoading;
@@ -119,6 +125,9 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
     private ProjectGridImageAdapter gridAdapter;
     private boolean isGridAdapterSetup = false;
 
+    SurveyProjectionHelper surveyProjectionHelper;
+    private boolean isProjection = false;
+    private boolean isProjectionZone = false;
 
     private RecyclerView recyclerView;
     private ProjectJobListAdaptor adapter;
@@ -128,7 +137,8 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
 
     private ProgressDialog progressDialog;
 
-    private static SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM dd,yyyy");
+    private static SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM dd, yyyy");
+    private static DecimalFormat COORDINATE_FORMATTER ;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -137,6 +147,7 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
         setContentView(R.layout.activity_project_details);
         mContext = ProjectDetailsActivity.this;
         imageHelper = new ImageHelper(mContext);
+        surveyProjectionHelper = new SurveyProjectionHelper(mContext);
 
         Log.d(TAG, "onCreate: Started---------------------------->");
 
@@ -289,6 +300,9 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
         tvLocationLat = (TextView) findViewById(R.id.map_item1_value_lat);
         tvLocationLong = (TextView) findViewById(R.id.map_item1_value_long);
 
+        tvLocationProjNorth = (TextView) findViewById(R.id.map_item1_value_proj_north);
+        tvLocationProjEast = (TextView) findViewById(R.id.map_item1_value_proj_east);
+
         tvDescription = (TextView) findViewById(R.id.card4_projectNotes);
 
         ivProjectImage = (ImageView) findViewById(R.id.header_image_in_activity_project_details);
@@ -395,7 +409,6 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
 
             initProjectionDetails();
 
-
             //--------------------------------------------------------------------------------------//
 
             int storage_pos = project.getmStorage();
@@ -453,35 +466,72 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
     }
 
     //-------------------------------------------------------------------------------------------------------------------------//
+
+    /**
+     * Projection Calculations
+     */
+
+
     private void initProjectionDetails(){
         Log.d(TAG, "initProjectionDetails: Started");
-
-        boolean isThereAProjection = false, isThereAZone = false;
+        String projectionString, zoneString;
 
 
         if (project.getmProjection() == 1){
-            isThereAProjection = true;
-            String projectionString = project.getProjectionString();
+            isProjection = true;
+            projectionString = project.getProjectionString();
             String[] separatedProjectionValue = projectionString.split(",");
             String projectionName = separatedProjectionValue[0];
 
             tvProjection.setText(projectionName);
         }else{
+            projectionString = getResources().getString(R.string.projection_none);
             tvProjection.setText(getResources().getString(R.string.general_none));
         }
 
         if (project.getmZone() == 1){
-            isThereAZone = true;
-            String zoneString = project.getZoneString();
+            isProjectionZone = true;
+            zoneString = project.getZoneString();
             String[] separatedProjectionValue = zoneString.split(",");
             String zoneName = separatedProjectionValue[0];
 
             tvZone.setText(zoneName);
         }else{
+            zoneString = getResources().getString(R.string.projection_zone_none);
             tvZone.setText(getResources().getString(R.string.general_none));
         }
 
+        if(isProjection){
+            surveyProjectionHelper.setConfig(projectionString,zoneString);
+        }
+
+
     }
+
+
+    private void showMapProjection(){
+        Log.d(TAG, "showMapProjection: Started");
+
+        Point pointIn = new Point(locationLatitude,locationLongitude);
+        Point myProjectionPoint = surveyProjectionHelper.calculateGridCoordinates(pointIn);
+
+        double projectionNorth = myProjectionPoint.getNorthing();
+        double projectionEast = myProjectionPoint.getEasting();
+
+        COORDINATE_FORMATTER = StringUtilityHelper.createUSNonBiasDecimalFormat();
+
+        String formattedProjectionNorth = getResources().getString(R.string.gps_status_projection_northing_value_string,COORDINATE_FORMATTER.format(projectionNorth));
+        String formattedProjectionEast = getResources().getString(R.string.gps_status_projection_easting_value_string, COORDINATE_FORMATTER.format(projectionEast));
+
+        tvLocationProjNorth.setText(formattedProjectionNorth);
+        tvLocationProjEast.setText(formattedProjectionEast);
+
+
+    }
+
+
+    //--------------------------------------------------------------------------------------------------------------------------//
+
 
 
     private void initJobAdapter(){
@@ -555,7 +605,7 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
 
 
     private void createProjectJobDialog(final Integer project_id){
-        DialogFragment viewDialog = DialogProjectJobAdd.newInstance(projectID);
+        DialogFragment viewDialog = DialogProjectJobAdd.newInstance(projectID, project);
         viewDialog.show(getFragmentManager(),"dialog");
 
 
@@ -571,6 +621,9 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
                 @Override
                 public void run() {
                     initMapView();
+                    if(isProjection){
+                        showMapProjection();
+                    }
                 }
             },DELAY_TO_MAP);
         }else{
@@ -627,11 +680,6 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
 
     }
 
-
-
-
-
-
     //-------------------------------------------------------------------------------------------------------------------------//
 
     /**
@@ -682,7 +730,7 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
         ProjectDatabaseHandler projectDb = new ProjectDatabaseHandler(mContext);
         SQLiteDatabase db = projectDb.getReadableDatabase();
 
-        ArrayList<ProjectImages> projectImages = new ArrayList<ProjectImages>(projectDb.getProjectImagesbyProjectID(db,projectId));
+        ArrayList<ProjectImages> projectImages = new ArrayList<>(projectDb.getProjectImagesbyProjectID(db,projectId));
 
 
         Log.d(TAG, "getImageFromProjectData: Closing DB Connection");
@@ -984,6 +1032,13 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
     }
 
     //----------------------------------------------------------------------------------------------//
+
+    /**
+     * Listeners
+     */
+
+
+
     @Override
     public void refreshView() {
         initValuesFromObject();

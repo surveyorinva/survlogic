@@ -1,14 +1,20 @@
 package com.survlogic.survlogic.model;
 
+import com.survlogic.survlogic.utils.StringUtilityHelper;
+
 /**
  * Created by chrisfillmore on 7/29/2017.
  */
 
 public class ProjectJobs {
 
-    int id, projectId;
-    String mJobName, mJobDbName, mJobDescription;
-    int mDateCreated, mDateAccessed, mDateModified;
+    private int id, projectId;
+    private String mJobName, mJobDbName, mJobDescription;
+    private int mDateCreated, mDateAccessed, mDateModified;
+
+    private int isProjection, isProjectionZone;
+    private String projectionString, zoneString;
+
 
     public ProjectJobs() {
 
@@ -111,5 +117,37 @@ public class ProjectJobs {
 
     public void setmDateModified(int mDateModified) {
         this.mDateModified = mDateModified;
+    }
+
+    public int isProjection() {
+        return isProjection;
+    }
+
+    public void setProjection(int projection) {
+        isProjection = projection;
+    }
+
+    public int isProjectionZone() {
+        return isProjectionZone;
+    }
+
+    public void setProjectionZone(int projectionZone) {
+        isProjectionZone = projectionZone;
+    }
+
+    public String getProjectionString() {
+        return projectionString;
+    }
+
+    public void setProjectionString(String projectionString) {
+        this.projectionString = projectionString;
+    }
+
+    public String getZoneString() {
+        return zoneString;
+    }
+
+    public void setZoneString(String zoneString) {
+        this.zoneString = zoneString;
     }
 }

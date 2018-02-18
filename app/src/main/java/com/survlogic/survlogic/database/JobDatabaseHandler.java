@@ -45,7 +45,9 @@ public class JobDatabaseHandler extends SQLiteOpenHelper {
             + JobContract.JobSettingsEntry.KEY_DRAWER_STATE + " INTEGER,"
             + JobContract.JobSettingsEntry.KEY_DEFAULT_JOB_TYPE + " INTEGER,"
             + JobContract.JobSettingsEntry.KEY_OVER_PROJECTION + " INTEGER,"
+            + JobContract.JobSettingsEntry.KEY_OVER_PROJECTION_STRING + " TEXT,"
             + JobContract.JobSettingsEntry.KEY_OVER_ZONE + " INTEGER,"
+            + JobContract.JobSettingsEntry.KEY_OVER_PROJECTION_ZONE_STRING + " TEXT,"
             + JobContract.JobSettingsEntry.KEY_UNITS + " INTEGER,"
             + JobContract.JobSettingsEntry.KEY_ATTR_CLIENT + " TEXT,"
             + JobContract.JobSettingsEntry.KEY_ATTR_MISSION + " TEXT,"
@@ -161,7 +163,9 @@ public class JobDatabaseHandler extends SQLiteOpenHelper {
         contentValues.put(JobContract.JobSettingsEntry.KEY_DEFAULT_JOB_TYPE, settings.getDefaultJobType());
 
         contentValues.put(JobContract.JobSettingsEntry.KEY_OVER_PROJECTION, settings.getOverrideProjection());
+        contentValues.put(JobContract.JobSettingsEntry.KEY_OVER_PROJECTION_STRING, settings.getOverrideProjectionString());
         contentValues.put(JobContract.JobSettingsEntry.KEY_OVER_ZONE,settings.getOverrideZone());
+        contentValues.put(JobContract.JobSettingsEntry.KEY_OVER_PROJECTION_ZONE_STRING, settings.getOverrideZoneString());
         contentValues.put(JobContract.JobSettingsEntry.KEY_UNITS,settings.getOverrideUnits());
 
         contentValues.put(JobContract.JobSettingsEntry.KEY_SYSTEM_DIST_DISPLAY,settings.getSystemDistanceDisplay());
@@ -377,8 +381,13 @@ public class JobDatabaseHandler extends SQLiteOpenHelper {
         settings.setUiDrawerState(c.getInt((c.getColumnIndex(JobContract.JobSettingsEntry.KEY_DRAWER_STATE))));
 
         settings.setDefaultJobType(c.getInt((c.getColumnIndex(JobContract.JobSettingsEntry.KEY_DEFAULT_JOB_TYPE))));
+
         settings.setOverrideProjection(c.getInt((c.getColumnIndex(JobContract.JobSettingsEntry.KEY_OVER_PROJECTION))));
+        settings.setOverrideProjectionString(c.getString(c.getColumnIndex(JobContract.JobSettingsEntry.KEY_OVER_PROJECTION_STRING)));
+
         settings.setOverrideZone(c.getInt((c.getColumnIndex(JobContract.JobSettingsEntry.KEY_OVER_ZONE))));
+        settings.setOverrideZoneString(c.getString(c.getColumnIndex(JobContract.JobSettingsEntry.KEY_OVER_PROJECTION_ZONE_STRING)));
+
         settings.setOverrideUnits(c.getInt((c.getColumnIndex(JobContract.JobSettingsEntry.KEY_UNITS))));
 
         settings.setAttClient((c.getString(c.getColumnIndex(JobContract.JobSettingsEntry.KEY_ATTR_CLIENT))));
@@ -427,7 +436,10 @@ public class JobDatabaseHandler extends SQLiteOpenHelper {
         contentValues.put(JobContract.JobSettingsEntry.KEY_DEFAULT_JOB_TYPE, settings.getDefaultJobType());
 
         contentValues.put(JobContract.JobSettingsEntry.KEY_OVER_PROJECTION, settings.getOverrideProjection());
+        contentValues.put(JobContract.JobSettingsEntry.KEY_OVER_PROJECTION_STRING, settings.getOverrideProjectionString());
+
         contentValues.put(JobContract.JobSettingsEntry.KEY_OVER_ZONE,settings.getOverrideZone());
+        contentValues.put(JobContract.JobSettingsEntry.KEY_OVER_PROJECTION_ZONE_STRING,settings.getOverrideZoneString());
         contentValues.put(JobContract.JobSettingsEntry.KEY_UNITS,settings.getOverrideUnits());
 
         contentValues.put(JobContract.JobSettingsEntry.KEY_SYSTEM_DIST_DISPLAY,settings.getSystemDistanceDisplay());

@@ -21,6 +21,9 @@ public class PreferenceLoaderHelper {
 
     private String general_name, attr_client, attr_mission, attr_weather_general,attr_weather_temp,attr_weather_pres,
             attr_staff_chief, attr_staff_iman, attr_staff_rman, attr_staff_other;
+
+    private String general_over_projection_string, general_over_zone_string;
+
     private int general_type, general_over_projection, general_over_zone, general_over_units,
             system_distance_display, system_distance_precision_display, system_coordinates_precision_display, system_angle_display,
             format_coord_entry, format_angle_hz_display, format_angle_hz_obsrv_entry, format_angle_vz_obsrv_display, format_distance_hz_obsrv_display,
@@ -48,7 +51,9 @@ public class PreferenceLoaderHelper {
         general_name = sharedPreferences.getString(mContext.getString(R.string.pref_key_current_job_name),mContext.getString(R.string.general_default));
         general_type = Integer.parseInt(sharedPreferences.getString(mContext.getString(R.string.pref_key_current_job_type),"0"));
         general_over_projection = Integer.parseInt(sharedPreferences.getString(mContext.getString(R.string.pref_key_current_job_over_projection),"0"));
+        general_over_projection_string = sharedPreferences.getString(mContext.getString(R.string.pref_key_current_job_over_projection_string),mContext.getString(R.string.general_blank));
         general_over_zone = Integer.parseInt(sharedPreferences.getString(mContext.getString(R.string.pref_key_current_job_over_zone),"0"));
+        general_over_zone_string = sharedPreferences.getString(mContext.getString(R.string.pref_key_current_job_over_zone_string),mContext.getString(R.string.general_blank));
         general_over_units = Integer.parseInt(sharedPreferences.getString(mContext.getString(R.string.pref_key_current_job_over_units),"0"));
 
         Log.d(TAG, "initPreferencesFromXML: Saving Notes Data...");
@@ -334,4 +339,52 @@ public class PreferenceLoaderHelper {
     }
 
 
+    public int getGeneral_over_projection() {
+        return general_over_projection;
+    }
+
+    public void setGeneral_over_projection(int general_over_projection) {
+        this.general_over_projection = general_over_projection;
+    }
+
+    public int getGeneral_over_zone() {
+        return general_over_zone;
+    }
+
+    public void setGeneral_over_zone(int general_over_zone) {
+        this.general_over_zone = general_over_zone;
+    }
+
+    public String getGeneral_over_projection_string() {
+        return general_over_projection_string;
+    }
+
+    public void setGeneral_over_projection_string(String general_over_projection_string) {
+        this.general_over_projection_string = general_over_projection_string;
+    }
+
+    public String getGeneral_over_zone_string() {
+        return general_over_zone_string;
+    }
+
+    public void setGeneral_over_zone_string(String general_over_zone_string) {
+        this.general_over_zone_string = general_over_zone_string;
+    }
+
+
+    public String getJob_name() {
+        return general_name;
+    }
+
+    public void setJob_name(String general_name) {
+        this.general_name = general_name;
+    }
+
+    public int getGeneral_over_units() {
+        return general_over_units;
+    }
+
+    public void setGeneral_over_units(int general_over_units) {
+        this.general_over_units = general_over_units;
+    }
 }

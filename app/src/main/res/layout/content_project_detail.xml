@@ -344,12 +344,13 @@
                             android:layout_height="wrap_content" />
 
                         <LinearLayout
+                            android:id="@+id/llMap_WGS_Data"
                             android:orientation="horizontal"
                             android:layout_alignStart="@id/map_item1_header"
                             android:layout_below="@id/map_item1_header"
                             android:weightSum="2"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent">
+                            android:layout_height="wrap_content">
 
                             <TextView
                                 android:id="@+id/map_item1_value_lat"
@@ -361,6 +362,31 @@
 
                             <TextView
                                 android:id="@+id/map_item1_value_long"
+                                style="@style/Labels.Card.ProjectLocation"
+                                android:layout_gravity="top"
+                                android:layout_weight="1"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:orientation="horizontal"
+                            android:layout_alignStart="@id/map_item1_header"
+                            android:layout_below="@id/llMap_WGS_Data"
+                            android:weightSum="2"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <TextView
+                                android:id="@+id/map_item1_value_proj_north"
+                                style="@style/Labels.Card.ProjectLocation"
+                                android:layout_gravity="top"
+                                android:layout_weight="1"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content" />
+
+                            <TextView
+                                android:id="@+id/map_item1_value_proj_east"
                                 style="@style/Labels.Card.ProjectLocation"
                                 android:layout_gravity="top"
                                 android:layout_weight="1"

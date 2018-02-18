@@ -66,7 +66,32 @@ public class BackgroundProjectJobNew extends AsyncTask <ProjectJobs,ProjectJobs,
 
             //Get Model
             Log.d(TAG, "doInBackground: Fetching Job Settings Model");
-            ProjectJobSettings settings = new ProjectJobSettings(projectJob.getProjectId(), project_job_id, projectJob.getmJobName(),1,1,0,0,0,1,0,2,3,0,0,0,0,0,0,1,1,0,0);
+            ProjectJobSettings settings = new ProjectJobSettings();
+                settings.setProjectId(projectJob.getProjectId());
+                settings.setJob_id(project_job_id);
+                settings.setJobName(projectJob.getmJobName());
+                settings.setUiFirstStart(1);
+                settings.setUiDrawerState(1);
+                settings.setDefaultJobType(0);
+                settings.setOverrideProjection(projectJob.isProjection());
+                settings.setOverrideProjectionString(projectJob.getProjectionString());
+                settings.setOverrideZone(projectJob.isProjectionZone());
+                settings.setOverrideZoneString(projectJob.getZoneString());
+                settings.setOverrideUnits(0);
+                settings.setSystemDistanceDisplay(0);
+                settings.setSystemDistancePrecisionDisplay(2);
+                settings.setSystemCoordinatesPrecisionDisplay(3);
+                settings.setSystemAngleDisplay(0);
+                settings.setFormatAngleHorizontalDisplay(0);
+                settings.setFormatAngleVerticalObsDisplay(0);
+                settings.setFormatDistanceHorizontalObsDisplay(0);
+                settings.setFormatCoordinatesEntry(0);
+                settings.setFormatAngleHorizontalObsEntry(0);
+                settings.setOptionsRawFile(1);
+                settings.setOptionsRawTimeStamp(1);
+                settings.setOptionsGpsAttribute(0);
+                settings.setOptionsCodeTable(0);
+
             Log.d(TAG, "doInBackground: Complete fetching Job Setting Model");
 
             //Saving Job Settings
