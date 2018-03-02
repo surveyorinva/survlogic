@@ -14,7 +14,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.survlogic.survlogic.R;
@@ -39,8 +41,8 @@ public class DialogJobPointGeodeticEntryAdd extends DialogFragment {
     private SharedPreferences sharedPreferences;
     private PreferenceLoaderHelper preferenceLoaderHelper;
 
-
-
+    private TextView tvAppBarTitle;
+    private ImageButton ibAppBarBack;
     private EditText etLatDegree, etLatMinute, etLatSecond,
             etLongDegree, etLongMinute, etLongSecond,
             etHeightEllipse, etHeightOrtho;
@@ -72,7 +74,7 @@ public class DialogJobPointGeodeticEntryAdd extends DialogFragment {
         heightEllipsoidValue = getArguments().getDouble("ellipsoid");
         heightOrthoValue = getArguments().getDouble("ortho");
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.DialogPopupStyle);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.DialogPopupStyleExpolodingOut);
         LayoutInflater inflater = getActivity().getLayoutInflater();
 
         View v = inflater.inflate(R.layout.dialog_job_point_geodetic_entry,null);
@@ -112,6 +114,8 @@ public class DialogJobPointGeodeticEntryAdd extends DialogFragment {
 
         initViewWidgets();
         setOnClickListeners();
+        setOnFocusChangeListeners();
+
         preferenceLoaderHelper = new PreferenceLoaderHelper(mContext);
         loadPreferences();
 
@@ -131,22 +135,41 @@ public class DialogJobPointGeodeticEntryAdd extends DialogFragment {
     private void initViewWidgets(){
         Log.d(TAG, "initViewWidgets: Started...");
 
+        tvAppBarTitle = (TextView) getDialog().findViewById(R.id.app_bar_title);
+        ibAppBarBack = (ImageButton) getDialog().findViewById(R.id.button_back);
+
+        tvAppBarTitle.setText(getResources().getString(R.string.dialog_job_point_geodetic_app_title));
+        ibAppBarBack.setVisibility(View.GONE);
+
         etLatDegree = (EditText) getDialog().findViewById(R.id.lat_degree);
+        etLatDegree.setSelectAllOnFocus(true);
+
         etLatMinute = (EditText) getDialog().findViewById(R.id.lat_min);
+        etLatMinute.setSelectAllOnFocus(true);
+
         etLatSecond = (EditText) getDialog().findViewById(R.id.lat_sec);
+        etLatSecond.setSelectAllOnFocus(true);
 
         etLongDegree = (EditText) getDialog().findViewById(R.id.long_degree);
+        etLongDegree.setSelectAllOnFocus(true);
+
         etLongMinute = (EditText) getDialog().findViewById(R.id.long_minute);
+        etLongMinute.setSelectAllOnFocus(true);
+
         etLongSecond = (EditText) getDialog().findViewById(R.id.long_second);
+        etLongSecond.setSelectAllOnFocus(true);
 
         etHeightEllipse = (EditText) getDialog().findViewById(R.id.height_ellipsoid);
-        etHeightOrtho = (EditText) getDialog().findViewById(R.id.height_ortho);
+        etHeightEllipse.setSelectAllOnFocus(true);
 
+        etHeightOrtho = (EditText) getDialog().findViewById(R.id.height_ortho);
+        etHeightOrtho.setSelectAllOnFocus(true);
 
     }
 
     private void setOnClickListeners(){
         Log.d(TAG, "setOnClickListeners: Starting...");
+
         etLatDegree.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -257,6 +280,168 @@ public class DialogJobPointGeodeticEntryAdd extends DialogFragment {
 
     }
 
+    private void setOnFocusChangeListeners(){
+        Log.d(TAG, "setOnFocusChangeListeners: Started");
+
+        etLatDegree.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(!hasFocus){
+                    try{
+                        String angle = null;
+                        angle = etLatDegree.getText().toString();
+
+                        if(StringUtilityHelper.isStringNull(angle)){
+                            etLatDegree.setText("00");
+                        }
+
+                    }catch(NumberFormatException ex){
+                        showToast("Error.  Check Number Format", true);
+
+                    }
+                }
+            }
+        });
+
+        etLatMinute.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(!hasFocus){
+                    try{
+                        String angle = null;
+                        angle = etLatMinute.getText().toString();
+
+                        if(StringUtilityHelper.isStringNull(angle)){
+                            etLatMinute.setText("00");
+                        }
+
+                    }catch(NumberFormatException ex){
+                        showToast("Error.  Check Number Format", true);
+
+                    }
+                }
+            }
+        });
+
+        etLatSecond.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(!hasFocus){
+                    try{
+                        String angle = null;
+                        angle = etLatSecond.getText().toString();
+
+                        if(StringUtilityHelper.isStringNull(angle)){
+                            etLatSecond.setText("00.000");
+                        }
+
+                    }catch(NumberFormatException ex){
+                        showToast("Error.  Check Number Format", true);
+
+                    }
+                }
+            }
+        });
+
+        etLongDegree.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(!hasFocus){
+                    try{
+                        String angle = null;
+                        angle = etLongDegree.getText().toString();
+
+                        if(StringUtilityHelper.isStringNull(angle)){
+                            etLongDegree.setText("00");
+                        }
+
+                    }catch(NumberFormatException ex){
+                        showToast("Error.  Check Number Format", true);
+
+                    }
+                }
+            }
+        });
+
+        etLongMinute.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(!hasFocus){
+                    try{
+                        String angle = null;
+                        angle = etLongMinute.getText().toString();
+
+                        if(StringUtilityHelper.isStringNull(angle)){
+                            etLongMinute.setText("00");
+                        }
+
+                    }catch(NumberFormatException ex){
+                        showToast("Error.  Check Number Format", true);
+
+                    }
+                }
+            }
+        });
+
+        etLongSecond.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(!hasFocus){
+                    try{
+                        String angle = null;
+                        angle = etLongSecond.getText().toString();
+
+                        if(StringUtilityHelper.isStringNull(angle)){
+                            etLongSecond.setText("00.000");                      }
+
+                    }catch(NumberFormatException ex){
+                        showToast("Error.  Check Number Format", true);
+
+                    }
+                }
+            }
+        });
+
+        etHeightEllipse.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(!hasFocus){
+                    try{
+                        String angle = null;
+                        angle = etHeightEllipse.getText().toString();
+
+                        if(StringUtilityHelper.isStringNull(angle)){
+                            etHeightEllipse.setText("00.00");
+                        }
+
+                    }catch(NumberFormatException ex){
+                        showToast("Error.  Check Number Format", true);
+
+                    }
+                }
+            }
+        });
+
+        etHeightOrtho.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(!hasFocus){
+                    try{
+                        String angle = null;
+                        angle = etHeightOrtho.getText().toString();
+
+                        if(StringUtilityHelper.isStringNull(angle)){
+                            etHeightOrtho.setText("00.00");
+                        }
+
+                    }catch(NumberFormatException ex){
+                        showToast("Error.  Check Number Format", true);
+
+                    }
+                }
+            }
+        });
+    }
 
     private void populateItems(){
         Log.d(TAG, "populateItems: Starting...");
@@ -393,7 +578,7 @@ public class DialogJobPointGeodeticEntryAdd extends DialogFragment {
         }
 
         PointGeodeticEntryListener listener = (PointGeodeticEntryListener) getActivity();
-        listener.onReturnValues(latitudeDEC, longitudeDEC, heightEllipsoid, heightOrtho);
+        listener.onWorldReturnValues(latitudeDEC, longitudeDEC, heightEllipsoid, heightOrtho);
         dismiss();
 
     }

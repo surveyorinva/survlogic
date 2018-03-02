@@ -6,9 +6,9 @@ package com.survlogic.survlogic.interf;
 
 public interface PointGeodeticEntryListener {
 
-    void onReturnValues(double latOut, double longOut, double heightEllipsOut, double heightOrthoOut);
+    void onWorldReturnValues(double latOut, double longOut, double heightEllipsOut, double heightOrthoOut);
 
 
-
+    void onGridReturnValues(double gridNorth, double gridEast);
 
 }

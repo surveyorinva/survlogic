@@ -13,7 +13,7 @@
             android:text="@string/dialog_job_point_item_header_pointno"
             style="@style/Labels.Card.TableValues"
             android:gravity="center"
-            android:layout_weight="20"
+            android:layout_weight="15"
             android:layout_width="0dp"
             android:layout_height="match_parent" />
 
@@ -28,7 +28,7 @@
             android:text="@string/dialog_job_point_item_header_northing"
             style="@style/Labels.Card.TableValues"
             android:gravity="center"
-            android:layout_weight="20"
+            android:layout_weight="22"
             android:layout_width="0dp"
             android:layout_height="match_parent" />
 
@@ -43,7 +43,7 @@
             android:text="@string/dialog_job_point_item_header_easting"
             style="@style/Labels.Card.TableValues"
             android:gravity="center"
-            android:layout_weight="20"
+            android:layout_weight="22"
             android:layout_width="0dp"
             android:layout_height="match_parent" />
 

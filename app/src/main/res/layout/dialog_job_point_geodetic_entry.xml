@@ -6,6 +6,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <include
+        layout="@layout/app_bar_job_point_new_top"/>
+
+
     <LinearLayout
         android:id="@+id/layout_area_Lat_1"
         android:orientation="horizontal"
@@ -42,12 +46,12 @@
             android:text="Degrees"
             android:gravity="center"
             android:textSize="@dimen/text_size_normal"
-            android:layout_weight="15"
+            android:layout_weight="20"
             android:layout_width="0dp"
             android:layout_height="wrap_content" />
 
         <Space
-            android:layout_weight="5"
+            android:layout_weight="3"
             android:layout_width="0dp"
             android:layout_height="wrap_content" />
 
@@ -55,12 +59,12 @@
             android:text="Minutes"
             android:gravity="center"
             android:textSize="@dimen/text_size_normal"
-            android:layout_weight="15"
+            android:layout_weight="20"
             android:layout_width="0dp"
             android:layout_height="wrap_content" />
 
         <Space
-            android:layout_weight="5"
+            android:layout_weight="3"
             android:layout_width="0dp"
             android:layout_height="wrap_content" />
 
@@ -68,7 +72,7 @@
             android:text="Seconds"
             android:gravity="center"
             android:textSize="@dimen/text_size_normal"
-            android:layout_weight="15"
+            android:layout_weight="25"
             android:layout_width="0dp"
             android:layout_height="wrap_content" />
 
@@ -99,18 +103,18 @@
             android:layout_marginEnd="4dp"
             android:layout_marginStart="4dp"
             android:layout_marginTop="1dp"
-            android:layout_weight="15"
+            android:layout_weight="20"
             android:gravity="center"
             android:hint="DD"
             android:inputType="number|numberSigned"
             android:nextFocusDown="@+id/lat_min"
-            android:textColor="@color/black"
-            android:textSize="14sp" />
+            style="@style/InputField.EditText"
+            android:background="@drawable/editbox_background_normal" />
 
         <Space
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="5" />
+            android:layout_weight="3" />
 
         <EditText
             android:id="@+id/lat_min"
@@ -119,18 +123,18 @@
             android:layout_marginEnd="4dp"
             android:layout_marginStart="4dp"
             android:layout_marginTop="1dp"
-            android:layout_weight="15"
+            android:layout_weight="20"
             android:gravity="center"
             android:hint="MM"
             android:inputType="number"
             android:nextFocusDown="@+id/lat_sec"
-            android:textColor="@color/black"
-            android:textSize="14sp" />
+            style="@style/InputField.EditText"
+            android:background="@drawable/editbox_background_normal" />
 
         <Space
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="5" />
+            android:layout_weight="3" />
 
         <EditText
             android:id="@+id/lat_sec"
@@ -139,12 +143,12 @@
             android:layout_marginEnd="4dp"
             android:layout_marginStart="4dp"
             android:layout_marginTop="1dp"
-            android:layout_weight="15"
-            android:hint="ss.ssss"
+            android:layout_weight="25"
+            android:hint="ss.sss"
             android:inputType="numberDecimal"
             android:nextFocusDown="@+id/long_degree"
-            android:textColor="@color/black"
-            android:textSize="14sp" />
+            style="@style/InputField.EditText"
+            android:background="@drawable/editbox_background_normal" />
     </LinearLayout>
 
     <LinearLayout
@@ -203,12 +207,12 @@
             android:text="Degrees"
             android:gravity="center"
             android:textSize="@dimen/text_size_normal"
-            android:layout_weight="15"
+            android:layout_weight="20"
             android:layout_width="0dp"
             android:layout_height="wrap_content" />
 
         <Space
-            android:layout_weight="5"
+            android:layout_weight="3"
             android:layout_width="0dp"
             android:layout_height="wrap_content" />
 
@@ -216,12 +220,12 @@
             android:text="Minutes"
             android:gravity="center"
             android:textSize="@dimen/text_size_normal"
-            android:layout_weight="15"
+            android:layout_weight="20"
             android:layout_width="0dp"
             android:layout_height="wrap_content" />
 
         <Space
-            android:layout_weight="5"
+            android:layout_weight="3"
             android:layout_width="0dp"
             android:layout_height="wrap_content" />
 
@@ -229,7 +233,7 @@
             android:text="Seconds"
             android:gravity="center"
             android:textSize="@dimen/text_size_normal"
-            android:layout_weight="15"
+            android:layout_weight="25"
             android:layout_width="0dp"
             android:layout_height="wrap_content" />
 
@@ -251,56 +255,56 @@
         <EditText
             android:id="@+id/long_degree"
             android:hint="DDD"
-            android:textColor="@color/black"
-            android:textSize="14sp"
             android:inputType="number|numberSigned"
             android:gravity="center"
             android:nextFocusDown="@+id/long_minute"
             android:layout_marginStart="4dp"
             android:layout_marginTop="1dp"
             android:layout_marginEnd="4dp"
-            android:layout_weight="15"
+            android:layout_weight="20"
+            style="@style/InputField.EditText"
+            android:background="@drawable/editbox_background_normal"
             android:layout_width="0dp"
             android:layout_height="wrap_content"/>
 
         <Space
-            android:layout_weight="5"
+            android:layout_weight="3"
             android:layout_width="0dp"
             android:layout_height="wrap_content" />
 
         <EditText
             android:id="@+id/long_minute"
             android:hint="MM"
-            android:textColor="@color/black"
             android:gravity="center"
-            android:textSize="14sp"
             android:inputType="number"
             android:nextFocusDown="@+id/long_second"
             android:layout_marginStart="4dp"
             android:layout_marginTop="1dp"
             android:layout_marginEnd="4dp"
-            android:layout_weight="15"
+            android:layout_weight="20"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            style="@style/InputField.EditText"
+            android:background="@drawable/editbox_background_normal"/>
 
         <Space
-            android:layout_weight="5"
+            android:layout_weight="3"
             android:layout_width="0dp"
             android:layout_height="wrap_content" />
 
         <EditText
             android:id="@+id/long_second"
-            android:hint="ss.ssss"
-            android:textColor="@color/black"
-            android:textSize="14sp"
+            android:hint="ss.sss"
             android:inputType="numberDecimal"
             android:nextFocusDown="@+id/height_ellipsoid"
             android:layout_marginStart="4dp"
             android:layout_marginTop="1dp"
             android:layout_marginEnd="4dp"
-            android:layout_weight="15"
+            android:layout_weight="25"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            style="@style/InputField.EditText"
+            android:background="@drawable/editbox_background_normal"/>
 
 
     </LinearLayout>
@@ -402,16 +406,17 @@
         <EditText
             android:id="@+id/height_ellipsoid"
             android:hint=""
-            android:textSize="14sp"
             android:inputType="numberDecimal|numberSigned"
             android:gravity="center"
-            android:nextFocusDown="@+id/height_geoid"
+            android:nextFocusDown="@+id/height_ortho"
             android:layout_marginStart="4dp"
             android:layout_marginTop="1dp"
             android:layout_marginEnd="4dp"
             android:layout_weight="25"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            style="@style/InputField.EditText"
+            android:background="@drawable/editbox_background_normal"/>
 
         <Space
             android:layout_weight="5"
@@ -421,15 +426,15 @@
         <EditText
             android:id="@+id/height_ortho"
             android:gravity="center"
-            android:textSize="14sp"
             android:inputType="numberDecimal|numberSigned"
-            android:nextFocusDown="@+id/height_ortho"
             android:layout_marginStart="4dp"
             android:layout_marginTop="1dp"
             android:layout_marginEnd="4dp"
             android:layout_weight="25"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            style="@style/InputField.EditText"
+            android:background="@drawable/editbox_background_normal"/>
 
 
 

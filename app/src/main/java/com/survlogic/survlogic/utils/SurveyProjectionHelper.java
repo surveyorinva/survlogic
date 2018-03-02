@@ -19,8 +19,6 @@ import org.cts.op.CoordinateOperationFactory;
 import org.cts.registry.EPSGRegistry;
 import org.cts.registry.RegistryManager;
 
-import java.math.BigDecimal;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -79,26 +77,61 @@ public class SurveyProjectionHelper {
     }
 
 
-    public Point calculateGridCoordinates(Point pointIn){
-        Log.d(TAG, "calculateGridCoordinates: Started");
-        Point pointReturn = new Point();
+    private Point solveGeodeticPointFromGridPoint(double gridNorthIN, double gridEastIN)throws IllegalCoordinateException, CoordinateOperationException, CRSException{
+        Log.d(TAG, "solveGeodeticPointFromGridPoint: Started");
 
-        try{
-            pointReturn = solveFromGeodetic(pointIn.getNorthing(), pointIn.getEasting());
 
-        }catch (Exception e){
-            Log.d(TAG, "calculateGridCoordinates: Error");
+        Point pointOut = new Point();
+
+        double[] coord = new double[2];
+        coord[0] = gridEastIN;
+        coord[1] = gridNorthIN;
+
+        System.out.println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<Variables Used>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+
+        Log.d(TAG, "solveGeodeticPointFromGridPoint: North: " + gridNorthIN);
+        Log.d(TAG, "solveGeodeticPointFromGridPoint: East: " + gridEastIN);
+        Log.d(TAG, "solveGeodeticPointFromGridPoint: EPSG_OUT: " + projection_OUT_EPSG);
+        Log.d(TAG, "solveGeodeticPointFromGridPoint: EPSG_IN: " + projection_IN_EPSG);
+
+        // Create a new CRSFactory, a necessary element to create a CRS without defining one by one all its components
+        CRSFactory cRSFactory = new CRSFactory();
+        RegistryManager registryManager = cRSFactory.getRegistryManager();
+
+        registryManager.addRegistry(new EPSGRegistry());
+        CoordinateReferenceSystem sourceCRS = cRSFactory.getCRS(projection_OUT_EPSG); // Grid
+        CoordinateReferenceSystem targetCRS = cRSFactory.getCRS(projection_IN_EPSG);  //WGS
+
+        ProjectedCRS sourceGCRS = (ProjectedCRS) sourceCRS;
+        GeodeticCRS targetGCRS = (GeodeticCRS) targetCRS;
+
+        Set<CoordinateOperation> set = CoordinateOperationFactory.createCoordinateOperations(sourceGCRS, targetGCRS);
+        List<CoordinateOperation> coordOps = new ArrayList<>();
+
+        coordOps.addAll(set);
+
+        Log.d(TAG, "solveGeodeticPointFromGridPoint: Size: " + coordOps.size());
+        if (coordOps.size() != 0) {
+
+            // Test each transformation method (generally, only one method is available)
+            for (CoordinateOperation op : coordOps) {
+                Log.d(TAG, "solveGeodeticPointFromGridPoint: In");
+                // Transform coord using the op CoordinateOperation from crs1 to crs2
+                double[] dd = op.transform(coord);
+
+                pointOut.setNorthing(dd[1]);
+                pointOut.setEasting(dd[0]);
+
+            }
         }
 
 
-        return pointReturn;
-
-
+        return pointOut;
     }
 
 
-    private Point solveFromGeodetic(double latIN, double longIN)  throws IllegalCoordinateException, CoordinateOperationException, CRSException {
-        Log.d(TAG, "solveFromGeodetic: ");
+    private Point solveGridPointFromGeodeticPoint(double latIN, double longIN)  throws IllegalCoordinateException, CoordinateOperationException, CRSException {
+        Log.d(TAG, "solveGridPointFromGeodeticPoint: ");
 
         Point pointOut = new Point();
 
@@ -108,8 +141,8 @@ public class SurveyProjectionHelper {
 
         System.out.println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<Variables Used>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
 
-        Log.d(TAG, "solveFromGeodetic: Lat: " + latIN);
-        Log.d(TAG, "solveFromGeodetic: Long: " + longIN);
+        Log.d(TAG, "solveGridPointFromGeodeticPoint: Lat: " + latIN);
+        Log.d(TAG, "solveGridPointFromGeodeticPoint: Long: " + longIN);
 
         // Create a new CRSFactory, a necessary element to create a CRS without defining one by one all its components
         CRSFactory cRSFactory = new CRSFactory();
@@ -127,12 +160,12 @@ public class SurveyProjectionHelper {
 
         coordOps.addAll(set);
 
-        Log.d(TAG, "solveFromGeodetic: Size: " + coordOps.size());
+        Log.d(TAG, "solveGridPointFromGeodeticPoint: Size: " + coordOps.size());
         if (coordOps.size() != 0) {
 
             // Test each transformation method (generally, only one method is available)
             for (CoordinateOperation op : coordOps) {
-                Log.d(TAG, "solveFromGeodetic: In");
+                Log.d(TAG, "solveGridPointFromGeodeticPoint: In");
                 // Transform coord using the op CoordinateOperation from crs1 to crs2
                 double[] dd = op.transform(coord);
 
@@ -146,6 +179,42 @@ public class SurveyProjectionHelper {
 
     }
 
+    public Point calculateGridCoordinates(Point pointIn){
+        Log.d(TAG, "calculateGridCoordinates: Started");
+        Point pointReturn = new Point();
+
+        try{
+            pointReturn = solveGridPointFromGeodeticPoint(pointIn.getNorthing(), pointIn.getEasting());
+
+        }catch (Exception e){
+            Log.d(TAG, "calculateGridCoordinates: Error");
+        }
+
+
+        return pointReturn;
+
+
+    }
+
+
+    public Point calculateGeodeticCoordinates(Point pointIn){
+        Log.d(TAG, "calculateGeodeticCoordinates: Started");
+
+        Point pointReturn = new Point();
+
+        try{
+            pointReturn = solveGeodeticPointFromGridPoint(pointIn.getNorthing(), pointIn.getEasting());
+
+        }catch (Exception e){
+            Log.d(TAG, "calculateGridCoordinates: Error");
+        }
+
+
+        return pointReturn;
+
+
+
+    }
 
     public ArrayList<PointSurvey> generateGridPoints(ArrayList<PointGeodetic> lstPointGeodetic) {
         Log.d(TAG, "generateGridPoints: Started");

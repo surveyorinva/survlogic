@@ -603,7 +603,7 @@ public class JobHomeActivity extends AppCompatActivity implements NavigationView
                         menuItem = menu.getItem(ACTIVITY_NUM);
                         menuItem.setChecked(false);
 
-                        jobHomeFragment = new JobHomeHomeFragment();
+
                         jobHomeFragment.setArguments(getIntent().getExtras());
 
                         swapFragment(jobHomeFragment,false,"HOME");

@@ -421,17 +421,12 @@ public class JobPointsActivity extends AppCompatActivity implements NavigationVi
         zoneString = preferenceLoaderHelper.getGeneral_over_zone_string();
 
         if(isProjection == 1){
+            Log.d(TAG, "initProjection: With Projection");
             surveyProjectionHelper.setConfig(projectionString,zoneString);
+            isJobWithProjection = true;
         }
 
-
     }
-
-
-
-
-
-
 
     //----------------------------------------------------------------------------------------------//
 
@@ -467,8 +462,8 @@ public class JobPointsActivity extends AppCompatActivity implements NavigationVi
 
     @Override
     public void onReturnValues(boolean pointNo, boolean pointElev, boolean pointDesc) {
-        Log.d(TAG, "Listener:onReturnValues: Started");
-        Log.i(TAG, "onReturnValues: (pointNo/pointElev/pointDesc:" + pointNo + "/" + pointElev + "/" + pointDesc);
+        Log.d(TAG, "Listener:onWorldReturnValues: Started");
+        Log.i(TAG, "onWorldReturnValues: (pointNo/pointElev/pointDesc:" + pointNo + "/" + pointElev + "/" + pointDesc);
         jobPointsMapFragment.getMapPointOptionsFromActivity(pointNo, pointElev, pointDesc);
 
     }
@@ -490,12 +485,20 @@ public class JobPointsActivity extends AppCompatActivity implements NavigationVi
 
         if(jobPointsListFragment != null){
             jobPointsListFragment.setArrayListPointGeodetic(lstPointGeodetics);
-            jobPointsListFragment.setArrayListPointGrid(surveyProjectionHelper.generateGridPoints(lstPointGeodetics));
+        }
+
+        if(isJobWithProjection){
+            lstPointGrid = surveyProjectionHelper.generateGridPoints(lstPointGeodetics);
+
+            if(jobPointsListFragment !=null){
+                jobPointsListFragment.setArrayListPointGrid(surveyProjectionHelper.generateGridPoints(lstPointGeodetics));
+            }
+
         }
 
 
-        Log.d(TAG, "getPointsGeodetic: After Size: " + this.lstPointGeodetic.size());
-
+        Log.d(TAG, "getPointsGeodetic: Geodetic After Size: " + this.lstPointGeodetic.size());
+        Log.d(TAG, "getPointsGeodetic: Grid After Size: " + lstPointGrid.size());
     }
 
     @Override

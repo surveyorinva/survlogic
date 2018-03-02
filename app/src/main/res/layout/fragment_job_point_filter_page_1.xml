@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/colorPrimary"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+
+        <ImageView
+            android:src="@drawable/ic_add_location"
+            android:layout_gravity="center"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="1dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp" />
+
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/dialog_item_header_pointno"
+            app:hintTextAppearance="@style/DialogHintStyleDark"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <EditText
+                android:id="@+id/dialog_item_pointNo"
+                android:hint="@string/dialog_job_point_item_pointNo"
+                android:textSize="20sp"
+                android:inputType="number"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="1dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+        </android.support.design.widget.TextInputLayout>
+
+    </LinearLayout>
+
+
+
+</LinearLayout>

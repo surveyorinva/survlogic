@@ -1,10 +1,13 @@
 package com.survlogic.survlogic.activity;
 
 import android.Manifest;
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -23,6 +26,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewAnimationUtils;
+import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -40,6 +45,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static android.view.View.INVISIBLE;
+import static android.view.View.VISIBLE;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, ProjectListListener {
 
@@ -61,7 +69,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     //----------------------------------------------------------//
     private static final int REQUEST_GET_NEW_PROJECT = 1;
 
-
+    //---------------------------------------------------------//
+    private View reveal_view;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,6 +115,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         fab = (FloatingActionButton) findViewById(R.id.fab_in_app_bar_layout);
         fab.setOnClickListener(this);
+
+        reveal_view = findViewById(R.id.reveal);
 
     }
 
@@ -237,6 +248,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void goToNewProjectForm(){
         Intent i = new Intent(this, ProjectNewActivity.class);
         startActivityForResult(i,REQUEST_GET_NEW_PROJECT);
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+
     }
 
     public FloatingActionButton getFloatingActionButton() {
@@ -248,7 +261,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.fab_in_app_bar_layout:
-                goToNewProjectForm();
+                //goToNewProjectForm();
+                revealNewProjectActions();
                 break;
 
 
@@ -270,6 +284,69 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         backgroundProjectList.execute();
 
 
+    }
+
+    //----------------------------------------------------------------------------------------------//
+    private void revealNewProjectActions() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                revealButton();
+
+                delayedStartNextActivity();
+            }
+        }, 500);
+    }
+
+
+    private void revealButton() {
+        fab.setElevation(0f);
+
+        reveal_view.setVisibility(VISIBLE);
+
+        int cx = reveal_view.getWidth();
+        int cy = reveal_view.getHeight();
+
+
+        int x = (int) (getFabWidth() / 2 + fab.getX());
+        int y = (int) (getFabWidth() / 2 + fab.getY());
+
+        float finalRadius = Math.max(cx, cy) * 1.2f;
+
+        Animator reveal = ViewAnimationUtils
+                .createCircularReveal(reveal_view, x, y, getFabWidth(), finalRadius);
+
+        reveal.setDuration(400);
+        reveal.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                reset(animation);
+
+            }
+
+            private void reset(Animator animation) {
+                super.onAnimationEnd(animation);
+                reveal_view.setVisibility(INVISIBLE);
+
+            }
+        });
+
+        reveal.start();
+    }
+
+    private void delayedStartNextActivity() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                goToNewProjectForm();
+
+            }
+        }, 100);
+    }
+
+
+    private int getFabWidth() {
+        return (int) getResources().getDimension(R.dimen.fab_size);
     }
 
 

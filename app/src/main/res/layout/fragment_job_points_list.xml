@@ -8,6 +8,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+
     <RelativeLayout
         android:id="@+id/rl_layout_1_header"
         android:layout_width="match_parent"
@@ -17,6 +18,8 @@
             android:id="@+id/ll_projections_actions"
             android:paddingTop="5dp"
             android:paddingBottom="5dp"
+            android:layout_marginEnd="5dp"
+            android:gravity="end"
             android:weightSum="100"
             android:layout_width="match_parent"
             android:layout_height="50dp">
@@ -51,7 +54,8 @@
                 android:paddingBottom="5dp"
                 android:layout_weight="15"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:visibility="gone"/>
 
             <Space
                 android:layout_weight="1"
@@ -91,7 +95,6 @@
         android:id="@+id/rl_layout_point_survey_table"
         android:visibility="visible"
         android:layout_below="@id/rl_layout_1_header"
-        android:layout_above="@+id/rl_layout_3_footer"
         android:focusable="true"
         android:clickable="true"
         android:layout_width="match_parent"
@@ -120,7 +123,6 @@
         android:focusable="true"
         android:clickable="true"
         android:layout_below="@id/rl_layout_1_header"
-        android:layout_above="@+id/rl_layout_3_footer"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -142,44 +144,62 @@
     </RelativeLayout>
 
     <RelativeLayout
-        android:id="@+id/rl_layout_3_footer"
-        android:background="@drawable/box_border_bottom_screen"
-        android:elevation="4dp"
+        android:id="@+id/rl_layout_point_grid_table"
+        android:visibility="invisible"
+        android:focusable="true"
+        android:clickable="true"
+        android:layout_below="@id/rl_layout_1_header"
         android:layout_width="match_parent"
-        android:layout_height="80dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true">
+        android:layout_height="match_parent">
+
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:id="@+id/point_grid_swipe_to_refresh"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/tableView_for_Points_Grid"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+            </android.support.v7.widget.RecyclerView>
+
+        </android.support.v4.widget.SwipeRefreshLayout>
+
+    </RelativeLayout>
+
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fabSelect"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_action_filter_dark"
+            android:src="@drawable/ic_general_add"
             android:scaleType="center"
             app:elevation="6dp"
             app:fabSize="normal"
             android:layout_margin="@dimen/fab_margin"
             android:layout_alignParentBottom="true"
-            android:layout_alignParentStart="true"/>
+            android:layout_alignParentEnd="true"/>
 
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab_in_job_points"
-            android:src="@drawable/ic_general_add"
-            app:elevation="6dp"
-            app:fabSize="normal"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentEnd="true"
-            android:layout_margin="@dimen/fab_margin"
-            app:layout_scrollFlags="scroll|enterAlways"
-            android:visibility="visible"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
 
-    </RelativeLayout>
+    <View
+        android:id="@+id/revealNew"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorPrimary"
+        android:visibility="invisible" />
+
 
     <include
         android:id="@+id/fab_select_submenu"
         android:visibility="visible"
         layout="@layout/layout_point_view_fab_select_submenu"/>
+
+    <include
+        android:id="@+id/layout_new_point"
+        android:visibility="visible"
+        layout="@layout/layout_new_point_imbedded" />
+
 
 </RelativeLayout>

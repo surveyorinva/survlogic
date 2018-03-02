@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.os.Handler;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.util.Pair;
 import android.support.v4.view.ViewCompat;
@@ -131,6 +132,7 @@ public class ProjectListAdaptor extends RecyclerView.Adapter<RecyclerView.ViewHo
             case LARGE:
 
         }
+
 
     }
 

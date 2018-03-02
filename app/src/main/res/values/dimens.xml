@@ -7,6 +7,7 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
 
     <dimen name="fab_margin">16dp</dimen>
+    <dimen name="fab_size">56dp</dimen>
 
     <dimen name="app_bar_height">180dp</dimen>
     <dimen name="app_bar_height_detail">256dp</dimen>
@@ -72,5 +73,12 @@
     <dimen name="map_cardElevation">4dp</dimen>
     <dimen name="map_cardview_horizontal_padding">6dp</dimen>
     <dimen name="map_cardview_vertical_padding">2dp</dimen>
+
+    <!--New Point-->
+    <dimen name="point_new_dialog_hidden_text">12dp</dimen>
+    <dimen name="point_new_dialog_hidden_text_height">5dp</dimen>
+    
+    <!--Filter Menu-->
+    <dimen name="filter_menu_height">300dp</dimen>
 
 </resources>

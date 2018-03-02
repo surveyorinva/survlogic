@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/transparent"
+    android:fitsSystemWindows="true"
+    android:elevation="5dp">
+
+    <View
+        android:id="@+id/reveal_container"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/filter_menu_height"
+        android:layout_alignParentBottom="true"
+        android:background="@color/colorPrimary"
+        android:visibility="invisible" />
+
+    <LinearLayout
+        android:id="@+id/content_container"
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:visibility="invisible"
+        android:layout_alignParentBottom="true"
+        android:layout_height="@dimen/filter_menu_height">
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/viewpager_in_content_container"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/reveal_container">
+
+        <View
+            android:id="@+id/sheetTop"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:background="@color/colorPrimaryDark"
+            android:transformPivotY="64dp"
+            android:visibility="invisible" />
+
+        <android.support.design.widget.TabLayout
+            android:id="@+id/tabScroll_layout"
+            app:tabMode="scrollable"
+            app:tabGravity="fill"
+            app:tabIndicatorColor="@color/colorAccent"
+            app:tabIndicatorHeight="@dimen/tab_indicator"
+            app:theme="@style/MyToolbarTheme.TabLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="invisible"/>
+
+    </FrameLayout>
+
+    <View
+        android:id="@+id/bottom_list_background"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:alpha="0"
+        android:background="@drawable/box_border_sheet" />
+
+    <LinearLayout
+        android:id="@+id/bottom_list"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:layout_alignParentBottom="true">
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <ImageView
+                android:id="@+id/iv_cancel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:padding="12dp"
+                android:visibility="invisible"
+                app:srcCompat="@drawable/ic_action_cancel" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <ImageView
+                android:id="@+id/iv_add_new_point"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:padding="12dp"
+                android:visibility="invisible"
+                app:srcCompat="@drawable/ic_action_filter_dark" />
+        </FrameLayout>
+    </LinearLayout>
+
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_in_job_points"
+        android:src="@drawable/ic_action_filter_dark"
+        app:fabSize="normal"
+        app:borderWidth="0dp"
+        android:scaleType="center"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="@dimen/fab_margin"
+        android:layout_marginBottom="80dp"
+        app:layout_scrollFlags="scroll|enterAlways"
+        android:visibility="visible"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+
+
+</RelativeLayout>

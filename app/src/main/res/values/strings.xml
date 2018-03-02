@@ -145,6 +145,8 @@
     <string name="project_new_header_5">Project Photo</string>
     <string name="project_new_header_6">Projection</string>
     <string name="project_new_header_7">Zone</string>
+    <string name="project_new_header_8">Geographic Coordinates</string>
+    <string name="project_new_header_9">Grid Coordinates</string>
     <string name="project_new_name_hint">Enter the name of the Project</string>
     <string name="project_new_storage_prompt">Choose where the Project is Stored</string>
     <string name="project_new_units_prompt">Select unit of measurements</string>
@@ -227,18 +229,33 @@
     <string name="job_point_list_header_ellipsoid">Ellipsoid</string>
 
     <!--Add New Point-->
+    <string name="add_new_point_tab_header_1">Search</string>
+    <string name="add_new_point_tab_header_2">Point Group</string>
+    <string name="add_new_point_tab_header_3">Filters</string>
+
     <string name="dialog_job_point_name">Add New Point</string>
     <string name="dialog_job_point_item_pointNo">Point No.</string>
     <string name="dialog_job_point_item_northing">Northing</string>
     <string name="dialog_job_point_item_easting">Easting</string>
     <string name="dialog_job_point_item_elevation">Elevation</string>
     <string name="dialog_job_point_item_description">Description</string>
-    <string name="dialog_job_point_item_header_pointno">POINT NO.</string>
+    <string name="dialog_job_point_item_header_pointno">NO.</string>
     <string name="dialog_job_point_item_header_northing">NORTHING</string>
     <string name="dialog_job_point_item_header_easting">EASTING</string>
     <string name="dialog_job_point_item_header_elevation">ELEVATION</string>
     <string name="dialog_job_point_item_header_description">DESCRIPTION</string>
     <string name="dialog_job_point_item_header_description_short">DESC.</string>
+    <string name="dialog_job_point_item_header_latitude">LAT</string>
+    <string name="dialog_job_point_item_header_longitude">LON</string>
+    <string name="dialog_job_point_item_header_grid_north">GRID N</string>
+    <string name="dialog_job_point_item_header_grid_east">GRID E</string>
+    <string name="dialog_job_point_item_header_grid_north_default">Grid North:  (Not Defined)</string>
+    <string name="dialog_job_point_item_header_grid_east_default">Grid East:  (Not Defined)</string>
+    <string name="dialog_job_point_item_header_grid_north_title">Grid North: </string>
+    <string name="dialog_job_point_item_header_grid_east_title">Grid East: </string>
+    <string name="dialog_job_point_item_header_grid_north_value">Grid North:  %1$s</string>
+    <string name="dialog_job_point_item_header_grid_east_value">Grid East:  %1$s</string>
+
     <string name="dialog_job_point_button_advanced_settings">Advanced Settings</string>
     <string name="job_point_header_add_photos">Add Photos for this Point</string>
 
@@ -254,6 +271,7 @@
 
 
     <!--Geodetic Point Add/Edit-->
+    <string name="dialog_job_point_geodetic_app_title">Add/Edit Geodetic Position</string>
     <string name="dialog_job_point_geodetic_item_latitude">Latitude</string>
     <string name="dialog_job_point_geodetic_item_longitude">Longitude</string>
     <string name="dialog_job_point_geodetic_item_latitude_note">*Use - in Degrees for Southern Latitude</string>
@@ -262,6 +280,14 @@
     <string name="dialog_job_point_geodetic_long_missing_lat">You have entered a Longitude, but not a Latitude.  Please enter the missing data</string>
     <string name="dialog_job_point_geodetic_lat_missing_min_sec">Missing minute or seconds for the Latitude.  Please enter the missing data.</string>
     <string name="dialog_job_point_geodetic_long_missing_min_sec">Missing minute or seconds for the Longitude.  Please enter the missing data.</string>
+
+    <!--Grid Point Add/Edit-->
+    <string name="dialog_job_point_grid_app_title">Add/Edit Geodetic Position</string>
+    <string name="dialog_job_point_grid_item_header">Grid Coordinates</string>
+    <string name="dialog_job_point_grid_item_grid_north">Grid North</string>
+    <string name="dialog_job_point_grid_item_grid_east">Grid East</string>
+    <string name="dialog_job_point_grid_error_north_not_entered">Grid North cannot be empty.</string>
+    <string name="dialog_job_point_grid_error_east_not_entered">Grid East cannot be empty.</string>
 
     <!--Rod Height in GPS-->
     <string name="dialog_gps_rod_height_hand_held_title">Enter Rod Height</string>

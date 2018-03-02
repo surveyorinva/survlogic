@@ -1,145 +1,310 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:background="@color/white"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="500dp">
 
-
-    <LinearLayout
-        android:orientation="horizontal"
+    <!-- Top Toolbar -->
+    <RelativeLayout
+        android:id="@+id/appBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-
-        <ImageView
-            android:src="@drawable/ic_add_location"
-            android:layout_gravity="center"
-            android:layout_marginStart="4dp"
-            android:layout_marginTop="1dp"
-            android:layout_width="40dp"
-            android:layout_height="40dp" />
+        <include
+            layout="@layout/app_bar_job_point_new_top"/>
 
 
-        <android.support.design.widget.TextInputLayout
-            android:id="@+id/dialog_item_header_pointno"
-            app:hintTextAppearance="@style/DialogHintStyle"
+    </RelativeLayout>
+
+
+    <LinearLayout
+        android:layout_below="@id/appBar"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <EditText
-                android:id="@+id/dialog_item_pointNo"
-                android:hint="@string/dialog_job_point_item_pointNo"
-                android:textSize="20sp"
-                android:inputType="number"
+            <ImageView
+                android:src="@drawable/ic_add_location"
+                android:layout_gravity="center"
                 android:layout_marginStart="4dp"
                 android:layout_marginTop="1dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp" />
+
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content">
 
-        </android.support.design.widget.TextInputLayout>
+                <View
+                    android:layout_marginTop="13dp"
+                    android:background="@drawable/editbox_background_normal"
+                    android:layout_width="200dp"
+                    android:layout_height="52dp"/>
 
+                <TextView
+                    android:id="@+id/dialog_item_header_pointno_hint"
+                    android:layout_width="wrap_content"
+                    android:layout_height="5dp"
+                    android:layout_marginTop="@dimen/point_new_dialog_hidden_text"
+                    android:layout_marginStart="10dp"
+                    android:paddingLeft="4dp"
+                    android:paddingRight="4dp"
+                    android:text="@string/dialog_job_point_item_pointNo"
+                    android:textSize="16sp"
+                    android:textColor="@color/white"
+                    android:background="@android:color/white"
+                    android:visibility="invisible"/>
 
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/dialog_item_header_pointno"
+                    app:hintTextAppearance="@style/HintTextStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:id="@+id/dialog_item_pointNo"
+                        android:hint="@string/dialog_job_point_item_pointNo"
+                        android:inputType="number"
+                        android:maxLines="1"
+                        android:layout_marginStart="4dp"
+                        style="@style/InputField.EditText"
+                        android:backgroundTint="@color/transparent"
+                        android:layout_width="190dp"
+                        android:layout_height="50dp"/>
+
+                </android.support.design.widget.TextInputLayout>
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="25dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <View
+                android:layout_marginTop="13dp"
+                android:background="@drawable/editbox_background_normal"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"/>
+
+            <TextView
+                android:id="@+id/dialog_item_header_northing_hint"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/point_new_dialog_hidden_text_height"
+                android:layout_marginTop="@dimen/point_new_dialog_hidden_text"
+                android:layout_marginStart="10dp"
+                android:paddingLeft="4dp"
+                android:paddingRight="4dp"
+                android:text="@string/dialog_job_point_item_northing"
+                android:textSize="16sp"
+                android:textColor="@color/white"
+                android:background="@android:color/white"
+                android:visibility="invisible"/>
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/dialog_item_header_northing"
+                app:hintTextAppearance="@style/HintTextStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/dialog_item_northing"
+                    android:hint="@string/dialog_job_point_item_northing"
+                    android:inputType="numberDecimal"
+                    android:maxLines="1"
+                    android:layout_marginStart="4dp"
+                    style="@style/InputField.EditText"
+                    android:backgroundTint="@color/transparent"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="25dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <View
+                android:layout_marginTop="13dp"
+                android:background="@drawable/editbox_background_normal"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"/>
+
+            <TextView
+                android:id="@+id/dialog_item_header_easting_hint"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/point_new_dialog_hidden_text_height"
+                android:layout_marginTop="@dimen/point_new_dialog_hidden_text"
+                android:layout_marginStart="10dp"
+                android:paddingLeft="4dp"
+                android:paddingRight="4dp"
+                android:text="@string/dialog_job_point_item_easting"
+                android:textSize="16sp"
+                android:textColor="@color/white"
+                android:background="@android:color/white"
+                android:visibility="invisible"/>
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/dialog_item_header_easting"
+                app:hintTextAppearance="@style/HintTextStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/dialog_item_easting"
+                    android:hint="@string/dialog_job_point_item_easting"
+                    android:inputType="numberDecimal"
+                    android:maxLines="1"
+                    android:layout_marginStart="4dp"
+                    style="@style/InputField.EditText"
+                    android:backgroundTint="@color/transparent"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="25dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <View
+                android:layout_marginTop="13dp"
+                android:background="@drawable/editbox_background_normal"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"/>
+
+            <TextView
+                android:id="@+id/dialog_item_header_elevation_hint"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/point_new_dialog_hidden_text_height"
+                android:layout_marginTop="@dimen/point_new_dialog_hidden_text"
+                android:layout_marginStart="10dp"
+                android:paddingLeft="4dp"
+                android:paddingRight="4dp"
+                android:text="@string/dialog_job_point_item_elevation"
+                android:textSize="16sp"
+                android:textColor="@color/white"
+                android:background="@android:color/white"
+                android:visibility="invisible"/>
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/dialog_item_header_elevation"
+                app:hintTextAppearance="@style/HintTextStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/dialog_item_elevation"
+                    android:hint="@string/dialog_job_point_item_elevation"
+                    android:inputType="numberDecimal"
+                    android:maxLines="1"
+                    android:layout_marginStart="4dp"
+                    style="@style/InputField.EditText"
+                    android:backgroundTint="@color/transparent"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="25dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <View
+                android:layout_marginTop="13dp"
+                android:background="@drawable/editbox_background_normal"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"/>
+
+            <TextView
+                android:id="@+id/dialog_item_header_description_hint"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/point_new_dialog_hidden_text_height"
+                android:layout_marginTop="@dimen/point_new_dialog_hidden_text"
+                android:layout_marginStart="10dp"
+                android:paddingLeft="4dp"
+                android:paddingRight="4dp"
+                android:text="@string/dialog_job_point_item_description"
+                android:textSize="16sp"
+                android:textColor="@color/white"
+                android:background="@android:color/white"
+                android:visibility="invisible"/>
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/dialog_item_header_description"
+                app:hintTextAppearance="@style/HintTextStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/dialog_item_description"
+                    android:hint="@string/dialog_job_point_item_description"
+                    android:inputType="textAutoComplete|textAutoCorrect|textCapSentences"
+                    android:maxLines="1"
+                    android:layout_marginStart="4dp"
+                    style="@style/InputField.EditText"
+                    android:backgroundTint="@color/transparent"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+        </RelativeLayout>
+
+        <FrameLayout
+            android:id="@+id/btn_AdvancedSettings"
+            android:layout_width="300dp"
+            android:layout_height="56dp"
+            android:layout_marginTop="50dp"
+            android:layout_marginBottom="64dp"
+            android:layout_gravity="center"
+            android:background="@drawable/button_framed_blue_oval"
+            android:clickable="true"
+            android:focusable="true"
+            android:elevation="4dp">
+
+            <TextView
+                android:id="@+id/button_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:fontFamily="sans-serif-light"
+                android:text="@string/dialog_job_point_button_advanced_settings"
+                android:textColor="#ffffff" />
+
+            <ProgressBar
+                android:id="@+id/progress_bar"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_gravity="center"
+                android:visibility="invisible" />
+        </FrameLayout>
 
     </LinearLayout>
-
-
-
-    <android.support.design.widget.TextInputLayout
-        android:id="@+id/dialog_item_header_northing"
-        app:hintTextAppearance="@style/DialogHintStyle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <EditText
-            android:id="@+id/dialog_item_northing"
-            android:hint="@string/dialog_job_point_item_northing"
-            android:textSize="20sp"
-            android:inputType="numberDecimal"
-            android:layout_marginStart="4dp"
-            android:layout_marginTop="1dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-
-    </android.support.design.widget.TextInputLayout>
-
-
-    <android.support.design.widget.TextInputLayout
-        android:id="@+id/dialog_item_header_easting"
-        app:hintTextAppearance="@style/DialogHintStyle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <EditText
-            android:id="@+id/dialog_item_easting"
-            android:hint="@string/dialog_job_point_item_easting"
-            android:textSize="20sp"
-            android:inputType="numberDecimal"
-            android:layout_marginStart="4dp"
-            android:layout_marginTop="1dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-
-    </android.support.design.widget.TextInputLayout>
-
-
-    <android.support.design.widget.TextInputLayout
-        android:id="@+id/dialog_item_header_elevation"
-        app:hintTextAppearance="@style/DialogHintStyle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <EditText
-            android:id="@+id/dialog_item_elevation"
-            android:hint="@string/dialog_job_point_item_elevation"
-            android:textSize="20sp"
-            android:inputType="numberDecimal"
-            android:layout_marginStart="4dp"
-            android:layout_marginTop="1dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-
-    </android.support.design.widget.TextInputLayout>
-
-
-    <android.support.design.widget.TextInputLayout
-        android:id="@+id/dialog_item_header_description"
-        app:hintTextAppearance="@style/DialogHintStyle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <EditText
-            android:id="@+id/dialog_item_description"
-            android:hint="@string/dialog_job_point_item_description"
-            android:textSize="20sp"
-            android:inputType="text"
-            android:layout_marginStart="4dp"
-            android:layout_marginTop="1dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-
-    </android.support.design.widget.TextInputLayout>
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:weightSum="100"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-
-        <Button
-            android:id="@+id/btnAdvancedSettings"
-            android:text="@string/dialog_job_point_button_advanced_settings"
-            android:textColor="@color/contextualText"
-            android:layout_weight="40"
-            style="@style/Button.Flat.Primary.BlueButton"
-            android:layout_marginStart="2dp"
-            android:layout_width="0dp"
-            android:layout_height="75dp" />
-
-
-    </LinearLayout>
-
 
 </LinearLayout>

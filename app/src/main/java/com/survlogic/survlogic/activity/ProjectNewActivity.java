@@ -154,7 +154,7 @@ public class ProjectNewActivity extends AppCompatActivity {
         btnCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
+                returnResults(true);
             }
         });
 
@@ -180,20 +180,27 @@ public class ProjectNewActivity extends AppCompatActivity {
 
                     // Execute background task
                     backgroundProjectNew.execute(project);
-                    returnResults();
+                    returnResults(false);
                 }
 
             }
         });
     }
 
-    private void returnResults(){
+    private void returnResults(boolean isCancel){
         Log.d(TAG, "returnResults: Started");
         Intent returnIntent = new Intent();
         returnIntent.putExtra(getString(R.string.KEY_PROJECT_NAME),mProjectName);
 
-        setResult(Activity.RESULT_OK,returnIntent);
+        if(!isCancel){
+            setResult(Activity.RESULT_OK,returnIntent);
+
+        }else{
+            setResult(Activity.RESULT_CANCELED);
+        }
+
         finish();
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
 
     }
 
