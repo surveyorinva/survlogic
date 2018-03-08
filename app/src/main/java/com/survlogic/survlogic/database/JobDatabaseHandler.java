@@ -14,7 +14,6 @@ import com.survlogic.survlogic.model.PointSurvey;
 import com.survlogic.survlogic.model.ProjectJobSettings;
 
 import java.io.File;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -87,7 +86,7 @@ public class JobDatabaseHandler extends SQLiteOpenHelper {
             + JobContract.PointEntry.KEY_GEOORTHO + " DOUBLE,"
             + JobContract.PointEntry.KEY_GEOACCURACY + " DOUBLE,"
             + JobContract.PointEntry.KEY_DESCRIPTION + " TEXT,"
-            + JobContract.PointEntry.KEY_POINT_TYPE + " INTEGER,"
+            + JobContract.PointEntry.KEY_POINT_PLANAR_TYPE + " INTEGER,"
             + JobContract.PointEntry.KEY_POINT_GEODETIC_TYPE + " INTEGER,"
             + JobContract.PointEntry.KEY_DATE_CREATED + " INTEGER,"
             + JobContract.PointEntry.KEY_DATE_MODIFIED + " INTEGER);";
@@ -227,7 +226,7 @@ public class JobDatabaseHandler extends SQLiteOpenHelper {
         contentValues.put(JobContract.PointEntry.KEY_EASTING, pointSurvey.getEasting());
         contentValues.put(JobContract.PointEntry.KEY_ELEVATION, pointSurvey.getElevation());
         contentValues.put(JobContract.PointEntry.KEY_DESCRIPTION, pointSurvey.getDescription());
-        contentValues.put(JobContract.PointEntry.KEY_POINT_TYPE, pointSurvey.getPointType());
+        contentValues.put(JobContract.PointEntry.KEY_POINT_PLANAR_TYPE, pointSurvey.getPointType());
 
         contentValues.put(JobContract.PointEntry.KEY_DATE_CREATED,(int) (new Date().getTime()/1000));
 
@@ -263,7 +262,7 @@ public class JobDatabaseHandler extends SQLiteOpenHelper {
             contentValues.put(JobContract.PointEntry.KEY_EASTING, pointSurvey.getEasting());
             contentValues.put(JobContract.PointEntry.KEY_ELEVATION, pointSurvey.getElevation());
             contentValues.put(JobContract.PointEntry.KEY_DESCRIPTION, pointSurvey.getDescription());
-            contentValues.put(JobContract.PointEntry.KEY_POINT_TYPE, pointSurvey.getPointType());
+            contentValues.put(JobContract.PointEntry.KEY_POINT_PLANAR_TYPE, pointSurvey.getPointType());
 
             contentValues.put(JobContract.PointEntry.KEY_DATE_CREATED,(int) (new Date().getTime()/1000));
 
@@ -294,15 +293,17 @@ public class JobDatabaseHandler extends SQLiteOpenHelper {
         contentValues.put(JobContract.PointEntry.KEY_EASTING, pointGeodetic.getEasting());
         contentValues.put(JobContract.PointEntry.KEY_ELEVATION, pointGeodetic.getElevation());
         contentValues.put(JobContract.PointEntry.KEY_DESCRIPTION, pointGeodetic.getDescription());
-        contentValues.put(JobContract.PointEntry.KEY_POINT_TYPE, pointGeodetic.getPointType());
+        contentValues.put(JobContract.PointEntry.KEY_POINT_PLANAR_TYPE, pointGeodetic.getPointType());
 
         //Required - From PointGeodetic
-        contentValues.put(JobContract.PointEntry.KEY_GEOLAT, pointGeodetic.getLatitude());
-        contentValues.put(JobContract.PointEntry.KEY_GEOLON, pointGeodetic.getLongitude());
-        contentValues.put(JobContract.PointEntry.KEY_GEOELLIPS, pointGeodetic.getEllipsoid());
-        contentValues.put(JobContract.PointEntry.KEY_GEOORTHO, pointGeodetic.getOrtho());
-        contentValues.put(JobContract.PointEntry.KEY_GEOACCURACY, pointGeodetic.getAccuracy());
-        contentValues.put(JobContract.PointEntry.KEY_POINT_GEODETIC_TYPE, pointGeodetic.getPointGeodeticType());
+        if(pointGeodetic.getPointGeodeticType() !=0){
+            contentValues.put(JobContract.PointEntry.KEY_GEOLAT, pointGeodetic.getLatitude());
+            contentValues.put(JobContract.PointEntry.KEY_GEOLON, pointGeodetic.getLongitude());
+            contentValues.put(JobContract.PointEntry.KEY_GEOELLIPS, pointGeodetic.getEllipsoid());
+            contentValues.put(JobContract.PointEntry.KEY_GEOORTHO, pointGeodetic.getOrtho());
+            contentValues.put(JobContract.PointEntry.KEY_GEOACCURACY, pointGeodetic.getAccuracy());
+            contentValues.put(JobContract.PointEntry.KEY_POINT_GEODETIC_TYPE, pointGeodetic.getPointGeodeticType());
+        }
 
         contentValues.put(JobContract.PointEntry.KEY_DATE_CREATED,(int) (new Date().getTime()/1000));
 
@@ -496,7 +497,7 @@ public class JobDatabaseHandler extends SQLiteOpenHelper {
                 pointSurvey.setEasting(c.getDouble(c.getColumnIndex(JobContract.PointEntry.KEY_EASTING)));
                 pointSurvey.setElevation(c.getDouble(c.getColumnIndex(JobContract.PointEntry.KEY_ELEVATION)));
                 pointSurvey.setDescription((c.getString(c.getColumnIndex(JobContract.PointEntry.KEY_DESCRIPTION))));
-                pointSurvey.setPointType(c.getInt((c.getColumnIndex(JobContract.PointEntry.KEY_POINT_TYPE))));
+                pointSurvey.setPointType(c.getInt((c.getColumnIndex(JobContract.PointEntry.KEY_POINT_PLANAR_TYPE))));
 
                 // Project MetaData
                 pointSurvey.setDateCreated(c.getInt(c.getColumnIndex(JobContract.PointEntry.KEY_DATE_CREATED)));
@@ -531,13 +532,14 @@ public class JobDatabaseHandler extends SQLiteOpenHelper {
                 pointGeodetic.setEasting(c.getDouble(c.getColumnIndex(JobContract.PointEntry.KEY_EASTING)));
                 pointGeodetic.setElevation(c.getDouble(c.getColumnIndex(JobContract.PointEntry.KEY_ELEVATION)));
                 pointGeodetic.setDescription((c.getString(c.getColumnIndex(JobContract.PointEntry.KEY_DESCRIPTION))));
-                pointGeodetic.setPointType(c.getInt((c.getColumnIndex(JobContract.PointEntry.KEY_POINT_TYPE))));
-                pointGeodetic.setPointGeodeticType(c.getInt((c.getColumnIndex(JobContract.PointEntry.KEY_POINT_GEODETIC_TYPE))));
+                pointGeodetic.setPointType(c.getInt((c.getColumnIndex(JobContract.PointEntry.KEY_POINT_PLANAR_TYPE))));
 
                 pointGeodetic.setLatitude(c.getDouble(c.getColumnIndex(JobContract.PointEntry.KEY_GEOLAT)));
                 pointGeodetic.setLongitude(c.getDouble(c.getColumnIndex(JobContract.PointEntry.KEY_GEOLON)));
                 pointGeodetic.setEllipsoid(c.getDouble(c.getColumnIndex(JobContract.PointEntry.KEY_GEOELLIPS)));
                 pointGeodetic.setOrtho(c.getDouble(c.getColumnIndex(JobContract.PointEntry.KEY_GEOORTHO)));
+                pointGeodetic.setPointGeodeticType(c.getInt((c.getColumnIndex(JobContract.PointEntry.KEY_POINT_GEODETIC_TYPE))));
+
 
                 // Project MetaData
                 pointGeodetic.setDateCreated(c.getInt(c.getColumnIndex(JobContract.PointEntry.KEY_DATE_CREATED)));
@@ -575,12 +577,13 @@ public class JobDatabaseHandler extends SQLiteOpenHelper {
         pointGeodetic.setEasting(c.getDouble(c.getColumnIndex(JobContract.PointEntry.KEY_EASTING)));
         pointGeodetic.setElevation(c.getDouble(c.getColumnIndex(JobContract.PointEntry.KEY_ELEVATION)));
         pointGeodetic.setDescription((c.getString(c.getColumnIndex(JobContract.PointEntry.KEY_DESCRIPTION))));
-        pointGeodetic.setPointType(c.getInt((c.getColumnIndex(JobContract.PointEntry.KEY_POINT_TYPE))));
+        pointGeodetic.setPointType(c.getInt((c.getColumnIndex(JobContract.PointEntry.KEY_POINT_PLANAR_TYPE))));
 
         pointGeodetic.setLatitude(c.getDouble(c.getColumnIndex(JobContract.PointEntry.KEY_GEOLAT)));
         pointGeodetic.setLongitude(c.getDouble(c.getColumnIndex(JobContract.PointEntry.KEY_GEOLON)));
         pointGeodetic.setEllipsoid(c.getDouble(c.getColumnIndex(JobContract.PointEntry.KEY_GEOELLIPS)));
         pointGeodetic.setOrtho(c.getDouble(c.getColumnIndex(JobContract.PointEntry.KEY_GEOORTHO)));
+        pointGeodetic.setPointGeodeticType(c.getInt((c.getColumnIndex(JobContract.PointEntry.KEY_POINT_GEODETIC_TYPE))));
 
         // Project MetaData
         pointGeodetic.setDateCreated(c.getInt(c.getColumnIndex(JobContract.PointEntry.KEY_DATE_CREATED)));

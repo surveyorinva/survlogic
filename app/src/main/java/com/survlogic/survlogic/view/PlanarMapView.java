@@ -76,7 +76,6 @@ public class PlanarMapView extends View {
     private Rect clipBounds_canvas, originalBounds_canvas;
 
     private float screenDistance, symbolSize, textSize;
-    private static float scaleRatioSymbol= 0.01f, scaleRatioText = 0.02f;
     private float drawingTouchRadius = 30;
 
     private boolean mLongClick = false;
@@ -151,51 +150,81 @@ public class PlanarMapView extends View {
         Log.d(TAG, "||initPoints: Started...");
         Log.d(TAG, "initPoints: Planar Scale: " + planarScale);
 
-        for(int i=0; i<lstPoints.size(); i++) {
-            PointSurvey pointSurvey = lstPoints.get(i);
-            lstNorthings.add(pointSurvey.getNorthing());
-            lstEasting.add(pointSurvey.getEasting());
+        if(lstPoints.size() != 0){
+            for(int i=0; i<lstPoints.size(); i++) {
+                PointSurvey pointSurvey = lstPoints.get(i);
+                lstNorthings.add(pointSurvey.getNorthing());
+                lstEasting.add(pointSurvey.getEasting());
+            }
+
+            double minNorth = Collections.min(lstNorthings);
+            double minEast = Collections.min(lstEasting);
+
+            double maxNorth = Collections.max(lstNorthings);
+            double maxEast = Collections.max(lstEasting);
+
+            minNorth = minNorth - screenBufferY;
+            minEast = minEast - screenBufferX;
+
+            maxNorth = maxNorth + screenBufferY;
+            maxEast = maxEast + screenBufferX;
+
+            fakeOriginX = (int) minEast;
+            fakeOriginY = (int) maxNorth;
+
+            planarWidth = (int) maxEast - (int) minEast;
+            planarHeight = (int) maxNorth - (int) minNorth;
+
+            planarWidthScale = (double) screenWidth / (double) planarWidth;
+            planarHeightScale = (double) screenHeight / (double) planarHeight;
+
+            if(screenWidth<screenHeight){
+                planarScale = planarWidthScale;
+            }else{
+                planarScale = planarHeightScale;
+            }
+
+            planarCanvas = Bitmap.createBitmap(screenWidth,screenHeight,Bitmap.Config.ARGB_8888);
+            drawPlanarCanvas = new Canvas(planarCanvas);
+            originalBounds_canvas = drawPlanarCanvas.getClipBounds();
+
+            screenDistance = getInitialMapScaleDistance(0,screenWidth);
+            Log.d(TAG, "initPoints: Screen Distance: " + screenDistance);
+
+            setObjectSize(screenDistance);
+
+            invalidate();
         }
-
-        double minNorth = Collections.min(lstNorthings);
-        double minEast = Collections.min(lstEasting);
-
-        double maxNorth = Collections.max(lstNorthings);
-        double maxEast = Collections.max(lstEasting);
-
-        minNorth = minNorth - screenBufferY;
-        minEast = minEast - screenBufferX;
-
-        maxNorth = maxNorth + screenBufferY;
-        maxEast = maxEast + screenBufferX;
-
-        fakeOriginX = (int) minEast;
-        fakeOriginY = (int) maxNorth;
-
-        planarWidth = (int) maxEast - (int) minEast;
-        planarHeight = (int) maxNorth - (int) minNorth;
-
-        planarWidthScale = (double) screenWidth / (double) planarWidth;
-        planarHeightScale = (double) screenHeight / (double) planarHeight;
-
-        if(screenWidth<screenHeight){
-            planarScale = planarWidthScale;
-        }else{
-            planarScale = planarHeightScale;
-        }
-
-        planarCanvas = Bitmap.createBitmap(screenWidth,screenHeight,Bitmap.Config.ARGB_8888);
-        drawPlanarCanvas = new Canvas(planarCanvas);
-        originalBounds_canvas = drawPlanarCanvas.getClipBounds();
-
-        screenDistance = getInitialMapScaleDistance(0,screenWidth);
-        Log.d(TAG, "initPoints: Screen Distance: " + screenDistance);
-
-        setObjectSize(screenDistance);
-
-        invalidate();
 
     }
+
+    private void initDrawingScales(){
+        Log.d(TAG, "initDrawingScales: Started");
+
+        if(lstPoints.size() != 0) {
+            for (int i = 0; i < lstPoints.size(); i++) {
+                PointSurvey pointSurvey = lstPoints.get(i);
+                lstNorthings.add(pointSurvey.getNorthing());
+                lstEasting.add(pointSurvey.getEasting());
+            }
+
+            double minNorth = Collections.min(lstNorthings);
+            double minEast = Collections.min(lstEasting);
+
+            double maxNorth = Collections.max(lstNorthings);
+            double maxEast = Collections.max(lstEasting);
+
+
+
+
+        }
+
+
+
+
+    }
+
+
 
     public boolean getShowPointNo(){
         return showPointNo;
@@ -286,11 +315,27 @@ public class PlanarMapView extends View {
 
     public void setObjectSize(float scaleDistance){
         Log.d(TAG, "setObjectSize: Started...");
+        Log.d(TAG, "setObjectSize: Scale Distance: " + scaleDistance);
 
-        Log.d(TAG, "Sizes: Scale Distance: " + scaleDistance);
-        this.symbolSize = scaleDistance * scaleRatioSymbol;
+        float scaleRatioSymbol= 0.01f, scaleRatioText = 0.02f;
 
-        this.textSize = scaleDistance * scaleRatioText;
+        if(scaleDistance * scaleRatioSymbol < 10){
+            this.symbolSize = 10;
+        }else{
+            this.symbolSize = scaleDistance * scaleRatioSymbol;
+        }
+
+        if(scaleDistance * scaleRatioText < 16){
+            this.textSize = 16;
+        }else{
+            this.textSize = scaleDistance * scaleRatioText;
+
+        }
+
+        Log.d(TAG, "setObjectSize: ScreenDistance: " + scaleDistance);
+        Log.d(TAG, "setObjectSize: Computed Symbol Size: " + scaleDistance * scaleRatioSymbol);
+        Log.d(TAG, "setObjectSize: Symbol Scaled Size: " + symbolSize);
+        Log.d(TAG, "setObjectSize: Text Scaled Size: " + textSize);
 
         this.screenDistance = scaleDistance;
 
@@ -352,8 +397,6 @@ public class PlanarMapView extends View {
     protected void onDraw(Canvas canvas) {
         Log.d(TAG, "onDraw: Started");
         canvas.save();
-
-
 
         if(planarCanvas != null){
             Log.d(TAG, "|onDraw: Planar Canvas = Added");
@@ -654,7 +697,13 @@ public class PlanarMapView extends View {
         paintLine.setColor(lineColor);
 
         float lineWidth = 0.003f;
+
         float scaledLineWidth = lineWidth * screenDistance;
+
+        if(scaledLineWidth <1){
+            scaledLineWidth = 1;
+        }
+
         Log.d(TAG, "Sizes: Symbol: " + LINE_RADIUS);
         Log.d(TAG, "Sizes: Line Width: " + scaledLineWidth);
 

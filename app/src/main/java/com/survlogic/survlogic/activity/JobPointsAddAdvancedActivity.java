@@ -72,12 +72,16 @@ public class JobPointsAddAdvancedActivity extends AppCompatActivity implements P
     private Button btCancel, btSave;
     private ImageButton btGPSAdd, btGPSEntryAdd, btGridAdd;
 
-    private int pointNumber, pointType, projectId, jobId;
+    private int pointNumber, projectId, jobId;
     private double pointNorthing,pointEasting,pointElevation;
     private String pointDescription, jobDbName;
 
+    int pointTypePlanar = 1;
+    int pointTypeGeodetic = 0;
+
     double mLocationLat = 0, mLocationLong = 0, mLocationEllipsoid = 0, mLocationOrtho = 0, mLocationAccuracy = 0;
     double mLocationGridNorth = 0, mLocationGridEast = 0;
+
 
 
     private boolean isGeodeticManualEntry = false, isGridManualEntry = false;
@@ -392,7 +396,7 @@ public class JobPointsAddAdvancedActivity extends AppCompatActivity implements P
         pointEasting = pointSurvey.getEasting();
         pointElevation = pointSurvey.getElevation();
         pointDescription = pointSurvey.getDescription();
-        pointType = pointSurvey.getPointType();
+        pointTypePlanar = pointSurvey.getPointType();
 
         if(pointNumber !=0){
             etPointNumber.setText(String.valueOf(pointNumber));
@@ -452,6 +456,7 @@ public class JobPointsAddAdvancedActivity extends AppCompatActivity implements P
             mLocationOrtho = data.getDoubleExtra(getString(R.string.KEY_POSITION_ORTHO), 0);
 
             isGeodeticManualEntry = false;
+            pointTypeGeodetic = 3;
 
             populateWorldValues();
 
@@ -501,7 +506,7 @@ public class JobPointsAddAdvancedActivity extends AppCompatActivity implements P
         worldIN.setNorthing(mLocationLat);
         worldIN.setEasting(mLocationLong);
 
-        Point gridOUT = new Point();
+        Point gridOUT;
         gridOUT = surveyProjectionHelper.calculateGridCoordinates(worldIN);
 
         mLocationGridNorth = gridOUT.getNorthing();
@@ -520,12 +525,14 @@ public class JobPointsAddAdvancedActivity extends AppCompatActivity implements P
         gridIN.setNorthing(mLocationGridNorth);
         gridIN.setEasting(mLocationGridEast);
 
-        Point worldOUT = new Point();
+        Point worldOUT;
         worldOUT = surveyProjectionHelper.calculateGeodeticCoordinates(gridIN);
 
         mLocationLat = worldOUT.getNorthing();
         mLocationLong = worldOUT.getEasting();
         isGeodeticManualEntry = false;
+
+        pointTypeGeodetic = 5;
 
         populateWorldValues();
 
@@ -656,23 +663,14 @@ public class JobPointsAddAdvancedActivity extends AppCompatActivity implements P
         pointDescription = etPointDescription.getText().toString();
         pointGeodetic.setDescription(pointDescription);
 
-        pointGeodetic.setPointType(1);
-
         pointGeodetic.setLatitude(mLocationLat);
         pointGeodetic.setLongitude(mLocationLong);
         pointGeodetic.setEllipsoid(mLocationEllipsoid);
         pointGeodetic.setOrtho(mLocationOrtho);
 
 
-        int geodeticEntry;
-
-        if(isGeodeticManualEntry){
-            geodeticEntry = 1;
-        }else{
-            geodeticEntry = 3;
-        }
-
-        pointGeodetic.setPointGeodeticType(geodeticEntry);
+        pointGeodetic.setPointType(pointTypePlanar);
+        pointGeodetic.setPointGeodeticType(pointTypeGeodetic);
 
 
         Log.d(TAG, "createPointGeodetic: Finished creating pointGeodetic");
@@ -753,6 +751,7 @@ public class JobPointsAddAdvancedActivity extends AppCompatActivity implements P
         mLocationLong = longOut;
         mLocationEllipsoid = heightEllipsOut;
         mLocationOrtho = heightOrthoOut;
+        pointTypeGeodetic = 1;
 
         if(isJobWithProjection){
             findGridCoordinatesFromWorld();

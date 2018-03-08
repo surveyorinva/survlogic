@@ -22,15 +22,22 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.FileProvider;
+import android.support.v7.widget.CardView;
+import android.transition.TransitionManager;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.GridView;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,8 +52,10 @@ import com.survlogic.survlogic.database.ProjectDatabaseHandler;
 import com.survlogic.survlogic.model.JobSketch;
 import com.survlogic.survlogic.model.PointGeodetic;
 import com.survlogic.survlogic.model.ProjectImages;
+import com.survlogic.survlogic.utils.AnimateBounceInterpolator;
 import com.survlogic.survlogic.utils.SurveyMathHelper;
 import com.survlogic.survlogic.utils.PreferenceLoaderHelper;
+import com.survlogic.survlogic.utils.SurveyProjectionHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -83,16 +92,29 @@ public class DialogJobPointView extends DialogFragment {
     private String databaseName, mCurrentPhotoPath;
     private Bitmap mBitmap, mBitmapRaw;
 
+    private RelativeLayout rlGridView, rlGridViewDetails, rlPointCommands, rlPlanarCommands, rlGeodeticCommands, rlGridCommands;
+
+    private CardView cardViewGrid;
+
     private TextView tvPointNo, tvPointDesc, tvPointClass, tvPointNorth, tvPointEast, tvPointElev,
             tvPointLat, tvPointLong, tvPointEllipsoid, tvPointOrtho,
             tvPointLatHeader, tvPointLongHeader, tvPointEllipsoidHeader;
+
+    private ImageView ivPointCommands;
+
+    private ImageButton ibPointCommand_1, ibPointCommand_2, ibPointCommand_3;
+    private ImageButton ibPlanarCommand_1;
+    private ImageButton ibGeodeticCommand_1, ibGeodeticCommand_2, ibGeodeticCommand_3;
+    private ImageButton ibGridCommand_1, ibGridCommand_2, ibGridCommand_3;
 
     private ProgressBar pbProgressCircle;
 
     private Button btTakePhoto, btAddSketch;
 
-    private SharedPreferences sharedPreferences;
+    private boolean isPointCommandsShown = false, isProjection = false;
+
     private PreferenceLoaderHelper preferenceLoaderHelper;
+    SurveyProjectionHelper surveyProjectionHelper;
 
     private static DecimalFormat COORDINATE_FORMATTER, DISTANCE_PRECISION_FORMATTER;
 
@@ -166,6 +188,8 @@ public class DialogJobPointView extends DialogFragment {
         });
 
         preferenceLoaderHelper = new PreferenceLoaderHelper(mContext);
+        surveyProjectionHelper = new SurveyProjectionHelper(mContext);
+
         loadPreferences();
 
         initViewWidgets();
@@ -175,6 +199,7 @@ public class DialogJobPointView extends DialogFragment {
         showSketchGridView();
 
         showDialogAnimation();
+        initProjection();
 
     }
 
@@ -251,6 +276,15 @@ public class DialogJobPointView extends DialogFragment {
         gridView = (GridView) getDialog().findViewById(R.id.photo_grid_view);
         sketchGridView = (GridView) getDialog().findViewById(R.id.sketch_grid_view);
 
+        rlGridView = (RelativeLayout) getDialog().findViewById(R.id.rlGridView);
+        rlGridViewDetails = (RelativeLayout) getDialog().findViewById(R.id.rl_grid_view_details);
+        rlPointCommands = (RelativeLayout) getDialog().findViewById(R.id.rl_points_commands);
+        rlPlanarCommands = (RelativeLayout) getDialog().findViewById(R.id.rl_points_commands_planar);
+        rlGeodeticCommands = (RelativeLayout) getDialog().findViewById(R.id.rl_points_commands_geographic);
+        rlGridCommands = (RelativeLayout) getDialog().findViewById(R.id.rl_points_commands_grid);
+
+        cardViewGrid = (CardView) getDialog().findViewById(R.id.card_grid_view);
+
         tvPointNo = (TextView) getDialog().findViewById(R.id.pointNoValue);
         tvPointDesc = (TextView) getDialog().findViewById(R.id.pointDescValue);
         tvPointClass = (TextView) getDialog().findViewById(R.id.pointClassValue);
@@ -267,6 +301,21 @@ public class DialogJobPointView extends DialogFragment {
         tvPointLong = (TextView) getDialog().findViewById(R.id.longitudeValue);
         tvPointEllipsoid = (TextView) getDialog().findViewById(R.id.ellipsoidHeightValue);
         tvPointOrtho = (TextView) getDialog().findViewById(R.id.orthoHeightValue);
+
+        ivPointCommands = (ImageView) getDialog().findViewById(R.id.survey_image_center);
+        ibPointCommand_1 = (ImageButton) getDialog().findViewById(R.id.points_command_1);
+        ibPointCommand_2 = (ImageButton) getDialog().findViewById(R.id.points_command_2);
+        ibPointCommand_3 = (ImageButton) getDialog().findViewById(R.id.points_command_3);
+
+        ibPlanarCommand_1 = (ImageButton) getDialog().findViewById(R.id.planar_command_1);
+
+        ibGeodeticCommand_1 = (ImageButton) getDialog().findViewById(R.id.geographic_command_1);
+        ibGeodeticCommand_2 = (ImageButton) getDialog().findViewById(R.id.geographic_command_2);
+        ibGeodeticCommand_3 = (ImageButton) getDialog().findViewById(R.id.geographic_command_3);
+
+        ibGridCommand_1 = (ImageButton) getDialog().findViewById(R.id.grid_command_1);
+        ibGridCommand_2 = (ImageButton) getDialog().findViewById(R.id.grid_command_2);
+        ibGridCommand_3 = (ImageButton) getDialog().findViewById(R.id.grid_command_3);
 
         pbProgressCircle = (ProgressBar) getDialog().findViewById(R.id.progressBar_Loading_point);
 
@@ -316,9 +365,13 @@ public class DialogJobPointView extends DialogFragment {
             }
         });
 
+        ivPointCommands.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showPointCommands();
 
-
-
+            }
+        });
 
     }
 
@@ -381,7 +434,20 @@ public class DialogJobPointView extends DialogFragment {
                 tvPointEllipsoid.setVisibility(View.VISIBLE);
             }
 
+
+
+
+            if(isProjection){
+                rlGridView.setVisibility(View.VISIBLE);
+
+                TransitionManager.beginDelayedTransition(cardViewGrid);
+                rlGridViewDetails.setVisibility(View.VISIBLE);
+
+            }
+
+
             Log.d(TAG, "initValuesFromObject: Success, Closing Db");
+
             db.close();
             results = true;
         }catch (Exception e){
@@ -406,7 +472,36 @@ public class DialogJobPointView extends DialogFragment {
         COORDINATE_FORMATTER = new DecimalFormat(preferenceLoaderHelper.getValueSystemCoordinatesPrecisionDisplay());
         DISTANCE_PRECISION_FORMATTER = new DecimalFormat(preferenceLoaderHelper.getValueSystemDistancePrecisionDisplay());
 
+
     }
+
+    //-------------------------------------------------------------------------------------------------------------------------//
+
+
+    /**
+     * Projections
+     */
+
+
+    private void initProjection(){
+        Log.d(TAG, "initProjection: Started");
+        String projectionString, zoneString;
+
+        int isProjection = 0;
+
+        isProjection = preferenceLoaderHelper.getGeneral_over_projection();
+        projectionString = preferenceLoaderHelper.getGeneral_over_projection_string();
+        zoneString = preferenceLoaderHelper.getGeneral_over_zone_string();
+
+        if(isProjection == 1){
+            Log.d(TAG, "initProjection: With Projection");
+            surveyProjectionHelper.setConfig(projectionString,zoneString);
+            this.isProjection = true;
+        }
+
+    }
+
+    //----------------------------------------------------------------------------------------------//
 
     private void showDialogAnimation(){
         isLoading = true;
@@ -448,6 +543,466 @@ public class DialogJobPointView extends DialogFragment {
 
 
     }
+
+    //----------------------------------------------------------------------------------------------//
+    private void showPointCommands(){
+        Log.d(TAG, "showPointCommands: Started");
+
+        if(isPointCommandsShown){
+            isPointCommandsShown = false;
+
+            animatePointCommands(false);
+            animatePlanarCommands(false);
+            animateGeodeticCommands(false);
+
+        }else{
+            isPointCommandsShown = true;
+
+            animatePointCommands(true);
+            animatePlanarCommands(true);
+            animateGeodeticCommands(true);
+
+            if(isProjection){
+                animateGridCommands(true);
+            }
+
+        }
+
+    }
+
+    private void animatePointCommands(boolean isShow){
+        Log.d(TAG, "animatePointCommandsShow: Started");
+
+
+        if(isShow){
+            rlPointCommands.setVisibility(View.VISIBLE);
+
+            final Animation mAnimPoints_1 = AnimationUtils.loadAnimation(mContext,R.anim.anim_button_bounce_in);
+            final Animation mAnimPoints_2 = AnimationUtils.loadAnimation(mContext,R.anim.anim_button_bounce_in);
+            final Animation mAnimPoints_3 = AnimationUtils.loadAnimation(mContext,R.anim.anim_button_bounce_in);
+
+            AnimateBounceInterpolator animateBounceInterpolator = new AnimateBounceInterpolator(0.2,20);
+            mAnimPoints_1.setInterpolator(animateBounceInterpolator);
+            mAnimPoints_2.setInterpolator(animateBounceInterpolator);
+            mAnimPoints_3.setInterpolator(animateBounceInterpolator);
+
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    ibPointCommand_1.setVisibility(View.VISIBLE);
+                    ibPointCommand_1.startAnimation(mAnimPoints_1);
+                }
+            },200);
+
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    ibPointCommand_2.setVisibility(View.VISIBLE);
+                    ibPointCommand_2.startAnimation(mAnimPoints_2);
+                }
+            },400);
+
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    ibPointCommand_3.setVisibility(View.VISIBLE);
+                    ibPointCommand_3.startAnimation(mAnimPoints_3);
+                }
+            },600);
+        }else{
+            final Animation mAnimPoints_1 = AnimationUtils.loadAnimation(mContext,R.anim.anim_button_bounce_out);
+            final Animation mAnimPoints_2 = AnimationUtils.loadAnimation(mContext,R.anim.anim_button_bounce_out);
+            final Animation mAnimPoints_3 = AnimationUtils.loadAnimation(mContext,R.anim.anim_button_bounce_out);
+
+            mAnimPoints_1.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    ibPointCommand_1.setVisibility(View.INVISIBLE);
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+
+                }
+            });
+
+            mAnimPoints_2.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    ibPointCommand_2.setVisibility(View.INVISIBLE);
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+
+                }
+            });
+
+            mAnimPoints_3.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    ibPointCommand_3.setVisibility(View.INVISIBLE);
+                    rlPointCommands.setVisibility(View.GONE);
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+
+                }
+            });
+
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    ibPointCommand_1.startAnimation(mAnimPoints_1);
+
+                }
+            },200);
+
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    ibPointCommand_2.startAnimation(mAnimPoints_2);
+
+                }
+            },400);
+
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    ibPointCommand_3.startAnimation(mAnimPoints_3);
+
+                }
+            },600);
+
+        }
+
+    }
+
+    private void animatePlanarCommands(boolean isShow){
+        Log.d(TAG, "animatePlanarCommandsShow: Started");
+
+        if(isShow){
+            rlPlanarCommands.setVisibility(View.VISIBLE);
+
+            final Animation mAnimPlanar_1 = AnimationUtils.loadAnimation(mContext,R.anim.anim_button_bounce_in);
+
+            AnimateBounceInterpolator animateBounceInterpolator = new AnimateBounceInterpolator(0.2,20);
+            mAnimPlanar_1.setInterpolator(animateBounceInterpolator);
+
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    ibPlanarCommand_1.setVisibility(View.VISIBLE);
+                    ibPlanarCommand_1.startAnimation(mAnimPlanar_1);
+
+                }
+            },200);
+
+        }else {
+            final Animation mAnimPlanar_1 = AnimationUtils.loadAnimation(mContext,R.anim.anim_button_bounce_out);
+
+            mAnimPlanar_1.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    ibPlanarCommand_1.setVisibility(View.INVISIBLE);
+                    rlPlanarCommands.setVisibility(View.GONE);
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+
+                }
+            });
+
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    ibPlanarCommand_1.startAnimation(mAnimPlanar_1);
+
+                }
+            },200);
+
+
+        }
+
+
+    }
+
+    private void animateGeodeticCommands(boolean isShow){
+        Log.d(TAG, "animateGeodeticCommandsShow: Started");
+
+        if(isShow){
+            rlGeodeticCommands.setVisibility(View.VISIBLE);
+
+            final Animation mAnimGeodetic_1 = AnimationUtils.loadAnimation(mContext,R.anim.anim_button_bounce_in);
+            final Animation mAnimGeodetic_2 = AnimationUtils.loadAnimation(mContext,R.anim.anim_button_bounce_in);
+            final Animation mAnimGeodetic_3 = AnimationUtils.loadAnimation(mContext,R.anim.anim_button_bounce_in);
+
+            AnimateBounceInterpolator animateBounceInterpolator = new AnimateBounceInterpolator(0.2,20);
+
+            mAnimGeodetic_1.setInterpolator(animateBounceInterpolator);
+            mAnimGeodetic_2.setInterpolator(animateBounceInterpolator);
+            mAnimGeodetic_3.setInterpolator(animateBounceInterpolator);
+
+            //--Geodetic Commands
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    ibGeodeticCommand_1.setVisibility(View.VISIBLE);
+                    ibGeodeticCommand_1.startAnimation(mAnimGeodetic_1);
+                }
+            },200);
+
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    ibGeodeticCommand_2.setVisibility(View.VISIBLE);
+                    ibGeodeticCommand_2.startAnimation(mAnimGeodetic_2);
+                }
+            },400);
+
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    ibGeodeticCommand_3.setVisibility(View.VISIBLE);
+                    ibGeodeticCommand_3.startAnimation(mAnimGeodetic_3);
+                }
+            },600);
+
+        }else {
+            final Animation mAnimGeodetic_1 = AnimationUtils.loadAnimation(mContext,R.anim.anim_button_bounce_out);
+            final Animation mAnimGeodetic_2 = AnimationUtils.loadAnimation(mContext,R.anim.anim_button_bounce_out);
+            final Animation mAnimGeodetic_3 = AnimationUtils.loadAnimation(mContext,R.anim.anim_button_bounce_out);
+
+            mAnimGeodetic_1.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    ibGeodeticCommand_1.setVisibility(View.INVISIBLE);
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+
+                }
+            });
+
+            mAnimGeodetic_2.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    ibGeodeticCommand_2.setVisibility(View.INVISIBLE);
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+
+                }
+            });
+
+            mAnimGeodetic_3.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    ibGeodeticCommand_3.setVisibility(View.INVISIBLE);
+                    rlGeodeticCommands.setVisibility(View.GONE);
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+
+                }
+            });
+
+            //--Geodetic Commands
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    ibGeodeticCommand_1.startAnimation(mAnimGeodetic_1);
+                }
+            },200);
+
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    ibGeodeticCommand_2.startAnimation(mAnimGeodetic_2);
+                }
+            },400);
+
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    ibGeodeticCommand_3.startAnimation(mAnimGeodetic_3);
+
+                }
+            },600);
+
+
+        }
+
+
+
+    }
+
+    private void animateGridCommands(boolean isShow){
+        Log.d(TAG, "animateGridCommandsShow: Started");
+
+        if(isShow){
+            rlGridCommands.setVisibility(View.VISIBLE);
+
+            final Animation mAnimGrid_1 = AnimationUtils.loadAnimation(mContext,R.anim.anim_button_bounce_in);
+            final Animation mAnimGrid_2 = AnimationUtils.loadAnimation(mContext,R.anim.anim_button_bounce_in);
+            final Animation mAnimGrid_3 = AnimationUtils.loadAnimation(mContext,R.anim.anim_button_bounce_in);
+
+            AnimateBounceInterpolator animateBounceInterpolator = new AnimateBounceInterpolator(0.2,20);
+
+            mAnimGrid_1.setInterpolator(animateBounceInterpolator);
+            mAnimGrid_2.setInterpolator(animateBounceInterpolator);
+            mAnimGrid_3.setInterpolator(animateBounceInterpolator);
+
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    ibGridCommand_1.setVisibility(View.VISIBLE);
+                    ibGridCommand_1.startAnimation(mAnimGrid_1);
+                }
+            },200);
+
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    ibGridCommand_2.setVisibility(View.VISIBLE);
+                    ibGridCommand_2.startAnimation(mAnimGrid_2);
+                }
+            },400);
+
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    ibGridCommand_3.setVisibility(View.VISIBLE);
+                    ibGridCommand_3.startAnimation(mAnimGrid_3);
+                }
+            },600);
+        }else{
+            final Animation mAnimGrid_1 = AnimationUtils.loadAnimation(mContext,R.anim.anim_button_bounce_in);
+            final Animation mAnimGrid_2 = AnimationUtils.loadAnimation(mContext,R.anim.anim_button_bounce_in);
+            final Animation mAnimGrid_3 = AnimationUtils.loadAnimation(mContext,R.anim.anim_button_bounce_in);
+
+            mAnimGrid_1.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    ibGridCommand_1.setVisibility(View.INVISIBLE);
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+
+                }
+            });
+
+            mAnimGrid_2.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    ibGridCommand_2.setVisibility(View.INVISIBLE);
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+
+                }
+            });
+
+            mAnimGrid_3.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    ibGridCommand_3.setVisibility(View.INVISIBLE);
+                    rlGridCommands.setVisibility(View.GONE);
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+
+                }
+            });
+
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    ibGridCommand_1.startAnimation(mAnimGrid_1);
+                }
+            },200);
+
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    ibGridCommand_2.startAnimation(mAnimGrid_2);
+                }
+            },400);
+
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    ibGridCommand_3.startAnimation(mAnimGrid_3);
+                }
+            },600);
+
+
+
+        }
+
+
+
+    }
+
+
 
     //-------------------------------------------------------------------------------------------------------------------------//
 

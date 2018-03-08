@@ -93,11 +93,56 @@
 
 
         <ImageView
+            android:id="@+id/survey_image_center"
             android:background="@drawable/circle_image_add_location"
             android:elevation="5dp"
             android:layout_centerHorizontal="true"
             android:layout_width="40dp"
             android:layout_height="40dp" />
+
+        <RelativeLayout
+            android:id="@+id/rl_points_commands"
+            android:elevation="5dp"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="5dp"
+            android:layout_marginTop="1dp"
+            android:gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:visibility="gone">
+
+            <ImageButton
+                android:id="@+id/points_command_1"
+                android:background="@drawable/circle_image_edit"
+                android:elevation="5dp"
+                android:layout_marginStart="10dp"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:visibility="invisible"/>
+
+            <ImageButton
+                android:id="@+id/points_command_2"
+                android:layout_toEndOf="@id/points_command_1"
+                android:layout_marginStart="5dp"
+                android:background="@drawable/circle_image_sketch_eraser"
+                android:elevation="5dp"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:visibility="invisible"/>
+
+            <ImageButton
+                android:id="@+id/points_command_3"
+                android:layout_toEndOf="@id/points_command_2"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="10dp"
+                android:background="@drawable/circle_image_cross"
+                android:elevation="5dp"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:visibility="invisible"/>
+
+        </RelativeLayout>
+
 
 
         <ProgressBar

@@ -219,6 +219,17 @@ public class JobPointsActivity extends AppCompatActivity implements NavigationVi
 
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(jobPointsListFragment !=null){
+            refreshPointArrays();
+
+        }
+
+    }
+
     private void initViewWidgets(){
         Log.d(TAG, "initViewWidgets: Starting...");
 
