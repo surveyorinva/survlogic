@@ -33,14 +33,20 @@ public class StringUtilityHelper {
         DecimalFormatSymbols dcf = new DecimalFormatSymbols(Locale.US);
         dcf.setDecimalSeparator('.');
 
-        DecimalFormat result = new DecimalFormat("0.##",dcf);
+        DecimalFormat result = new DecimalFormat("#,##0.00",dcf);
         return result;
-
-
 
 
     }
 
+    public static DecimalFormat createUSGeodeticDecimalFormat(){
+        DecimalFormatSymbols dcf = new DecimalFormatSymbols(Locale.US);
+        dcf.setDecimalSeparator('.');
 
+        DecimalFormat result = new DecimalFormat("0.0000",dcf);
+        return result;
+
+
+    }
 
 }

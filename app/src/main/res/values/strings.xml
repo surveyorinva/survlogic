@@ -289,6 +289,23 @@
     <string name="dialog_job_point_grid_error_north_not_entered">Grid North cannot be empty.</string>
     <string name="dialog_job_point_grid_error_east_not_entered">Grid East cannot be empty.</string>
 
+    <!--Point Description Edit-->
+    <string name="dialog_job_point_description_title">Edit Point Description</string>
+    <string name="dialog_job_point_description_header">Point Description</string>
+    <string name="dialog_job_point_description">Description</string>
+    <string name="dialog_job_point_description_error_description_not_entered">Grid North cannot be empty.</string>
+
+    <!--Planar Point Edit-->
+    <string name="dialog_job_point_planar_app_title">Edit Planar Position</string>
+    <string name="dialog_job_point_planar_item_header">Planar Coordinates</string>
+    <string name="dialog_job_point_planar_item_grid_north">Northing</string>
+    <string name="dialog_job_point_planar_item_grid_east">Easting</string>
+    <string name="dialog_job_point_planar_item_grid_elevation">Elevation</string>
+    <string name="dialog_job_point_planar_error_north_not_entered">Northing cannot be empty.</string>
+    <string name="dialog_job_point_planar_error_east_not_entered">Easting cannot be empty.</string>
+    <string name="dialog_job_point_planar_error_elevation_not_entered">Elevation cannot be empty.</string>
+
+
     <!--Rod Height in GPS-->
     <string name="dialog_gps_rod_height_hand_held_title">Enter Rod Height</string>
     <string name="dialog_gps_rod_height_hand_held_message">Height of Hand-held above ground</string>
@@ -317,6 +334,12 @@
     <string name="dialog_point_view_pointOrtho_default">Ortho.:  (Not Defined)</string>
     <string name="dialog_point_view_add_photos">Add Photos</string>
     <string name="dialog_point_view_add_sketch">Add Sketch</string>
+
+    <string name="dialog_point_view_dirty_points_title">Point Values Changed</string>
+    <string name="dialog_point_view_dirty_points_description">Point Values have changed.  Do you want to save these values?</string>
+
+    <string name="dialog_point_view_delete_point_title">Delete Point?</string>
+    <string name="dialog_point_view_delete_point_description">Are you sure you want to remove this point from the Job Database?</string>
 
     <!--Sketch View-->
     <string name="sketch_menu_clear_canvas">Clear Canvas</string>
@@ -489,6 +512,20 @@
     <string name="tools_curve_tangent">Tangent:</string>
     <string name="tools_curve_chordDistance">Chord:</string>
     <string name="tools_curve_chordDirection">Direction:</string>
+
+
+    <!-- ******************************Custom Views**********************************************-->
+
+    <!-- Compass View -->
+    <string name="compassview_compass_north">N</string>
+    <string name="compassview_compass_east">E</string>
+    <string name="compassview_compass_south">S</string>
+    <string name="compassview_compass_west">W</string>
+    <string name="compassview_error_out_index_degrees" translatable="false">Degrees must be between 0 and 359, both inclusive. Actual value: </string>
+    <string name="compassview_error_out_index_range_degrees" translatable="false">Range degrees must be between 90 and 360, both inclusive. Actual value: </string>
+
+
+
     <!-- ******************************Strings related to Settings****************************** -->
 
     <!--**************************Current Job Preferences**************************-->

@@ -244,7 +244,7 @@ public class SurveyMathHelper {
             double minutes = Math.floor((angle * 60) % 60);  // This is an integer in the range [0, 60)
             double seconds = (angle * 3600) % 60;            // This is a decimal in the range [0, 60)
 
-            myAngleDMS = (int)deg + "°" + (int)minutes + "'"+ seconds;
+            myAngleDMS = (int)deg + "°" + (int)minutes + "'" + seconds;
 
             int pointIndex = myAngleDMS.indexOf(".");
             int endIndex = pointIndex + 1 + decimalPlace;
@@ -258,6 +258,65 @@ public class SurveyMathHelper {
                 myAngleDMS = myAngleDMS + "\" E";
             }
         }
+
+        return myAngleDMS;
+    }
+
+    public static String convertDECtoDMSGeodeticV2(double angle, int decimalPlace){
+        Log.d(TAG, "convertDECtoDMSGeodeticV2: Started...");
+
+        boolean neg = angle < 0;
+        String myAngleDMS;
+        Log.d(TAG, "convertDECtoDMSGeodeticV2: Angle In: " + angle);
+        Log.d(TAG, "convertDECtoDMSGeodeticV2: Decimal: " + decimalPlace);
+
+        if (angle ==0){
+            myAngleDMS = "0";
+
+        }else{
+            angle = Math.abs(angle);
+
+            double deg = Math.floor(angle);                  // Round down
+            double minutes = Math.floor((angle * 60) % 60);  // This is an integer in the range [0, 60)
+            double seconds = (angle * 3600) % 60;            // This is a decimal in the range [0, 60)
+
+            String sDeg, sMin, sSec;
+
+            if(deg <10){
+                sDeg = "0" + (int)deg + "°";
+            }else{
+                sDeg = (int) deg + "°";
+            }
+
+            if(minutes <10){
+                sMin = "0" + (int) minutes + "'";
+            }else{
+                sMin = (int) minutes + "'";
+            }
+
+            if(seconds <10){
+                sSec = "0" + String.valueOf(seconds);
+            }else{
+                sSec = String.valueOf(seconds);
+            }
+
+            int pointIndex = sSec.indexOf(".");
+            int endIndex = pointIndex + 1 + decimalPlace;
+            if(endIndex < sSec.length()) {
+                sSec = sSec.substring(0, endIndex);
+            }
+            sSec = sSec + "\"";
+
+            myAngleDMS = sDeg + sMin + sSec;
+            Log.d(TAG, "convertDECtoDMSGeodeticV2: Angle Out: " + myAngleDMS);
+
+            if (neg){
+                myAngleDMS = myAngleDMS + " W";
+            }else{
+                myAngleDMS = myAngleDMS + " E";
+            }
+        }
+
 
         return myAngleDMS;
     }
@@ -1125,6 +1184,7 @@ public class SurveyMathHelper {
 
 
     }
+
 
 
 }

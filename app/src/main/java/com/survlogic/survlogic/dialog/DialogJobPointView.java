@@ -4,12 +4,12 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Matrix;
+import android.graphics.Typeface;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Build;
@@ -49,10 +49,13 @@ import com.survlogic.survlogic.adapter.PointGridImageAdapter;
 import com.survlogic.survlogic.adapter.PointGridSketchAdapter;
 import com.survlogic.survlogic.database.JobDatabaseHandler;
 import com.survlogic.survlogic.database.ProjectDatabaseHandler;
+import com.survlogic.survlogic.interf.JobPointsActivityListener;
 import com.survlogic.survlogic.model.JobSketch;
+import com.survlogic.survlogic.model.Point;
 import com.survlogic.survlogic.model.PointGeodetic;
 import com.survlogic.survlogic.model.ProjectImages;
 import com.survlogic.survlogic.utils.AnimateBounceInterpolator;
+import com.survlogic.survlogic.utils.StringUtilityHelper;
 import com.survlogic.survlogic.utils.SurveyMathHelper;
 import com.survlogic.survlogic.utils.PreferenceLoaderHelper;
 import com.survlogic.survlogic.utils.SurveyProjectionHelper;
@@ -69,7 +72,7 @@ import java.util.Date;
  * Created by chrisfillmore on 8/21/2017.
  */
 
-public class DialogJobPointView extends DialogFragment {
+public class DialogJobPointView extends DialogFragment{
     private static final String TAG = "DialogJobPointView";
 
     private Context mContext;
@@ -80,47 +83,71 @@ public class DialogJobPointView extends DialogFragment {
     private static final int REQUEST_TAKE_PHOTO = 2;
     private static final int REQUEST_SELECT_PICTURE = 3;
 
-    private static final int DELAY_TO_SHOW_DATA = 1500;
+    private static final int DELAY_TO_SHOW_DATA = 1000;
     private static final int DELAY_TO_DIALOG = 1;
-    private static final int DELAY_TO_GRID = 1000;
+    private static final int DELAY_TO_GRID = 1500;
 
     private Handler showDataHandler, dialogHandler, gridHandler, sketchHandler;
     private boolean isLoading = false, tryingToExit = false;
     private String mURLSyntex = "file://";
 
     private int pointNo, projectID, jobId, pointId;
-    private String databaseName, mCurrentPhotoPath;
+    private String databaseName, mCurrentPhotoPath, pointDescription, pointDescriptionDirty;
     private Bitmap mBitmap, mBitmapRaw;
 
-    private RelativeLayout rlGridView, rlGridViewDetails, rlPointCommands, rlPlanarCommands, rlGeodeticCommands, rlGridCommands;
+    private RelativeLayout rlGridView, rlPointOptions,
+            rlPlanarViewDetails, rlWorldViewDetails, rlGridViewDetails,
+            rlPointCommands, rlPlanarCommands, rlGeodeticCommands, rlGridCommands;
 
-    private CardView cardViewGrid;
+    private CardView cardViewPoint, cardViewPlanar, cardViewWorld, cardViewGrid, cardViewPhotos, cardViewSketchs;
 
-    private TextView tvPointNo, tvPointDesc, tvPointClass, tvPointNorth, tvPointEast, tvPointElev,
-            tvPointLat, tvPointLong, tvPointEllipsoid, tvPointOrtho,
-            tvPointLatHeader, tvPointLongHeader, tvPointEllipsoidHeader;
+    private TextView tvPointNo, tvPointDesc, tvPointClassPlanar, tvPointNorth, tvPointEast, tvPointElev,
+            tvPointLat, tvPointLong, tvPointEllipsoid, tvPointOrtho, tvPointClassWorld,
+            tvPointLatHeader, tvPointLongHeader, tvPointEllipsoidHeader, tvPointOrthoHeader,
+            tvPointGridNorthHeader, tvPointGridEastHeader,
+            tvPointGridNorth, tvPointGridEast, tvPointClassGrid;
 
     private ImageView ivPointCommands;
 
+    private ImageButton ibPointCardExpand;
+    private ImageButton ibPointOption_1, ibPointOption_2;
     private ImageButton ibPointCommand_1, ibPointCommand_2, ibPointCommand_3;
     private ImageButton ibPlanarCommand_1;
-    private ImageButton ibGeodeticCommand_1, ibGeodeticCommand_2, ibGeodeticCommand_3;
-    private ImageButton ibGridCommand_1, ibGridCommand_2, ibGridCommand_3;
+    private ImageButton ibGeodeticCommand_1, ibGeodeticCommand_2;
+    private ImageButton ibGridCommand_1;
 
     private ProgressBar pbProgressCircle;
 
     private Button btTakePhoto, btAddSketch;
 
-    private boolean isPointCommandsShown = false, isProjection = false;
+    private boolean isPointCardExpanded = false, isPointCommandsShown = false, isProjection = false;
 
     private PreferenceLoaderHelper preferenceLoaderHelper;
-    SurveyProjectionHelper surveyProjectionHelper;
+    private SurveyProjectionHelper surveyProjectionHelper;
 
+    private int planarPointType, geodeticPointType, gridPointType;
+    private int geodeticPointTypeDirty, gridPointTypeDirty;
+
+    private double planarNorthValue = 0, planarEastValue = 0, planarElevationValue = 0;
+    private double planarNorthDirty = 0, planarEastDirty = 0, planarElevationDirty = 0;
+
+    private double latitudeValue = 0, longitudeValue = 0, heightEllipsoidValue = 0, heightOrthoValue = 0;
+    private double latitudeDirty = 0, longitudeDirty = 0, heightEllipsoidDirty = 0, heightOrthoDirty = 0;
+
+    private boolean isGridViewShown = false;
+    private double gridNorthValue = 0, gridEastValue = 0;
+    private double gridNorthDirty = 0, gridEastDirty = 0;
+
+    private int creationDate;
+
+    private boolean isPlanarDirty = false, isGeodeticDirty = false, isGridDirty = false, isPointDescriptionDirty = false;
     private static DecimalFormat COORDINATE_FORMATTER, DISTANCE_PRECISION_FORMATTER;
+
 
 
     public static DialogJobPointView newInstance(int projectId, int jobId, long pointId, int pointNo, String databaseName) {
         Log.d(TAG, "newInstance: Starting...");
+
         DialogJobPointView frag = new DialogJobPointView();
         Bundle args = new Bundle();
         args.putInt("project_id", projectId);
@@ -132,6 +159,7 @@ public class DialogJobPointView extends DialogFragment {
         return frag;
 
     }
+
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -180,8 +208,11 @@ public class DialogJobPointView extends DialogFragment {
                     showDataHandler.removeCallbacksAndMessages(null);
                     dialogHandler.removeCallbacksAndMessages(null);
                     gridHandler.removeCallbacksAndMessages(null);
+                    sketchHandler.removeCallbacks(null);
 
-                    return false;
+                    dismissDialogFragment();
+
+                    return true;
                 }
                 return false;
             }
@@ -195,11 +226,9 @@ public class DialogJobPointView extends DialogFragment {
         initViewWidgets();
         setOnClickListeners();
         showPointData();
-        showGridView();
-        showSketchGridView();
-
-        showDialogAnimation();
         initProjection();
+
+        showCardAnimation();
 
     }
 
@@ -276,18 +305,31 @@ public class DialogJobPointView extends DialogFragment {
         gridView = (GridView) getDialog().findViewById(R.id.photo_grid_view);
         sketchGridView = (GridView) getDialog().findViewById(R.id.sketch_grid_view);
 
+        rlPointOptions = (RelativeLayout) getDialog().findViewById(R.id.rl_point_options);
         rlGridView = (RelativeLayout) getDialog().findViewById(R.id.rlGridView);
+
+        rlPlanarViewDetails = (RelativeLayout) getDialog().findViewById(R.id.rl_planar_view_details);
+        rlWorldViewDetails = (RelativeLayout) getDialog().findViewById(R.id.rl_geographic_view_details);
         rlGridViewDetails = (RelativeLayout) getDialog().findViewById(R.id.rl_grid_view_details);
+
         rlPointCommands = (RelativeLayout) getDialog().findViewById(R.id.rl_points_commands);
         rlPlanarCommands = (RelativeLayout) getDialog().findViewById(R.id.rl_points_commands_planar);
         rlGeodeticCommands = (RelativeLayout) getDialog().findViewById(R.id.rl_points_commands_geographic);
         rlGridCommands = (RelativeLayout) getDialog().findViewById(R.id.rl_points_commands_grid);
 
+        cardViewPoint = (CardView) getDialog().findViewById(R.id.layout_area_1);
+        cardViewPlanar = (CardView) getDialog().findViewById(R.id.card_planar_view);
+        cardViewWorld = (CardView) getDialog().findViewById(R.id.card_geographic_view);
         cardViewGrid = (CardView) getDialog().findViewById(R.id.card_grid_view);
+        cardViewPhotos = (CardView) getDialog().findViewById(R.id.card_photo_view);
+        cardViewSketchs = (CardView) getDialog().findViewById(R.id.card_sketch_view);
 
         tvPointNo = (TextView) getDialog().findViewById(R.id.pointNoValue);
         tvPointDesc = (TextView) getDialog().findViewById(R.id.pointDescValue);
-        tvPointClass = (TextView) getDialog().findViewById(R.id.pointClassValue);
+
+        tvPointClassPlanar = (TextView) getDialog().findViewById(R.id.planarPointTypeValue);
+        tvPointClassWorld = (TextView) getDialog().findViewById(R.id.geographicPointTypeValue);
+        tvPointClassGrid = (TextView) getDialog().findViewById(R.id.gridPointTypeValue);
 
         tvPointNorth = (TextView) getDialog().findViewById(R.id.northingValue);
         tvPointEast = (TextView) getDialog().findViewById(R.id.eastingValue);
@@ -296,11 +338,22 @@ public class DialogJobPointView extends DialogFragment {
         tvPointLatHeader = (TextView) getDialog().findViewById(R.id.latitudeTitle);
         tvPointLongHeader = (TextView) getDialog().findViewById(R.id.longitudeTitle);
         tvPointEllipsoidHeader = (TextView) getDialog().findViewById(R.id.ellipsoidHeightTitle);
+        tvPointOrthoHeader = (TextView) getDialog().findViewById(R.id.orthoHeightTitle);
 
         tvPointLat  = (TextView) getDialog().findViewById(R.id.latitudeValue);
         tvPointLong = (TextView) getDialog().findViewById(R.id.longitudeValue);
         tvPointEllipsoid = (TextView) getDialog().findViewById(R.id.ellipsoidHeightValue);
         tvPointOrtho = (TextView) getDialog().findViewById(R.id.orthoHeightValue);
+
+        tvPointGridNorthHeader = (TextView) getDialog().findViewById(R.id.gridNorthTitle);
+        tvPointGridEastHeader = (TextView) getDialog().findViewById(R.id.gridEastTitle);
+        tvPointGridNorth = (TextView) getDialog().findViewById(R.id.gridNorthValue);
+        tvPointGridEast = (TextView) getDialog().findViewById(R.id.gridEastValue);
+
+        ibPointCardExpand = (ImageButton) getDialog().findViewById(R.id.card_point_expand);
+
+        ibPointOption_1 = (ImageButton) getDialog().findViewById(R.id.points_options_1);
+        ibPointOption_2 = (ImageButton) getDialog().findViewById(R.id.points_options_2);
 
         ivPointCommands = (ImageView) getDialog().findViewById(R.id.survey_image_center);
         ibPointCommand_1 = (ImageButton) getDialog().findViewById(R.id.points_command_1);
@@ -311,11 +364,8 @@ public class DialogJobPointView extends DialogFragment {
 
         ibGeodeticCommand_1 = (ImageButton) getDialog().findViewById(R.id.geographic_command_1);
         ibGeodeticCommand_2 = (ImageButton) getDialog().findViewById(R.id.geographic_command_2);
-        ibGeodeticCommand_3 = (ImageButton) getDialog().findViewById(R.id.geographic_command_3);
 
         ibGridCommand_1 = (ImageButton) getDialog().findViewById(R.id.grid_command_1);
-        ibGridCommand_2 = (ImageButton) getDialog().findViewById(R.id.grid_command_2);
-        ibGridCommand_3 = (ImageButton) getDialog().findViewById(R.id.grid_command_3);
 
         pbProgressCircle = (ProgressBar) getDialog().findViewById(R.id.progressBar_Loading_point);
 
@@ -365,11 +415,54 @@ public class DialogJobPointView extends DialogFragment {
             }
         });
 
-        ivPointCommands.setOnClickListener(new View.OnClickListener() {
+        ibPointCardExpand.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showPointCommands();
+                animatePointCard();
+            }
+        });
 
+        ibPointOption_1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goToDialogPointDescription();
+            }
+        });
+
+        ibPointOption_2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+               android.support.v7.app.AlertDialog dialog = DialogCloseActivity();
+               dialog.show();
+            }
+        });
+
+        ibPointCommand_3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dismissDialogFragment();
+            }
+        });
+
+
+        ibPlanarCommand_1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goToDialogPlanar();
+            }
+        });
+
+        ibGeodeticCommand_1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goToDialogWorld();
+            }
+        });
+
+        ibGridCommand_1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goToDialogGrid();
             }
         });
 
@@ -388,60 +481,71 @@ public class DialogJobPointView extends DialogFragment {
             Log.d(TAG, "initValuesFromObject: Point No: " + pointNo);
             PointGeodetic pointGeodetic = jobDb.getPointByPointNo(db,pointNo);
 
-            double pointNorthing = pointGeodetic.getNorthing();
-            String pointNorthingValue = COORDINATE_FORMATTER.format(pointNorthing);
+            planarNorthValue = pointGeodetic.getNorthing();
+            planarEastValue = pointGeodetic.getEasting();
+            planarElevationValue = pointGeodetic.getElevation();
 
-            double pointEasting = pointGeodetic.getEasting();
-            String pointEastingValue = COORDINATE_FORMATTER.format(pointEasting);
+            pointDescription = pointGeodetic.getDescription();
 
-            double pointElevation = pointGeodetic.getElevation();
-            String pointElevationValue = COORDINATE_FORMATTER.format(pointElevation);
+            //Point Class
+            planarPointType = pointGeodetic.getPointType();
+            geodeticPointType = pointGeodetic.getPointGeodeticType();
 
-            String pointDescription = pointGeodetic.getDescription();
 
-            double pointLatitude = pointGeodetic.getLatitude();
-            double pointLongitude = pointGeodetic.getLongitude();
+            latitudeValue= pointGeodetic.getLatitude();
+            longitudeValue = pointGeodetic.getLongitude();
 
-            double pointEllipsoid = pointGeodetic.getEllipsoid();
-            String pointEllipsoidValue = COORDINATE_FORMATTER.format(pointEllipsoid);
+            heightEllipsoidValue = pointGeodetic.getEllipsoid();
+            heightOrthoValue = pointGeodetic.getOrtho();
+
+            creationDate = pointGeodetic.getDateCreated();
 
             tvPointNo.setText(String.valueOf(pointNo));
             tvPointDesc.setText(pointDescription);
 
-            tvPointNorth.setText(pointNorthingValue);
-            tvPointEast.setText(pointEastingValue);
-            tvPointElev.setText(pointElevationValue);
+            setPointTypes();
 
-            tvPointNorth.setVisibility(View.VISIBLE);
-            tvPointEast.setVisibility(View.VISIBLE);
-            tvPointElev.setVisibility(View.VISIBLE);
+            setPlanarCoordinateText(planarNorthValue,planarEastValue,planarElevationValue,false);
 
-            if(pointLatitude !=0){
-                tvPointLatHeader.setText(getString(R.string.dialog_point_view_pointLatitude_header));
-                tvPointLongHeader.setText(getString(R.string.dialog_point_view_pointLongitude_header));
-
-                tvPointLat.setText(SurveyMathHelper.convertDECtoDMSGeodetic(pointLatitude,3,true));
-                tvPointLong.setText(SurveyMathHelper.convertDECtoDMSGeodetic(pointLongitude,3,true));
-
-                tvPointLat.setVisibility(View.VISIBLE);
-                tvPointLong.setVisibility(View.VISIBLE);
-            }
-
-            if(pointEllipsoid !=0){
-                tvPointEllipsoidHeader.setText(getString(R.string.dialog_point_view_pointEllipsoid_header));
-
-                tvPointEllipsoid.setText(pointEllipsoidValue);
-                tvPointEllipsoid.setVisibility(View.VISIBLE);
-            }
+            setGeodeticCoordinateText(latitudeValue,longitudeValue,false);
+            setGeodeticEllipsoidText(heightEllipsoidValue,false);
+            setGeodeticOrthoText(heightOrthoValue,false );
 
 
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    animatePlanarCard();
+                    animatePlanarCommands(true);
+                }
+            },250);
 
 
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    animateWorldCard();
+                    animateGeodeticCommands(true);
+                }
+            },500);
+
+
+            Log.d(TAG, "initValuesFromObject: Is projected: " + isProjection);
             if(isProjection){
                 rlGridView.setVisibility(View.VISIBLE);
+                isGridViewShown = true;
 
-                TransitionManager.beginDelayedTransition(cardViewGrid);
-                rlGridViewDetails.setVisibility(View.VISIBLE);
+                if(latitudeValue !=0){
+                    findGridCoordinatesFromWorld(latitudeValue,longitudeValue);
+                }
+
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        animateGridCard();
+                        animateGridCommands(true);
+                    }
+                },750);
 
             }
 
@@ -457,6 +561,68 @@ public class DialogJobPointView extends DialogFragment {
 
 
         return results;
+    }
+
+    private void findGridCoordinatesFromWorld(double latitude, double longitude){
+        Log.d(TAG, "showMapProjection: Started");
+
+        Point pointIn = new Point(latitude,longitude);
+        Point myProjectionPoint = surveyProjectionHelper.calculateGridCoordinates(pointIn);
+
+        if(isGeodeticDirty){
+            isGridDirty = true;
+            gridNorthDirty = myProjectionPoint.getNorthing();
+            gridEastDirty = myProjectionPoint.getEasting();
+
+            setGridCoordinateText(gridNorthValue,gridEastValue,false);
+        }else{
+            gridNorthValue = myProjectionPoint.getNorthing();
+            gridEastValue = myProjectionPoint.getEasting();
+
+            setGridCoordinateText(gridNorthValue,gridEastValue,false);
+        }
+
+        geodeticPointType = 1;
+        gridPointType = 1;
+        setPointTypes();
+
+    }
+
+    private void findWorldCoordinatesFromGrid(double gridNorth, double gridEast){
+        Log.d(TAG, "findWorldCoordinatesFromGrid: Started");
+
+        Point gridIN = new Point();
+        gridIN.setNorthing(gridNorth);
+        gridIN.setEasting(gridEast);
+
+        Point worldOUT;
+        worldOUT = surveyProjectionHelper.calculateGeodeticCoordinates(gridIN);
+
+        if(isGridDirty){
+            isGeodeticDirty = true;
+            latitudeDirty = worldOUT.getNorthing();
+            longitudeDirty = worldOUT.getEasting();
+            setGeodeticCoordinateText(latitudeDirty,longitudeDirty,true);
+
+            geodeticPointType = 5;
+            gridPointType = 5;
+            setPointTypes();
+
+
+        }
+
+    }
+
+
+    private void deletePoint(){
+        Log.d(TAG, "deletePoint: Started");
+        JobDatabaseHandler jobDb = new JobDatabaseHandler(mContext, databaseName);
+        SQLiteDatabase db = jobDb.getWritableDatabase();
+
+        jobDb.deletePointByPointNo(db,pointNo);
+
+        db.close();
+
     }
 
     private void createPhotoDialog(Bitmap bitmap){
@@ -475,8 +641,225 @@ public class DialogJobPointView extends DialogFragment {
 
     }
 
-    //-------------------------------------------------------------------------------------------------------------------------//
+    private void dismissDialogFragment(){
+        Log.d(TAG, "dismissDialogFragment: ");
 
+        Log.d(TAG, "dismissDialogFragment: What is dirty: " + isPlanarDirty + "," + isGeodeticDirty + ", " + isGridDirty);
+
+
+        if(isPlanarDirty || isGeodeticDirty || isGridDirty || isPointDescriptionDirty){
+            android.support.v7.app.AlertDialog dialog = DialogDirtyActivity();
+            dialog.show();
+        }else{
+            closeThisView();
+        }
+
+
+    }
+
+    /**
+     *Creates a Dialog Box to Confirm user to leave the Job Activity
+     */
+
+    private android.support.v7.app.AlertDialog DialogCloseActivity(){
+
+        android.support.v7.app.AlertDialog myDialogBox = new android.support.v7.app.AlertDialog.Builder(mContext)
+                .setTitle(getResources().getString(R.string.dialog_point_view_delete_point_title))
+                .setMessage(getResources().getString(R.string.dialog_point_view_delete_point_description))
+                .setPositiveButton(getResources().getString(R.string.general_yes), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        pbProgressCircle.setVisibility(View.VISIBLE);
+                        deletePoint();
+                        dialog.dismiss();
+                        closeThisView();
+                    }
+                })
+                .setNegativeButton(getResources().getString(R.string.general_no), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+
+                .create();
+
+        return myDialogBox;
+    }
+
+    private android.support.v7.app.AlertDialog DialogDirtyActivity(){
+
+        android.support.v7.app.AlertDialog myDialogBox = new android.support.v7.app.AlertDialog.Builder(mContext)
+                .setTitle(getResources().getString(R.string.dialog_point_view_dirty_points_title))
+                .setMessage(getResources().getString(R.string.dialog_point_view_dirty_points_description))
+                .setPositiveButton(getResources().getString(R.string.general_yes), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        pbProgressCircle.setVisibility(View.VISIBLE);
+                        createDirtyPointGeodetic();
+
+                        dialog.dismiss();
+                        closeThisView();
+                    }
+                })
+                .setNegativeButton(getResources().getString(R.string.general_no), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        closeThisView();
+                    }
+                })
+
+                .setNeutralButton(getResources().getString(R.string.general_cancel), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+
+                .create();
+
+        return myDialogBox;
+    }
+
+
+    private void closeThisView(){
+        Log.d(TAG, "closeThisView: Started");
+
+        JobPointsActivityListener jobPointsActivityListener = (JobPointsActivityListener) getActivity();
+        jobPointsActivityListener.refreshPointArrays();
+
+        dismiss();
+
+
+    }
+
+    //-------------------------------------------------------------------------------------------------------------------------//
+    /**
+     * Edit menu unctions
+     */
+
+
+    private void goToDialogPlanar(){
+        Log.d(TAG, "goToDialogPlanar: Started");
+
+        double mPointNorth, mPointEast, mPointElev;
+
+        if(isPlanarDirty){
+            mPointNorth = planarNorthDirty;
+            mPointEast = planarEastDirty;
+            mPointElev = planarElevationDirty;
+        }else{
+            mPointNorth = planarNorthValue;
+            mPointEast = planarEastValue;
+            mPointElev = planarElevationValue;
+        }
+
+
+        android.app.FragmentManager fm = getActivity().getFragmentManager();
+
+        DialogJobPointPlanarEntryAdd planarEdit = DialogJobPointPlanarEntryAdd.newInstance(mPointNorth, mPointEast, mPointElev,true);
+        planarEdit.setDialogListener(new DialogJobPointPlanarEntryAdd.onUpdatePlanarCoordinatesListener() {
+            @Override
+            public void onUpdatePlanarCoordinatesSubmit(Point pointOut) {
+                checkPlanarCoordinatesFromDialog(pointOut);
+            }
+        });
+        planarEdit.show(fm,"dialog_edit_planar");
+
+
+    }
+
+    private void goToDialogWorld(){
+        Log.d(TAG, "goToDialogCoordinateValues: Starting...");
+
+
+        double mPointLat, mPointLong, mPointEllipsoid, mPointOrtho;
+
+        if(isGeodeticDirty){
+            mPointLat = latitudeDirty;
+            mPointLong = longitudeDirty;
+            mPointEllipsoid = heightEllipsoidDirty;
+            mPointOrtho = heightOrthoDirty;
+        }else{
+            mPointLat = latitudeValue;
+            mPointLong = longitudeValue;
+            mPointEllipsoid = heightEllipsoidValue;
+            mPointOrtho = heightOrthoValue;
+        }
+
+
+        android.app.FragmentManager fm = getActivity().getFragmentManager();
+
+        DialogJobPointGeodeticEntryAdd geodeticEdit = DialogJobPointGeodeticEntryAdd.newInstance(mPointLat, mPointLong, mPointEllipsoid, mPointOrtho,true);
+        geodeticEdit.setDialogListener(new DialogJobPointGeodeticEntryAdd.onUpdateGeodeticCoordinatesListener() {
+            @Override
+            public void onUpdateGeodeticCoordinatesSubmit(double latOut, double longOut, double heightEllipsOut, double heightOrthoOut) {
+                checkGeodeticCoordinatesFromDialog(latOut, longOut, heightEllipsOut, heightOrthoOut);
+
+            }
+        });
+
+        geodeticEdit.show(fm,"dialog_edit_geodetic");
+
+    }
+
+    private void goToDialogGrid(){
+        Log.d(TAG, "goToDialogGrid: Started");
+
+        double mPointNorth, mPointEast;
+
+        if(isGridDirty){
+            mPointNorth = gridNorthDirty;
+            mPointEast = gridEastDirty;
+        }else{
+            mPointNorth = gridNorthValue;
+            mPointEast = gridEastValue;
+
+        }
+
+        android.app.FragmentManager fm = getActivity().getFragmentManager();
+
+        DialogJobPointGridEntryAdd gridEdit = DialogJobPointGridEntryAdd.newInstance(mPointNorth, mPointEast,true);
+        gridEdit.setDialogListener(new DialogJobPointGridEntryAdd.onUpdateGridCoordinatesListener() {
+            @Override
+            public void onUpdateGridCoordinatesSubmit(double northOut, double eastOut) {
+                checkGridCoordinatesFromDialog(northOut, eastOut);
+            }
+        });
+
+        gridEdit.show(fm,"dialog_edit_grid");
+
+    }
+
+    private void goToDialogPointDescription(){
+        Log.d(TAG, "goToDialogPointDescription: Started");
+
+        String mDescription;
+
+        if(isPointDescriptionDirty){
+            mDescription = pointDescriptionDirty;
+        }else{
+            mDescription = pointDescription;
+        }
+
+        android.app.FragmentManager fm = getActivity().getFragmentManager();
+
+        DialogJobPointDescriptionEntryEdit descriptionEdit = DialogJobPointDescriptionEntryEdit.newInstance(mDescription,true);
+        descriptionEdit.setDialogListener(new DialogJobPointDescriptionEntryEdit.onUpdateDescriptionListener() {
+            @Override
+            public void onUpdateDescriptionSubmit(String description) {
+                checkPointDescriptionFromDialog(description);
+            }
+        });
+
+        descriptionEdit.show(fm,"dialog_edit_description");
+
+
+    }
+
+
+    //-------------------------------------------------------------------------------------------------------------------------//
 
     /**
      * Projections
@@ -503,7 +886,7 @@ public class DialogJobPointView extends DialogFragment {
 
     //----------------------------------------------------------------------------------------------//
 
-    private void showDialogAnimation(){
+    private void showCardAnimation(){
         isLoading = true;
         dialogHandler = new Handler();
 
@@ -521,6 +904,11 @@ public class DialogJobPointView extends DialogFragment {
             }
         },DELAY_TO_DIALOG);
 
+
+        showPointCommandsAnimation();
+        showPhotoGridView();
+        showSketchGridView();
+
     }
 
     private void callAddNewSketch(){
@@ -536,17 +924,14 @@ public class DialogJobPointView extends DialogFragment {
         i.putExtra(getString(R.string.KEY_POINT_NO), pointNo);
         i.putExtra(getString(R.string.KEY_JOB_DATABASE), databaseName);
 
-
         startActivity(i);
         getActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-
-
 
     }
 
     //----------------------------------------------------------------------------------------------//
-    private void showPointCommands(){
-        Log.d(TAG, "showPointCommands: Started");
+    private void showPointCommandsAnimation(){
+        Log.d(TAG, "showPointCommandsAnimation: Started");
 
         if(isPointCommandsShown){
             isPointCommandsShown = false;
@@ -555,18 +940,80 @@ public class DialogJobPointView extends DialogFragment {
             animatePlanarCommands(false);
             animateGeodeticCommands(false);
 
+            if(isProjection){
+                animateGridCommands(false);
+            }
+
         }else{
             isPointCommandsShown = true;
 
             animatePointCommands(true);
-            animatePlanarCommands(true);
-            animateGeodeticCommands(true);
 
-            if(isProjection){
-                animateGridCommands(true);
-            }
+            Log.d(TAG, "showPointCommandsAnimation: " + isProjection);
 
         }
+
+    }
+
+    private void animatePointCard(){
+        Log.d(TAG, "animatePointCard: Started");
+
+        if(isPointCardExpanded){
+
+            TransitionManager.beginDelayedTransition(cardViewPoint);
+            rlPointOptions.setVisibility(View.GONE);
+
+            isPointCardExpanded = false;
+
+        }else{
+            TransitionManager.beginDelayedTransition(cardViewPoint);
+            rlPointOptions.setVisibility(View.VISIBLE);
+
+            isPointCardExpanded = true;
+
+        }
+
+    }
+
+
+    private void animatePlanarCard(){
+        Log.d(TAG, "animatePlanarCard: Started");
+
+        TransitionManager.beginDelayedTransition(cardViewPlanar);
+        rlPlanarViewDetails.setVisibility(View.VISIBLE);
+
+    }
+
+    private void animateWorldCard(){
+        Log.d(TAG, "animateWorldCard: Started");
+
+        TransitionManager.beginDelayedTransition(cardViewWorld);
+        rlWorldViewDetails.setVisibility(View.VISIBLE);
+
+    }
+
+
+    private void animateGridCard(){
+        Log.d(TAG, "animateGridCard: Started");
+
+        TransitionManager.beginDelayedTransition(cardViewGrid);
+        rlGridViewDetails.setVisibility(View.VISIBLE);
+
+
+    }
+
+    private void animatePhotoCard(){
+        Log.d(TAG, "animatePhotoCard: Started");
+
+        TransitionManager.beginDelayedTransition(cardViewPhotos);
+        gridView.setVisibility(View.VISIBLE);
+
+    }
+
+    private void animateSketchCard(){
+        Log.d(TAG, "animateSketchCard: Started");
+        TransitionManager.beginDelayedTransition(cardViewSketchs);
+        sketchGridView.setVisibility(View.VISIBLE);
 
     }
 
@@ -586,21 +1033,6 @@ public class DialogJobPointView extends DialogFragment {
             mAnimPoints_2.setInterpolator(animateBounceInterpolator);
             mAnimPoints_3.setInterpolator(animateBounceInterpolator);
 
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    ibPointCommand_1.setVisibility(View.VISIBLE);
-                    ibPointCommand_1.startAnimation(mAnimPoints_1);
-                }
-            },200);
-
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    ibPointCommand_2.setVisibility(View.VISIBLE);
-                    ibPointCommand_2.startAnimation(mAnimPoints_2);
-                }
-            },400);
 
             new Handler().postDelayed(new Runnable() {
                 @Override
@@ -757,13 +1189,11 @@ public class DialogJobPointView extends DialogFragment {
 
             final Animation mAnimGeodetic_1 = AnimationUtils.loadAnimation(mContext,R.anim.anim_button_bounce_in);
             final Animation mAnimGeodetic_2 = AnimationUtils.loadAnimation(mContext,R.anim.anim_button_bounce_in);
-            final Animation mAnimGeodetic_3 = AnimationUtils.loadAnimation(mContext,R.anim.anim_button_bounce_in);
 
             AnimateBounceInterpolator animateBounceInterpolator = new AnimateBounceInterpolator(0.2,20);
 
             mAnimGeodetic_1.setInterpolator(animateBounceInterpolator);
             mAnimGeodetic_2.setInterpolator(animateBounceInterpolator);
-            mAnimGeodetic_3.setInterpolator(animateBounceInterpolator);
 
             //--Geodetic Commands
             new Handler().postDelayed(new Runnable() {
@@ -782,18 +1212,10 @@ public class DialogJobPointView extends DialogFragment {
                 }
             },400);
 
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    ibGeodeticCommand_3.setVisibility(View.VISIBLE);
-                    ibGeodeticCommand_3.startAnimation(mAnimGeodetic_3);
-                }
-            },600);
 
         }else {
             final Animation mAnimGeodetic_1 = AnimationUtils.loadAnimation(mContext,R.anim.anim_button_bounce_out);
             final Animation mAnimGeodetic_2 = AnimationUtils.loadAnimation(mContext,R.anim.anim_button_bounce_out);
-            final Animation mAnimGeodetic_3 = AnimationUtils.loadAnimation(mContext,R.anim.anim_button_bounce_out);
 
             mAnimGeodetic_1.setAnimationListener(new Animation.AnimationListener() {
                 @Override
@@ -829,24 +1251,6 @@ public class DialogJobPointView extends DialogFragment {
                 }
             });
 
-            mAnimGeodetic_3.setAnimationListener(new Animation.AnimationListener() {
-                @Override
-                public void onAnimationStart(Animation animation) {
-
-                }
-
-                @Override
-                public void onAnimationEnd(Animation animation) {
-                    ibGeodeticCommand_3.setVisibility(View.INVISIBLE);
-                    rlGeodeticCommands.setVisibility(View.GONE);
-                }
-
-                @Override
-                public void onAnimationRepeat(Animation animation) {
-
-                }
-            });
-
             //--Geodetic Commands
             new Handler().postDelayed(new Runnable() {
                 @Override
@@ -861,21 +1265,10 @@ public class DialogJobPointView extends DialogFragment {
                     ibGeodeticCommand_2.startAnimation(mAnimGeodetic_2);
                 }
             },400);
-
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    ibGeodeticCommand_3.startAnimation(mAnimGeodetic_3);
-
-                }
-            },600);
-
-
         }
 
-
-
     }
+
 
     private void animateGridCommands(boolean isShow){
         Log.d(TAG, "animateGridCommandsShow: Started");
@@ -884,14 +1277,10 @@ public class DialogJobPointView extends DialogFragment {
             rlGridCommands.setVisibility(View.VISIBLE);
 
             final Animation mAnimGrid_1 = AnimationUtils.loadAnimation(mContext,R.anim.anim_button_bounce_in);
-            final Animation mAnimGrid_2 = AnimationUtils.loadAnimation(mContext,R.anim.anim_button_bounce_in);
-            final Animation mAnimGrid_3 = AnimationUtils.loadAnimation(mContext,R.anim.anim_button_bounce_in);
 
             AnimateBounceInterpolator animateBounceInterpolator = new AnimateBounceInterpolator(0.2,20);
 
             mAnimGrid_1.setInterpolator(animateBounceInterpolator);
-            mAnimGrid_2.setInterpolator(animateBounceInterpolator);
-            mAnimGrid_3.setInterpolator(animateBounceInterpolator);
 
             new Handler().postDelayed(new Runnable() {
                 @Override
@@ -901,25 +1290,9 @@ public class DialogJobPointView extends DialogFragment {
                 }
             },200);
 
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    ibGridCommand_2.setVisibility(View.VISIBLE);
-                    ibGridCommand_2.startAnimation(mAnimGrid_2);
-                }
-            },400);
-
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    ibGridCommand_3.setVisibility(View.VISIBLE);
-                    ibGridCommand_3.startAnimation(mAnimGrid_3);
-                }
-            },600);
         }else{
             final Animation mAnimGrid_1 = AnimationUtils.loadAnimation(mContext,R.anim.anim_button_bounce_in);
-            final Animation mAnimGrid_2 = AnimationUtils.loadAnimation(mContext,R.anim.anim_button_bounce_in);
-            final Animation mAnimGrid_3 = AnimationUtils.loadAnimation(mContext,R.anim.anim_button_bounce_in);
+
 
             mAnimGrid_1.setAnimationListener(new Animation.AnimationListener() {
                 @Override
@@ -938,41 +1311,6 @@ public class DialogJobPointView extends DialogFragment {
                 }
             });
 
-            mAnimGrid_2.setAnimationListener(new Animation.AnimationListener() {
-                @Override
-                public void onAnimationStart(Animation animation) {
-
-                }
-
-                @Override
-                public void onAnimationEnd(Animation animation) {
-                    ibGridCommand_2.setVisibility(View.INVISIBLE);
-                }
-
-                @Override
-                public void onAnimationRepeat(Animation animation) {
-
-                }
-            });
-
-            mAnimGrid_3.setAnimationListener(new Animation.AnimationListener() {
-                @Override
-                public void onAnimationStart(Animation animation) {
-
-                }
-
-                @Override
-                public void onAnimationEnd(Animation animation) {
-                    ibGridCommand_3.setVisibility(View.INVISIBLE);
-                    rlGridCommands.setVisibility(View.GONE);
-                }
-
-                @Override
-                public void onAnimationRepeat(Animation animation) {
-
-                }
-            });
-
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -980,29 +1318,92 @@ public class DialogJobPointView extends DialogFragment {
                 }
             },200);
 
+        }
+
+    }
+
+
+    private void animatePointOptions(boolean isShow){
+        Log.d(TAG, "animatePointOptions: Started");
+
+        if(isShow){
+            final Animation mAnim_1 = AnimationUtils.loadAnimation(mContext,R.anim.anim_activity_fade_in);
+            final Animation mAnim_2 = AnimationUtils.loadAnimation(mContext,R.anim.anim_activity_fade_in);
+
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    ibGridCommand_2.startAnimation(mAnimGrid_2);
+                    ibPointOption_1.setVisibility(View.VISIBLE);
+                    ibPointOption_1.startAnimation(mAnim_1);
+                }
+            },50);
+
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    ibPointOption_2.setVisibility(View.VISIBLE);
+                    ibPointOption_2.startAnimation(mAnim_2);
+                }
+            },50);
+
+
+        }else {
+            final Animation mAnim_1 = AnimationUtils.loadAnimation(mContext,R.anim.anim_button_bounce_out);
+            final Animation mAnim_2 = AnimationUtils.loadAnimation(mContext,R.anim.anim_button_bounce_out);
+
+            mAnim_1.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    ibPointOption_1.setVisibility(View.INVISIBLE);
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+
+                }
+            });
+
+            mAnim_2.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    ibPointOption_2.setVisibility(View.INVISIBLE);
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+
+                }
+            });
+
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    ibPointOption_1.startAnimation(mAnim_1);
+                }
+            },200);
+
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    ibPointOption_2.startAnimation(mAnim_2);
                 }
             },400);
-
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    ibGridCommand_3.startAnimation(mAnimGrid_3);
-                }
-            },600);
-
 
 
         }
 
 
-
     }
-
-
 
     //-------------------------------------------------------------------------------------------------------------------------//
 
@@ -1197,15 +1598,15 @@ public class DialogJobPointView extends DialogFragment {
      * Grid View (GV)
      */
 
-    private void showGridView(){
-        Log.d(TAG, "showGridView: Started...");
+    private void showPhotoGridView(){
+        Log.d(TAG, "showPhotoGridView: Started...");
         isLoading = true;
 
         gridHandler = new Handler();
         gridHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                initGridView();
+                initPhotoGridView();
                 isLoading = false;
             }
         },DELAY_TO_GRID);
@@ -1225,8 +1626,8 @@ public class DialogJobPointView extends DialogFragment {
         },DELAY_TO_GRID);
     }
 
-    private void initGridView(){
-        Log.d(TAG, "initGridView: Started");
+    private void initPhotoGridView(){
+        Log.d(TAG, "initPhotoGridView: Started");
 
         Log.d(TAG, "Data: ProjectID: " + projectID);
         Log.d(TAG, "Data: JobID: " + jobId);
@@ -1234,10 +1635,10 @@ public class DialogJobPointView extends DialogFragment {
 
 
         if(getImageCount(projectID, jobId, pointId)){
-            Log.d(TAG, "initGridView: getImageCount = True");
+            Log.d(TAG, "initPhotoGridView: getImageCount = True");
             gridAdapter = new PointGridImageAdapter(mContext, R.layout.layout_grid_imageview, mURLSyntex, getImageFromPointData(projectID, jobId, pointId));
             gridView.setAdapter(gridAdapter);
-            gridView.setVisibility(View.VISIBLE);
+            animatePhotoCard();
         }
     }
 
@@ -1252,7 +1653,7 @@ public class DialogJobPointView extends DialogFragment {
             Log.d(TAG, "initSketchGridView: getSketchCount = True");
             gridSketchAdapter = new PointGridSketchAdapter(mContext, R.layout.layout_grid_imageview, mURLSyntex, getSketchFromPointData(pointId));
             sketchGridView.setAdapter(gridSketchAdapter);
-            sketchGridView.setVisibility(View.VISIBLE);
+            animateSketchCard();
         }
 
 
@@ -1377,7 +1778,393 @@ public class DialogJobPointView extends DialogFragment {
         }
     }
 
+    //----------------------------------------------------------------------------------------------//
 
+    private void setPointTypes(){
+        Log.d(TAG, "setPointTypes: Started");
+        String[] type_values = getResources().getStringArray(R.array.point_type_entries);
+        String[] grid_type_values = getResources().getStringArray(R.array.point_type_grid_vs_type);
+
+        int planarType_pos = planarPointType;
+        tvPointClassPlanar.setText(type_values[planarType_pos]);
+
+        int geodeticType_pos = geodeticPointType;
+        tvPointClassWorld.setText(type_values[geodeticType_pos]);
+        tvPointClassGrid.setText(grid_type_values[geodeticType_pos]);
+
+        gridPointType = geodeticPointType;
+
+        tvPointClassPlanar.setVisibility(View.VISIBLE);
+        tvPointClassWorld.setVisibility(View.VISIBLE);
+        tvPointClassGrid.setVisibility(View.VISIBLE);
+
+    }
+
+    private void setPlanarCoordinateText(double north, double east, double elevation, boolean isDirty){
+        Log.d(TAG, "setPlanarCoordinateText: Started");
+        tvPointNorth.setText(COORDINATE_FORMATTER.format(north));
+        tvPointEast.setText(COORDINATE_FORMATTER.format(east));
+        tvPointElev.setText(COORDINATE_FORMATTER.format(elevation));
+
+        tvPointNorth.setVisibility(View.VISIBLE);
+        tvPointEast.setVisibility(View.VISIBLE);
+        tvPointElev.setVisibility(View.VISIBLE);
+
+        if(isDirty){
+            tvPointNorth.setTypeface(null, Typeface.ITALIC);
+            tvPointEast.setTypeface(null,Typeface.ITALIC);
+            tvPointElev.setTypeface(null,Typeface.ITALIC);
+        }
+    }
+
+    private void setGeodeticCoordinateText(double latValue, double longValue, boolean isDirty) {
+        Log.d(TAG, "setGeodeticCoordinateText: Started");
+
+        if (latValue != 0) {
+            tvPointLatHeader.setText(getString(R.string.dialog_point_view_pointLatitude_header));
+            tvPointLongHeader.setText(getString(R.string.dialog_point_view_pointLongitude_header));
+
+            tvPointLat.setText(SurveyMathHelper.convertDECtoDMSGeodeticV2(latValue, 4));
+            tvPointLong.setText(SurveyMathHelper.convertDECtoDMSGeodeticV2(longValue, 4));
+
+            tvPointLat.setVisibility(View.VISIBLE);
+            tvPointLong.setVisibility(View.VISIBLE);
+
+        }
+
+        if (isDirty) {
+            tvPointLat.setTypeface(null, Typeface.ITALIC);
+            tvPointLong.setTypeface(null, Typeface.ITALIC);
+
+        }
+    }
+
+    private void setGeodeticEllipsoidText(double heightEllips, boolean isDirty){
+        Log.d(TAG, "setGeodeticEllipsoidText: Started");
+
+        if (heightEllips != 0) {
+            tvPointEllipsoidHeader.setText(getString(R.string.dialog_point_view_pointEllipsoid_header));
+
+            tvPointEllipsoid.setText(COORDINATE_FORMATTER.format(heightEllips));
+
+            tvPointEllipsoid.setVisibility(View.VISIBLE);
+        }
+
+        if (isDirty) {
+            tvPointEllipsoid.setTypeface(null, Typeface.ITALIC);
+        }
+    }
+
+    private void setGeodeticOrthoText(double heightOrtho, boolean isDirty){
+        Log.d(TAG, "setGeodeticOrthoText: Started");
+
+        if (heightOrtho != 0) {
+            tvPointOrthoHeader.setText(getString(R.string.dialog_point_view_pointOrtho_header));
+
+            tvPointOrtho.setText(COORDINATE_FORMATTER.format(heightOrtho));
+
+            tvPointOrtho.setVisibility(View.VISIBLE);
+        }
+
+        if (isDirty) {
+            tvPointOrtho.setTypeface(null, Typeface.ITALIC);
+        }
+
+
+    }
+
+    private void setGridCoordinateText(double north,double east,boolean isDirty){
+        Log.d(TAG, "setPlanarCoordinateText: Started");
+
+
+        COORDINATE_FORMATTER = StringUtilityHelper.createUSNonBiasDecimalFormat();
+
+        tvPointGridNorthHeader.setText(getString(R.string.dialog_job_point_item_header_grid_north_title));
+        tvPointGridEastHeader.setText(getString(R.string.dialog_job_point_item_header_grid_east_title));
+
+        tvPointGridNorth.setText(COORDINATE_FORMATTER.format(north));
+        tvPointGridEast.setText(COORDINATE_FORMATTER.format(east));
+
+        tvPointGridNorth.setVisibility(View.VISIBLE);
+        tvPointGridEast.setVisibility(View.VISIBLE);
+
+        if(isDirty){
+            tvPointGridNorth.setTypeface(null, Typeface.ITALIC);
+            tvPointGridEast.setTypeface(null,Typeface.ITALIC);
+        }
+    }
+
+    private void setPointDescriptionText(String description, boolean isDirty){
+        Log.d(TAG, "setPointDescriptionText: Started");
+
+
+        tvPointDesc.setText(description);
+
+        if(isDirty){
+            tvPointDesc.setTypeface(null, Typeface.ITALIC);
+        }
+
+    }
+
+
+    //----------------------------------------------------------------------------------------------//
+
+    private void checkPlanarCoordinatesFromDialog(Point point){
+        Log.d(TAG, "checkPlanarCoordinatesFromDialog: Started");
+
+        if(isPlanarPointDirty(point)){
+            isPlanarDirty = true;
+            planarNorthDirty = point.getNorthing();
+            planarEastDirty = point.getEasting();
+            planarElevationDirty = point.getElevation();
+            planarPointType = 1;
+
+            setPlanarCoordinateText(planarNorthDirty, planarEastDirty,planarElevationDirty,true);
+
+        }
+
+    }
+
+    private void checkGeodeticCoordinatesFromDialog(double latOut, double longOut, double heightEllipsOut, double heightOrthoOut){
+        Log.d(TAG, "checkGeodeticCoordinatesFromDialog: Started");
+
+        if(isGeodeticPointDirty(latOut, longOut, heightEllipsOut, heightOrthoOut)){
+            isGeodeticDirty = true;
+            latitudeDirty = latOut;
+            longitudeDirty = longOut;
+            heightEllipsoidDirty = heightEllipsOut;
+            heightOrthoDirty = heightOrthoOut;
+
+            setGeodeticCoordinateText(latitudeValue,longitudeValue,true);
+            setGeodeticEllipsoidText(heightEllipsoidValue,true);
+            setGeodeticOrthoText(heightOrthoValue,true );
+
+            if(latitudeValue !=0){
+                findGridCoordinatesFromWorld(latitudeDirty,longitudeDirty);
+            }
+
+            if(!isGridViewShown){
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        animateGridCard();
+                        animateGridCommands(true);
+                    }
+                },750);
+            }
+        }
+
+    }
+
+    private void checkGridCoordinatesFromDialog(double northOut, double eastOut){
+        Log.d(TAG, "checkGridCoordinatesFromDialog: Started");
+
+        if(isGridPointDirty(northOut, eastOut)){
+            isGridDirty = true;
+            gridNorthDirty = northOut;
+            gridEastDirty = eastOut;
+
+            setGridCoordinateText(gridNorthDirty, gridEastDirty,true);
+
+            findWorldCoordinatesFromGrid(gridNorthDirty,gridEastDirty);
+
+        }
+
+    }
+
+    private void checkPointDescriptionFromDialog(String descriptionOut){
+        Log.d(TAG, "checkPointDescriptionFromDialog: Started");
+
+        if(isPointDescriptionDirty(descriptionOut)){
+            isPointDescriptionDirty = true;
+            pointDescriptionDirty = descriptionOut;
+
+            setPointDescriptionText(pointDescriptionDirty,true);
+
+        }
+
+
+    }
+
+    private boolean isPlanarPointDirty(Point point){
+        Log.d(TAG, "isPlanarPointsDirty: Started");
+
+        double mNorth, mEast, mElevation;
+        mNorth = point.getNorthing();
+        mEast = point.getEasting();
+        mElevation = point.getElevation();
+
+        Log.d(TAG, "isPlanarPointDirty: North: " + mNorth + " vs " + planarNorthValue);
+        Log.d(TAG, "isPlanarPointDirty: East: " + mEast + " vs " + planarEastValue);
+
+        int dNorth, dEast, dElev;
+
+        //Comparing
+        if(!isPlanarDirty){
+            dNorth = Double.compare(planarNorthValue,mNorth);
+            dEast = Double.compare(planarEastValue, mEast);
+            dElev = Double.compare(planarElevationValue, mElevation);
+        }else{
+            dNorth = Double.compare(planarNorthDirty,mNorth);
+            dEast = Double.compare(planarEastDirty, mEast);
+            dElev = Double.compare(planarElevationDirty, mElevation);
+        }
+
+
+        Log.d(TAG, "isPlanarPointDirty: delta:"  + dNorth + ", " + dEast + ", " + dElev);
+
+
+        if(dNorth != 0 || dEast != 0 || dElev != 0){
+            Log.d(TAG, "isPlanarPointDirty: Dirty");
+            return true;
+        }else{
+            Log.d(TAG, "isPlanarPointDirty: Not Dirty");
+            return false;
+        }
+    }
+
+    private boolean isGeodeticPointDirty(double latValue, double longValue, double heightEllips, double heightOrtho){
+        Log.d(TAG, "isGeodeticPointDirty: Started");
+
+        int dLat, dLong, dEllipsoid, dOrtho;
+
+        if(!isGeodeticDirty){
+            dLat = Double.compare(latitudeValue,latValue);
+            dLong = Double.compare(longitudeValue,longValue);
+            dEllipsoid = Double.compare(heightEllipsoidValue,heightEllips);
+            dOrtho = Double.compare(heightOrthoValue,heightOrtho);
+        }else{
+            dLat = Double.compare(latitudeDirty,latValue);
+            dLong = Double.compare(longitudeDirty,longValue);
+            dEllipsoid = Double.compare(heightEllipsoidDirty,heightEllips);
+            dOrtho = Double.compare(heightOrthoValue,heightOrtho);
+        }
+
+        if(dLat !=0 || dLong !=0 || dEllipsoid !=0 || dOrtho !=0){
+            Log.d(TAG, "isGeodeticPointDirty: Dirty");
+            return true;
+        }else{
+            Log.d(TAG, "isGeodeticPointDirty: Not Dirty");
+            return false;
+        }
+
+    }
+
+    private boolean isGridPointDirty(double north, double east){
+        Log.d(TAG, "isGridPointDirty: Started");
+
+        int dNorth, dEast;
+
+        //Comparing
+        if(!isPlanarDirty){
+            dNorth = Double.compare(planarNorthValue,north);
+            dEast = Double.compare(planarEastValue, east);
+        }else{
+            dNorth = Double.compare(planarNorthDirty,north);
+            dEast = Double.compare(planarEastDirty, east);
+
+        }
+
+        if(dNorth != 0 || dEast != 0){
+            Log.d(TAG, "isPlanarPointDirty: Dirty");
+            return true;
+        }else{
+            Log.d(TAG, "isPlanarPointDirty: Not Dirty");
+            return false;
+        }
+    }
+
+    private boolean isPointDescriptionDirty(String description){
+        Log.d(TAG, "isPointDescriptionDirty: Started");
+
+        boolean isTheSame;
+
+        //Comparing
+        if(!isPointDescriptionDirty){
+            isTheSame = description.equals(pointDescription);
+        }else{
+            isTheSame = description.equals(pointDescriptionDirty);
+        }
+
+        if (isTheSame){
+            Log.d(TAG, "isPointDescriptionDirty: Not Dirty");
+            return false;
+        }else{
+            Log.d(TAG, "isPointDescriptionDirty: Dirty");
+            return true;
+        }
+
+    }
+
+    //----------------------------------------------------------------------------------------------//
+    private void createDirtyPointGeodetic(){
+        Log.d(TAG, "createDirtyPointGeodetic: Started");
+        boolean isDirty = false;
+
+        PointGeodetic dirtyPoint = new PointGeodetic();
+
+        dirtyPoint.setPoint_no(pointNo);
+
+        if(isPlanarDirty){
+            dirtyPoint.setNorthing(planarNorthDirty);
+            dirtyPoint.setEasting(planarEastDirty);
+            dirtyPoint.setElevation(planarElevationDirty);
+            dirtyPoint.setPointType(planarPointType);
+            isDirty = true;
+
+        }else{
+            dirtyPoint.setNorthing(planarNorthValue);
+            dirtyPoint.setEasting(planarEastValue);
+            dirtyPoint.setElevation(planarElevationValue);
+            dirtyPoint.setPointType(planarPointType);
+        }
+
+        if(isGeodeticDirty){
+            dirtyPoint.setLatitude(latitudeDirty);
+            dirtyPoint.setLongitude(longitudeDirty);
+            dirtyPoint.setEllipsoid(heightEllipsoidDirty);
+            dirtyPoint.setOrtho(heightOrthoDirty);
+            dirtyPoint.setPointGeodeticType(geodeticPointTypeDirty);
+            isDirty = true;
+
+        }else{
+            dirtyPoint.setLatitude(latitudeValue);
+            dirtyPoint.setLongitude(longitudeValue);
+            dirtyPoint.setEllipsoid(heightEllipsoidValue);
+            dirtyPoint.setOrtho(heightOrthoValue);
+            dirtyPoint.setPointGeodeticType(geodeticPointType);
+        }
+
+        if(isPointDescriptionDirty){
+            dirtyPoint.setDescription(pointDescriptionDirty);
+            isDirty = true;
+        }else{
+            Log.d(TAG, "createDirtyPointGeodetic: Not Dirty Point Description");
+            dirtyPoint.setDescription(pointDescription);
+        }
+
+        dirtyPoint.setDateCreated(creationDate);
+
+        dirtyPoint.setDateModified((int) (new Date().getTime()/1000));
+
+        if(isDirty){
+            replacePointGeodeticWithDirtyPoint(dirtyPoint);
+        }
+
+
+    }
+
+    private void replacePointGeodeticWithDirtyPoint(PointGeodetic pointGeodeticIN){
+        Log.d(TAG, "replacePointGeodeticWithDirtyPoint: Started");
+
+        JobDatabaseHandler jobDb = new JobDatabaseHandler(mContext, databaseName);
+        SQLiteDatabase db = jobDb.getWritableDatabase();
+
+        int results = jobDb.updatePointGeodeticByPointNo(db,pointNo,pointGeodeticIN);
+
+        db.close();
+
+    }
 
 
     //-------------------------------------------------------------------------------------------------------------------------//

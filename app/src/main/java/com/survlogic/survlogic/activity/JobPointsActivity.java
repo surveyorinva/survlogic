@@ -32,6 +32,7 @@ import com.survlogic.survlogic.fragment.JobPointsHomeFragment;
 import com.survlogic.survlogic.fragment.JobPointsInverseFragment;
 import com.survlogic.survlogic.fragment.JobPointsListFragment;
 import com.survlogic.survlogic.fragment.JobPointsMapFragment;
+import com.survlogic.survlogic.interf.DialogJobPointViewInterface;
 import com.survlogic.survlogic.interf.JobMapOptionsListener;
 import com.survlogic.survlogic.interf.JobPointsActivityListener;
 import com.survlogic.survlogic.interf.JobPointsInversePointListListener;
@@ -50,7 +51,7 @@ import java.util.ArrayList;
  * Created by chrisfillmore on 8/8/2017.
  */
 
-public class JobPointsActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, JobPointsMapListener, JobMapOptionsListener, JobPointsActivityListener, JobPointsInversePointListListener{
+public class JobPointsActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, JobPointsMapListener, JobMapOptionsListener, JobPointsActivityListener, JobPointsInversePointListListener, DialogJobPointViewInterface{
     private static final String TAG = "JobPointsActivity";
 
     private static Context mContext;
@@ -85,8 +86,9 @@ public class JobPointsActivity extends AppCompatActivity implements NavigationVi
     private boolean isJobWithProjection = false;
 
     private PreferenceLoaderHelper preferenceLoaderHelper;
-    SurveyProjectionHelper surveyProjectionHelper;
+    private SurveyProjectionHelper surveyProjectionHelper;
 
+    private Point editPlanarPoint;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -409,7 +411,7 @@ public class JobPointsActivity extends AppCompatActivity implements NavigationVi
 
         FragmentManager fm = getSupportFragmentManager();
         android.support.v4.app.DialogFragment pointDialog = DialogJobPointView.newInstance(project_id, job_id, point_id, pointNo, jobDatabaseName);
-        pointDialog.show(fm,"dialog");
+        pointDialog.show(fm,"dialog_point_view");
     }
 
 
@@ -564,5 +566,17 @@ public class JobPointsActivity extends AppCompatActivity implements NavigationVi
         Log.d(TAG, "onReturnValuesInverseTo: Started");
         jobPointsInverseFragment.setPointSurveyFromPointSurvey(pointSurvey,false);
 
+    }
+
+    //DialogJobPointViewInterface
+
+    @Override
+    public void setPlanarCoordinates(Point pointIN) {
+        this.editPlanarPoint = pointIN;
+    }
+
+    @Override
+    public Point getPlanarCoordinates() {
+        return null;
     }
 }

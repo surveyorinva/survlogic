@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.interf.PointGeodeticEntryListener;
+import com.survlogic.survlogic.model.Point;
 import com.survlogic.survlogic.utils.SurveyMathHelper;
 import com.survlogic.survlogic.utils.PreferenceLoaderHelper;
 import com.survlogic.survlogic.utils.StringUtilityHelper;
@@ -49,7 +50,10 @@ public class DialogJobPointGeodeticEntryAdd extends DialogFragment {
 
     private Spinner sLatDirection, sLongDirection;
 
+    private boolean isEdit = false;
     private double latitudeValue = 0, longitudeValue = 0, heightEllipsoidValue = 0, heightOrthoValue = 0;
+
+    private onUpdateGeodeticCoordinatesListener listener;
 
     public static DialogJobPointGeodeticEntryAdd newInstance(double latitude, double longitude, double heightEllipsoid, double heightOrtho) {
         Log.d(TAG, "newInstance: Starting...");
@@ -65,6 +69,20 @@ public class DialogJobPointGeodeticEntryAdd extends DialogFragment {
 
     }
 
+    public static DialogJobPointGeodeticEntryAdd newInstance(double latitude, double longitude, double heightEllipsoid, double heightOrtho, boolean isEdit) {
+        Log.d(TAG, "newInstance: Starting...");
+        DialogJobPointGeodeticEntryAdd frag = new DialogJobPointGeodeticEntryAdd();
+        Bundle args = new Bundle();
+        args.putDouble("latitude", latitude);
+        args.putDouble("longitude", longitude);
+        args.putDouble("ellipsoid", heightEllipsoid);
+        args.putDouble("ortho", heightOrtho);
+        args.putBoolean("isEdit",isEdit);
+        frag.setArguments(args);
+        return frag;
+
+    }
+
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         Log.d(TAG, "onCreateDialog: Starting...>");
@@ -73,6 +91,7 @@ public class DialogJobPointGeodeticEntryAdd extends DialogFragment {
         longitudeValue = getArguments().getDouble("longitude");
         heightEllipsoidValue = getArguments().getDouble("ellipsoid");
         heightOrthoValue = getArguments().getDouble("ortho");
+        isEdit = getArguments().getBoolean("isEdit");
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.DialogPopupStyleExpolodingOut);
         LayoutInflater inflater = getActivity().getLayoutInflater();
@@ -88,8 +107,18 @@ public class DialogJobPointGeodeticEntryAdd extends DialogFragment {
 
             }
         });
+
+        if(isEdit){
+            builder.setNeutralButton(R.string.general_clear, null);
+        }
+
+
         builder.create();
         return builder.show();
+    }
+
+    public void setDialogListener(onUpdateGeodeticCoordinatesListener listener){
+        this.listener = listener;
     }
 
     @Override
@@ -111,6 +140,16 @@ public class DialogJobPointGeodeticEntryAdd extends DialogFragment {
 
             }
         });
+
+        if (isEdit) {
+            Button btnClear = alertDialog.getButton(AlertDialog.BUTTON_NEUTRAL);
+            btnClear.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    clearResults();
+                }
+            });
+        }
 
         initViewWidgets();
         setOnClickListeners();
@@ -451,7 +490,7 @@ public class DialogJobPointGeodeticEntryAdd extends DialogFragment {
             Log.d(TAG, "Latitude Values: Started: " + latitudeValue);
             String degValue = String.valueOf(SurveyMathHelper.convertDECToDegree(latitudeValue));
             String minuteValue = String.valueOf(SurveyMathHelper.convertDECToMinute(latitudeValue));
-            String secondValue = String.valueOf(COORDINATE_FORMATTER.format(SurveyMathHelper.convertDECToSeconds(latitudeValue)));
+            String secondValue = String.valueOf(StringUtilityHelper.createUSGeodeticDecimalFormat().format(SurveyMathHelper.convertDECToSeconds(latitudeValue)));
 
             etLatDegree.setText(degValue);
             etLatMinute.setText(minuteValue);
@@ -464,7 +503,7 @@ public class DialogJobPointGeodeticEntryAdd extends DialogFragment {
             Log.d(TAG, "Longitude Values: Started:  " + longitudeValue);
             String degValue = String.valueOf(SurveyMathHelper.convertDECToDegree(longitudeValue));
             String minuteValue = String.valueOf(SurveyMathHelper.convertDECToMinute(longitudeValue));
-            String secondValue = String.valueOf(COORDINATE_FORMATTER.format(SurveyMathHelper.convertDECToSeconds(longitudeValue)));
+            String secondValue = String.valueOf(StringUtilityHelper.createUSGeodeticDecimalFormat().format(SurveyMathHelper.convertDECToSeconds(longitudeValue)));
 
             etLongDegree.setText(degValue);
             etLongMinute.setText(minuteValue);
@@ -577,9 +616,24 @@ public class DialogJobPointGeodeticEntryAdd extends DialogFragment {
             heightOrtho = Double.parseDouble(heightOrthoIn);
         }
 
-        PointGeodeticEntryListener listener = (PointGeodeticEntryListener) getActivity();
-        listener.onWorldReturnValues(latitudeDEC, longitudeDEC, heightEllipsoid, heightOrtho);
+
+        if (!isEdit) {
+            PointGeodeticEntryListener listener = (PointGeodeticEntryListener) getActivity();
+            listener.onWorldReturnValues(latitudeDEC, longitudeDEC, heightEllipsoid, heightOrtho);
+
+        } else {
+            listener.onUpdateGeodeticCoordinatesSubmit(latitudeDEC, longitudeDEC, heightEllipsoid, heightOrtho);
+
+        }
+
         dismiss();
+
+    }
+
+    private void clearResults(){
+        Log.d(TAG, "clearResults: Started");
+
+
 
     }
 
@@ -594,6 +648,9 @@ public class DialogJobPointGeodeticEntryAdd extends DialogFragment {
         }
     }
 
+    public interface onUpdateGeodeticCoordinatesListener {
+        void onUpdateGeodeticCoordinatesSubmit(double latOut, double longOut, double heightEllipsOut, double heightOrthoOut);
+    }
 
 
 

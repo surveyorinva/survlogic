@@ -125,7 +125,7 @@ public class ProjectDetailsActivity extends AppCompatActivity implements OnMapRe
     private ProjectGridImageAdapter gridAdapter;
     private boolean isGridAdapterSetup = false;
 
-    SurveyProjectionHelper surveyProjectionHelper;
+    private SurveyProjectionHelper surveyProjectionHelper;
     private boolean isProjection = false;
     private boolean isProjectionZone = false;
 

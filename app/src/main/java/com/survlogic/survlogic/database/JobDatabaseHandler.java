@@ -592,6 +592,42 @@ public class JobDatabaseHandler extends SQLiteOpenHelper {
 
     }
 
+
+    public int updatePointGeodeticByPointNo(SQLiteDatabase db, int point_no, PointGeodetic pointGeodetic){
+        Log.d(TAG, "updatePointGeodeticByPointNo: Started");
+
+        ContentValues contentValues = new ContentValues();
+
+        contentValues.put(JobContract.PointEntry.KEY_POINT_NO, pointGeodetic.getPoint_no());
+        contentValues.put(JobContract.PointEntry.KEY_NORTHING, pointGeodetic.getNorthing());
+        contentValues.put(JobContract.PointEntry.KEY_EASTING, pointGeodetic.getEasting());
+        contentValues.put(JobContract.PointEntry.KEY_ELEVATION, pointGeodetic.getElevation());
+        contentValues.put(JobContract.PointEntry.KEY_POINT_PLANAR_TYPE, pointGeodetic.getPointType());
+
+        contentValues.put(JobContract.PointEntry.KEY_GEOLAT, pointGeodetic.getLatitude());
+        contentValues.put(JobContract.PointEntry.KEY_GEOLON, pointGeodetic.getLongitude());
+        contentValues.put(JobContract.PointEntry.KEY_GEOELLIPS, pointGeodetic.getEllipsoid());
+        contentValues.put(JobContract.PointEntry.KEY_GEOORTHO, pointGeodetic.getOrtho());
+        contentValues.put(JobContract.PointEntry.KEY_POINT_GEODETIC_TYPE, pointGeodetic.getPointGeodeticType());
+
+        contentValues.put(JobContract.PointEntry.KEY_DESCRIPTION, pointGeodetic.getDescription());
+
+        contentValues.put(JobContract.PointEntry.KEY_DATE_CREATED, pointGeodetic.getDateCreated());
+        contentValues.put(JobContract.PointEntry.KEY_DATE_MODIFIED, pointGeodetic.getDateModified());
+
+        return db.update(JobContract.PointEntry.TABLE_NAME, contentValues, JobContract.PointEntry.KEY_POINT_NO + " = ?",
+                new String[] {String.valueOf(point_no)});
+
+    }
+
+
+    public void deletePointByPointNo(SQLiteDatabase db, int point_no){
+        db.delete(JobContract.PointEntry.TABLE_NAME, JobContract.PointEntry.KEY_POINT_NO + " = ?",
+                new String[] { String.valueOf(point_no) });
+    }
+
+
+
     public List<JobSketch> getJobSketchesByPointID(SQLiteDatabase db, int point_id){
         Log.d(TAG, "getJobSketchesByPointID: Started...");
         List<JobSketch> lstprojectSketches = new ArrayList<>();

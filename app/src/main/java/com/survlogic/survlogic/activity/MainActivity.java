@@ -31,6 +31,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.survlogic.survlogic.ARvS.JobGPSSurveyARvSActivity;
 import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.adapter.ActivityViewPagerAdapter;
 import com.survlogic.survlogic.background.BackgroundProjectList;
@@ -183,7 +184,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
 
             case R.id.menu_item3_id:
-                intent.setClass(this, TestActivity.class);
+                intent.setClass(this, JobGPSSurveyARvSActivity.class);
                 startActivity(intent);
                 break;
 

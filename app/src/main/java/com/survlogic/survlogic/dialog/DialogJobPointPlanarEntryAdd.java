@@ -3,27 +3,28 @@ package com.survlogic.survlogic.dialog;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.survlogic.survlogic.R;
+import com.survlogic.survlogic.interf.DialogJobPointViewInterface;
 import com.survlogic.survlogic.interf.PointGeodeticEntryListener;
+import com.survlogic.survlogic.model.Point;
 import com.survlogic.survlogic.utils.PreferenceLoaderHelper;
 import com.survlogic.survlogic.utils.StringUtilityHelper;
-import com.survlogic.survlogic.utils.SurveyMathHelper;
 
 import java.text.DecimalFormat;
 
@@ -31,7 +32,7 @@ import java.text.DecimalFormat;
  * Created by chrisfillmore on 8/11/2017.
  */
 
-public class DialogJobPointGridEntryAdd extends DialogFragment {
+public class DialogJobPointPlanarEntryAdd extends DialogFragment {
     private static final String TAG = "DialogJobPointEntryAdd";
 
     private static DecimalFormat COORDINATE_FORMATTER;
@@ -42,50 +43,56 @@ public class DialogJobPointGridEntryAdd extends DialogFragment {
 
     private TextView tvAppBarTitle;
     private ImageButton ibAppBarBack;
-    private EditText etGridNorth, etGridEast;
+    private EditText etPlanarNorth, etPlanarEast, etPlanarElevation;
 
-    private double gridNorth = 0, gridEast = 0;
+    private double planarNorthIn = 0, planarEastIn = 0, planarElevationIn = 0 ;
+    private double planarNorthOut = 0, planarEastOut = 0, planarElevationOut = 0 ;
     private boolean isEdit = false;
 
-    private onUpdateGridCoordinatesListener listener;
+    private onUpdatePlanarCoordinatesListener listener;
 
-    public static DialogJobPointGridEntryAdd newInstance(double gridNorth, double gridEast) {
+    public static DialogJobPointPlanarEntryAdd newInstance(double planarNorth, double planarEast, double planarElevation ) {
         Log.d(TAG, "newInstance: Starting...");
-        DialogJobPointGridEntryAdd frag = new DialogJobPointGridEntryAdd();
+        DialogJobPointPlanarEntryAdd frag = new DialogJobPointPlanarEntryAdd();
         Bundle args = new Bundle();
-        args.putDouble("grid_north", gridNorth);
-        args.putDouble("grid_east", gridEast);
+        args.putDouble("planar_north", planarNorth);
+        args.putDouble("planar_east", planarEast);
+        args.putDouble("planar_elevation", planarElevation);
 
         frag.setArguments(args);
         return frag;
 
     }
 
-    public static DialogJobPointGridEntryAdd newInstance(double gridNorth, double gridEast, boolean isEdit) {
+    public static DialogJobPointPlanarEntryAdd newInstance(double planarNorth, double planarEast, double planarElevation, boolean isEdit ) {
         Log.d(TAG, "newInstance: Starting...");
-        DialogJobPointGridEntryAdd frag = new DialogJobPointGridEntryAdd();
+        DialogJobPointPlanarEntryAdd frag = new DialogJobPointPlanarEntryAdd();
         Bundle args = new Bundle();
-        args.putDouble("grid_north", gridNorth);
-        args.putDouble("grid_east", gridEast);
-        args.putBoolean("is_Edit", isEdit);
+        args.putDouble("planar_north", planarNorth);
+        args.putDouble("planar_east", planarEast);
+        args.putDouble("planar_elevation", planarElevation);
+        args.putBoolean("is_edit", isEdit);
 
         frag.setArguments(args);
         return frag;
 
     }
+
+
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         Log.d(TAG, "onCreateDialog: Starting...>");
 
-        gridNorth = getArguments().getDouble("grid_north");
-        gridEast = getArguments().getDouble("grid_east");
-        isEdit = getArguments().getBoolean("is_Edit");
+        planarNorthIn = getArguments().getDouble("planar_north");
+        planarEastIn = getArguments().getDouble("planar_east");
+        planarElevationIn = getArguments().getDouble("planar_elevation");
+        isEdit = getArguments().getBoolean("is_edit");
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.DialogPopupStyleExpolodingOut);
         LayoutInflater inflater = getActivity().getLayoutInflater();
 
-        View v = inflater.inflate(R.layout.dialog_job_point_grid_entry,null);
+        View v = inflater.inflate(R.layout.dialog_job_point_planar_entry,null);
         builder.setView(v);
 
         builder.setPositiveButton(R.string.general_save,null);
@@ -99,6 +106,12 @@ public class DialogJobPointGridEntryAdd extends DialogFragment {
         builder.create();
         return builder.show();
     }
+
+
+    public void setDialogListener(onUpdatePlanarCoordinatesListener listener){
+        this.listener = listener;
+    }
+
 
     @Override
     public void onResume() {
@@ -131,10 +144,6 @@ public class DialogJobPointGridEntryAdd extends DialogFragment {
 
     }
 
-    public void setDialogListener(onUpdateGridCoordinatesListener listener){
-        this.listener = listener;
-    }
-
     private void loadPreferences(){
         Log.d(TAG, "loadPreferences: Started...");
 
@@ -149,15 +158,17 @@ public class DialogJobPointGridEntryAdd extends DialogFragment {
         tvAppBarTitle = (TextView) getDialog().findViewById(R.id.app_bar_title);
         ibAppBarBack = (ImageButton) getDialog().findViewById(R.id.button_back);
 
-        tvAppBarTitle.setText(getResources().getString(R.string.dialog_job_point_grid_app_title));
+        tvAppBarTitle.setText(getResources().getString(R.string.dialog_job_point_planar_app_title));
         ibAppBarBack.setVisibility(View.GONE);
 
-        etGridNorth = (EditText) getDialog().findViewById(R.id.grid_north);
-        etGridNorth.setSelectAllOnFocus(true);
+        etPlanarNorth = (EditText) getDialog().findViewById(R.id.planar_north);
+        etPlanarNorth.setSelectAllOnFocus(true);
 
-        etGridEast = (EditText) getDialog().findViewById(R.id.grid_east);
-        etGridEast.setSelectAllOnFocus(true);
+        etPlanarEast = (EditText) getDialog().findViewById(R.id.planar_east);
+        etPlanarNorth.setSelectAllOnFocus(true);
 
+        etPlanarElevation = (EditText) getDialog().findViewById(R.id.planar_elevation);
+        etPlanarElevation.setSelectAllOnFocus(true);
 
     }
 
@@ -171,18 +182,18 @@ public class DialogJobPointGridEntryAdd extends DialogFragment {
     private void setOnFocusChangeListeners(){
         Log.d(TAG, "setOnFocusChangeListeners: Started");
 
-        etGridNorth.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+        etPlanarNorth.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if(!hasFocus){
                     try{
                         String value = null;
-                        value = etGridNorth.getText().toString();
+                        value = etPlanarNorth.getText().toString();
 
                         if(!StringUtilityHelper.isStringNull(value)){
                             double mValue = Double.parseDouble(value);
 
-                            etGridNorth.setText(COORDINATE_FORMATTER.format(mValue));
+                            etPlanarNorth.setText(COORDINATE_FORMATTER.format(mValue));
 
                         }
 
@@ -194,18 +205,41 @@ public class DialogJobPointGridEntryAdd extends DialogFragment {
             }
         });
 
-        etGridEast.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+        etPlanarEast.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if(!hasFocus){
                     try{
                         String value = null;
-                        value = etGridEast.getText().toString();
+                        value = etPlanarEast.getText().toString();
 
                         if(!StringUtilityHelper.isStringNull(value)){
                             double mValue = Double.parseDouble(value);
 
-                            etGridEast.setText(COORDINATE_FORMATTER.format(mValue));
+                            etPlanarEast.setText(COORDINATE_FORMATTER.format(mValue));
+
+                        }
+
+                    }catch(NumberFormatException ex){
+                        showToast("Error.  Check Number Format", true);
+
+                    }
+                }
+            }
+        });
+
+        etPlanarElevation.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(!hasFocus){
+                    try{
+                        String value = null;
+                        value = etPlanarElevation.getText().toString();
+
+                        if(!StringUtilityHelper.isStringNull(value)){
+                            double mValue = Double.parseDouble(value);
+
+                            etPlanarElevation.setText(COORDINATE_FORMATTER.format(mValue));
 
                         }
 
@@ -224,12 +258,22 @@ public class DialogJobPointGridEntryAdd extends DialogFragment {
         Log.d(TAG, "populateItems: Starting...");
 
 
-        if(gridNorth !=0){
-            etGridNorth.setText(COORDINATE_FORMATTER.format(gridNorth));
+        if(planarNorthIn != 0){
+            etPlanarNorth.setText(COORDINATE_FORMATTER.format(planarNorthIn));
+        }else{
+            etPlanarNorth.setText((COORDINATE_FORMATTER.format(0)));
         }
 
-        if(gridEast !=0){
-            etGridEast.setText(COORDINATE_FORMATTER.format(gridEast));
+        if(planarEastIn !=0){
+            etPlanarEast.setText(COORDINATE_FORMATTER.format(planarEastIn));
+        }else{
+            etPlanarEast.setText((COORDINATE_FORMATTER.format(0)));
+        }
+
+        if(planarElevationIn !=0){
+            etPlanarElevation.setText(COORDINATE_FORMATTER.format(planarElevationIn));
+        }else{
+            etPlanarElevation.setText((COORDINATE_FORMATTER.format(0)));
         }
 
     }
@@ -238,20 +282,27 @@ public class DialogJobPointGridEntryAdd extends DialogFragment {
     private boolean checkForm(){
         boolean isInError = false;
 
-        String gNorth = etGridNorth.getText().toString();
-        String gEast = etGridEast.getText().toString();
+        String gNorth = etPlanarNorth.getText().toString();
+        String gEast = etPlanarEast.getText().toString();
+        String gElevation = etPlanarElevation.getText().toString();
 
-        if(!StringUtilityHelper.isStringNull(gNorth) && !StringUtilityHelper.isStringNull(gEast)){
+        if(!StringUtilityHelper.isStringNull(gNorth) && !StringUtilityHelper.isStringNull(gEast) && !StringUtilityHelper.isStringNull(gElevation)){
             //Ready
             isInError = false;
-            gridNorth = Double.parseDouble(gNorth);
-            gridEast = Double.parseDouble(gEast);
+            planarNorthOut = Double.parseDouble(gNorth);
+            planarEastOut = Double.parseDouble(gEast);
+            planarElevationOut = Double.parseDouble(gElevation);
+
+            Log.d(TAG, "checkForm: Elevation: " + planarElevationOut);
 
         }else if(StringUtilityHelper.isStringNull(gNorth)){
-            etGridNorth.setError(getResources().getString(R.string.dialog_job_point_grid_error_north_not_entered));
+            etPlanarNorth.setError(getResources().getString(R.string.dialog_job_point_planar_error_north_not_entered));
             isInError = true;
         }else if(StringUtilityHelper.isStringNull(gEast)){
-            etGridEast.setError(getResources().getString(R.string.dialog_job_point_grid_error_east_not_entered));
+            etPlanarEast.setError(getResources().getString(R.string.dialog_job_point_planar_error_east_not_entered));
+            isInError = true;
+        }else if(StringUtilityHelper.isStringNull(gElevation)) {
+            etPlanarElevation.setError(getResources().getString(R.string.dialog_job_point_planar_error_elevation_not_entered));
             isInError = true;
         }
 
@@ -263,12 +314,12 @@ public class DialogJobPointGridEntryAdd extends DialogFragment {
     private void submitForm(View v){
         Log.d(TAG, "submitForm: Started...");
 
-        if(!isEdit){
-            PointGeodeticEntryListener listener = (PointGeodeticEntryListener) getActivity();
-            listener.onGridReturnValues(gridNorth, gridEast);
-        }else{
-                listener.onUpdateGridCoordinatesSubmit(gridNorth,gridEast);
-            }
+        Point pointOut = new Point();
+        pointOut.setNorthing(planarNorthOut);
+        pointOut.setEasting(planarEastOut);
+        pointOut.setElevation(planarElevationOut);
+
+        listener.onUpdatePlanarCoordinatesSubmit(pointOut);
         dismiss();
 
     }
@@ -284,11 +335,10 @@ public class DialogJobPointGridEntryAdd extends DialogFragment {
         }
     }
 
-    public interface onUpdateGridCoordinatesListener {
-        void onUpdateGridCoordinatesSubmit(double northOut, double eastOut);
+
+
+    public interface onUpdatePlanarCoordinatesListener {
+        void onUpdatePlanarCoordinatesSubmit(Point pointOut);
     }
-
-
-
 
 }

@@ -553,6 +553,7 @@ public class DialogJobPointEntryAdd extends DialogFragment {
         i.putExtra("PROJECT_ID",project_id);
         i.putExtra("JOB_ID", job_id);
         i.putExtra("JOB_DB_NAME", databaseName);
+        i.putExtra("IS_EDIT", false);
 
         Bundle b = new Bundle();
         PointSurvey pointSurvey = populateValuesNull();

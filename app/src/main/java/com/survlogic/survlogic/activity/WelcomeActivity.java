@@ -90,7 +90,7 @@ public class WelcomeActivity extends AppCompatActivity {
         int permissionLocationFine = ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_FINE_LOCATION);
         int permissionLocationCourse = ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_COARSE_LOCATION);
         int permissionInternet = ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET);
-
+        int permissionCamera = ContextCompat.checkSelfPermission(this,Manifest.permission.CAMERA);
 
         List<String> listPermissionsNeeded = new ArrayList<>();
 
@@ -105,6 +105,10 @@ public class WelcomeActivity extends AppCompatActivity {
         }
         if (permissionInternet != PackageManager.PERMISSION_GRANTED) {
             listPermissionsNeeded.add(Manifest.permission.INTERNET);
+        }
+
+        if (permissionCamera != PackageManager.PERMISSION_GRANTED){
+            listPermissionsNeeded.add(Manifest.permission.CAMERA);
         }
         if (!listPermissionsNeeded.isEmpty()) {
             ActivityCompat.requestPermissions(this, listPermissionsNeeded.toArray(new String[listPermissionsNeeded.size()]), REQUEST_ID_MULTIPLE_PERMISSIONS);
@@ -129,6 +133,7 @@ public class WelcomeActivity extends AppCompatActivity {
                 perms.put(Manifest.permission.ACCESS_FINE_LOCATION, PackageManager.PERMISSION_GRANTED);
                 perms.put(Manifest.permission.ACCESS_COARSE_LOCATION, PackageManager.PERMISSION_GRANTED);
                 perms.put(Manifest.permission.INTERNET, PackageManager.PERMISSION_GRANTED);
+                perms.put(Manifest.permission.CAMERA, PackageManager.PERMISSION_GRANTED);
                 // Fill with actual results from user
                 if (grantResults.length > 0) {
                     for (int i = 0; i < permissions.length; i++)
@@ -137,7 +142,8 @@ public class WelcomeActivity extends AppCompatActivity {
                     if (perms.get(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
                             && perms.get(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
                             && perms.get(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
-                            && perms.get(Manifest.permission.INTERNET) == PackageManager.PERMISSION_GRANTED) {
+                            && perms.get(Manifest.permission.INTERNET) == PackageManager.PERMISSION_GRANTED
+                            && perms.get(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
                         Log.d(TAG, "permissions granted");
                         // process the normal flow
                         setupFolders();
@@ -152,7 +158,8 @@ public class WelcomeActivity extends AppCompatActivity {
                         if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                                 || ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)
                                 || ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_COARSE_LOCATION)
-                                || ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.INTERNET)) {
+                                || ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.INTERNET)
+                                || ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {
 
                             showDialogOK("Service Permissions are required for this app",
                                     new DialogInterface.OnClickListener() {
