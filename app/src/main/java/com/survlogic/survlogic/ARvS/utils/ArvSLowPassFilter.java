@@ -1,5 +1,7 @@
 package com.survlogic.survlogic.ARvS.utils;
 
+import android.util.Log;
+
 /**
  * Created by chrisfillmore on 3/21/2018.
  */
@@ -10,7 +12,7 @@ public class ArvSLowPassFilter {
      * basically means more smoothing See:
      * http://en.wikipedia.org/wiki/Low-pass_filter#Discrete-time_realization
      */
-    private static final float ALPHA = 0.2f;
+    private static final float ALPHA = 0.02f;
 
     // Time constant in seconds
     static final float timeConstant = 0.297f;
@@ -43,6 +45,12 @@ public class ArvSLowPassFilter {
             output[i] = output[i] + ALPHA * (input[i] - output[i]);
         }
         return output;
+    }
+
+    public static float lowPass(float current, float last, float alpha){
+
+        return last * (1.0f - alpha) + current * alpha;
+
     }
 
 

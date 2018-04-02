@@ -516,11 +516,37 @@
 
     <!-- ******************************Custom Views**********************************************-->
 
+    <string name="ar_gps_status_static">Static</string>
+    <string name="ar_gps_status_moving">Moving</string>
+    <string name="ar_sensor_status_static">Holding</string>
+    <string name="ar_sensor_status_moving">Rotating</string>
+
     <!-- Compass View -->
-    <string name="compassview_compass_north">N</string>
-    <string name="compassview_compass_east">E</string>
-    <string name="compassview_compass_south">S</string>
-    <string name="compassview_compass_west">W</string>
+    <string name="compassview_compass_north">0</string>
+    <string name="compassview_compass_east">90</string>
+    <string name="compassview_compass_south">180</string>
+    <string name="compassview_compass_west">270</string>
+    <string name="compassview_compass_15">15</string>
+    <string name="compassview_compass_30">30</string>
+    <string name="compassview_compass_45">45</string>
+    <string name="compassview_compass_60">60</string>
+    <string name="compassview_compass_75">75</string>
+    <string name="compassview_compass_105">105</string>
+    <string name="compassview_compass_120">120</string>
+    <string name="compassview_compass_135">135</string>
+    <string name="compassview_compass_150">150</string>
+    <string name="compassview_compass_165">165</string>
+    <string name="compassview_compass_195">195</string>
+    <string name="compassview_compass_210">210</string>
+    <string name="compassview_compass_225">225</string>
+    <string name="compassview_compass_240">240</string>
+    <string name="compassview_compass_255">255</string>
+    <string name="compassview_compass_285">285</string>
+    <string name="compassview_compass_300">300</string>
+    <string name="compassview_compass_315">315</string>
+    <string name="compassview_compass_330">330</string>
+    <string name="compassview_compass_345">345</string>
+
     <string name="compassview_error_out_index_degrees" translatable="false">Degrees must be between 0 and 359, both inclusive. Actual value: </string>
     <string name="compassview_error_out_index_range_degrees" translatable="false">Range degrees must be between 90 and 360, both inclusive. Actual value: </string>
 

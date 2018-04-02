@@ -43,10 +43,139 @@
 
     </RelativeLayout>
 
+    <RelativeLayout
+        android:id="@+id/rl_camera_overlay_view"
+        android:layout_below="@id/appBar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.survlogic.survlogic.view.CameraOverlayView
+            android:id="@+id/camera_overlay_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </RelativeLayout>
+
+
+    <RelativeLayout
+        android:id="@+id/rl_gnss_info"
+        android:layout_below="@id/appBar"
+        android:background="@drawable/table_background_white"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="5dp"
+        android:layout_marginStart="3dp"
+        android:layout_marginEnd="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="40dp">
+
+        <ImageButton
+            android:id="@+id/gps_satellite_btn"
+            android:src="@drawable/ic_gps_icon_36"
+            android:background="@drawable/table_background_white"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="15dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+
+        <TextView
+            android:id="@+id/gps_status_noSatellites"
+            android:text="@string/gps_satellites_default"
+            android:textSize="12sp"
+            android:textColor="@color/primary_text"
+            android:layout_toEndOf="@id/gps_satellite_btn"
+            android:layout_marginTop="5dp"
+            android:layout_marginStart="2dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/gps_status_noSatellitesLocked"
+            android:text="@string/gps_satellites_default"
+            android:textSize="12sp"
+            android:textColor="@color/header_text"
+            android:layout_toEndOf="@id/gps_satellite_btn"
+            android:layout_marginStart="2dp"
+            android:layout_below="@id/gps_status_noSatellites"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/PDOP_value"
+            android:text="@string/gps_pdop_default"
+            android:textSize="12sp"
+            android:textColor="@color/primary_text"
+            android:layout_toEndOf="@id/gps_status_noSatellites"
+            android:layout_marginStart="20dp"
+            android:layout_alignTop="@id/gps_status_noSatellites"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/HDOP_value"
+            android:text="@string/gps_hdop_default"
+            android:textSize="12sp"
+            android:textColor="@color/primary_text"
+            android:layout_toRightOf="@id/PDOP_value"
+            android:layout_marginStart="20dp"
+            android:layout_alignTop="@id/PDOP_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/VDOP_value"
+            android:text="@string/gps_vdop_default"
+            android:textSize="12sp"
+            android:textColor="@color/primary_text"
+            android:layout_toRightOf="@id/HDOP_value"
+            android:layout_marginStart="20dp"
+            android:layout_alignTop="@id/HDOP_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/ttff_value"
+            android:text="@string/gps_ttff_default"
+            android:textSize="12sp"
+            android:textColor="@color/primary_text"
+            android:layout_toEndOf="@id/VDOP_value"
+            android:layout_marginStart="20dp"
+            android:layout_alignTop="@id/VDOP_value"
+            android:visibility="visible"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/orientation_value"
+            android:text="@string/gps_ttff_default"
+            android:textSize="12sp"
+            android:textColor="@color/primary_text"
+            android:layout_toEndOf="@id/VDOP_value"
+            android:layout_below="@+id/ttff_value"
+            android:layout_marginStart="20dp"
+            android:visibility="visible"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <ProgressBar
+            android:id="@+id/progressBarRecording"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:indeterminate="false"
+            android:theme="@style/AppTheme.RecordingProgressBar"
+            android:layout_alignStart="@+id/PDOP_value"
+            android:layout_marginStart="30dp"
+            android:layout_below="@id/PDOP_value"
+            android:visibility="invisible"
+            android:layout_width="160dp"
+            android:layout_height="wrap_content"/>
+
+    </RelativeLayout>
+
 
     <RelativeLayout
         android:id="@+id/rl_radar_view"
-        android:layout_below="@id/appBar"
+        android:layout_below="@id/rl_gnss_info"
+        android:layout_marginTop="5dp"
         android:layout_width="100dp"
         android:layout_height="100dp">
 
@@ -58,9 +187,8 @@
 
     </RelativeLayout>
 
-
     <RelativeLayout
-        android:id="@+id/rlFrame"
+        android:id="@+id/rlFrame_bottom_compass_rule"
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
         android:layout_width="match_parent"

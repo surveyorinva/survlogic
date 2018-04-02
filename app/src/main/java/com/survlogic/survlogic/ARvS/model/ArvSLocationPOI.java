@@ -11,16 +11,18 @@ public class ArvSLocationPOI {
     private String mDescription;
     private double mLatitude;
     private double mLongitude;
+    private double mAltitude;
 
 
     public ArvSLocationPOI() {
     }
 
-    public ArvSLocationPOI(String mName, String mDescription, double mLatitude, double mLongitude) {
+    public ArvSLocationPOI(String mName, String mDescription, double mLatitude, double mLongitude, double mAltitude) {
         this.mName = mName;
         this.mDescription = mDescription;
         this.mLatitude = mLatitude;
         this.mLongitude = mLongitude;
+        this.mAltitude = mAltitude;
     }
 
     public int getId() {
@@ -61,5 +63,13 @@ public class ArvSLocationPOI {
 
     public void setLongitude(double mLongitude) {
         this.mLongitude = mLongitude;
+    }
+
+    public double getAltitude() {
+        return mAltitude;
+    }
+
+    public void setAltitude(double mAltitude) {
+        this.mAltitude = mAltitude;
     }
 }

@@ -2,7 +2,9 @@ package com.survlogic.survlogic.ARvS.utils;
 
 import android.app.Activity;
 import android.content.Context;
+import android.location.GnssStatus;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -43,7 +45,7 @@ public class ArvSCurrentLocation  {
     private FusedLocationProviderClient mFusedLocationClient;
     private SettingsClient mSettingsClient;
 
-    private LocationRequest mLocationRequest;
+    public LocationRequest mLocationRequest;
     private LocationSettingsRequest mLocationSettingsRequest;
     private LocationCallback mLocationCallback;
     private Location mCurrentLocation;
@@ -86,6 +88,7 @@ public class ArvSCurrentLocation  {
         if(!mRequestingLocationUpdates){
             mRequestingLocationUpdates = true;
             startLocationUpdates();
+
         }
 
     }
@@ -117,7 +120,7 @@ public class ArvSCurrentLocation  {
     private void createLocationRequest(){
         Log.d(TAG, "createLocationRequest: Started");
 
-        mLocationRequest = new LocationRequest();
+        mLocationRequest = LocationRequest.create();
 
         mLocationRequest.setInterval(GPS_INTERVAL);
         mLocationRequest.setFastestInterval(GPS_FASTEST_INTERVAL);

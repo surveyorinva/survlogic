@@ -1,5 +1,6 @@
 package com.survlogic.survlogic.ARvS.utils;
 
+import android.app.Activity;
 import android.content.Context;
 import android.hardware.GeomagneticField;
 import android.hardware.Sensor;
@@ -7,6 +8,8 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.util.Log;
+import android.view.Surface;
+import android.view.WindowManager;
 
 import com.survlogic.survlogic.ARvS.interf.ArvSOnAzimuthChangeListener;
 
@@ -28,7 +31,7 @@ public class ArvSCurrentAzimuth implements SensorEventListener {
     private static List<Sensor> sensors = null;
     private static Sensor sensorGrav = null;
     private static Sensor sensorMag = null;
-    private static GeomagneticField gmf = null;
+    private GeomagneticField gmf = null;
     private AtomicBoolean computing = new AtomicBoolean(false);
     private static double floatBearing = 0;
 
@@ -37,6 +40,16 @@ public class ArvSCurrentAzimuth implements SensorEventListener {
     private static final float rotation[] = new float[9];
     private static final float orientation[] = new float[3];
     private static float smoothed[] = new float[3];
+
+    private static final float vector_orientation[] = new float[3];
+    private static final float vector_rotation[] = new float[9];
+    private static float vector_orientation_smoothed[] = new float[3];
+
+    private final WindowManager mWindowManager;
+
+    private static float cameraRotation[]= new float[9];
+    private float cameraOrientation[] = new float[3];
+
 
     private int azimuthFrom = 0;
     private int azimuthTo = 0;
@@ -47,6 +60,10 @@ public class ArvSCurrentAzimuth implements SensorEventListener {
 
     public ArvSCurrentAzimuth(Context mContext, ArvSOnAzimuthChangeListener mAzimuthListener, boolean isSimpleSensor ) {
         this.mContext = mContext;
+
+        Activity mActivity = (Activity) mContext;
+        this.mWindowManager = mActivity.getWindow().getWindowManager();
+
         this.mAzimuthListener = mAzimuthListener;
         this.isSimpleSensor = isSimpleSensor;
     }
@@ -59,15 +76,16 @@ public class ArvSCurrentAzimuth implements SensorEventListener {
         if(isSimpleSensor){
             mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
             mSensorManager.registerListener(this,mSensor,SensorManager.SENSOR_DELAY_NORMAL);
+
         }else{
             sensors = mSensorManager.getSensorList(Sensor.TYPE_ACCELEROMETER);
             if (sensors.size() >0) {
-                Log.d(TAG, "startAzimuth: Senosr Size Acc:" + sensors.size());
+                Log.d(TAG, "startAzimuth: Sensor Size Acc:" + sensors.size());
                 sensorGrav = sensors.get(0);
             }
             sensors = mSensorManager.getSensorList(Sensor.TYPE_MAGNETIC_FIELD);
             if (sensors.size() >0) {
-                Log.d(TAG, "startAzimuth: Senosr Size Acc:" + sensors.size());
+                Log.d(TAG, "startAzimuth: Sensor Size Acc:" + sensors.size());
                 sensorMag = sensors.get(0);
             }
 
@@ -100,23 +118,28 @@ public class ArvSCurrentAzimuth implements SensorEventListener {
 
     }
 
+
+    public void setGmf(GeomagneticField gmf){
+        this.gmf = gmf;
+    }
+
     //----------------------------------------------------------------------------------------------//
     @Override
     public void onSensorChanged(SensorEvent event) {
         Log.d(TAG, "onSensorChanged- Started");
 
         if(isSimpleSensor){
-            onSimpleSensorChange(event);
+            //onSimpleSensorChange(event);
+            onSimpleSensorChangeSmoothedWithPitch(event);
+
         }else{
             onAdvanceSensorChange(event);
         }
 
-
     }
 
-
-    private void onSimpleSensorChange(SensorEvent event) {
-        Log.d(TAG, "OnSimpleSensorChange: Started");
+    private void onSimpleSensorChangeSmoothed(SensorEvent event){
+        Log.d(TAG, "onSimpleSensorChangeOriginal: Started");
 
         if(event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
             azimuthFrom = azimuthTo;
@@ -124,11 +147,81 @@ public class ArvSCurrentAzimuth implements SensorEventListener {
             float[] orientation = new float[3];
             float[] rMat = new float[9];
             SensorManager.getRotationMatrixFromVector(rMat, event.values);
+            SensorManager.getOrientation(rMat,orientation);
+
+            int azimuthTo_Original = (int) (Math.toDegrees(orientation[0]) + 360) % 360;
+            Log.d(TAG, "onSimpleSensorChangeSmoothed: Original Orientation: " + azimuthTo_Original);
+            Log.d(TAG, "onSimpleSensorChangeSmoothed: Orientation: " + Math.toDegrees(orientation[0]));
+            mAzimuthListener.onAzimuthChanged(azimuthFrom, azimuthTo_Original, orientation);
+        }
+    }
+
+    private void onSimpleSensorChangeSmoothedWithPitch(SensorEvent event){
+        Log.d(TAG, "onSimpleSensorChangeOriginal: Started");
+
+        if(event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
+            azimuthFrom = azimuthTo;
+
+            float[] orientation = new float[3];
+            float[] rMat = new float[9];
+
+            SensorManager.getRotationMatrixFromVector(rMat, event.values);
+            final int worldAxisForDeviceAxisX;
+            final int worldAxisForDeviceAxisY;
+
+            // Remap the axes as if the device screen was the instrument panel,
+            // and adjust the rotation matrix for the device orientation.
+            switch (mWindowManager.getDefaultDisplay().getRotation()) {
+                case Surface.ROTATION_0:
+                default:
+                    worldAxisForDeviceAxisX = SensorManager.AXIS_X;
+                    worldAxisForDeviceAxisY = SensorManager.AXIS_Z;
+                    break;
+                case Surface.ROTATION_90:
+                    worldAxisForDeviceAxisX = SensorManager.AXIS_Z;
+                    worldAxisForDeviceAxisY = SensorManager.AXIS_MINUS_X;
+                    break;
+                case Surface.ROTATION_180:
+                    worldAxisForDeviceAxisX = SensorManager.AXIS_MINUS_X;
+                    worldAxisForDeviceAxisY = SensorManager.AXIS_MINUS_Z;
+                    break;
+                case Surface.ROTATION_270:
+                    worldAxisForDeviceAxisX = SensorManager.AXIS_MINUS_Z;
+                    worldAxisForDeviceAxisY = SensorManager.AXIS_X;
+                    break;
+            }
+
+            float[] adjustedRotationMatrix = new float[9];
+            SensorManager.remapCoordinateSystem(rMat, worldAxisForDeviceAxisX, worldAxisForDeviceAxisY, adjustedRotationMatrix);
+
+            // Transform rotation matrix into azimuth/pitch/roll
+            SensorManager.getOrientation(adjustedRotationMatrix, orientation);
+
+            int azimuthTo_Original = (int) (Math.toDegrees(orientation[0]) + 360) % 360;
+            Log.d(TAG, "onSimpleSensorChangeSmoothed: Original Orientation: " + azimuthTo_Original);
+            Log.d(TAG, "onSimpleSensorChangeSmoothed: Orientation: " + Math.toDegrees(orientation[0]));
+
+            mAzimuthListener.onAzimuthChanged(azimuthFrom, azimuthTo_Original, orientation);
+        }
+    }
+
+
+
+    private void onSimpleSensorChangeOriginal(SensorEvent event){
+        Log.d(TAG, "onSimpleSensorChangeOriginal: Started");
+
+        if(event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
+            azimuthFrom = azimuthTo;
+
+            float[] orientation = new float[3];
+            float[] rMat = new float[9];
+            SensorManager.getRotationMatrixFromVector(rMat, event.values);
+
             azimuthTo = (int) (Math.toDegrees(SensorManager.getOrientation(rMat, orientation)[0]) + 360) % 360;
 
-            mAzimuthListener.onAzimuthChanged(azimuthFrom, azimuthTo);
+            Log.d(TAG, "onSimpleSensorChangeOriginal: Correct: " + azimuthTo);
+            mAzimuthListener.onAzimuthChanged(azimuthFrom, azimuthTo, orientation);
         }
-
     }
 
     private void onAdvanceSensorChange(SensorEvent event) {
@@ -162,14 +255,28 @@ public class ArvSCurrentAzimuth implements SensorEventListener {
 
         SensorManager.getRotationMatrix(rotation,null,grav,mag);
         SensorManager.getOrientation(rotation,orientation);
+
+        //------------------------------------------------------------------------------------------//
+
+        float compOrientation[] = new float[3];
+        float[] compRotationMatrix = new float[9];
+
+        SensorManager.getRotationMatrix(compRotationMatrix,null,grav,mag);
+        SensorManager.getOrientation(compRotationMatrix,compOrientation);
+
+        float cameraRotation[] = new float[9];
+        SensorManager.remapCoordinateSystem(compRotationMatrix,SensorManager.AXIS_X,SensorManager.AXIS_Y,cameraRotation);
+
+        float cameraOrientation[] = new float[3];
+        SensorManager.getOrientation(cameraRotation,cameraOrientation);
+
+
+        //------------------------------------------------------------------------------------------//
         floatBearing = orientation[0];
 
         floatBearing = Math.toDegrees(floatBearing);
         Log.d(TAG, "onSensorChanged: Floating Bearing: " + floatBearing);
 
-        if (gmf !=null){
-            floatBearing += gmf.getDeclination();
-        }
 
         if (floatBearing <0) {
             floatBearing += 360;
@@ -179,7 +286,8 @@ public class ArvSCurrentAzimuth implements SensorEventListener {
 
         Log.d(TAG, "onSensorChanged: Azimuth From: " + azimuthFrom + ", To:" + azimuthTo );
 
-        mAzimuthListener.onAzimuthChanged(azimuthFrom, azimuthTo);
+        mAzimuthListener.onAzimuthChanged(azimuthFrom, azimuthTo, orientation);
+        mAzimuthListener.onDeviceSensorChange(event);
 
         computing.set(false);
     }

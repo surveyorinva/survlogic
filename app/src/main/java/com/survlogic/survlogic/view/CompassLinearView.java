@@ -87,7 +87,7 @@ public class CompassLinearView extends View {
         mSecondaryLinePaint.setStrokeWidth(6f);
 
         mTerciaryLinePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mTerciaryLinePaint.setStrokeWidth(3f);
+        mTerciaryLinePaint.setStrokeWidth(4f);
 
         mMarkerPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mMarkerPaint.setStyle(Paint.Style.FILL);
@@ -204,16 +204,23 @@ public class CompassLinearView extends View {
         Log.d(TAG, "onDraw: Comp Degrees: " + compDegree);
 
 
-        for (int i = -180; i < 540; i += 15) {
+        for (int i = -180; i < 540; i += 5) {
             if ((i >= minDegrees) && (i <= maxDegrees)) {
                 canvas.drawLine(paddingLeft + pixDeg * (i - minDegrees), height - paddingBottom,
-                        paddingLeft + pixDeg * (i - minDegrees), 10 * unitHeight + paddingTop,
+                        paddingLeft + pixDeg * (i - minDegrees), 9 * unitHeight + paddingTop,
                         mTerciaryLinePaint);
+
+                if (i % 15 == 0) {
+                    canvas.drawLine(paddingLeft + pixDeg * (i - minDegrees),
+                            height - paddingBottom, paddingLeft + pixDeg * (i - minDegrees),
+                            8 * unitHeight + paddingTop, mTerciaryLinePaint);
+                }
+
 
                 if (i % 45 == 0) {
                     canvas.drawLine(paddingLeft + pixDeg * (i - minDegrees),
                             height - paddingBottom, paddingLeft + pixDeg * (i - minDegrees),
-                            8 * unitHeight + paddingTop, mSecondaryLinePaint);
+                            7 * unitHeight + paddingTop, mSecondaryLinePaint);
                 }
 
                 if (i % 90 == 0) {
@@ -242,19 +249,13 @@ public class CompassLinearView extends View {
                         case 180:
                             coord = getResources().getString(R.string.compassview_compass_south);
                             break;
+
                     }
 
                     canvas.drawText(coord, paddingLeft + pixDeg * (i - minDegrees), 5 * unitHeight
                             + paddingTop, mTextPaint);
                 }
 
-                if(compDegree !=0){
-                    if (i % compDegree == 0) {
-                        canvas.drawLine(paddingLeft + pixDeg * (i - minDegrees),
-                                height - paddingBottom, paddingLeft + pixDeg * (i - minDegrees),
-                                8 * unitHeight + paddingTop, mCompAzimuthLinePaint);
-                    }
-                }
             }
         }
 
@@ -272,9 +273,10 @@ public class CompassLinearView extends View {
     }
 
     public void setDegrees(float degrees) {
-        if ((mDegrees < 0) || (mDegrees >= 360))
-            throw new IndexOutOfBoundsException(getResources()
-                    .getString(R.string.compassview_error_out_index_degrees) + mDegrees);
+        if ((mDegrees < 0) || (mDegrees >= 360)){
+            mDegrees = 0;
+            Log.d(TAG, "setDegrees: Something went wrong, degrees at: " + mDegrees);
+        }
 
         mDegrees = degrees;
         invalidate();

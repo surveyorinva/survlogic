@@ -325,7 +325,7 @@ public class CompassRadarView extends View {
     }
 
     public void setCurrentLocation(Location location){
-        Log.d(TAG, "setCurrentLocation: Started");
+        Log.d(TAG, "setmCurrentLocation: Started");
 
         if (!mHaveLocation) {
             mHaveLocation = true;

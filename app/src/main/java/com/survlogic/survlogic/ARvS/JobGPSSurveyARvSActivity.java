@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.SurfaceTexture;
+import android.hardware.GeomagneticField;
+import android.hardware.SensorEvent;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraCharacteristics;
@@ -12,29 +14,39 @@ import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.params.StreamConfigurationMap;
+import android.location.GnssMeasurementsEvent;
+import android.location.GnssStatus;
+import android.location.GpsStatus;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.util.Size;
+import android.util.SizeF;
 import android.view.Surface;
 import android.view.TextureView;
-import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.survlogic.survlogic.ARvS.interf.ArvSOnAzimuthChangeListener;
 import com.survlogic.survlogic.ARvS.interf.ArvSOnLocationChangeListener;
 import com.survlogic.survlogic.ARvS.model.ArvSLocationPOI;
 import com.survlogic.survlogic.ARvS.utils.ArvSCurrentAzimuth;
 import com.survlogic.survlogic.ARvS.utils.ArvSCurrentLocation;
+import com.survlogic.survlogic.ARvS.utils.ArvSGnss;
 import com.survlogic.survlogic.R;
+import com.survlogic.survlogic.interf.GpsSurveyListener;
+import com.survlogic.survlogic.view.CameraOverlayView;
 import com.survlogic.survlogic.view.CompassLinearView;
 import com.survlogic.survlogic.view.CompassRadarView;
 
@@ -43,10 +55,10 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Created by chrisfillmore on 3/16/2018.
+ * Class dedicated to the AR View using GPS and device sensors
  */
 
-public class JobGPSSurveyARvSActivity extends AppCompatActivity implements ArvSOnAzimuthChangeListener, ArvSOnLocationChangeListener {
+public class JobGPSSurveyARvSActivity extends AppCompatActivity implements ArvSOnAzimuthChangeListener, ArvSOnLocationChangeListener, GpsSurveyListener {
 
     private static final String TAG = "JobGPSSurveyARvSActivit";
 
@@ -67,18 +79,21 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements ArvSO
     private CameraDevice.StateCallback mStateCallback;
 
     private boolean isCameraviewOn = false;
+    private boolean isFirstPosition = false;
 
     private ArvSLocationPOI mPoi;
 
+    //Values
     private double mAzimuthObserved = 0;
     private double mAzimuthTheoretical = 0;
     private static double AZIMUTH_ACCURACY = 5;
-    private double myCurrentLatitude = 0;
-    private double myCurrentLongitude = 0;
-    private double myCurrentLocationAccuracy = 0;
+
+    private Location mRawLocation;
 
     private ArvSCurrentAzimuth myCurrentAzimuthListener;
     private ArvSCurrentLocation myCurrentLocationListener;
+    private ArvSGnss myGnss;
+
     private TextureView.SurfaceTextureListener surfaceTextureListener;
 
     private TextureView txvCameraView;
@@ -87,10 +102,39 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements ArvSO
 
     private CompassLinearView compassLinearView;
     private CompassRadarView compassRadarView;
+    private CameraOverlayView cameraOverlayView;
 
+    //    UI Views
+    private TextView tvNumSats, tvNumSatsLocked, tvTtff, tvOrientation,
+            tvPdopView, tvHdopView, tvVdopView, tvHeightView;
+
+    //  Location Average and checking
+    private List<Location> listSampledLocations = new ArrayList<>();
+    private List<LatLng> lstSampledSplitLocations = new ArrayList<>();
+
+    //Sample Sensor and checking
+    private List<Float> listSampleOrientation = new ArrayList<>();
+    private List<Float> listSampleAzimithTo = new ArrayList<>();
+
+    //System set variables
+    boolean isMaxOrientation = false;
+    boolean isMaxLocation = false;
+
+    private Location mAveragedLocation;
+    private float mAverageAzimithTo;
+    private float[] mAverageOrientation = new float[3];
+    private float mLockedOrientationValue = 0;
+
+    private float mCameraVerticalFOV, mCameraHorizontalFOV;
+
+
+    //Custom Variables
     private boolean useFusedSensors = true;
-
     private static final int REQUEST_CAMERA_PERMISSION = 200;
+    private static final double LOCATION_ACCURACY_ERROR_ELLIPSE = 5;
+    private static final int LOCATION_ACCURACY_SAMPLE_RATE = 10;
+    private static final int SENSOR_ORIENTATION_SAMPLE_RATE = 10;
+    private static final float SENSOR_ACCURACY_ERROR_ELLIPSE = 0.50F;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -98,6 +142,7 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements ArvSO
         setContentView(R.layout.activity_gps_ar_simple);
 
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         initViewWidgets();
 
@@ -106,6 +151,7 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements ArvSO
 
         initCompassLinearView();
         initCompassRadarView();
+        initCameraOverlayView();
 
         initStateCallback();
 
@@ -118,6 +164,7 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements ArvSO
         Log.d(TAG, "onStop: Started");
         myCurrentAzimuthListener.stopAzimith();
         myCurrentLocationListener.stopGPS();
+        myGnss.stopGPS();
 
         closeCamera();
         closeBackgroundThread();
@@ -143,6 +190,9 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements ArvSO
         myCurrentAzimuthListener.startAzimuth();
         myCurrentLocationListener.startGPS();
 
+        ArvSGnss.getInstance().addListener(this);
+        myGnss.startGPS();
+
         startRadarView();
     }
 
@@ -157,6 +207,11 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements ArvSO
 
         myCurrentAzimuthListener = new ArvSCurrentAzimuth(this,this,useFusedSensors);
         myCurrentAzimuthListener.startAzimuth();
+
+        myGnss = new ArvSGnss(this);
+        myGnss.buildGnssClient(this);
+        myGnss.startGPS();
+
 
         surfaceTextureListener = new TextureView.SurfaceTextureListener(){
             @Override
@@ -200,12 +255,18 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements ArvSO
 
         compassRadarView = (CompassRadarView) findViewById(R.id.radar_view);
 
+        cameraOverlayView = (CameraOverlayView) findViewById(R.id.camera_overlay_view);
+
+        //On Screen View Widgets handled within this Activity (for now!)
+        initGnssWidget();
+
+
     }
 
     private void initPOIPoint(){
         Log.d(TAG, "initPOIPoint: Started");
 
-        mPoi = new ArvSLocationPOI("manhole","manhole description",38.28464,-77.54806);
+        mPoi = new ArvSLocationPOI("manhole","manhole description",38.953610,-76.833974,52.80);
 
     }
 
@@ -231,15 +292,87 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements ArvSO
         compassRadarView.setUseMetric(false);
         compassRadarView.startSweep();
 
+    }
+
+    private void initCameraOverlayView(){
+        Log.d(TAG, "initCameraOverlayView: Started");
+
+        cameraOverlayView.setTarget(mPoi);
+        cameraOverlayView.setDebugSensorData(false);
+        cameraOverlayView.setUseGMF(false);
+        cameraOverlayView.setAngleRange(10.0F,10.0F);
+
 
     }
+
+    //----------------------------------------------------------------------------------------------//
+    private void updateMetadata(){
+        Log.d(TAG, "updateMetadata: Started");
+
+        String metaDescription = mPoi.getName() + " Theoretical Azimuth: " + mAzimuthTheoretical
+                + ", Observed Azimuth: " + mAzimuthObserved + ". Current Location: " + mAveragedLocation.getLatitude() + ", " + mAveragedLocation.getLongitude();
+
+
+        descriptionTextView.setText(metaDescription);
+
+    }
+
+    private void updateCompassView(){
+        Log.d(TAG, "updateCompassView: Started");
+
+        float azimuth = (float) mAzimuthObserved;
+        float compAzimuth = (float) mAzimuthTheoretical;
+
+        compassLinearView.setCompDegree(compAzimuth);
+        compassLinearView.setDegrees(azimuth);
+
+
+    }
+
+    private void updateRadarViewOrientation(){
+        Log.d(TAG, "updateRadarView: Started");
+
+        float azimuth = (float) mAzimuthObserved;
+
+        compassRadarView.setOrientation(azimuth);
+
+    }
+
+
+    private void updateRadarViewLocation(Location location){
+        Log.d(TAG, "updateRadarViewLocation: Started");
+
+        if(location !=null){
+            compassRadarView.setCurrentLocation(location);
+        }
+
+    }
+
+
+    private void updateCameraOverlayViewSensorEvent(SensorEvent event){
+        Log.d(TAG, "updateCameraOverlayViewSensorEvent: Started");
+
+        cameraOverlayView.setMSensorEvent(event);
+
+    }
+
+    private void updateCameraOverlayViewSensorEvent(Location currentLocation, float azimuthFrom, float azimuthTo, float [] orientation){
+        Log.d(TAG, "updateCameraOverlayViewSensorEvent: Started");
+
+        Log.i(TAG, "updateCameraOverlayViewSensorEvent: Azimuth To: " + azimuthTo);
+        Log.i(TAG, "sensorWorx: updateCameraOverlayViewSensorEvent: " + orientation[0]);
+
+        cameraOverlayView.setCurrentCameraSensorData(currentLocation,azimuthFrom,azimuthTo, orientation);
+
+    }
+
 
     //----------------------------------------------------------------------------------------------//
     public double calculateTheoreticalAzimuth(ArvSLocationPOI mPOI){
         Log.d(TAG, "calculateTheoreticalAzimuth: Started");
 
-        double dX = mPOI.getLatitude() - myCurrentLatitude;
-        double dY = mPOI.getLongitude() - myCurrentLongitude;
+        double dX = mPOI.getLatitude() - mAveragedLocation.getLatitude();
+        double dY = mPOI.getLongitude() - mAveragedLocation.getLongitude();
 
         double phiAngle;
         double tanPhi;
@@ -294,49 +427,7 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements ArvSO
         return false;
     }
     
-    //----------------------------------------------------------------------------------------------//
-    private void updateMetadata(){
-        Log.d(TAG, "updateMetadata: Started");
 
-        String metaDescription = mPoi.getName() + " Theoretical Azimuth: " + mAzimuthTheoretical
-                + ", Observed Azimuth: " + mAzimuthObserved + ". Current Location: " + myCurrentLatitude + ", " + myCurrentLongitude;
-
-
-        descriptionTextView.setText(metaDescription);
-
-    }
-
-    private void updateCompassView(){
-        Log.d(TAG, "updateCompassView: Started");
-
-        float azimuth = (float) mAzimuthObserved;
-        float compAzimuth = (float) mAzimuthTheoretical;
-
-        compassLinearView.setCompDegree(compAzimuth);
-        compassLinearView.setDegrees(azimuth);
-
-
-    }
-
-    private void updateRadarViewOrientation(){
-        Log.d(TAG, "updateRadarView: Started");
-
-        float azimuth = (float) mAzimuthObserved;
-
-        compassRadarView.setOrientation(azimuth);
-
-    }
-
-
-    private void updateRadarViewLocation(Location location){
-        Log.d(TAG, "updateRadarViewLocation: Started");
-
-        if(location !=null){
-            compassRadarView.setCurrentLocation(location);
-        }
-
-
-    }
 
     //----------------------------------------------------------------------------------------------//
     private void setUpCamera(){
@@ -349,8 +440,10 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements ArvSO
                     StreamConfigurationMap streamConfigurationMap = cameraCharacteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
                     mPreviewSize = streamConfigurationMap.getOutputSizes(SurfaceTexture.class)[0];
                     this.mCameraId = cameraId;
+                    calculateFOV(cameraCharacteristics);
                 }
-            }
+
+     }
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
@@ -371,6 +464,25 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements ArvSO
         }
 
 
+    }
+
+    private void calculateFOV(CameraCharacteristics characteristics) {
+        Log.d(TAG, "calculateFOV: Started");
+
+        try {
+            float[] maxFocus = characteristics.get(CameraCharacteristics.LENS_INFO_AVAILABLE_FOCAL_LENGTHS);
+            SizeF size = characteristics.get(CameraCharacteristics.SENSOR_INFO_PHYSICAL_SIZE);
+            float w = size.getWidth();
+            float h = size.getHeight();
+            mCameraHorizontalFOV = (float) (2*Math.atan(w/(maxFocus[0]*2)));
+            mCameraVerticalFOV = (float) (2*Math.atan(h/(maxFocus[0]*2)));
+
+            cameraOverlayView.setCameraParamsFOV(mCameraVerticalFOV,mCameraHorizontalFOV);
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void closeCamera(){
@@ -475,42 +587,411 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements ArvSO
     }
 
     //----------------------------------------------------------------------------------------------//
-    //ArvSOnAzimuthChangeListener
+    //ArvSOnAzimuthChangeListener-------------------------------------------------------------------//
     @Override
-    public void onAzimuthChanged(float azimuthFrom, float azimuthTo) {
+    public void onAzimuthChanged(float azimuthFrom, float azimuthTo, float[] orientation) {
         Log.d(TAG, "onAzimuthChanged....Started");
 
-        mAzimuthObserved = azimuthTo;
-        mAzimuthTheoretical = calculateTheoreticalAzimuth(mPoi);
+        handleSensorData(azimuthFrom,azimuthTo,orientation);
+    }
 
-        double minAngle = calculateAzimuthAccuracy(mAzimuthTheoretical).get(0);
-        double maxAngle = calculateAzimuthAccuracy(mAzimuthTheoretical).get(1);
+    @Override
+    public void onDeviceSensorChange(SensorEvent event) {
+        Log.d(TAG, "onDeviceSensorChange: Started");
 
-        if(isBetween(minAngle,maxAngle,mAzimuthObserved)){
-            ivPointerIcon.setVisibility(View.VISIBLE);
-        }else{
-            ivPointerIcon.setVisibility(View.INVISIBLE);
-        }
+        updateCameraOverlayViewSensorEvent(event);
 
-        updateCompassView();
-        updateRadarViewOrientation();
-        updateMetadata();
+    }
+
+    //ArvSOnLocationChangeListener------------------------------------------------------------------//
+    @Override
+    public void onLocationChanged(Location currentLocation) {
+        Log.d(TAG, "onLocationChanged...Started");
+
+        handleLocationData(currentLocation);
 
     }
 
 
-    //ArvSOnLocationChangeListener
+    //GpsSurveyListener-----------------------------------------------------------------------------//
+
     @Override
-    public void onLocationChanged(Location currentLocation) {
-        Log.d(TAG, "onLocationChanged...Started");
-        myCurrentLatitude = currentLocation.getLatitude();
-        myCurrentLongitude = currentLocation.getLongitude();
-        myCurrentLocationAccuracy = currentLocation.getAccuracy();
+    public void gpsStart() {
+        Log.d(TAG, "gpsStart: Started");
+        setGnssWidget();
 
-        mAzimuthTheoretical = calculateTheoreticalAzimuth(mPoi);
+    }
 
-        updateRadarViewLocation(currentLocation);
-        updateMetadata();
+    @Override
+    public void gpsStop() {
+
+    }
+
+    @Override
+    public void onGpsStatusChanged(int event, GpsStatus status) {
+        Log.d(TAG, "onGpsStatusChanged: Started");
+
+    }
+
+    @Override
+    public void onGnssFirstFix(int ttffMillis) {
+
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    @Override
+    public void onSatelliteStatusChanged(GnssStatus status) {
+        int noOfSats = myGnss.getHowManySatellitesAvailable();
+        int lockedSats = myGnss.getHowManySatellitesLocked();
+
+        tvNumSats.setText(String.valueOf(noOfSats));
+        tvNumSatsLocked.setText(String.valueOf(lockedSats));
+
+
+    }
+
+    @Override
+    public void onGnssStarted() {
+        Log.d(TAG, "onGnssStarted: Started");
+    }
+
+    @Override
+    public void onGnssStopped() {
+        Log.d(TAG, "onGnssStopped: Started");
+
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    @Override
+    public void onGnssMeasurementsReceived(GnssMeasurementsEvent event) {
+
+    }
+
+    @Override
+    public void onOrientationChanged(double orientation, double tilt) {
+
+    }
+
+    @Override
+    public void onNmeaMessage(String message, long timestamp) {
+        double mP, mH, mV;
+        mP = myGnss.getpDop();
+        mH = myGnss.gethDop();
+        mV = myGnss.getvDop();
+
+        tvPdopView.setText(getString(R.string.gps_pdop_value, mP));
+        tvHdopView.setText(getString(R.string.gps_hdop_value, mH));
+        tvVdopView.setText(getString(R.string.gps_vdop_value, mV));
+
+        Log.d(TAG, "onNmeaMessage: Dops (P,H,V): " + mP + "," + mH + "," +  mV);
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
+    }
+
+    //----------------------------------------------------------------------------------------------//
+
+    private void setGmfForSensor(){
+        Log.d(TAG, "setGmfForSensor: Started");
+
+        GeomagneticField geoField = new GeomagneticField(
+                (float) mRawLocation.getLatitude(),
+                (float) mRawLocation.getLongitude(),
+                (float) mRawLocation.getAltitude(),
+                System.currentTimeMillis());
+
+        myCurrentAzimuthListener.setGmf(geoField);
+
+
+    }
+
+    //----------------------------------------------------------------------------------------------//
+    private void initGnssWidget(){
+        Log.d(TAG, "initViewWidgets: Started");
+
+        tvNumSats = (TextView) findViewById(R.id.gps_status_noSatellites);
+        tvNumSatsLocked = (TextView) findViewById(R.id.gps_status_noSatellitesLocked);
+
+        tvPdopView = (TextView) findViewById(R.id.PDOP_value);
+        tvHdopView = (TextView) findViewById(R.id.HDOP_value);
+        tvVdopView = (TextView) findViewById(R.id.VDOP_value);
+        tvTtff = (TextView) findViewById(R.id.ttff_value);
+        tvOrientation = (TextView) findViewById(R.id.orientation_value);
+
+    }
+
+    private void setGnssWidget(){
+        Log.d(TAG, "setGnssWidget: Started");
+
+        tvNumSats.setText(getString(R.string.satellite_default));
+
+        tvPdopView.setText(getString(R.string.gps_pdop_default));
+        tvHdopView.setText(getString(R.string.gps_hdop_default));
+        tvVdopView.setText(getString(R.string.gps_vdop_default));
+
+
+    }
+
+    //----------------------------------------------------------------------------------------------//
+
+    private void handleSensorData(float azimuthFrom, float azimuthTo, float[] orientation){
+        Log.d(TAG, "handleSensorData: Started");
+
+        if(mRawLocation != null){
+
+            float[] averagedOrientation = new float[3];
+            float averageAzimithTo = 0.00F;
+
+            addOrientationToArrayList(orientation[0]);
+            addAzimithToArrayList(azimuthTo);
+
+            boolean isShaken = isSensorOrientationShaking(orientation[0],SENSOR_ACCURACY_ERROR_ELLIPSE);
+
+            if(isShaken){
+                tvOrientation.setText(getResources().getString(R.string.ar_sensor_status_moving));
+
+                clearOrientationToArrayList();
+                clearAzimithToArrayList();
+                isMaxOrientation = false;
+
+            }else{
+                if(!isMaxOrientation){
+                    if(listSampleOrientation.size() <= SENSOR_ORIENTATION_SAMPLE_RATE ){
+                        averagedOrientation = orientation;
+                        averagedOrientation[0] = computeAverageOrientation();
+                        mLockedOrientationValue = averagedOrientation[0];
+
+                        mAverageOrientation = averagedOrientation;
+                        Log.i(TAG, "handleSensorData1: Average Orientation: " + averagedOrientation[0]);
+
+                        averageAzimithTo = computeAverageAzimithTo();
+                        mAverageAzimithTo = averageAzimithTo;
+
+                        String myResults = getResources().getString(R.string.ar_sensor_status_static) + "[" + String.valueOf(listSampleOrientation.size() + "]");
+                        tvOrientation.setText(myResults);
+
+                        if(listSampleOrientation.size() == SENSOR_ORIENTATION_SAMPLE_RATE){
+                            isMaxOrientation = true;
+
+                        }
+                    }
+                }
+            }
+            boolean isStationary = isGnssStationary(LOCATION_ACCURACY_ERROR_ELLIPSE);
+            Location averageLocation = mRawLocation;
+            String myResults;
+
+            if(isStationary){
+                if(!isMaxLocation){
+                    if(listSampledLocations.size() <= LOCATION_ACCURACY_SAMPLE_RATE){
+                        averageLocation = computeCentroidLocation();
+                        mAveragedLocation = averageLocation;
+
+                        myResults = getResources().getString(R.string.ar_gps_status_static) + "[" + String.valueOf(lstSampledSplitLocations.size()) + "]";
+                        tvTtff.setText(myResults);
+
+                        if(listSampledLocations.size() == LOCATION_ACCURACY_SAMPLE_RATE){
+                            isMaxLocation = true;
+                        }
+                    }
+                }
+
+            }else{
+                clearLocationArrayList();
+
+                averageLocation = mRawLocation;
+                mAveragedLocation = averageLocation;
+
+                myResults = getResources().getString(R.string.ar_gps_status_moving);
+                tvTtff.setText(myResults);
+                isMaxLocation = false;
+            }
+
+
+            mAverageOrientation[0] = mLockedOrientationValue;
+            Log.i(TAG, "sensorWorx: " + mAverageAzimithTo + ", " + mAverageOrientation[0]);
+            updateCameraOverlayViewSensorEvent(mAveragedLocation,azimuthFrom,mAverageAzimithTo,mAverageOrientation);
+
+            mAzimuthObserved = azimuthTo;
+            mAzimuthTheoretical = calculateTheoreticalAzimuth(mPoi);
+
+            updateCompassView();
+            updateRadarViewOrientation();
+            updateMetadata();
+            updateRadarViewLocation(mAveragedLocation);
+
+        }
+
+    }
+
+    private void handleLocationData(Location currentLocation){
+        Log.d(TAG, "handleLocationData: Started");
+        mRawLocation = new Location(currentLocation);
+        addLocationToArrayList(mRawLocation);
+
+        if(!isFirstPosition){
+            setGmfForSensor();
+            isFirstPosition = true;
+        }
+
+    }
+    //----------------------------------------------------------------------------------------------//
+    private void addLocationToArrayList(Location location){
+        Log.d(TAG, "addLocationToArrayList: Started");
+
+        listSampledLocations.add(location);
+
+        LatLng sample = new LatLng(location.getLatitude(),location.getLongitude());
+        lstSampledSplitLocations.add(sample);
+    }
+
+    private void clearLocationArrayList(){
+        Log.d(TAG, "clearLocationArrayList: Started");
+
+        listSampledLocations.clear();
+        lstSampledSplitLocations.clear();
+
+    }
+
+    private boolean isGnssStationary(double accuracyMeters ){
+        Log.d(TAG, "isGnssStationary: Started");
+
+        double sampleDistanceToCurrentDistance = computeCentroidToCurrentDistance();
+
+        Log.d(TAG, "isGnssStationary: Distance to Centroid: " + sampleDistanceToCurrentDistance);
+
+        if(sampleDistanceToCurrentDistance > accuracyMeters){
+            return false;
+        }else{
+            return true;
+        }
+
+    }
+
+    private double computeCentroidToCurrentDistance(){
+        Log.d(TAG, "computeCentroidToCurrentDistance: Started");
+
+        LatLng centroidSplit = computeCentroid(lstSampledSplitLocations);
+
+        double latitude = centroidSplit.latitude;
+        double longitude = centroidSplit.longitude;
+
+        Location centroid = new Location("sample");
+        centroid.setLatitude(latitude);
+        centroid.setLongitude(longitude);
+
+        return centroid.distanceTo(mRawLocation);
+
+
+    }
+
+    private Location computeCentroidLocation(){
+        Log.d(TAG, "computeCentroidLocation: Started");
+
+        LatLng centroidSplit = computeCentroid(lstSampledSplitLocations);
+
+        double latitude = centroidSplit.latitude;
+        double longitude = centroidSplit.longitude;
+
+        Location centroid = new Location("sample");
+        centroid.setLatitude(latitude);
+        centroid.setLongitude(longitude);
+
+        return centroid;
+
+    }
+
+
+    private LatLng computeCentroid(List<LatLng> points) {
+        double latitude = 0;
+        double longitude = 0;
+        int n = points.size();
+
+        for (LatLng point : points) {
+            latitude += point.latitude;
+            longitude += point.longitude;
+        }
+
+        return new LatLng(latitude/n, longitude/n);
+    }
+
+    private void addOrientationToArrayList(float orientation){
+        Log.d(TAG, "addOrientationToArrayList: Started");
+
+        listSampleOrientation.add(orientation);
+
+    }
+    private void clearOrientationToArrayList(){
+        Log.d(TAG, "clearOrientationToArrayList: Started");
+
+        listSampleOrientation.clear();
+    }
+
+    private void addAzimithToArrayList(float azimithIn){
+        Log.d(TAG, "addAzimithToArrayList: Started");
+
+        listSampleAzimithTo.add(azimithIn);
+
+    }
+
+    private void clearAzimithToArrayList(){
+        Log.d(TAG, "clearAzimithToArrayList: Started");
+
+        listSampleAzimithTo.clear();
+
+    }
+    private boolean isSensorOrientationShaking(float currentOrientation, double accuracyAngle){
+        Log.d(TAG, "isSensorOrientationShaking: Started");
+
+        float diff = Math.abs(Math.abs(currentOrientation) - Math.abs(computeAverageOrientation()));
+
+        double accuracyRadians = Math.toRadians(accuracyAngle);
+
+        if(diff > accuracyRadians){
+            return true;
+        }else{
+            return false;
+        }
+
+    }
+
+    private float computeAverageAzimithTo(){
+        Log.d(TAG, "computeAverageAzimithTo: Started");
+
+        return computeCentroidAngle(listSampleAzimithTo);
+
+    }
+
+    private float computeAverageOrientation(){
+        Log.d(TAG, "computeAverageOrientation: Started");
+        Log.i(TAG, "computeAverageOrientation: " + computeCentroidAngle(listSampleOrientation));
+        Log.i(TAG, "computeAverageOrientation: Size: " + listSampleOrientation.size());
+        return computeCentroidAngle(listSampleOrientation);
+
+
+    }
+
+    private float computeCentroidAngle(List<Float> points) {
+        Float sum = 0.0F;
+        if(!points.isEmpty()){
+            for (Float point : points){
+                sum +=point;
+            }
+            return sum / points.size();
+        }
+        return sum;
     }
 
 
