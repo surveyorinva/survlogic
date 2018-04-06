@@ -6,23 +6,26 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.Rect;
 import android.hardware.GeomagneticField;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.location.Location;
 import android.support.annotation.Nullable;
+import android.text.DynamicLayout;
+import android.text.Layout;
+import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.Range;
 import android.view.View;
 
 import com.survlogic.survlogic.ARvS.model.ArvSLocationPOI;
-import com.survlogic.survlogic.ARvS.utils.ArvSLowPassFilter;
 import com.survlogic.survlogic.R;
-import com.survlogic.survlogic.dialog.DialogProjectDescriptionAdd;
 import com.survlogic.survlogic.utils.StringUtilityHelper;
 
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -36,6 +39,7 @@ public class CameraOverlayView extends View {
     private static final String TAG = "Started";
 
     private Paint mTextPaint, mMainLinePaint, mSecondaryLinePaint, mMarkerPaint, mMarkerPulsePaint;
+    private TextPaint mDebugTextPaint;
     private Path pathMarker;
 
     private int mTextColor, mBackgroundColor, mLineColor, mSecLineColor, mMarkerColor;
@@ -48,15 +52,16 @@ public class CameraOverlayView extends View {
     private double mAzimuthObserved = 0;
     private double mAzimuthTheoretical = 0;
 
-    private ArvSLocationPOI mTargePoi;
+    private ArvSLocationPOI mTargetPoi;
+    private float mTargetPoiFalseAltitudeMsl = 0.00F;
+
     private Location mCurrentLocation;
     private float mOrientation[] = new float[3];
+    private float mCurrentAltitudeMsl = 0.00F;
 
     private GeomagneticField gmf = null;
 
     private boolean isSensorDataAvailable = false, isLocationDataAvailable = false;
-
-    private double mAzimuthRange = 5;
 
     private float mVerticalFOV, mHorizontalFOV;
 
@@ -66,8 +71,9 @@ public class CameraOverlayView extends View {
     private boolean showTargetMarker = false;
     private boolean isPoiInRange = false;
 
-    private float mRadiusPOI = 20.0F, mRadiusPOIMax = 75.0F, mRadiusPOICurrent = mRadiusPOI;
+    private double mAzimuthRange = 5;
 
+    private float mRadiusPOI = 20.0F, mRadiusPOIMax = 75.0F, mRadiusPOICurrent = mRadiusPOI;
 
     private float ANGLE_UPPER_RANGE = 10, ANGLE_LOWER_RANGE = 10;
     private static final float POI_MAPPING_SCALE = 0.5F;
@@ -125,6 +131,11 @@ public class CameraOverlayView extends View {
         mMarkerPulsePaint.setStyle(Paint.Style.FILL);
         mMarkerPulsePaint.setColor(mTextColor);
 
+        mDebugTextPaint = new TextPaint();
+        mDebugTextPaint.setAntiAlias(true);
+        mDebugTextPaint.setTextSize(mTextSize/2);
+        mDebugTextPaint.setColor(mTextColor);
+
 
     }
 
@@ -156,12 +167,13 @@ public class CameraOverlayView extends View {
 
     }
 
-    public void setCurrentCameraSensorData(Location location, float azimuthFrom, float azimuthTo, float[] orientation){
+    public void setCurrentCameraSensorData(Location location, float azimuthFrom, float azimuthTo, float[] orientation, float altitudeMsl){
         Log.d(TAG, "setCurrentCameraSensorData: Started");
 
         //Location
         this.mCurrentLocation = location;
-
+        this.mCurrentAltitudeMsl = altitudeMsl;
+        
         //Sensor
         this.mAzimuthObserved = azimuthTo;
         this.mAzimuthTheoretical = calculateTheoreticalAzimuth();
@@ -192,10 +204,13 @@ public class CameraOverlayView extends View {
     public void setTarget(ArvSLocationPOI poi){
         Log.d(TAG, "setTargetLocation: Started");
 
-        this.mTargePoi = poi;
+        this.mTargetPoi = poi;
         
     }
 
+    public void setTargetPoiFalseElevation(float mTargetPoiFalseElevation) {
+        this.mTargetPoiFalseAltitudeMsl = mTargetPoiFalseElevation;
+    }
 
     public void setAngleRange(float lowerRange, float upperRange){
         Log.d(TAG, "setAngleRange: Started");
@@ -219,23 +234,15 @@ public class CameraOverlayView extends View {
     private void setPoiInRange(){
         Log.d(TAG, "setPoiInRange: Started");
         Log.i(TAG, "sensorWorx: orientation In: " + mOrientation[0]);
-        float azimuth, pitch, bearing;
+        float azimuth, pitch, bearing, zenith;
         Range<Float> azimuthRange, pitchRange;
 
-        Location targetLocation = new Location(mTargePoi.getName());
-        targetLocation.setLatitude(mTargePoi.getLatitude());
-        targetLocation.setLongitude(mTargePoi.getLongitude());
-        targetLocation.setAltitude(mTargePoi.getAltitude());
+        Location targetLocation = convertPOIToLocation();
 
         bearing = (mCurrentLocation.bearingTo(targetLocation) + 360) % 360;
 
         azimuth = (float) Math.toDegrees(mOrientation[0]);
         pitch = (float) Math.toDegrees(mOrientation[1]);
-
-        Log.i(TAG, "sensorWorx: setPoiInRange: Bearing: " + bearing);
-        Log.i(TAG, "sensorWorx: setPoiInRange: Azimuth: " + mAzimuthObserved);
-        Log.i(TAG, "sensorWorx: setPoiInRange: Pitch: " + pitch);
-        Log.i(TAG, "sensorWorx: setPoiInRange: Called Azimuth: " + azimuth);
 
         azimuthRange = new Range<>(bearing - ANGLE_LOWER_RANGE, bearing + ANGLE_UPPER_RANGE);
         pitchRange = new Range<>(-90.0f, +90.0f);
@@ -255,7 +262,7 @@ public class CameraOverlayView extends View {
     private String solveForTargetDistance(){
         Log.d(TAG, "setTargetDistance: Started");
 
-        return String.valueOf(distanceToTarget(mTargePoi,mCurrentLocation));
+        return String.valueOf(distanceToTarget(mTargetPoi,mCurrentLocation));
 
     }
 
@@ -264,6 +271,18 @@ public class CameraOverlayView extends View {
     /**
      * Location Methods
      */
+
+    private Location convertPOIToLocation(){
+        Log.d(TAG, "convertPOIToLocation: Started");
+
+        Location targetLocation = new Location(mTargetPoi.getName());
+        targetLocation.setLatitude(mTargetPoi.getLatitude());
+        targetLocation.setLongitude(mTargetPoi.getLongitude());
+        targetLocation.setAltitude(mTargetPoi.getAltitude());
+
+        return targetLocation;
+
+    }
 
     private double distanceToTarget(ArvSLocationPOI target, Location current){
         Log.d(TAG, "distanceToTarget: Started");
@@ -366,8 +385,8 @@ public class CameraOverlayView extends View {
         double currentLatitude = mCurrentLocation.getLatitude();
         double currentLongitude = mCurrentLocation.getLongitude();
 
-        double dX = mTargePoi.getLatitude() - currentLatitude;
-        double dY = mTargePoi.getLongitude() - currentLongitude;
+        double dX = mTargetPoi.getLatitude() - currentLatitude;
+        double dY = mTargetPoi.getLongitude() - currentLongitude;
 
         double phiAngle;
         double tanPhi;
@@ -429,26 +448,75 @@ public class CameraOverlayView extends View {
         Log.d(TAG, "onDraw: Drawing");
         super.onDraw(canvas);
 
-        canvas.drawLine(0f - canvas.getHeight(), canvas.getHeight()/2, canvas.getWidth()+canvas.getHeight(), canvas.getHeight()/2, mMainLinePaint);
+        canvas.drawLine(0f - canvas.getWidth(), canvas.getHeight()/2, canvas.getWidth()+canvas.getHeight(), canvas.getHeight()/2, mMainLinePaint);
 
-        canvas.save();
-
-        if(showTargetMarker){
-            canvas.drawCircle(canvas.getWidth()/2, canvas.getHeight()/2, 8.0f, mMarkerPaint);
+        if(isDebugMode){
+            drawSmartWorxData(canvas);
         }
-        
+
         drawTargetInRange(canvas);
 
-        canvas.restore();
     }
 
     //----------------------------------------------------------------------------------------------//
 
+    private void drawSmartWorxData(Canvas c){
+        Log.d(TAG, "drawSmartWorxData: Started");
+       int padding = c.getWidth()/100;
+       int paddingStart = padding * 2;
+       int paddingEnd = padding * 2;
+
+        DecimalFormat df = StringUtilityHelper.createUSNonBiasDecimalFormatSelect(4);
+
+       if(mCurrentLocation !=null){
+           Location targetLocation = convertPOIToLocation();
+           float bearing = (mCurrentLocation.bearingTo(targetLocation) + 360) % 360;
+           float azimuth = (float) Math.toDegrees(mOrientation[0]);
+           float pitch = (float) Math.toDegrees(mOrientation[1]);
+
+
+           String debug_location = getResources().getString(R.string.cameraoverlayview_debug_location_value,
+                   df.format(mCurrentLocation.getLatitude()), df.format(mCurrentLocation.getLongitude()),df.format(mCurrentLocation.getAltitude()),
+                   df.format(targetLocation.getLatitude()),df.format(targetLocation.getLongitude()),df.format(targetLocation.getAltitude()));
+
+           String debug_sensor_orientation = getResources().getString(R.string.cameraoverlayview_debug_sensor_orientation_values,
+                   df.format(bearing),df.format(mAzimuthObserved),df.format(azimuth));
+
+           String debug_sensor_pitch = getResources().getString(R.string.cameraoverlayview_debug_sensor_pitch_values,
+                   df.format(0),df.format(pitch));
+
+           String debug_dtm = getResources().getString(R.string.cameraoverlayview_debug_dtm_values,
+                   df.format(mCurrentAltitudeMsl),df.format(mTargetPoiFalseAltitudeMsl));
+
+           String debug_metadata = getResources().getString(R.string.cameraoverlayview_debug_gps_accuracy,
+                   df.format(mCurrentLocation.getAccuracy()),String.valueOf(useGMF));
+
+           String combined = debug_location + debug_sensor_orientation + debug_sensor_pitch + debug_dtm + debug_metadata;
+
+           int debug_width = (int) c.getWidth()/2 - paddingStart - paddingEnd;
+           DynamicLayout mDl_location = new DynamicLayout(combined, mDebugTextPaint, debug_width, Layout.Alignment.ALIGN_NORMAL, 1.0f, 0, false);
+
+           int dX = c.getWidth()/2;
+           int dY = (c.getHeight()/100)*10;
+
+           c.save();
+
+           c.translate(dX, dY);
+           mDl_location.draw(c);
+
+           c.restore();
+       }
+
+    }
+
+
     private void drawTargetInRange(Canvas c){
         Log.d(TAG, "drawTargetInRange: Started");
 
+        c.save();
+
         if(isLocationDataAvailable){
-            float currentBearingToTarget = bearingToTarget(mTargePoi,mCurrentLocation);
+            float currentBearingToTarget = bearingToTarget(mTargetPoi,mCurrentLocation);
             float currentOnScreenAzimuth = (float) mAzimuthObserved;
 
             float dx = (float) ((c.getWidth()/mHorizontalFOV) * (currentOnScreenAzimuth-currentBearingToTarget))/(ANGLE_UPPER_RANGE / POI_MAPPING_SCALE);
@@ -462,6 +530,8 @@ public class CameraOverlayView extends View {
             mSensorMetaData = "No GPS Location Available";
             c.drawText(mSensorMetaData,(c.getWidth()/4)*2,(c.getHeight()/10)*2,mTextPaint);
         }
+
+        c.restore();
 
     }
 
@@ -492,4 +562,19 @@ public class CameraOverlayView extends View {
         return (((double)temp)/Math.pow(10,c));
     }
 
+
+    //----------------------------------------------------------------------------------------------//
+
+    /**
+     * @return text height
+     */
+    private float getTextHeight(String text, Paint paint) {
+
+        Rect rect = new Rect();
+        paint.getTextBounds(text, 0, text.length(), rect);
+        return rect.height();
+    }
+
+
 }
+

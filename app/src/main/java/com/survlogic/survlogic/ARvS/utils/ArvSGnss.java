@@ -82,6 +82,9 @@ public class ArvSGnss implements LocationListener {
     private String mSnrCn0Title;
     private boolean mHasEphemeris[], mHasAlmanac[], mUsedInFix[];
 
+    //Orthometric Height
+    private double altitudeMsl = 0;
+
     //DOP Metadata
     private double pDop = 0, hDop = 0, vDop = 0;
 
@@ -190,7 +193,12 @@ public class ArvSGnss implements LocationListener {
         return mAccuracy;
     }
 
-    //----------------------------------------------------------------------------------------------//
+    public double getAltitudeMsl() {
+        return altitudeMsl;
+    }
+
+
+//----------------------------------------------------------------------------------------------//
 
     private void initDummySettings(){
         Log.d(TAG, "initDummySettings: Started");
@@ -408,7 +416,7 @@ public class ArvSGnss implements LocationListener {
                         listener.onNmeaMessage(message, timestamp);
                     }
                     parseDOPSFromNmeaMessage(message,timestamp);
-
+                    parseOrthometricHeightFromNmeaMesage(message);
                 }
             };
         }
@@ -444,6 +452,7 @@ public class ArvSGnss implements LocationListener {
                     }
 
                     parseDOPSFromNmeaMessage(nmea,timestamp);
+                    parseOrthometricHeightFromNmeaMesage(nmea);
                 }
             };
         }
@@ -700,6 +709,22 @@ public class ArvSGnss implements LocationListener {
                 vDop = dop.getVerticalDop();
 
             }
+        }
+    }
+
+
+    private void parseOrthometricHeightFromNmeaMesage(String message){
+        Log.d(TAG, "parseOrthometricHeightFromNmeaMesage: Started");
+
+
+        if (message.startsWith("$GPGGA") || message.startsWith("$GNGNS")) {
+            Double altitudeMsl = GpsHelper.getAltitudeMeanSeaLevel(message);
+
+            if (altitudeMsl != null && mNavigating) {
+                this.altitudeMsl = GpsHelper.getAltitudeMeanSeaLevel(message);
+
+            }
+
         }
     }
 

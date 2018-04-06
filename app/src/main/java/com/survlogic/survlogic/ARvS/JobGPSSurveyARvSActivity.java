@@ -2,6 +2,7 @@ package com.survlogic.survlogic.ARvS;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.SurfaceTexture;
@@ -22,6 +23,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
@@ -40,11 +42,14 @@ import android.widget.Toast;
 import com.google.android.gms.maps.model.LatLng;
 import com.survlogic.survlogic.ARvS.interf.ArvSOnAzimuthChangeListener;
 import com.survlogic.survlogic.ARvS.interf.ArvSOnLocationChangeListener;
+import com.survlogic.survlogic.ARvS.interf.GetNationalMapElevationListener;
 import com.survlogic.survlogic.ARvS.model.ArvSLocationPOI;
 import com.survlogic.survlogic.ARvS.utils.ArvSCurrentAzimuth;
 import com.survlogic.survlogic.ARvS.utils.ArvSCurrentLocation;
 import com.survlogic.survlogic.ARvS.utils.ArvSGnss;
 import com.survlogic.survlogic.R;
+import com.survlogic.survlogic.background.BackgroundGetNationalMapElevation;
+import com.survlogic.survlogic.background.BackgroundGetSRTMElevation;
 import com.survlogic.survlogic.interf.GpsSurveyListener;
 import com.survlogic.survlogic.view.CameraOverlayView;
 import com.survlogic.survlogic.view.CompassLinearView;
@@ -54,14 +59,19 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.security.auth.login.LoginException;
+
+import static com.survlogic.survlogic.utils.GPSLocationConverter.convertMetersToValue;
+
 /**
  * Class dedicated to the AR View using GPS and device sensors
  */
 
-public class JobGPSSurveyARvSActivity extends AppCompatActivity implements ArvSOnAzimuthChangeListener, ArvSOnLocationChangeListener, GpsSurveyListener {
+public class JobGPSSurveyARvSActivity extends AppCompatActivity implements ArvSOnAzimuthChangeListener, ArvSOnLocationChangeListener, GpsSurveyListener, GetNationalMapElevationListener {
 
     private static final String TAG = "JobGPSSurveyARvSActivit";
 
+    private SharedPreferences sharedPreferences;
 
     private CameraManager cameraManager;
     private int cameraFacing;
@@ -111,6 +121,9 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements ArvSO
     //  Location Average and checking
     private List<Location> listSampledLocations = new ArrayList<>();
     private List<LatLng> lstSampledSplitLocations = new ArrayList<>();
+    private List<Float> listSampleAltitudeHeights = new ArrayList<>();
+    private List<Float> listSampleAltitudeHeightsMsl = new ArrayList<>();
+    private List<Float> listSampleLocationAccuracy = new ArrayList<>();
 
     //Sample Sensor and checking
     private List<Float> listSampleOrientation = new ArrayList<>();
@@ -120,7 +133,11 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements ArvSO
     boolean isMaxOrientation = false;
     boolean isMaxLocation = false;
 
+    private int elevationServiceToUse = 1;
+
     private Location mAveragedLocation;
+    private double mOrthoHeight;
+
     private float mAverageAzimithTo;
     private float[] mAverageOrientation = new float[3];
     private float mLockedOrientationValue = 0;
@@ -135,6 +152,7 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements ArvSO
     private static final int LOCATION_ACCURACY_SAMPLE_RATE = 10;
     private static final int SENSOR_ORIENTATION_SAMPLE_RATE = 10;
     private static final float SENSOR_ACCURACY_ERROR_ELLIPSE = 0.50F;
+    private static final float LOCATION_ACCURACY_ERROR_ALTITUDE_MSL = 5;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -144,6 +162,7 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements ArvSO
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
+        initPreferences();
         initViewWidgets();
 
         initActivityListeners();
@@ -197,6 +216,15 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements ArvSO
     }
 
     //----------------------------------------------------------------------------------------------//
+
+    private void initPreferences(){
+        Log.d(TAG, "initPreferences: Started");
+
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+
+
+    }
 
     private void initActivityListeners(){
         Log.d(TAG, "setupActivityListeners: Started");
@@ -268,6 +296,31 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements ArvSO
 
         mPoi = new ArvSLocationPOI("manhole","manhole description",38.953610,-76.833974,52.80);
 
+        Location targetLocation = new Location(mPoi.getName());
+        targetLocation.setLatitude(mPoi.getLatitude());
+        targetLocation.setLongitude(mPoi.getLongitude());
+
+
+        switch(elevationServiceToUse){
+            case 0:
+                //none
+                break;
+
+            case 1: //https://nationalmap.gov/epqs/
+                BackgroundGetNationalMapElevation backgroundGetNationalMapElevation = new BackgroundGetNationalMapElevation(this,targetLocation,this);
+                backgroundGetNationalMapElevation.execute();
+                break;
+
+            case 2: //http://www.geonames.org/export/web-services.html#srtm3
+                BackgroundGetSRTMElevation backgroundGetSRTMElevation = new BackgroundGetSRTMElevation(this,targetLocation,this);
+                backgroundGetSRTMElevation.execute();
+                break;
+        }
+
+
+
+
+
     }
 
     private void initCompassLinearView(){
@@ -298,7 +351,7 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements ArvSO
         Log.d(TAG, "initCameraOverlayView: Started");
 
         cameraOverlayView.setTarget(mPoi);
-        cameraOverlayView.setDebugSensorData(false);
+        cameraOverlayView.setDebugSensorData(true);
         cameraOverlayView.setUseGMF(false);
         cameraOverlayView.setAngleRange(10.0F,10.0F);
 
@@ -359,10 +412,22 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements ArvSO
     private void updateCameraOverlayViewSensorEvent(Location currentLocation, float azimuthFrom, float azimuthTo, float [] orientation){
         Log.d(TAG, "updateCameraOverlayViewSensorEvent: Started");
 
-        Log.i(TAG, "updateCameraOverlayViewSensorEvent: Azimuth To: " + azimuthTo);
-        Log.i(TAG, "sensorWorx: updateCameraOverlayViewSensorEvent: " + orientation[0]);
+        double altitudeMslRaw = myGnss.getAltitudeMsl();
+        double altitudeMslAverage = computeCentroidFloat(listSampleAltitudeHeightsMsl);
+        float currentAltitude = 0.00F;
 
-        cameraOverlayView.setCurrentCameraSensorData(currentLocation,azimuthFrom,azimuthTo, orientation);
+        if(altitudeMslAverage !=0){
+            double variance = altitudeMslAverage - altitudeMslRaw;
+
+            if(variance >= LOCATION_ACCURACY_ERROR_ALTITUDE_MSL){
+                currentAltitude = (float) altitudeMslRaw;
+            }else{
+                currentAltitude = (float) altitudeMslAverage;
+            }
+
+        }
+
+        cameraOverlayView.setCurrentCameraSensorData(currentLocation,azimuthFrom,azimuthTo, orientation,currentAltitude);
 
     }
 
@@ -774,7 +839,6 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements ArvSO
                         mLockedOrientationValue = averagedOrientation[0];
 
                         mAverageOrientation = averagedOrientation;
-                        Log.i(TAG, "handleSensorData1: Average Orientation: " + averagedOrientation[0]);
 
                         averageAzimithTo = computeAverageAzimithTo();
                         mAverageAzimithTo = averageAzimithTo;
@@ -821,7 +885,6 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements ArvSO
 
 
             mAverageOrientation[0] = mLockedOrientationValue;
-            Log.i(TAG, "sensorWorx: " + mAverageAzimithTo + ", " + mAverageOrientation[0]);
             updateCameraOverlayViewSensorEvent(mAveragedLocation,azimuthFrom,mAverageAzimithTo,mAverageOrientation);
 
             mAzimuthObserved = azimuthTo;
@@ -839,6 +902,7 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements ArvSO
     private void handleLocationData(Location currentLocation){
         Log.d(TAG, "handleLocationData: Started");
         mRawLocation = new Location(currentLocation);
+
         addLocationToArrayList(mRawLocation);
 
         if(!isFirstPosition){
@@ -855,6 +919,11 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements ArvSO
 
         LatLng sample = new LatLng(location.getLatitude(),location.getLongitude());
         lstSampledSplitLocations.add(sample);
+
+        listSampleAltitudeHeights.add((float) location.getAltitude());
+        listSampleAltitudeHeightsMsl.add((float) myGnss.getAltitudeMsl());
+        listSampleLocationAccuracy.add(location.getAccuracy());
+
     }
 
     private void clearLocationArrayList(){
@@ -862,6 +931,9 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements ArvSO
 
         listSampledLocations.clear();
         lstSampledSplitLocations.clear();
+        listSampleAltitudeHeights.clear();
+        listSampleAltitudeHeightsMsl.clear();
+        listSampleLocationAccuracy.clear();
 
     }
 
@@ -901,6 +973,8 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements ArvSO
         Log.d(TAG, "computeCentroidLocation: Started");
 
         LatLng centroidSplit = computeCentroid(lstSampledSplitLocations);
+        Float centroidAltitude = computeCentroidFloat(listSampleAltitudeHeights);
+        Float centroidAccuracy = computeCentroidFloat(listSampleLocationAccuracy);
 
         double latitude = centroidSplit.latitude;
         double longitude = centroidSplit.longitude;
@@ -908,7 +982,8 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements ArvSO
         Location centroid = new Location("sample");
         centroid.setLatitude(latitude);
         centroid.setLongitude(longitude);
-
+        centroid.setAltitude(centroidAltitude);
+        centroid.setAccuracy(centroidAccuracy);
         return centroid;
 
     }
@@ -970,20 +1045,34 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements ArvSO
     private float computeAverageAzimithTo(){
         Log.d(TAG, "computeAverageAzimithTo: Started");
 
-        return computeCentroidAngle(listSampleAzimithTo);
+        return computeCentroidFloat(listSampleAzimithTo);
 
     }
 
     private float computeAverageOrientation(){
         Log.d(TAG, "computeAverageOrientation: Started");
-        Log.i(TAG, "computeAverageOrientation: " + computeCentroidAngle(listSampleOrientation));
+        Log.i(TAG, "computeAverageOrientation: " + computeCentroidFloat(listSampleOrientation));
         Log.i(TAG, "computeAverageOrientation: Size: " + listSampleOrientation.size());
-        return computeCentroidAngle(listSampleOrientation);
+        return computeCentroidFloat(listSampleOrientation);
 
 
     }
 
-    private float computeCentroidAngle(List<Float> points) {
+    private float computeCentroidFloat(List<Float> points) {
+        Log.d(TAG, "computeCentroidFloat: Started");
+        Float mean = 0.0F;
+        mean = getMean(points);
+
+        Log.i(TAG, "Results: Mean: " + mean);
+        Log.i(TAG, "Results: Variance: " + getVariance(points));
+        Log.i(TAG, "Results: Std Deviation: " + getStdDev(points));
+
+        return mean;
+    }
+
+
+    //Simple Mathmatics
+    private float getMean(List<Float> points){
         Float sum = 0.0F;
         if(!points.isEmpty()){
             for (Float point : points){
@@ -993,6 +1082,24 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements ArvSO
         }
         return sum;
     }
+
+    private float getVariance(List<Float> points){
+        float mean = getMean(points);
+        float temp = 0;
+        for (Float point : points){
+            temp +=(point-mean)*(point-mean);
+
+        }
+
+        return temp/(points.size() - 1);
+
+    }
+
+    private float getStdDev(List<Float> points){
+        return (float) Math.sqrt(getVariance(points));
+    }
+
+
 
 
     //----------------------------------------------------------------------------------------------//
@@ -1024,5 +1131,21 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements ArvSO
     }
 
 
+    //----------------------------------------------------------------------------------------------//
 
+    @Override
+    public void getNationalMapResults(String results, String units, String source) {
+        Log.d(TAG, "getNationalMapResults: Started");
+
+        cameraOverlayView.setTargetPoiFalseElevation(Float.parseFloat(results));
+        
+    }
+
+    @Override
+    public void getResultSRTM(String results) {
+        Log.d(TAG, "getResultSRTM: Started");
+
+        cameraOverlayView.setTargetPoiFalseElevation(Float.parseFloat(results));
+
+    }
 }

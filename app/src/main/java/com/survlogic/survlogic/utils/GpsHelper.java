@@ -210,6 +210,24 @@ public class GpsHelper {
         }
     }
 
+    public static Double getGeoidSeparation(String nmeaSentence) {
+        final int ALTITUDE_INDEX = 11;
+        String[] tokens = nmeaSentence.split(",");
+
+        if (nmeaSentence.startsWith("$GPGGA") || nmeaSentence.startsWith("$GNGNS")) {
+            String altitude = tokens[ALTITUDE_INDEX];
+            if (!TextUtils.isEmpty(altitude)) {
+                return Double.parseDouble(altitude);
+            } else {
+                Log.w(TAG, "Couldn't parse geoid altitude from NMEA: " + nmeaSentence);
+                return null;
+            }
+        } else {
+            Log.w(TAG, "Input must be a $GPGGA or $GNGNS NMEA: " + nmeaSentence);
+            return null;
+        }
+    }
+
     /**
      * Given a $GNGSA or $GPGSA NMEA sentence, return the dilution of precision, or null if dilution of
      * precision can't be parsed.
