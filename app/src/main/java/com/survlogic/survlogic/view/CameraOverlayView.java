@@ -1,14 +1,21 @@
 package com.survlogic.survlogic.view;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.ArgbEvaluator;
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
+import android.graphics.Typeface;
 import android.hardware.GeomagneticField;
-import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.location.Location;
 import android.support.annotation.Nullable;
@@ -17,19 +24,16 @@ import android.text.Layout;
 import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.util.Property;
 import android.util.Range;
 import android.view.View;
+import android.view.animation.DecelerateInterpolator;
 
 import com.survlogic.survlogic.ARvS.model.ArvSLocationPOI;
 import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.utils.StringUtilityHelper;
 
-import java.text.DateFormat;
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
 
 /**
  * Created by chrisfillmore on 3/24/2018.
@@ -38,7 +42,9 @@ import java.util.List;
 public class CameraOverlayView extends View {
     private static final String TAG = "Started";
 
-    private Paint mTextPaint, mMainLinePaint, mSecondaryLinePaint, mMarkerPaint, mMarkerPulsePaint;
+    private Context mContext;
+
+    private Paint mTextPaint, mMainLinePaint, mSecondaryLinePaint, mMarkerPaint, mMarkerPulsePaint, mMarkerPulseMaskPaint;
     private TextPaint mDebugTextPaint;
     private Path pathMarker;
 
@@ -48,9 +54,8 @@ public class CameraOverlayView extends View {
     private static int screenWidth, screenHeight;
 
     private SensorEvent mSensorEvent;
-    private String mSensorMetaData, mRawVectorData, mRawAccelData, mRawCompassData, mRawGyroData;
+    private String mSensorMetaData;
     private double mAzimuthObserved = 0;
-    private double mAzimuthTheoretical = 0;
 
     private ArvSLocationPOI mTargetPoi;
     private float mTargetPoiFalseAltitudeMsl = 0.00F;
@@ -58,6 +63,7 @@ public class CameraOverlayView extends View {
     private Location mCurrentLocation;
     private float mOrientation[] = new float[3];
     private float mCurrentAltitudeMsl = 0.00F;
+    private float mCurrentFalseAltitudeMsl = 0.00F;
 
     private GeomagneticField gmf = null;
 
@@ -67,20 +73,29 @@ public class CameraOverlayView extends View {
 
     private boolean isDebugMode = false;
     private boolean useGMF = false;
+    private boolean useDTMModelTarget = false, useDTMModelCurrent = false;
 
-    private boolean showTargetMarker = false;
     private boolean isPoiInRange = false;
 
-    private double mAzimuthRange = 5;
-
-    private float mRadiusPOI = 20.0F, mRadiusPOIMax = 75.0F, mRadiusPOICurrent = mRadiusPOI;
-
     private float ANGLE_UPPER_RANGE = 10, ANGLE_LOWER_RANGE = 10;
+    private float PITCH_UPPER_RANGE = 25, PITCH_LOWER_RANGE = -25;
     private static final float POI_MAPPING_SCALE = 0.5F;
 
+    private float outerCircleRadiusProgress = 0f;
+    private float innerCircleRadiusProgress = 0f;
+
+    private float mRadiusPOI = 20.0F;
+    private int mRadiusPOIPulse = 80;
+
+    private ArgbEvaluator argbEvaluator = new ArgbEvaluator();
+    private static final int START_COLOR = 0xFFFF5722;
+    private static final int END_COLOR = 0xFFFFC107;
+    private boolean isAnimatingPulse = false;
 
     public CameraOverlayView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
+
+        mContext = context;
 
         TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.CompassView, 0, 0);
 
@@ -110,6 +125,8 @@ public class CameraOverlayView extends View {
     private void init(){
         Log.d(TAG, "init: Started");
 
+        Typeface typeface = Typeface.createFromAsset(mContext.getAssets(),"fonts/Roboto-ThinItalic.ttf");
+
         mTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mTextPaint.setTextAlign(Paint.Align.CENTER);
         mTextPaint.setTextSize(mTextSize);
@@ -131,11 +148,16 @@ public class CameraOverlayView extends View {
         mMarkerPulsePaint.setStyle(Paint.Style.FILL);
         mMarkerPulsePaint.setColor(mTextColor);
 
+        mMarkerPulseMaskPaint = new Paint();
+        mMarkerPulseMaskPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+
         mDebugTextPaint = new TextPaint();
         mDebugTextPaint.setAntiAlias(true);
         mDebugTextPaint.setTextSize(mTextSize/2);
         mDebugTextPaint.setColor(mTextColor);
+        mDebugTextPaint.setTypeface(typeface);
 
+        setLayerType(LAYER_TYPE_HARDWARE,null);
 
     }
 
@@ -156,7 +178,6 @@ public class CameraOverlayView extends View {
         Log.d(TAG, "setMSensorEvent: Sensor event");
 
         this.mSensorEvent = event;
-        parseEventToMetadata();
 
     }
 
@@ -167,7 +188,7 @@ public class CameraOverlayView extends View {
 
     }
 
-    public void setCurrentCameraSensorData(Location location, float azimuthFrom, float azimuthTo, float[] orientation, float altitudeMsl){
+    public void setCurrentCameraSensorData(Location location, float azimuthTo, float[] orientation, float altitudeMsl){
         Log.d(TAG, "setCurrentCameraSensorData: Started");
 
         //Location
@@ -176,14 +197,12 @@ public class CameraOverlayView extends View {
         
         //Sensor
         this.mAzimuthObserved = azimuthTo;
-        this.mAzimuthTheoretical = calculateTheoreticalAzimuth();
         this.mOrientation = orientation;
         isSensorDataAvailable = true;
 
         //Check and verify location before updating any of the UI
         if(mCurrentLocation !=null){
             isLocationDataAvailable = true;
-
 
             if(useGMF){
                 setGmfForSensor();
@@ -201,11 +220,29 @@ public class CameraOverlayView extends View {
 
     }
 
+    public void useDTMModelCurrent(boolean useDTM){
+        Log.d(TAG, "useDTMModelCurrent: Started");
+
+        this.useDTMModelCurrent = useDTM;
+
+    }
+
+    public void setDTMModelCurrent(float currentFalseElevation){
+        this.mCurrentFalseAltitudeMsl = currentFalseElevation;
+    }
+
+
     public void setTarget(ArvSLocationPOI poi){
         Log.d(TAG, "setTargetLocation: Started");
 
         this.mTargetPoi = poi;
         
+    }
+
+    public void useDTMModelTarget(boolean useDTM){
+        Log.d(TAG, "setUseDTMModelTarget: ");
+        this.useDTMModelTarget = useDTM;
+
     }
 
     public void setTargetPoiFalseElevation(float mTargetPoiFalseElevation) {
@@ -225,8 +262,9 @@ public class CameraOverlayView extends View {
 
         this.useGMF = useCorrection;
 
-
     }
+
+
 
 
     //----------------------------------------------------------------------------------------------//
@@ -240,9 +278,13 @@ public class CameraOverlayView extends View {
         Location targetLocation = convertPOIToLocation();
 
         bearing = (mCurrentLocation.bearingTo(targetLocation) + 360) % 360;
+        zenith = pitchToTarget(targetLocation,mCurrentLocation);
+
+        Log.d(TAG, "setPoiInRange: zenith: " + zenith);
 
         azimuth = (float) Math.toDegrees(mOrientation[0]);
         pitch = (float) Math.toDegrees(mOrientation[1]);
+
 
         azimuthRange = new Range<>(bearing - ANGLE_LOWER_RANGE, bearing + ANGLE_UPPER_RANGE);
         pitchRange = new Range<>(-90.0f, +90.0f);
@@ -259,12 +301,6 @@ public class CameraOverlayView extends View {
     }
 
 
-    private String solveForTargetDistance(){
-        Log.d(TAG, "setTargetDistance: Started");
-
-        return String.valueOf(distanceToTarget(mTargetPoi,mCurrentLocation));
-
-    }
 
     //----------------------------------------------------------------------------------------------//
 
@@ -284,15 +320,10 @@ public class CameraOverlayView extends View {
 
     }
 
-    private double distanceToTarget(ArvSLocationPOI target, Location current){
+    private float distanceToTarget(Location target, Location current){
         Log.d(TAG, "distanceToTarget: Started");
 
-        Location targetLocation = new Location(target.getName());
-        targetLocation.setLatitude(target.getLatitude());
-        targetLocation.setLongitude(target.getLongitude());
-        targetLocation.setAltitude(target.getAltitude());
-
-        double distanceMetric = current.distanceTo(targetLocation);
+        float distanceMetric = current.distanceTo(target);
 
         Log.d(TAG, "distanceToTarget: " + distanceMetric);
         return distanceMetric;
@@ -302,15 +333,55 @@ public class CameraOverlayView extends View {
     private float bearingToTarget(ArvSLocationPOI target, Location current){
         Log.d(TAG, "bearingToTarget: Started");
 
-        Location targetLocation = new Location(target.getName());
-        targetLocation.setLatitude(target.getLatitude());
-        targetLocation.setLongitude(target.getLongitude());
-        targetLocation.setAltitude(target.getAltitude());
+        Location targetLocation = convertPOIToLocation();
 
         float bearing = current.bearingTo(targetLocation);
 
         Log.d(TAG, "bearingToTarget: " + bearing);
         return bearing;
+
+    }
+
+    private float pitchToTarget(Location target, Location current){
+        Log.d(TAG, "pitchToTarget: Started");
+
+        double distance = current.distanceTo(target);
+
+        double elevationTarget = 0.00d, elevationCurrent = 0.00d;
+
+        elevationCurrent = getCurrentLocationElevation(current);
+        elevationTarget = getTargetLocationElevation(target);
+
+        double dElevation = elevationTarget - elevationCurrent;
+
+        double vAngle = (dElevation/distance);
+
+        vAngle = 0.00F - (Math.asin(vAngle));
+
+        return (float) Math.toDegrees(vAngle);
+
+    }
+
+    private double getCurrentLocationElevation(Location current){
+        Log.d(TAG, "getTargetElevation: Started");
+
+        if(useDTMModelCurrent){
+            return mCurrentFalseAltitudeMsl;
+        }else{
+            return current.getAltitude();
+        }
+
+    }
+
+    private double getTargetLocationElevation(Location target){
+        Log.d(TAG, "getTargetLocationElevation: Started");
+
+        if(useDTMModelTarget){
+            return mTargetPoiFalseAltitudeMsl;
+        }else{
+            return target.getAltitude();
+        }
+
 
     }
 
@@ -321,125 +392,8 @@ public class CameraOverlayView extends View {
      */
 
 
-    private void parseEventToMetadata(){
-        Log.d(TAG, "parseEventToMetadata: Started");
 
-        StringBuilder msg = new StringBuilder(mSensorEvent.sensor.getName()).append(" ");
-        for(float value: mSensorEvent.values)
-        {
-            msg.append("[").append(value).append("]");
-        }
 
-        switch(mSensorEvent.sensor.getType())
-        {
-            case Sensor.TYPE_ROTATION_VECTOR:
-                mRawVectorData = msg.toString();
-
-            case Sensor.TYPE_ACCELEROMETER:
-                mRawAccelData = msg.toString();
-                break;
-            case Sensor.TYPE_GYROSCOPE:
-                mRawGyroData = msg.toString();
-                break;
-            case Sensor.TYPE_MAGNETIC_FIELD:
-                mRawCompassData = msg.toString();
-                break;
-        }
-
-        updateSensorMetaData();
-
-    }
-
-    private void updateSensorMetaData(){
-        Log.d(TAG, "updateSensorMetaData: Started");
-
-        DateFormat df = new SimpleDateFormat("EEE, d MMM yyyy, HH:mm");
-        String date = df.format(Calendar.getInstance().getTime());
-
-        mSensorMetaData = "Sensor Data as of " + date + "\n" + ":";
-
-        if(!StringUtilityHelper.isStringNull(mRawVectorData)){
-            mSensorMetaData = "VECTOR: " + mRawVectorData + ". " + "\n";
-        }
-
-        if(!StringUtilityHelper.isStringNull(mRawAccelData)){
-            mSensorMetaData = "ACCEL: " + mRawAccelData + ". " + "\n";
-        }
-
-        if(!StringUtilityHelper.isStringNull(mRawGyroData)){
-            mSensorMetaData = "GYRO: " + mRawGyroData + ". " + "\n";
-        }
-
-        if(!StringUtilityHelper.isStringNull(mRawCompassData)){
-            mSensorMetaData = "COMPASS: " + mRawCompassData + ". " + "\n";
-        }
-
-        invalidate();
-
-    }
-
-    //----------------------------------------------------------------------------------------------//
-    public double calculateTheoreticalAzimuth(){
-        Log.d(TAG, "calculateTheoreticalAzimuth: Started");
-
-        double currentLatitude = mCurrentLocation.getLatitude();
-        double currentLongitude = mCurrentLocation.getLongitude();
-
-        double dX = mTargetPoi.getLatitude() - currentLatitude;
-        double dY = mTargetPoi.getLongitude() - currentLongitude;
-
-        double phiAngle;
-        double tanPhi;
-        double azimuth = 0;
-
-        tanPhi = Math.abs(dY / dX);
-        phiAngle = Math.atan(tanPhi);
-        phiAngle = Math.toDegrees(phiAngle);
-
-        if (dX > 0 && dY > 0) { // I quater
-            return azimuth = phiAngle;
-        } else if (dX < 0 && dY > 0) { // II
-            return azimuth = 180 - phiAngle;
-        } else if (dX < 0 && dY < 0) { // III
-            return azimuth = 180 + phiAngle;
-        } else if (dX > 0 && dY < 0) { // IV
-            return azimuth = 360 - phiAngle;
-        }
-
-        return azimuth;
-
-    }
-
-    private List<Double> calculateAzimuthAccuracy(double azimuth) {
-        Log.d(TAG, "calculateAzimuthAccuracy: Started");
-        double minAngle = azimuth - mAzimuthRange;
-        double maxAngle = azimuth + mAzimuthRange;
-        List<Double> minMax = new ArrayList<Double>();
-
-        if (minAngle < 0)
-            minAngle += 360;
-
-        if (maxAngle >= 360)
-            maxAngle -= 360;
-
-        minMax.clear();
-        minMax.add(minAngle);
-        minMax.add(maxAngle);
-
-        return minMax;
-    }
-
-    private boolean isBetween(double minAngle, double maxAngle, double azimuth) {
-        Log.d(TAG, "isBetween: Started");
-        if (minAngle > maxAngle) {
-            if (isBetween(0, maxAngle, azimuth) && isBetween(minAngle, 360, azimuth))
-                return true;
-        } else {
-            if (azimuth > minAngle && azimuth < maxAngle)
-                return true;
-        }
-        return false;
-    }
 
 
     //----------------------------------------------------------------------------------------------//
@@ -470,28 +424,43 @@ public class CameraOverlayView extends View {
 
        if(mCurrentLocation !=null){
            Location targetLocation = convertPOIToLocation();
+           float distance = distanceToTarget(targetLocation,mCurrentLocation);
            float bearing = (mCurrentLocation.bearingTo(targetLocation) + 360) % 360;
+           float zenith = pitchToTarget(targetLocation,mCurrentLocation);
            float azimuth = (float) Math.toDegrees(mOrientation[0]);
            float pitch = (float) Math.toDegrees(mOrientation[1]);
+
+           float currentBearingToTarget = bearingToTarget(mTargetPoi,mCurrentLocation);
+           float currentOnScreenAzimuth = (float) mAzimuthObserved;
+
+           double elevationCurrent = getCurrentLocationElevation(mCurrentLocation);
+           double elevationTarget = getTargetLocationElevation(targetLocation);
+
+           float dx = (float) ((c.getWidth()/mHorizontalFOV) * (currentOnScreenAzimuth-currentBearingToTarget))/(ANGLE_UPPER_RANGE / POI_MAPPING_SCALE);
+           float dy = (float) ((c.getHeight()/mVerticalFOV) * (pitch - zenith))/(PITCH_UPPER_RANGE);
 
 
            String debug_location = getResources().getString(R.string.cameraoverlayview_debug_location_value,
                    df.format(mCurrentLocation.getLatitude()), df.format(mCurrentLocation.getLongitude()),df.format(mCurrentLocation.getAltitude()),
-                   df.format(targetLocation.getLatitude()),df.format(targetLocation.getLongitude()),df.format(targetLocation.getAltitude()));
+                   df.format(targetLocation.getLatitude()),df.format(targetLocation.getLongitude()),df.format(targetLocation.getAltitude()),df.format(distance));
 
            String debug_sensor_orientation = getResources().getString(R.string.cameraoverlayview_debug_sensor_orientation_values,
                    df.format(bearing),df.format(mAzimuthObserved),df.format(azimuth));
 
            String debug_sensor_pitch = getResources().getString(R.string.cameraoverlayview_debug_sensor_pitch_values,
-                   df.format(0),df.format(pitch));
+                   df.format(zenith),df.format(pitch));
 
            String debug_dtm = getResources().getString(R.string.cameraoverlayview_debug_dtm_values,
                    df.format(mCurrentAltitudeMsl),df.format(mTargetPoiFalseAltitudeMsl));
 
-           String debug_metadata = getResources().getString(R.string.cameraoverlayview_debug_gps_accuracy,
-                   df.format(mCurrentLocation.getAccuracy()),String.valueOf(useGMF));
+           String debug_metadata_gps = getResources().getString(R.string.cameraoverlayview_debug_metadata_gps,
+                   df.format(mCurrentLocation.getAccuracy()),String.valueOf(useGMF),String.valueOf(useDTMModelTarget),df.format(elevationTarget),String.valueOf(useDTMModelCurrent),df.format(elevationCurrent));
 
-           String combined = debug_location + debug_sensor_orientation + debug_sensor_pitch + debug_dtm + debug_metadata;
+           String debug_metadata_canvas = getResources().getString(R.string.cameraoverlayview_debug_metadata_canvas,
+                   df.format(dx),df.format(dy), df.format(c.getWidth()), df.format(c.getHeight()));
+
+
+           String combined = debug_location + debug_sensor_orientation + debug_sensor_pitch + debug_dtm + debug_metadata_gps + debug_metadata_canvas;
 
            int debug_width = (int) c.getWidth()/2 - paddingStart - paddingEnd;
            DynamicLayout mDl_location = new DynamicLayout(combined, mDebugTextPaint, debug_width, Layout.Alignment.ALIGN_NORMAL, 1.0f, 0, false);
@@ -519,16 +488,26 @@ public class CameraOverlayView extends View {
             float currentBearingToTarget = bearingToTarget(mTargetPoi,mCurrentLocation);
             float currentOnScreenAzimuth = (float) mAzimuthObserved;
 
+            Location targetLocation = convertPOIToLocation();
+            float distance = distanceToTarget(targetLocation,mCurrentLocation);
+            float zenith = pitchToTarget(targetLocation,mCurrentLocation);
+            float pitch = (float) Math.toDegrees(mOrientation[1]);
+
             float dx = (float) ((c.getWidth()/mHorizontalFOV) * (currentOnScreenAzimuth-currentBearingToTarget))/(ANGLE_UPPER_RANGE / POI_MAPPING_SCALE);
+            float dy = (float) ((c.getHeight()/mVerticalFOV) * (pitch - zenith))/(PITCH_UPPER_RANGE);
+
+            Log.i(TAG, "drawTargetInRange: dx:" + dx);
+            Log.i(TAG, "drawTargetInRange: dy:" + (c.getHeight()/mVerticalFOV));
 
             if(isPoiInRange){
-                c.translate(0.0f-dx,0.0f);
+                c.translate(0.0f-dx,0.0f-dy);
                 drawMarker(c,c.getWidth()/2,c.getHeight()/2,true);
             }
 
         } else{
             mSensorMetaData = "No GPS Location Available";
             c.drawText(mSensorMetaData,(c.getWidth()/4)*2,(c.getHeight()/10)*2,mTextPaint);
+            isAnimatingPulse = false;
         }
 
         c.restore();
@@ -538,10 +517,128 @@ public class CameraOverlayView extends View {
     private void drawMarker(Canvas c, float mx, float my, boolean animate){
         Log.d(TAG, "drawMarker: Started");
 
+        if(animate){
+            drawPulse(c,mx,my);
+
+            if(!isAnimatingPulse){
+                isAnimatingPulse = true;
+                animatePulse();
+            }
+        }
+
         c.drawCircle(mx,my,mRadiusPOI,mMarkerPaint);
 
+    }
+
+    private void drawPulse(Canvas c, float mx, float my){
+        c.drawCircle(mx,my,outerCircleRadiusProgress * mRadiusPOIPulse, mMarkerPulsePaint);
+        c.drawCircle(mx,my,innerCircleRadiusProgress * mRadiusPOIPulse, mMarkerPulseMaskPaint);
 
     }
+
+
+    private void animatePulse(){
+        Log.d(TAG, "animatePulse: Started");
+
+        setInnerCircleRadiusProgress(0);
+        setOuterCircleRadiusProgress(0);
+
+        final AnimatorSet animatorSet = new AnimatorSet();
+
+        ObjectAnimator outerCircleAnimator = ObjectAnimator.ofFloat(this,CameraOverlayView.OUTER_CIRCLE_RADIUS_PROGRESS,0.1f,1f);
+        outerCircleAnimator.setDuration(550);
+        outerCircleAnimator.setInterpolator(new DecelerateInterpolator());
+
+
+        ObjectAnimator innerCircleAnimator = ObjectAnimator.ofFloat(this,CameraOverlayView.INNER_CIRCLE_RADIUS_PROGRESS,0.1f,1f);
+        innerCircleAnimator.setDuration(500);
+        innerCircleAnimator.setStartDelay(500);
+        innerCircleAnimator.setInterpolator(new DecelerateInterpolator());
+
+        animatorSet.playTogether(
+                outerCircleAnimator,
+                innerCircleAnimator
+        );
+
+        animatorSet.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationCancel(Animator animation) {
+                super.onAnimationCancel(animation);
+                setInnerCircleRadiusProgress(0);
+                setOuterCircleRadiusProgress(0);
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                animatorSet.start();
+            }
+        });
+
+        animatorSet.start();
+
+    }
+
+    private void progressOuterCircle(float value){
+        setOuterCircleRadiusProgress(value);
+    }
+
+    private void progressInnerCircle(float value){
+        setInnerCircleRadiusProgress(value);
+
+    }
+
+    private void setInnerCircleRadiusProgress(float innerCircleRadiusProgress){
+        this.innerCircleRadiusProgress = innerCircleRadiusProgress;
+        postInvalidate();
+    }
+
+    private float getInnerCircleRadiusProgress(){
+        return innerCircleRadiusProgress;
+    }
+
+    private void setOuterCircleRadiusProgress(float outerCircleRadiusProgress){
+        this.outerCircleRadiusProgress = outerCircleRadiusProgress;
+        updateCircleColor();
+        postInvalidate();
+    }
+
+    public float getOuterCircleRadiusProgress() {
+        return outerCircleRadiusProgress;
+    }
+
+    private void updateCircleColor(){
+        float colorProgress = (float) clamp(outerCircleRadiusProgress,0.5,1);
+        colorProgress = (float) mapValueFromRangeToRange(colorProgress,0.5f,1f,0f,1f);
+        this.mMarkerPulsePaint.setColor((Integer) argbEvaluator.evaluate(colorProgress,START_COLOR,END_COLOR));
+    }
+
+
+    public static final Property<CameraOverlayView, Float> INNER_CIRCLE_RADIUS_PROGRESS =
+            new Property<CameraOverlayView, Float>(Float.class, "innerCircleRadiusProgress") {
+                @Override
+                public Float get(CameraOverlayView object) {
+                    return object.getInnerCircleRadiusProgress();
+                }
+
+                @Override
+                public void set(CameraOverlayView object, Float value) {
+                    object.setInnerCircleRadiusProgress(value);
+                }
+            };
+
+    public static final Property<CameraOverlayView, Float> OUTER_CIRCLE_RADIUS_PROGRESS =
+            new Property<CameraOverlayView, Float>(Float.class, "outerCircleRadiusProgress") {
+                @Override
+                public Float get(CameraOverlayView object) {
+                    return object.getOuterCircleRadiusProgress();
+                }
+
+                @Override
+                public void set(CameraOverlayView object, Float value) {
+                    object.setOuterCircleRadiusProgress(value);
+                }
+            };
 
     //----------------------------------------------------------------------------------------------//
     private synchronized void setGmfForSensor(){
@@ -573,6 +670,14 @@ public class CameraOverlayView extends View {
         Rect rect = new Rect();
         paint.getTextBounds(text, 0, text.length(), rect);
         return rect.height();
+    }
+
+    private static double mapValueFromRangeToRange(double value, double fromLow, double fromHigh, double toLow, double toHigh) {
+        return toLow + ((value - fromLow) / (fromHigh - fromLow) * (toHigh - toLow));
+    }
+
+    private static double clamp(double value, double low, double high) {
+        return Math.min(Math.max(value, low), high);
     }
 
 

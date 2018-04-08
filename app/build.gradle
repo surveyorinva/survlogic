@@ -35,9 +35,9 @@ dependencies {
     //Glide - Used in the GPS Functionality
     implementation 'com.github.bumptech.glide:glide:4.0.0-RC0'
     //Maps Play Services
-    implementation 'com.google.android.gms:play-services-maps:12.0.0'
+    implementation 'com.google.android.gms:play-services-maps:12.0.1'
     //Location Play Services
-    implementation 'com.google.android.gms:play-services-location:12.0.0'
+    implementation 'com.google.android.gms:play-services-location:12.0.1'
     //Universal Image Loader (https://github.com/nostra13/Android-Universal-Image-Loader)
     implementation 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
     //Bottom Navigation ViewEX (https://github.com/ittianyu/BottomNavigationViewEx)
@@ -51,7 +51,9 @@ dependencies {
     //https://github.com/orbisgis/cts  FROM https://jitpack.io/
     implementation 'com.github.orbisgis:cts:v1.5.1'
     implementation 'sk.baka.slf4j:slf4j-handroid:1.7.26'
-    testCompile 'junit:junit:4.12'
+
+
+    testImplementation 'junit:junit:4.12'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.0.0-RC0'
     annotationProcessor 'org.parceler:parceler:1.1.6'
 }

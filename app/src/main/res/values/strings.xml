@@ -549,11 +549,14 @@
 
     <string name="compassview_error_out_index_degrees" translatable="false">Degrees must be between 0 and 359, both inclusive. Actual value: </string>
     <string name="compassview_error_out_index_range_degrees" translatable="false">Range degrees must be between 90 and 360, both inclusive. Actual value: </string>
-    <string name="cameraoverlayview_debug_location_value">Debug Status-Location \n Current Location: %1$s, %2$s, %3$s \n Target Location: %4$s, %5$s, %6$s \n</string>
+    <string name="cameraoverlayview_debug_location_value">Debug Status-Location \n Current Location: %1$s, %2$s, %3$s \n Target Location: %4$s, %5$s, %6$s \n Distance to Target: %7$s \n</string>
     <string name="cameraoverlayview_debug_sensor_orientation_values">Debug Status-Sensor (Orientation) \n Target Azimuth: %1$s \n Current Azimuth: %2$s \n Sensor Azimuth (Not Used): %3$s \n</string>
     <string name="cameraoverlayview_debug_sensor_pitch_values">Debug Status-Sensor (Pitch) \n Target Pitch: %1$s \n Current Pitch: %2$s \n</string>
     <string name="cameraoverlayview_debug_dtm_values">Debug Status-DTM Value \n Altitude MSL (NMEA): %1s \n DTM Elevation: %2$s\n</string>
-    <string name="cameraoverlayview_debug_gps_accuracy">Metadata \n GPS Location Accuracy: %1$s \n Using GMF: %2$s</string>
+    <string name="cameraoverlayview_debug_metadata_gps">Metadata \n GPS Location Accuracy: %1$s \n Using GMF: %2$s \n Using DTM Target: %3$s (%4$s) \n Using DTM Current: %5$s (%6$s) \n</string>
+    <string name="cameraoverlayview_debug_metadata_canvas">Screen Logic \n dX: %1$s   dY: %2$s \n Screen Width: %3$s Height: %4$s \n</string>
+
+
     <!-- ******************************Strings related to Settings****************************** -->
 
     <!--**************************Current Job Preferences**************************-->

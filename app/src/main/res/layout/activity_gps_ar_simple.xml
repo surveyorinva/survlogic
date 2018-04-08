@@ -194,15 +194,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <TextView
-            android:id="@+id/cameraTextView"
-            android:src="@drawable/ic_launcher"
-            android:layout_above="@id/compassLinearView"
-            android:background="#FFFFFF"
-            android:text="Large Text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-
         <com.survlogic.survlogic.view.CompassLinearView
             android:id="@+id/compassLinearView"
             compass:backgroundColor="@color/semi_transparent"

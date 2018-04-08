@@ -275,8 +275,6 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements ArvSO
 
         txvCameraView = (TextureView) findViewById(R.id.camera_view);
 
-        descriptionTextView = (TextView) findViewById(R.id.cameraTextView);
-
         ivPointerIcon = (ImageView) findViewById(R.id.pointer_icon);
 
         compassLinearView = (CompassLinearView) findViewById(R.id.compassLinearView);
@@ -296,10 +294,7 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements ArvSO
 
         mPoi = new ArvSLocationPOI("manhole","manhole description",38.953610,-76.833974,52.80);
 
-        Location targetLocation = new Location(mPoi.getName());
-        targetLocation.setLatitude(mPoi.getLatitude());
-        targetLocation.setLongitude(mPoi.getLongitude());
-
+        Location targetLocation = convertPOIToLocation(mPoi);
 
         switch(elevationServiceToUse){
             case 0:
@@ -316,10 +311,6 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements ArvSO
                 backgroundGetSRTMElevation.execute();
                 break;
         }
-
-
-
-
 
     }
 
@@ -359,17 +350,6 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements ArvSO
     }
 
     //----------------------------------------------------------------------------------------------//
-    private void updateMetadata(){
-        Log.d(TAG, "updateMetadata: Started");
-
-        String metaDescription = mPoi.getName() + " Theoretical Azimuth: " + mAzimuthTheoretical
-                + ", Observed Azimuth: " + mAzimuthObserved + ". Current Location: " + mAveragedLocation.getLatitude() + ", " + mAveragedLocation.getLongitude();
-
-
-        descriptionTextView.setText(metaDescription);
-
-    }
-
     private void updateCompassView(){
         Log.d(TAG, "updateCompassView: Started");
 
@@ -401,7 +381,6 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements ArvSO
 
     }
 
-
     private void updateCameraOverlayViewSensorEvent(SensorEvent event){
         Log.d(TAG, "updateCameraOverlayViewSensorEvent: Started");
 
@@ -409,7 +388,7 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements ArvSO
 
     }
 
-    private void updateCameraOverlayViewSensorEvent(Location currentLocation, float azimuthFrom, float azimuthTo, float [] orientation){
+    private void updateCameraOverlayViewSensorEvent(Location currentLocation, float azimuthTo, float [] orientation){
         Log.d(TAG, "updateCameraOverlayViewSensorEvent: Started");
 
         double altitudeMslRaw = myGnss.getAltitudeMsl();
@@ -427,7 +406,7 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements ArvSO
 
         }
 
-        cameraOverlayView.setCurrentCameraSensorData(currentLocation,azimuthFrom,azimuthTo, orientation,currentAltitude);
+        cameraOverlayView.setCurrentCameraSensorData(currentLocation,azimuthTo, orientation,currentAltitude);
 
     }
 
@@ -436,62 +415,28 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements ArvSO
     public double calculateTheoreticalAzimuth(ArvSLocationPOI mPOI){
         Log.d(TAG, "calculateTheoreticalAzimuth: Started");
 
-        double dX = mPOI.getLatitude() - mAveragedLocation.getLatitude();
-        double dY = mPOI.getLongitude() - mAveragedLocation.getLongitude();
+        Location targetLocation = convertPOIToLocation(mPOI);
 
-        double phiAngle;
-        double tanPhi;
-        double azimuth = 0;
+        float bearing = mAveragedLocation.bearingTo(targetLocation);
 
-        tanPhi = Math.abs(dY / dX);
-        phiAngle = Math.atan(tanPhi);
-        phiAngle = Math.toDegrees(phiAngle);
+        Log.d(TAG, "bearingToTarget: " + bearing);
 
-        if (dX > 0 && dY > 0) { // I quater
-            return azimuth = phiAngle;
-        } else if (dX < 0 && dY > 0) { // II
-            return azimuth = 180 - phiAngle;
-        } else if (dX < 0 && dY < 0) { // III
-            return azimuth = 180 + phiAngle;
-        } else if (dX > 0 && dY < 0) { // IV
-            return azimuth = 360 - phiAngle;
-        }
+        return bearing;
 
-        return azimuth;
 
     }
 
-    private List<Double> calculateAzimuthAccuracy(double azimuth) {
-        Log.d(TAG, "calculateAzimuthAccuracy: Started");
-        double minAngle = azimuth - AZIMUTH_ACCURACY;
-        double maxAngle = azimuth + AZIMUTH_ACCURACY;
-        List<Double> minMax = new ArrayList<Double>();
+    private Location convertPOIToLocation(ArvSLocationPOI mPOI){
+        Log.d(TAG, "convertPOIToLocation: Started");
 
-        if (minAngle < 0)
-            minAngle += 360;
+        Location targetLocation = new Location(mPOI.getName());
+        targetLocation.setLatitude(mPOI.getLatitude());
+        targetLocation.setLongitude(mPOI.getLongitude());
+        targetLocation.setAltitude(mPOI.getAltitude());
 
-        if (maxAngle >= 360)
-            maxAngle -= 360;
+        return targetLocation;
 
-        minMax.clear();
-        minMax.add(minAngle);
-        minMax.add(maxAngle);
-
-        return minMax;
     }
-
-    private boolean isBetween(double minAngle, double maxAngle, double azimuth) {
-        Log.d(TAG, "isBetween: Started");
-        if (minAngle > maxAngle) {
-            if (isBetween(0, maxAngle, azimuth) && isBetween(minAngle, 360, azimuth))
-                return true;
-        } else {
-            if (azimuth > minAngle && azimuth < maxAngle)
-                return true;
-        }
-        return false;
-    }
-    
 
 
     //----------------------------------------------------------------------------------------------//
@@ -885,14 +830,13 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements ArvSO
 
 
             mAverageOrientation[0] = mLockedOrientationValue;
-            updateCameraOverlayViewSensorEvent(mAveragedLocation,azimuthFrom,mAverageAzimithTo,mAverageOrientation);
+            updateCameraOverlayViewSensorEvent(mAveragedLocation,mAverageAzimithTo,mAverageOrientation);
 
             mAzimuthObserved = azimuthTo;
             mAzimuthTheoretical = calculateTheoreticalAzimuth(mPoi);
 
             updateCompassView();
             updateRadarViewOrientation();
-            updateMetadata();
             updateRadarViewLocation(mAveragedLocation);
 
         }
@@ -1137,6 +1081,7 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements ArvSO
     public void getNationalMapResults(String results, String units, String source) {
         Log.d(TAG, "getNationalMapResults: Started");
 
+        cameraOverlayView.useDTMModelTarget(true);
         cameraOverlayView.setTargetPoiFalseElevation(Float.parseFloat(results));
         
     }
@@ -1145,6 +1090,7 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements ArvSO
     public void getResultSRTM(String results) {
         Log.d(TAG, "getResultSRTM: Started");
 
+        cameraOverlayView.useDTMModelTarget(true);
         cameraOverlayView.setTargetPoiFalseElevation(Float.parseFloat(results));
 
     }
