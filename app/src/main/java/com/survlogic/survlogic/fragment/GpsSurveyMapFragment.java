@@ -981,9 +981,6 @@ public class GpsSurveyMapFragment extends Fragment implements GpsSurveyListener,
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(latlng));
             }
 
-
-
-
         }
 
     }

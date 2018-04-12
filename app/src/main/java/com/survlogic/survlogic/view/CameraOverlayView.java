@@ -377,11 +377,16 @@ public class CameraOverlayView extends View {
         Log.d(TAG, "getTargetLocationElevation: Started");
 
         if(useDTMModelTarget){
-            return mTargetPoiFalseAltitudeMsl;
+
+            if(mTargetPoiFalseAltitudeMsl !=0){
+                return mTargetPoiFalseAltitudeMsl;
+            }else{
+                return target.getAltitude();
+            }
+
         }else{
             return target.getAltitude();
         }
-
 
     }
 

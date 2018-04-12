@@ -42,7 +42,7 @@ public class BackgroundGetNationalMapElevation extends AsyncTask<String,String,S
         pd = new ProgressDialog(mContext);
         pd.setMessage("Please wait");
         pd.setCancelable(false);
-        pd.show();
+        //pd.show();
 
     }
 
