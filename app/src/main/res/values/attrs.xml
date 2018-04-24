@@ -14,5 +14,8 @@
         <attr name="showRadarCircleText" format="boolean"/>
     </declare-styleable>
 
+    <declare-styleable name="MapView">
+        <attr name="MapStyle" format="reference"/>
+    </declare-styleable>
 
 </resources>

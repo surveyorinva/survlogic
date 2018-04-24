@@ -178,6 +178,12 @@ public class GpsSurveySkyViewCircleFragment extends Fragment implements GpsSurve
 
     }
 
+    @Override
+    public void onFilterLocationChange(Location filtered) {
+
+    }
+
+
 
     private static class GpsSkyView extends View implements GpsSurveyListener {
 
@@ -372,6 +378,11 @@ public class GpsSurveySkyViewCircleFragment extends Fragment implements GpsSurve
             mSkyViewStarted = false;
             mSvCount = 0;
             invalidate();
+
+        }
+
+        @Override
+        public void onFilterLocationChange(Location filtered) {
 
         }
 
@@ -984,4 +995,6 @@ public class GpsSurveySkyViewCircleFragment extends Fragment implements GpsSurve
 
         }
     }
+
+
 }

@@ -165,4 +165,10 @@
         <item name="android:background">@android:color/transparent</item>
         <item name="android:windowBackground">@drawable/table_background_clear</item>
     </style>
+    
+    
+    <style name="MapStyle" parent="android:Widget.Holo.Light">
+        <item name="android:padding">@dimen/map_custom_view_padding</item>
+        <item name="android:background">@color/activity_background</item>
+    </style>
 </resources>

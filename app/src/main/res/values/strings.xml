@@ -452,6 +452,7 @@
     <string name="cogo_setup_backsight_error_no_point">A backsight station has not been selected.  \nPlease either enter station number or choose from list.</string>
     <string name="cogo_setup_backsight_error_same_as_occupy">Occupy and Backsight are the Same. \nPlease check your setup"</string>
 
+    <string name="gps_no_service_message">No GPS signal able to be locked. \nMove to a clearer location and try again.</string>
 
     <!--Sideshot/Traverse -->
     <string name="cogo_hint_quadrant">1-4</string>

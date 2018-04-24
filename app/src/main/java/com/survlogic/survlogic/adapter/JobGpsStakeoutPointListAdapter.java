@@ -10,6 +10,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.survlogic.survlogic.ARvS.JobGPSSurveyARvSActivity;
+import com.survlogic.survlogic.ARvS.interf.JobGPSSurveyARvSActivityListener;
 import com.survlogic.survlogic.ARvS.model.ArvSLocationPOI;
 import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.model.PointGeodetic;
@@ -29,6 +31,8 @@ import java.util.ArrayList;
 public class JobGpsStakeoutPointListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private static final String TAG = "JobGpsStakeoutPointList";
 
+    private JobGPSSurveyARvSActivityListener listener;
+
     private ArrayList<PointGeodetic> pointGeodetics = new ArrayList<>();
     private Location mCurrentLocation;
 
@@ -39,9 +43,10 @@ public class JobGpsStakeoutPointListAdapter extends RecyclerView.Adapter<Recycle
     private Context mContext;
 
     //    CONSTRUCTOR!!!!!
-    public JobGpsStakeoutPointListAdapter(Context context, ArrayList<PointGeodetic> pointGeodetics){
+    public JobGpsStakeoutPointListAdapter(Context context, ArrayList<PointGeodetic> pointGeodetics, JobGPSSurveyARvSActivityListener listener){
         this.pointGeodetics = pointGeodetics;
         this.mContext = context;
+        this.listener = listener;
     }
 
     @Override
@@ -117,7 +122,8 @@ public class JobGpsStakeoutPointListAdapter extends RecyclerView.Adapter<Recycle
         vh1.mCardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showToast("Geodetic",true);
+                listener.setTargetLocation(pointGeodetic);
+
             }
         });
 

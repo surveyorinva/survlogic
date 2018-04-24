@@ -2,6 +2,7 @@ package com.survlogic.survlogic.ARvS.utils;
 
 import android.app.Activity;
 import android.content.Context;
+import android.location.Criteria;
 import android.location.GnssMeasurementsEvent;
 import android.location.GnssNavigationMessage;
 import android.location.GnssStatus;
@@ -14,6 +15,7 @@ import android.location.LocationProvider;
 import android.location.OnNmeaMessageListener;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
 import com.survlogic.survlogic.interf.GpsSurveyListener;
@@ -38,7 +40,8 @@ public class ArvSGnss implements LocationListener {
     //    Location Managers (GPS)
     private LocationManager mLocationManager;
     private LocationProvider mProvider;
-    private Location mLastLocation;
+    private String mCustomProvider;
+    private Location mLocationRaw;
 
 
     //    GNSSStatus Call Listeners and CallBacks (GNSS Status - Version N)
@@ -60,16 +63,16 @@ public class ArvSGnss implements LocationListener {
 
 
     // Variables for Getter & Setter
+    private Integer gpsFreqInMillis;
+    private Integer gpsFreqInDistance;  // in meters
     private long minTime; //needs to be in milliseconds
     private float minDistance; //in meters
     private boolean autoStartGPS; //hot start GPS when GPS Activity is Loaded
     private boolean useVersionNApi; //Use N APIs for GNSS Status
 
-    private int displayUnits = 3; //Units to display
-
     //    Constants
     private static final int SECONDS_TO_MILLISECONDS = 1000;
-    public boolean gpsRunning = false; //gps service is running (True) or not running (false)
+    public boolean isGpsRunning = false; //gps service is running (True) or not running (false)
 
     //Location
     private Location mLocation;
@@ -88,21 +91,34 @@ public class ArvSGnss implements LocationListener {
     //DOP Metadata
     private double pDop = 0, hDop = 0, vDop = 0;
 
-
     //    Satellite Constants
     private long mFixTime;
     private boolean mNavigating, mGotFix;
 
-
     //Getters
     private int howManySatellitesAvailable = 0, howManySatellitesLocked = 0;
 
-
     private static ArvSGnss sInstance;
+
+    //Kalman Filter Efforts
+    private ArrayList<Location> rawLocationList;
+    private ArrayList<Location> filteredLocationList;
+
+    private ArrayList<Location> oldLocationList;
+    private ArrayList<Location> noAccuracyLocationList;
+    private ArrayList<Location> inaccurateLocationList;
+    private ArrayList<Location> kalmanNGLocationList;
+
+    private ArvKalmanLatLong kalmanFilter;
+    private long runStartTimeInMillis;
+    private float currentSpeed = 0.0f; // meters/second
+
+
 
     public ArvSGnss(GpsSurveyListener gnssListener) {
         this.gnssListener = gnssListener;
         sInstance = this;
+
     }
 
     public synchronized void buildGnssClient(Context context){
@@ -112,9 +128,10 @@ public class ArvSGnss implements LocationListener {
         mActivity = (Activity) mContext;
 
         mLocationManager = (LocationManager) mActivity.getSystemService(Context.LOCATION_SERVICE);
+
         mProvider = mLocationManager.getProvider(LocationManager.GPS_PROVIDER);
 
-        initDummySettings();
+        initGnssSettings();
 
     }
 
@@ -200,15 +217,34 @@ public class ArvSGnss implements LocationListener {
 
 //----------------------------------------------------------------------------------------------//
 
-    private void initDummySettings(){
-        Log.d(TAG, "initDummySettings: Started");
+    private void initGnssSettings(){
+        Log.d(TAG, "initGnssSettings: Started");
 
         minTime = (long) (0.5 * SECONDS_TO_MILLISECONDS);
-
         minDistance = 0;
+
+        gpsFreqInMillis = 500;
+        gpsFreqInDistance = 0;
+
         autoStartGPS = true;
         useVersionNApi = true;
 
+        rawLocationList = new ArrayList<>();
+        filteredLocationList = new ArrayList<>();
+        noAccuracyLocationList = new ArrayList<>();
+        oldLocationList = new ArrayList<>();
+        inaccurateLocationList = new ArrayList<>();
+        kalmanNGLocationList = new ArrayList<>();
+        kalmanFilter = new ArvKalmanLatLong(3);
+
+    }
+
+    public Integer getGpsFreqInMillis() {
+        return gpsFreqInMillis;
+    }
+
+    public Integer getGpsFreqInDistance() {
+        return gpsFreqInDistance;
     }
 
     //----------------------------------------------------------------------------------------------//
@@ -495,14 +531,37 @@ public class ArvSGnss implements LocationListener {
     private synchronized void warmBootGPS() {
         Log.e(TAG, "Start: warmBootGPS");
 
-        if (!gpsRunning) {
-            try {
+        if (!isGpsRunning) {
 
-                mLocationManager.requestLocationUpdates(mProvider.getName(), minTime, minDistance, this);
-                gpsRunning = true;
+            runStartTimeInMillis = SystemClock.elapsedRealtimeNanos() / 1000000;
+
+            rawLocationList.clear();
+            filteredLocationList.clear();
+            oldLocationList.clear();
+            noAccuracyLocationList.clear();
+            inaccurateLocationList.clear();
+            kalmanNGLocationList.clear();
+
+            try {
+                Criteria criteria = new Criteria();
+                criteria.setAccuracy(Criteria.ACCURACY_FINE);
+                criteria.setPowerRequirement(Criteria.POWER_HIGH);
+                criteria.setAltitudeRequired(false);
+                criteria.setSpeedRequired(false);
+                criteria.setCostAllowed(true);
+                criteria.setBearingRequired(false);
+
+                //API level 9 and up
+                criteria.setHorizontalAccuracy(Criteria.ACCURACY_HIGH);
+                criteria.setVerticalAccuracy(Criteria.ACCURACY_HIGH);
+
+                mLocationManager.requestLocationUpdates(gpsFreqInMillis,gpsFreqInDistance, criteria, this, null);
+                //mLocationManager.requestLocationUpdates(mProvider.getName(), minTime, minDistance, this);
+
+                isGpsRunning = true;
 
             } catch (SecurityException ex) {
-                Log.e(TAG, "startLocationUpdates: " + ex);
+                Log.e(TAG, "startLocationUpdates: " + ex.getLocalizedMessage());
             }
 
         }
@@ -519,9 +578,9 @@ public class ArvSGnss implements LocationListener {
 
     private synchronized void stopGPSService() {
         Log.d(TAG, "stopGPSService: Started");
-        if (gpsRunning) {
+        if (isGpsRunning) {
             mLocationManager.removeUpdates(this);
-            gpsRunning = false;
+            isGpsRunning = false;
 
         }
 
@@ -535,17 +594,17 @@ public class ArvSGnss implements LocationListener {
     @Override
     public void onLocationChanged(Location location) {
         Log.d(TAG, "onLocationChanged: Started");
-        mLastLocation = location;
+
+        rawLocationList.add(location);
+
+        if(isGpsRunning){
+            filterAndAddLocation(location);
+        }
 
         for (GpsSurveyListener listener : mGpsSurveyListener){
             listener.onLocationChanged(location);
+
         }
-
-        mLocation = location;
-        mLatitude = location.getLatitude();
-        mLongitude = location.getLongitude();
-        mAccuracy = location.getAccuracy();
-
 
     }
 
@@ -592,18 +651,6 @@ public class ArvSGnss implements LocationListener {
             }
             mNavigating = navigating;
         }
-
-    }
-
-    private void getLocation(Location location){
-        Log.d(TAG, "getLocation: Started");
-
-        mLatitude = location.getLatitude();
-        mLongitude = location.getLongitude();
-        mAccuracy = location.getAccuracy();
-
-
-
 
     }
 
@@ -749,6 +796,90 @@ public class ArvSGnss implements LocationListener {
                 break;
         }
 
+    }
+
+    //----------------------------------------------------------------------------------------------//
+    private boolean filterAndAddLocation(Location location){
+        Log.d(TAG, "filterAndAddLocation: Started");
+
+        long age = getLocationAge(location);
+
+        if(age > gpsFreqInMillis){
+            Log.d(TAG, "filterAndAddLocation: Location is Old");
+            oldLocationList.add(location);
+            return false;
+        }
+
+        if(location.getAccuracy() <= 0){
+            Log.d(TAG, "filterAndAddLocation: Latitude and Longitude values are invalid");
+            noAccuracyLocationList.add(location);
+            return false;
+        }
+
+        float horizontalAccuracy = location.getAccuracy();
+        if(horizontalAccuracy > 10) {
+            Log.d(TAG, "filterAndAddLocation: Accuracy: " + horizontalAccuracy + " exceeds 10m error tolerance");
+            inaccurateLocationList.add(location);
+            return false;
+
+        }
+
+        float qValue;
+
+        long locationTimeInMillis = location.getElapsedRealtimeNanos() / 1000000;
+        long elapsedTimeInMillis = locationTimeInMillis - runStartTimeInMillis;
+
+        if(currentSpeed == 0.0f){
+            qValue = 3.0f;
+        }else{
+            qValue = currentSpeed;
+        }
+
+        kalmanFilter.Process(location.getLatitude(),location.getLongitude(),location.getAccuracy(),elapsedTimeInMillis,qValue);
+        double predictedLat = kalmanFilter.get_lat();
+        double predictedLng = kalmanFilter.get_lng();
+
+        Location predictedLocation = new Location("");
+        predictedLocation.setLatitude(predictedLat);
+        predictedLocation.setLongitude(predictedLng);
+        float predictedDeltaInMeters = predictedLocation.distanceTo(location);
+
+        if(predictedDeltaInMeters >60){
+            Log.d(TAG, "filterAndAddLocation: Detected mal GPS, remove from track at: " + predictedDeltaInMeters);
+            kalmanFilter.consecutiveRejectCount +=1;
+
+            if(kalmanFilter.consecutiveRejectCount > 3){
+                kalmanFilter = new ArvKalmanLatLong(3);
+            }
+
+            kalmanNGLocationList.add(location);
+            return false;
+        }else{
+            kalmanFilter.consecutiveRejectCount = 0;
+        }
+
+        currentSpeed = location.getSpeed();
+        filteredLocationList.add(location);
+
+        for (GpsSurveyListener listener : mGpsSurveyListener){
+            listener.onFilterLocationChange(location);
+
+        }
+
+        Log.d(TAG, "filterAndAddLocation: Added at: " + predictedDeltaInMeters + " -- Location List: " + filteredLocationList.size());
+
+        return true;
+
+    }
+
+    private long getLocationAge(Location newLocation){
+        long locationAge;
+
+        long currentTimeInMilli = SystemClock.elapsedRealtimeNanos() / 1000000;
+        long locationTimeInMilli = newLocation.getElapsedRealtimeNanos() / 1000000;
+        locationAge = currentTimeInMilli - locationTimeInMilli;
+
+        return locationAge;
     }
 
 }

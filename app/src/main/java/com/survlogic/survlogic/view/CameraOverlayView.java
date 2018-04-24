@@ -40,7 +40,7 @@ import java.text.DecimalFormat;
  */
 
 public class CameraOverlayView extends View {
-    private static final String TAG = "Started";
+    private static final String TAG = "CameraOverlayView";
 
     private Context mContext;
 
@@ -119,7 +119,6 @@ public class CameraOverlayView extends View {
         screenHeight = h;
 
         init();
-
     }
 
     private void init(){
@@ -155,7 +154,7 @@ public class CameraOverlayView extends View {
         mDebugTextPaint.setAntiAlias(true);
         mDebugTextPaint.setTextSize(mTextSize/2);
         mDebugTextPaint.setColor(mTextColor);
-        mDebugTextPaint.setTypeface(typeface);
+        //mDebugTextPaint.setTypeface(typeface);
 
         setLayerType(LAYER_TYPE_HARDWARE,null);
 
@@ -358,7 +357,12 @@ public class CameraOverlayView extends View {
 
         vAngle = 0.00F - (Math.asin(vAngle));
 
-        return (float) Math.toDegrees(vAngle);
+        if(Double.isNaN(vAngle)){
+            return (float) 0.0;
+        }else{
+            return (float) Math.toDegrees(vAngle);
+        }
+
 
     }
 
@@ -368,7 +372,13 @@ public class CameraOverlayView extends View {
         if(useDTMModelCurrent){
             return mCurrentFalseAltitudeMsl;
         }else{
-            return current.getAltitude();
+
+            if(mCurrentAltitudeMsl !=0){
+                return mCurrentAltitudeMsl;
+            }else{
+                return current.getAltitude();
+            }
+
         }
 
     }
@@ -407,17 +417,24 @@ public class CameraOverlayView extends View {
         Log.d(TAG, "onDraw: Drawing");
         super.onDraw(canvas);
 
-        canvas.drawLine(0f - canvas.getWidth(), canvas.getHeight()/2, canvas.getWidth()+canvas.getHeight(), canvas.getHeight()/2, mMainLinePaint);
-
         if(isDebugMode){
             drawSmartWorxData(canvas);
         }
 
         drawTargetInRange(canvas);
 
+        drawCrossHairs(canvas);
     }
 
     //----------------------------------------------------------------------------------------------//
+
+    private void drawCrossHairs(Canvas c){
+        Log.d(TAG, "drawCrossHairs: Started");
+
+        c.drawLine(0f - c.getWidth(), c.getHeight()/2, c.getWidth()+c.getHeight(), c.getHeight()/2, mMainLinePaint);
+
+
+    }
 
     private void drawSmartWorxData(Canvas c){
         Log.d(TAG, "drawSmartWorxData: Started");
@@ -490,19 +507,36 @@ public class CameraOverlayView extends View {
         c.save();
 
         if(isLocationDataAvailable){
-            float currentBearingToTarget = bearingToTarget(mTargetPoi,mCurrentLocation);
+            Location targetLocation = convertPOIToLocation();
+            float currentAzimuthToTarget = bearingToTarget(mTargetPoi,mCurrentLocation);
+            float bearing = (mCurrentLocation.bearingTo(targetLocation) + 360) % 360;
             float currentOnScreenAzimuth = (float) mAzimuthObserved;
 
-            Location targetLocation = convertPOIToLocation();
             float distance = distanceToTarget(targetLocation,mCurrentLocation);
             float zenith = pitchToTarget(targetLocation,mCurrentLocation);
             float pitch = (float) Math.toDegrees(mOrientation[1]);
 
-            float dx = (float) ((c.getWidth()/mHorizontalFOV) * (currentOnScreenAzimuth-currentBearingToTarget))/(ANGLE_UPPER_RANGE / POI_MAPPING_SCALE);
+            float angleDifference = currentOnScreenAzimuth - bearing;
+
+            float rawDx = (c.getWidth()/mHorizontalFOV) * (angleDifference);
+            float adjustedAngle = ((angleDifference)/(ANGLE_UPPER_RANGE / POI_MAPPING_SCALE));
+
+            float dx = (c.getWidth()/mHorizontalFOV) * ((angleDifference)/(ANGLE_UPPER_RANGE / POI_MAPPING_SCALE));
             float dy = (float) ((c.getHeight()/mVerticalFOV) * (pitch - zenith))/(PITCH_UPPER_RANGE);
+
+
+            Log.i(TAG, "drawTargetInRange: ---------------------------------------------------");
+            Log.i(TAG, "drawTargetInRange: Target Azimith: " + bearing);
+            Log.i(TAG, "drawTargetInRange: Reading: " + currentOnScreenAzimuth);
+            Log.i(TAG, "drawTargetInRange: Width: " + c.getWidth());
+            Log.i(TAG, "drawTargetInRange: Horizontal FOV: " + mHorizontalFOV);
+            Log.i(TAG, "drawTargetInRange: Azimuth Difference:" + angleDifference);
+            Log.i(TAG, "drawTargetInRange: Raw dx: " + rawDx);
+            Log.i(TAG, "drawTargetInRange: " + adjustedAngle);
 
             Log.i(TAG, "drawTargetInRange: dx:" + dx);
             Log.i(TAG, "drawTargetInRange: dy:" + (c.getHeight()/mVerticalFOV));
+            Log.i(TAG, "drawTargetInRange: ---------------------------------------------------");
 
             if(isPoiInRange){
                 c.translate(0.0f-dx,0.0f-dy);

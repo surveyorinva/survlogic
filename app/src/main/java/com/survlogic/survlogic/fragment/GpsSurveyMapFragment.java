@@ -985,4 +985,8 @@ public class GpsSurveyMapFragment extends Fragment implements GpsSurveyListener,
 
     }
 
+    @Override
+    public void onFilterLocationChange(Location filtered) {
+
+    }
 }

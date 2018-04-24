@@ -1,6 +1,7 @@
 package com.survlogic.survlogic.ARvS;
 
 import android.Manifest;
+import android.animation.LayoutTransition;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -30,13 +31,16 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.util.Range;
 import android.util.Size;
 import android.util.SizeF;
 import android.view.MenuItem;
@@ -44,6 +48,7 @@ import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -56,6 +61,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -65,6 +71,7 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.survlogic.survlogic.ARvS.interf.ArvSOnAzimuthChangeListener;
 import com.survlogic.survlogic.ARvS.interf.ArvSOnLocationChangeListener;
 import com.survlogic.survlogic.ARvS.interf.GetNationalMapElevationListener;
+import com.survlogic.survlogic.ARvS.interf.JobGPSSurveyARvSActivityListener;
 import com.survlogic.survlogic.ARvS.model.ArvSLocationPOI;
 import com.survlogic.survlogic.ARvS.utils.ArvSCurrentAzimuth;
 import com.survlogic.survlogic.ARvS.utils.ArvSCurrentLocation;
@@ -81,17 +88,25 @@ import com.survlogic.survlogic.model.PointSurvey;
 import com.survlogic.survlogic.view.CameraOverlayView;
 import com.survlogic.survlogic.view.CompassLinearView;
 import com.survlogic.survlogic.view.CompassRadarView;
+import com.survlogic.survlogic.view.DistanceToTargetView;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Class dedicated to the AR View using GPS and device sensors
  */
 
-public class JobGPSSurveyARvSActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, ArvSOnAzimuthChangeListener, ArvSOnLocationChangeListener, GpsSurveyListener, GetNationalMapElevationListener, JobPointsMapListener, OnMapReadyCallback {
+public class JobGPSSurveyARvSActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
+                                                                            ArvSOnAzimuthChangeListener, ArvSOnLocationChangeListener,
+                                                                            GpsSurveyListener,
+                                                                            GetNationalMapElevationListener,
+                                                                            JobPointsMapListener, OnMapReadyCallback,
+                                                                            JobGPSSurveyARvSActivityListener {
 
     private static final String TAG = "JobGPSSurveyARvSActivit";
 
@@ -134,22 +149,38 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements Navig
 
     private TextureView.SurfaceTextureListener surfaceTextureListener;
 
+    private float mDistanceToTarget;
 
     //Widgets
+    private ImageButton ibAppBarBackButton;
     private TextureView txvCameraView;
-    private RelativeLayout rlCameraView, rlCameraOverlayView, rlMapOverlayView, rlCompassOverlayView, rlRadarOverlayView;
+    private RelativeLayout rlCameraView, rlCameraOverlayView, rlMapOverlayView, rlCompassOverlayView, rlRadarOverlayView, rlGPSError, rlDistanceView;
     private TextView descriptionTextView;
-    private ImageView ivPointerIcon;
+    private ImageView ivPointerIcon, ivNavOptionsMapView, ivNavOptionsCameraView;
+
+    private FloatingActionButton fabMenu;
 
     private CompassLinearView compassLinearView;
     private CompassRadarView compassRadarView;
     private CameraOverlayView cameraOverlayView;
+    private DistanceToTargetView distanceToTargetView;
+
+    //UI View Variables
+    private int stageMap = STAGE_START;
+    private int previousStageMap=STAGE_START;
+
+    private int stageCamera = STAGE_START;
+
+    private static final int STAGE_START = -1, STAGE_HIDDEN = 0, STAGE_HALF = 1, STAGE_FULL = 2;
+
 
     //    Mapping Variables
     private SupportMapFragment mMapFragment;
     private GoogleMap mMap;
     private UiSettings mUiSettings;
     private int mapType = 1;
+
+    private boolean isTargetZoomDone = false;
 
     private Marker targetMarker, currentMarker;
     private List<Polyline> listMapPolylines = new ArrayList<>();
@@ -175,8 +206,8 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements Navig
     private boolean hasLocation = false;
     private boolean isMaxOrientation = false;
     private boolean isMaxLocation = false;
-    private boolean isCameraOverlaySet=false, isMapOverlaySet=false, isRadarOverlaySet=false, isCompassOverlaySet=false;
-
+    private boolean isCameraOverlaySet=false, isMapOverlaySet=false, isRadarOverlaySet=false, isCompassOverlaySet=false, isDistanceOverlaySet=false;
+    private boolean isViewsAutomated = true;
 
     private int elevationServiceToUse = 1;
 
@@ -211,6 +242,11 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements Navig
     private JobGpsStakeoutPointListAdapter adapterGeodetic;
 
 
+    //Mapping Variables
+    private boolean isMapZoomable = true, didInitialMapZoom = false;
+    private Timer mapZoomBlockingTimer;
+    private Handler handlerOnUIThread;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -223,11 +259,11 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements Navig
 
         initPreferences();
         initViewWidgets();
+        setOnClickListeners();
         initActivityListeners();
         initStateCallback();
 
         initPointDataInBackground();
-        initPOIPoint();
 
         LoadGPSDataTask loadGPSDataTask = new LoadGPSDataTask();
         loadGPSDataTask.execute();
@@ -269,7 +305,7 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements Navig
         ArvSGnss.getInstance().addListener(this);
         myGnss.startGPS();
 
-        startRadarView();
+
     }
 
     //----------------------------------------------------------------------------------------------//
@@ -331,6 +367,15 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements Navig
         jobDatabaseName = extras.getString(getString(R.string.KEY_JOB_DATABASE));
         Log.d(TAG, "||Database|| : " + jobDatabaseName);
 
+        ibAppBarBackButton = findViewById(R.id.button_back);
+        ibAppBarBackButton.setVisibility(View.VISIBLE);
+        ibAppBarBackButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
+
         drawerLayout = findViewById(R.id.drawer_in_gps_ar);
         drawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
             @Override
@@ -355,12 +400,28 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements Navig
             }
         });
 
+        ivNavOptionsMapView = findViewById(R.id.mapViewOptions);
+        ivNavOptionsCameraView = findViewById(R.id.cameraViewOptions);
 
         rlCameraView = findViewById(R.id.rl_camera_view);
         rlCameraOverlayView = findViewById(R.id.rl_camera_overlay_view);
         rlMapOverlayView = findViewById(R.id.rl_map_overlay_view);
         rlCompassOverlayView = findViewById(R.id.rlFrame_bottom_compass_rule);
         rlRadarOverlayView = findViewById(R.id.rl_radar_view);
+        rlDistanceView= findViewById(R.id.rl_distance_view);
+        rlGPSError = findViewById(R.id.rl_error_message);
+
+        fabMenu = findViewById(R.id.fab_menu);
+        fabMenu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(drawerLayout.isDrawerOpen(GravityCompat.START)){
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                }else{
+                    drawerLayout.openDrawer(GravityCompat.START);
+                }
+            }
+        });
 
         cameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
         cameraFacing = CameraCharacteristics.LENS_FACING_BACK;
@@ -375,6 +436,8 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements Navig
 
         cameraOverlayView = findViewById(R.id.camera_overlay_view);
 
+        distanceToTargetView = findViewById(R.id.distance_view);
+
         //On Screen View Widgets handled within this Activity (for now!)
         initGnssWidget();
 
@@ -387,10 +450,35 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements Navig
 
     }
 
-    private void initPOIPoint() {
+    private void setOnClickListeners(){
+        Log.d(TAG, "setOnClickListeners: Started");
+
+        ivNavOptionsMapView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                viewMapControllerByButton();
+                isViewsAutomated = false;
+            }
+        });
+
+        ivNavOptionsCameraView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                viewController();
+                isViewsAutomated = false;
+            }
+        });
+
+
+    }
+
+    private void initPOIPoint(PointGeodetic pointGeodetic) {
         Log.d(TAG, "initPOIPoint: Started");
 
-        mPoi = new ArvSLocationPOI("manhole", "manhole description", 38.953610, -76.833974, 52.80);
+        mPoi = new ArvSLocationPOI(String.valueOf(pointGeodetic.getPoint_no()),
+                                    pointGeodetic.getDescription(),
+                                    pointGeodetic.getLatitude(), pointGeodetic.getLongitude(),
+                                    pointGeodetic.getElevation());
 
         Location targetLocation = convertPOIToLocation(mPoi);
 
@@ -409,6 +497,8 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements Navig
                 backgroundGetSRTMElevation.execute();
                 break;
         }
+
+        startRadarView();
 
 
     }
@@ -486,8 +576,21 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements Navig
 
         }
 
-        settings.setZoomControlsEnabled(true);  //Zoom Controls Shown
+        settings.setZoomControlsEnabled(false);  //Zoom Controls
+        settings.setMyLocationButtonEnabled(true);
         settings.setCompassEnabled(true); //Compass controls shown
+    }
+
+    private void initDistanceOverlayView(){
+        Log.d(TAG, "initDistanceOverlayView: Started");
+
+        distanceToTargetView.setLocationTarget(convertPOIToLocation(mPoi));
+        distanceToTargetView.setUnitsToDisplay(distanceToTargetView.UNITS_USFEET);
+        distanceToTargetView.setIsTracking(true);
+        rlDistanceView.setVisibility(View.VISIBLE);
+
+        isDistanceOverlaySet = true;
+
     }
 
     //----------------------------------------------------------------------------------------------//
@@ -511,7 +614,7 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements Navig
         rvPointList.setLayoutManager(layoutManagerPointGeodetic);
         rvPointList.setHasFixedSize(false);
 
-        adapterGeodetic = new JobGpsStakeoutPointListAdapter(mContext, lstPointGeodetic);
+        adapterGeodetic = new JobGpsStakeoutPointListAdapter(mContext, lstPointGeodetic,this);
 
         rvPointList.setAdapter(adapterGeodetic);
 
@@ -586,9 +689,30 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements Navig
 
     }
 
+    private void updateDistanceView(){
+        Log.d(TAG, "updateDistanceView: Started");
+
+        if(isDistanceOverlaySet){
+            distanceToTargetView.setLocationCurrent(mAveragedLocation);
+            distanceToTargetView.setHaveLocation(true);
+
+        }
+
+    }
+
+    private void updateViewBasedUponDistance(){
+        Log.d(TAG, "updateViewBasedUponDistance: Started");
+
+        if(isViewsAutomated){
+            mDistanceToTarget = distanceToTarget(convertPOIToLocation(mPoi),mAveragedLocation);
+            viewControllerByDistance(mDistanceToTarget);
+        }
+
+    }
+
 
     //----------------------------------------------------------------------------------------------//
-    public double calculateTheoreticalAzimuth(ArvSLocationPOI mPOI) {
+    private double calculateTheoreticalAzimuth(ArvSLocationPOI mPOI) {
         Log.d(TAG, "calculateTheoreticalAzimuth: Started");
 
         Location targetLocation = convertPOIToLocation(mPOI);
@@ -599,6 +723,16 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements Navig
 
         return bearing;
 
+
+    }
+
+    private float distanceToTarget(Location target, Location current){
+        Log.d(TAG, "distanceToTarget: Started");
+
+        float distanceMetric = current.distanceTo(target);
+
+        Log.d(TAG, "distanceToTarget: " + distanceMetric);
+        return distanceMetric;
 
     }
 
@@ -778,7 +912,7 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements Navig
     public void onAzimuthChanged(float azimuthFrom, float azimuthTo, float[] orientation) {
         Log.d(TAG, "onAzimuthChanged....Started");
 
-        handleSensorData(azimuthFrom, azimuthTo, orientation);
+        handleSensorData(azimuthTo, orientation);
     }
 
     @Override
@@ -799,6 +933,11 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements Navig
         }
 
         handleLocationData(currentLocation);
+
+    }
+
+    @Override
+    public void onFilterLocationChange(Location filtered) {
 
     }
 
@@ -913,14 +1052,14 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements Navig
     private void initGnssWidget() {
         Log.d(TAG, "initViewWidgets: Started");
 
-        tvNumSats = (TextView) findViewById(R.id.gps_status_noSatellites);
-        tvNumSatsLocked = (TextView) findViewById(R.id.gps_status_noSatellitesLocked);
+        tvNumSats = findViewById(R.id.gps_status_noSatellites);
+        tvNumSatsLocked = findViewById(R.id.gps_status_noSatellitesLocked);
 
-        tvPdopView = (TextView) findViewById(R.id.PDOP_value);
-        tvHdopView = (TextView) findViewById(R.id.HDOP_value);
-        tvVdopView = (TextView) findViewById(R.id.VDOP_value);
-        tvTtff = (TextView) findViewById(R.id.ttff_value);
-        tvOrientation = (TextView) findViewById(R.id.orientation_value);
+        tvPdopView = findViewById(R.id.PDOP_value);
+        tvHdopView = findViewById(R.id.HDOP_value);
+        tvVdopView =  findViewById(R.id.VDOP_value);
+        tvTtff =  findViewById(R.id.ttff_value);
+        tvOrientation = findViewById(R.id.orientation_value);
 
         tvNavNumSats = findViewById(R.id.nav_gps_status_noSatellites);
 
@@ -940,7 +1079,7 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements Navig
 
     //----------------------------------------------------------------------------------------------//
 
-    private void handleSensorData(float azimuthFrom, float azimuthTo, float[] orientation) {
+    private void handleSensorData(float azimuthTo, float[] orientation) {
         Log.d(TAG, "handleSensorData: Started");
 
         if (mRawLocation != null) {
@@ -982,6 +1121,7 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements Navig
                     }
                 }
             }
+
             boolean isStationary = isGnssStationary(LOCATION_ACCURACY_ERROR_ELLIPSE);
             Location averageLocation = mRawLocation;
             String myResults;
@@ -1002,10 +1142,10 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements Navig
                 }
 
             } else {
-                clearLocationArrayList();
-
                 averageLocation = mRawLocation;
                 mAveragedLocation = averageLocation;
+
+                clearLocationArrayList();
 
                 myResults = getResources().getString(R.string.ar_gps_status_moving);
                 tvTtff.setText(myResults);
@@ -1023,7 +1163,8 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements Navig
             updateRadarViewOrientation();
             updateRadarViewLocation(mAveragedLocation);
             updateCurrentLocationMarker();
-
+            updateViewBasedUponDistance();
+            updateDistanceView();
         }
 
     }
@@ -1306,12 +1447,30 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements Navig
     public void getPointsGeodetic(ArrayList<PointGeodetic> lstPointGeodetics) {
         this.lstPointGeodetic = lstPointGeodetics;
 
+        if(lstPointGeodetics.size() >0){
+            initPOIPoint(lstPointGeodetic.get(0));
+        }
+
         setPointGeodeticAdapter();
 
     }
 
     @Override
     public void getPointsSurvey(ArrayList<PointSurvey> lstPointSurvey) {
+
+    }
+    //----------------------------------------------------------------------------------------------//
+
+    @Override
+    public void setTargetLocation(PointGeodetic pointGeodetic) {
+        initPOIPoint(pointGeodetic);
+
+        if(drawerLayout.isDrawerOpen(GravityCompat.START)){
+            drawerLayout.closeDrawer(GravityCompat.START);
+        }else{
+            drawerLayout.openDrawer(GravityCompat.START);
+        }
+
 
     }
 
@@ -1328,6 +1487,43 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements Navig
             mMap.setMyLocationEnabled(true);
             drawTargetLocationMarker(convertPOIToLocation(mPoi));
 
+            mMap.setOnCameraMoveStartedListener(new GoogleMap.OnCameraMoveStartedListener() {
+                @Override
+                public void onCameraMoveStarted(int reason) {
+
+                    if(reason == GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE){
+                        Log.d(TAG, "onCameraMoveStarted: User zoom action ");
+
+                        isMapZoomable = false;
+
+                        if(mapZoomBlockingTimer !=null){
+                            mapZoomBlockingTimer.cancel();
+                        }
+
+                        handlerOnUIThread = new Handler();
+
+                        TimerTask task = new TimerTask() {
+                            @Override
+                            public void run() {
+                                handlerOnUIThread.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        mapZoomBlockingTimer = null;
+                                        isMapZoomable = true;
+                                    }
+                                });
+                            }
+                        };
+
+                        mapZoomBlockingTimer = new Timer();
+                        mapZoomBlockingTimer.schedule(task,10*1000);
+                        Log.d(TAG, "onCameraMoveStarted: start blocking autozoom for 10 seconds");
+
+                    }
+                }
+            });
+
+
         } catch (SecurityException ex) {
             Log.e(TAG, "onMapReady: " + ex);
         }
@@ -1337,10 +1533,19 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements Navig
     private void updateCurrentLocationMarker() {
         Log.d(TAG, "updateCurrentLocationMarker: Started");
         if (mMap !=null) {
-            drawPathToTarget();
-            zoomExtents();
+            if(!isTargetZoomDone){
+                zoomToTarget();
+            }else
+                zoomMapTo(mAveragedLocation);
+                //zoomExtents();
+
+            if(mDistanceToTarget < 50.0F){
+                drawPathToTarget();
+            }
+
         }
     }
+
 
     private void drawTargetLocationMarker(Location targetLocation) {
         Log.d(TAG, "drawTargetLocationMarker: Started");
@@ -1355,27 +1560,84 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements Navig
         }
     }
 
+    private void zoomToTarget(){
+        Log.d(TAG, "zoomToTarget: Started");
+
+        Location targetLocation = convertPOIToLocation(mPoi);
+        LatLng targetLatLng = new LatLng(targetLocation.getLatitude(), targetLocation.getLongitude());
+
+        CameraPosition cameraPosition = new CameraPosition.Builder()
+                .target(targetLatLng)                               // Sets the center of the map to Target
+                .zoom(17.5f)                                           // Sets the zoom
+                .bearing((float) mAzimuthTheoretical)               // Sets the orientation of the camera to north
+                .tilt(30)                   // Sets the tilt of the camera to 30 degrees
+                .build();                   // Creates a CameraPosition from the builder
+
+
+        mMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+        isTargetZoomDone = true;
+    }
+
+
+    private void zoomMapTo(Location location){
+        Log.d(TAG, "zoomMapTo: Started");
+        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+
+        CameraPosition cameraPosition = new CameraPosition.Builder()
+                .target(latLng)                               // Sets the center of the map to Target
+                .zoom(18.5f)                                           // Sets the zoom
+                .bearing((float) mAzimuthTheoretical)               // Sets the orientation of the camera to north
+                .tilt(15)                   // Sets the tilt of the camera to 30 degrees
+                .build();                   // Creates a CameraPosition from the builder
+
+
+
+        if(isMapZoomable){
+            try{
+                isMapZoomable = false;
+                mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), new GoogleMap.CancelableCallback() {
+                    @Override
+                    public void onFinish() {
+                        isMapZoomable = true;
+                    }
+
+                    @Override
+                    public void onCancel() {
+                        isMapZoomable = true;
+                    }
+                });
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+
+    }
+
+
     private void zoomExtents() {
         Log.d(TAG, "zoomExtents: Started");
 
-        try {
-            LatLng currentLatLng = new LatLng(mAveragedLocation.getLatitude(), mAveragedLocation.getLongitude());
+        if (isMapZoomable) {
+            try {
+                isMapZoomable = false;
+                LatLng currentLatLng = new LatLng(mAveragedLocation.getLatitude(), mAveragedLocation.getLongitude());
 
-            LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                LatLngBounds.Builder builder = new LatLngBounds.Builder();
 
-            builder.include(targetMarker.getPosition());
-            builder.include(currentLatLng);
+                builder.include(targetMarker.getPosition());
+                builder.include(currentLatLng);
 
-            LatLngBounds bounds = builder.build();
+                LatLngBounds bounds = builder.build();
 
-            int width = getResources().getDisplayMetrics().widthPixels;
-            int padding = (int) (width * 0.10); // offset from edges of the map 10% of screen
+                int width = getResources().getDisplayMetrics().widthPixels;
+                int padding = (int) (width * 0.10); // offset from edges of the map 10% of screen
 
-            CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
-            mMap.animateCamera(cu);
-        } catch (Exception e) {
-            LatLng currentLocation = new LatLng(mAveragedLocation.getLatitude(), mAveragedLocation.getLongitude());
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 13));
+                CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
+                mMap.moveCamera(cu);
+            } catch (Exception e) {
+                LatLng currentLocation = new LatLng(mAveragedLocation.getLatitude(), mAveragedLocation.getLongitude());
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 13));
+            }
         }
 
     }
@@ -1394,8 +1656,9 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements Navig
 
         Polyline targetPath = mMap.addPolyline(new PolylineOptions()
                 .add(currentLatLng, targetLatLng)
-                .width(5)
-                .color(Color.RED));
+                .geodesic(false)
+                .width(10)
+                .color(Color.parseColor("#801B60FE")));
 
         listMapPolylines.add(targetPath);
 
@@ -1408,6 +1671,146 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements Navig
             line.remove();
         }
         listMapPolylines.clear();
+
+    }
+
+    //----------------------------------------------------------------------------------------------//
+
+    private void viewControllerByDistance(float distance){
+        Log.d(TAG, "viewControllerByDistance: Started");
+        Log.d(TAG, "viewControllerByDistance: Distance: " + distance);
+        previousStageMap = stageMap;
+        float rangeLower = 10.00F, rangeHigh = 50.00F;
+
+        //in meters
+        Range rangeForSplit= new Range<>(rangeLower, rangeHigh);
+
+        if(distance > rangeHigh){
+            Log.d(TAG, "viewControllerByDistance: Larger than range High");
+            stageMap = STAGE_FULL;
+        }else if(rangeForSplit.contains(distance)){
+            Log.d(TAG, "viewControllerByDistance: In between");
+            stageMap = STAGE_HALF;
+        }else{
+            Log.d(TAG, "viewControllerByDistance: Close to target");
+            stageMap = STAGE_HIDDEN;
+        }
+
+        Log.d(TAG, "viewControllerByDistance: Previous Stage: " + previousStageMap);
+        Log.d(TAG, "viewControllerByDistance: Current Stage:" + stageMap);
+
+        if(previousStageMap != stageMap){
+            viewController();
+        }
+
+    }
+
+    private void viewMapControllerByButton(){
+        Log.d(TAG, "viewMapControllerByButton: Started");
+        previousStageMap = stageMap;
+
+        switch (stageMap){
+            case STAGE_HIDDEN:
+                stageMap = STAGE_HALF;
+
+                break;
+            case STAGE_HALF:
+                stageMap = STAGE_FULL;
+                break;
+            case STAGE_FULL:
+                stageMap = STAGE_HIDDEN;
+                break;
+        }
+
+        if(previousStageMap != stageMap){
+            viewController();
+        }
+    }
+
+
+    private void viewController(){
+        Log.d(TAG, "viewController: Started");
+
+        switchMapView();
+
+        switch (stageMap){
+            case STAGE_HIDDEN:
+                stageCamera = STAGE_FULL;
+
+                break;
+            case STAGE_HALF:
+                stageCamera = STAGE_HALF;
+
+                break;
+            case STAGE_FULL:
+                stageCamera = STAGE_HIDDEN;
+
+                break;
+        }
+
+        Log.d(TAG, "viewController: stageMap/stageCamera:" + stageMap + "," + stageCamera);
+        switchCameraView();
+
+    }
+    
+    
+    private void switchMapView(){
+        Log.d(TAG, "switchMapView: Started");
+
+        rlMapOverlayView.getLayoutTransition().enableTransitionType(LayoutTransition.CHANGING);
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) rlMapOverlayView.getLayoutParams();
+
+        switch(stageMap){
+            case STAGE_HIDDEN:
+                params.addRule(RelativeLayout.BELOW, R.id.bottomShim);
+
+                break;
+            case STAGE_HALF:
+                params.addRule(RelativeLayout.BELOW, R.id.centerShim);
+
+                break;
+            case STAGE_FULL:
+                params.addRule(RelativeLayout.BELOW, R.id.appBar);
+
+                break;
+
+        }
+    }
+
+    private void switchCameraView(){
+        Log.d(TAG, "switchCameraView: Started");
+
+        rlCameraView.getLayoutTransition().enableTransitionType(LayoutTransition.CHANGING);
+        RelativeLayout.LayoutParams paramsCamera= (RelativeLayout.LayoutParams) rlCameraView.getLayoutParams();
+
+        rlCameraOverlayView.getLayoutTransition().enableTransitionType(LayoutTransition.CHANGING);
+        RelativeLayout.LayoutParams paramsCameraOverlay= (RelativeLayout.LayoutParams) rlCameraOverlayView.getLayoutParams();
+
+        switch(stageCamera){
+            case STAGE_HIDDEN:
+                paramsCamera.addRule(RelativeLayout.ABOVE, R.id.appBar);
+                paramsCameraOverlay.addRule(RelativeLayout.ABOVE, R.id.appBar);
+                break;
+
+            case STAGE_HALF:
+                paramsCamera.addRule(RelativeLayout.ABOVE,R.id.centerShim);
+                paramsCamera.addRule(RelativeLayout.BELOW, R.id.appBar);
+
+                paramsCameraOverlay.addRule(RelativeLayout.ABOVE,R.id.centerShim);
+                paramsCameraOverlay.addRule(RelativeLayout.BELOW, R.id.appBar);
+                break;
+
+            case STAGE_FULL:
+                paramsCamera.addRule(RelativeLayout.BELOW, R.id.appBar);
+                paramsCamera.removeRule(RelativeLayout.ABOVE);
+
+                paramsCameraOverlay.addRule(RelativeLayout.BELOW, R.id.appBar);
+                paramsCameraOverlay.removeRule(RelativeLayout.ABOVE);
+                break;
+
+        }
+
+        rlCameraOverlayView.invalidate();
 
     }
 
@@ -1456,10 +1859,15 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements Navig
         protected void onPostExecute(Void result) {
 
             if(hasLocation){
+                rlGPSError.setVisibility(View.GONE);
                 initCompassLinearView();
                 initRadarOverlayView();
                 initCameraOverlayView();
                 initMapOverlayView();
+                initDistanceOverlayView();
+
+            }else{
+                rlGPSError.setVisibility(View.VISIBLE);
             }
 
             if (pd.isShowing()) {

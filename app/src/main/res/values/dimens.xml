@@ -73,6 +73,7 @@
     <dimen name="map_cardElevation">4dp</dimen>
     <dimen name="map_cardview_horizontal_padding">6dp</dimen>
     <dimen name="map_cardview_vertical_padding">2dp</dimen>
+    <dimen name="map_custom_view_padding">5dp</dimen>
 
     <!--New Point-->
     <dimen name="point_new_dialog_hidden_text">12dp</dimen>

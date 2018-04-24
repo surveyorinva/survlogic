@@ -22,10 +22,11 @@
 
     <RelativeLayout
         android:id="@+id/rl_camera_view"
-        android:visibility="invisible"
         android:layout_below="@id/appBar"
+        android:animateLayoutChanges="true"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:visibility="invisible">
 
         <TextureView
             android:id="@+id/camera_view"
@@ -40,6 +41,7 @@
         android:layout_below="@id/appBar"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:animateLayoutChanges="true"
         android:visibility="invisible">
 
         <com.survlogic.survlogic.view.CameraOverlayView
@@ -49,6 +51,23 @@
 
     </RelativeLayout>
 
+
+    <RelativeLayout
+        android:id="@+id/rl_map_overlay_view"
+        android:layout_below="@id/bottomShim"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:animateLayoutChanges="true"
+        android:visibility="visible">
+
+        <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/map"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+
+    </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/rl_gnss_info"
@@ -182,6 +201,24 @@
     </RelativeLayout>
 
     <RelativeLayout
+        android:id="@+id/rl_distance_view"
+        android:layout_marginStart="5dp"
+        android:layout_marginBottom="5dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:visibility="visible">
+
+        <com.survlogic.survlogic.view.DistanceToTargetView
+            android:id="@+id/distance_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+
+    </RelativeLayout>
+
+    <RelativeLayout
         android:id="@+id/rlFrame_bottom_compass_rule"
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
@@ -216,21 +253,40 @@
         android:layout_height="0dp"/>
 
 
+
+
     <RelativeLayout
-        android:id="@+id/rl_map_overlay_view"
-        android:layout_below="@id/centerShim"
+        android:id="@+id/rl_error_message"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="invisible">
+        android:visibility="gone">
 
-        <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@+id/map"
-            android:name="com.google.android.gms.maps.SupportMapFragment"
+        <TextView
+            android:text="@string/gps_no_service_message"
+            android:gravity="center"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
 
     </RelativeLayout>
+
+    <View
+        android:id="@+id/bottomShim"
+        android:layout_alignParentBottom="true"
+        android:visibility="invisible"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"/>
+
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_menu"
+        android:src="@drawable/ic_menu"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="@dimen/fab_margin"
+        android:visibility="visible"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
 
 </RelativeLayout>

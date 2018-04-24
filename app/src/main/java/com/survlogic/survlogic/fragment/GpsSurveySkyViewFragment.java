@@ -616,5 +616,8 @@ public class GpsSurveySkyViewFragment extends Fragment implements GpsSurveyListe
         }
     }
 
+    @Override
+    public void onFilterLocationChange(Location filtered) {
 
+    }
 }
