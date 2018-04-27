@@ -142,6 +142,7 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements Navig
     private static double AZIMUTH_ACCURACY = 5;
 
     private Location mRawLocation;
+    private Location mCurrentLocation, mFilteredLocation;
 
     private ArvSCurrentAzimuth myCurrentAzimuthListener;
     private ArvSCurrentLocation myCurrentLocationListener;
@@ -204,6 +205,7 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements Navig
 
     //System set variables
     private boolean hasLocation = false;
+    private boolean hasFilteredLocation = false;
     private boolean isMaxOrientation = false;
     private boolean isMaxLocation = false;
     private boolean isCameraOverlaySet=false, isMapOverlaySet=false, isRadarOverlaySet=false, isCompassOverlaySet=false, isDistanceOverlaySet=false;
@@ -228,6 +230,7 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements Navig
     private static final int SENSOR_ORIENTATION_SAMPLE_RATE = 10;
     private static final float SENSOR_ACCURACY_ERROR_ELLIPSE = 0.50F;
     private static final float LOCATION_ACCURACY_ERROR_ALTITUDE_MSL = 5;
+    private static final int POI_TARGET = 0, POI_CURRENT = 1;
 
     //Geodetic Points
     private ArrayList<PointGeodetic> lstPointGeodetic = new ArrayList<>();
@@ -488,7 +491,7 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements Navig
                 break;
 
             case 1: //https://nationalmap.gov/epqs/
-                BackgroundGetNationalMapElevation backgroundGetNationalMapElevation = new BackgroundGetNationalMapElevation(this, targetLocation, this);
+                BackgroundGetNationalMapElevation backgroundGetNationalMapElevation = new BackgroundGetNationalMapElevation(this, targetLocation, this,POI_TARGET);
                 backgroundGetNationalMapElevation.execute();
                 break;
 
@@ -668,20 +671,34 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements Navig
     private void updateCameraOverlayViewSensorEvent(Location currentLocation, float azimuthTo, float[] orientation) {
         Log.d(TAG, "updateCameraOverlayViewSensorEvent: Started");
 
-        double altitudeMslRaw = myGnss.getAltitudeMsl();
-        double altitudeMslAverage = computeCentroidFloat(listSampleAltitudeHeightsMsl);
-        float currentAltitude = 0.00F;
+        Location targetLocation = convertPOIToLocation(mPoi);
+        float currentAltitude = 0.0f;
+        float distanceToTarget = distanceToTarget(convertPOIToLocation(mPoi),mAveragedLocation);
 
-        if (altitudeMslAverage != 0) {
-            double variance = altitudeMslAverage - altitudeMslRaw;
+        if(distanceToTarget < 500){
+            cameraOverlayView.useDTMModelCurrent(true);
+            cameraOverlayView.setDTMModelCurrent(cameraOverlayView.getTargetPoiFalseAltitudeMsl());
+        }else if (distanceToTarget >= 500 && distanceToTarget <= 1000){
+            switch (elevationServiceToUse) {
+                case 0:
+                    //none
+                    break;
 
-            if (variance >= LOCATION_ACCURACY_ERROR_ALTITUDE_MSL) {
-                currentAltitude = (float) altitudeMslRaw;
-            } else {
-                currentAltitude = (float) altitudeMslAverage;
+                case 1: //https://nationalmap.gov/epqs/
+                    BackgroundGetNationalMapElevation backgroundGetNationalMapElevation = new BackgroundGetNationalMapElevation(this, targetLocation, this,POI_CURRENT);
+                    backgroundGetNationalMapElevation.execute();
+                    break;
+
+                case 2: //http://www.geonames.org/export/web-services.html#srtm3
+                    BackgroundGetSRTMElevation backgroundGetSRTMElevation = new BackgroundGetSRTMElevation(this, targetLocation, this);
+                    backgroundGetSRTMElevation.execute();
+                    break;
             }
-
+        }else{
+            currentAltitude = (float) mAveragedLocation.getAltitude();
         }
+
+
 
         if (isCameraOverlaySet) {
             cameraOverlayView.setCurrentCameraSensorData(currentLocation, azimuthTo, orientation, currentAltitude);
@@ -912,7 +929,7 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements Navig
     public void onAzimuthChanged(float azimuthFrom, float azimuthTo, float[] orientation) {
         Log.d(TAG, "onAzimuthChanged....Started");
 
-        handleSensorData(azimuthTo, orientation);
+        handleSensorDataFiltered(azimuthTo, orientation);
     }
 
     @Override
@@ -938,6 +955,12 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements Navig
 
     @Override
     public void onFilterLocationChange(Location filtered) {
+
+        if(!hasFilteredLocation){
+            hasFilteredLocation = true;
+        }
+
+        handleFilteredLocationData(filtered);
 
     }
 
@@ -1034,17 +1057,16 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements Navig
 
     //----------------------------------------------------------------------------------------------//
 
-    private void setGmfForSensor() {
+    private void setGmfForSensor(Location location) {
         Log.d(TAG, "setGmfForSensor: Started");
 
         GeomagneticField geoField = new GeomagneticField(
-                (float) mRawLocation.getLatitude(),
-                (float) mRawLocation.getLongitude(),
-                (float) mRawLocation.getAltitude(),
+                (float) location.getLatitude(),
+                (float) location.getLongitude(),
+                (float) location.getAltitude(),
                 System.currentTimeMillis());
 
         myCurrentAzimuthListener.setGmf(geoField);
-
 
     }
 
@@ -1152,7 +1174,6 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements Navig
                 isMaxLocation = false;
             }
 
-
             mAverageOrientation[0] = mLockedOrientationValue;
             updateCameraOverlayViewSensorEvent(mAveragedLocation, mAverageAzimithTo, mAverageOrientation);
 
@@ -1172,15 +1193,96 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements Navig
     private void handleLocationData(Location currentLocation) {
         Log.d(TAG, "handleLocationData: Started");
         mRawLocation = new Location(currentLocation);
+        mCurrentLocation = currentLocation;
 
         addLocationToArrayList(mRawLocation);
 
+
+    }
+
+    private void handleFilteredLocationData(Location filteredLocation){
+        Log.d(TAG, "handleFilteredLocationData: Started");
+
         if (!isFirstPosition) {
-            setGmfForSensor();
+            setGmfForSensor(filteredLocation);
             isFirstPosition = true;
         }
 
+        mFilteredLocation = filteredLocation;
     }
+
+    private void handleSensorDataFiltered(float azimuthTo, float[] orientation) {
+        Log.d(TAG, "handleSensorData: Started");
+
+        if (mFilteredLocation != null) {
+
+            float[] averagedOrientation;
+            float averageAzimithTo;
+
+            addOrientationToArrayList(orientation[0]);
+            addAzimithToArrayList(azimuthTo);
+
+            boolean isShaken = isSensorOrientationShaking(orientation[0], SENSOR_ACCURACY_ERROR_ELLIPSE);
+
+            if (isShaken) {
+                tvOrientation.setText(getResources().getString(R.string.ar_sensor_status_moving));
+
+                clearOrientationToArrayList();
+                clearAzimithToArrayList();
+                isMaxOrientation = false;
+
+            } else {
+                if (!isMaxOrientation) {
+                    if (listSampleOrientation.size() <= SENSOR_ORIENTATION_SAMPLE_RATE) {
+                        averagedOrientation = orientation;
+                        averagedOrientation[0] = computeAverageOrientation();
+                        mLockedOrientationValue = averagedOrientation[0];
+
+                        mAverageOrientation = averagedOrientation;
+
+                        averageAzimithTo = computeAverageAzimithTo();
+                        mAverageAzimithTo = averageAzimithTo;
+
+                        String myResults = getResources().getString(R.string.ar_sensor_status_static) + "[" + String.valueOf(listSampleOrientation.size() + "]");
+                        tvOrientation.setText(myResults);
+
+                        if (listSampleOrientation.size() == SENSOR_ORIENTATION_SAMPLE_RATE) {
+                            isMaxOrientation = true;
+
+                        }
+                    }
+                }
+            }
+
+
+            if(hasFilteredLocation = true){
+                mAveragedLocation = mFilteredLocation;
+            }else{
+                mAveragedLocation = mCurrentLocation;
+            }
+
+
+            mAverageOrientation[0] = mLockedOrientationValue;
+            updateCameraOverlayViewSensorEvent(mAveragedLocation, mAverageAzimithTo, mAverageOrientation);
+
+            mAzimuthObserved = azimuthTo;
+            mAzimuthTheoretical = calculateTheoreticalAzimuth(mPoi);
+
+            updateCompassView();
+            updateRadarViewOrientation();
+            updateRadarViewLocation(mAveragedLocation);
+            updateCurrentLocationMarker();
+            updateViewBasedUponDistance();
+            updateDistanceView();
+        }
+
+    }
+
+
+
+
+
+
 
     //----------------------------------------------------------------------------------------------//
     private void addLocationToArrayList(Location location) {
@@ -1250,7 +1352,7 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements Navig
         double latitude = centroidSplit.latitude;
         double longitude = centroidSplit.longitude;
 
-        Location centroid = new Location("sample");
+        Location centroid = new Location("");
         centroid.setLatitude(latitude);
         centroid.setLongitude(longitude);
         centroid.setAltitude(centroidAltitude);
@@ -1405,14 +1507,25 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements Navig
 
     //----------------------------------------------------------------------------------------------//
 
+
     @Override
-    public void getNationalMapResults(String results, String units, String source) {
+    public void getNationalMapResults(String results, String units, String source, Integer var) {
         Log.d(TAG, "getNationalMapResults: Started");
 
-        cameraOverlayView.useDTMModelTarget(true);
-        cameraOverlayView.setTargetPoiFalseElevation(Float.parseFloat(results));
+        switch(var){
+            case POI_TARGET:
+                cameraOverlayView.useDTMModelTarget(true);
+                cameraOverlayView.setTargetPoiFalseElevation(Float.parseFloat(results));
+                break;
+
+            case POI_CURRENT:
+                cameraOverlayView.useDTMModelCurrent(true);
+                cameraOverlayView.setDTMModelCurrent(Float.parseFloat(results));
+                break;
+        }
 
     }
+
 
     @Override
     public void getResultSRTM(String results) {
@@ -1835,9 +1948,10 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements Navig
         @Override
         protected Void doInBackground(Void... params) {
             Long t = Calendar.getInstance().getTimeInMillis();
-            while(!hasLocation && Calendar.getInstance().getTimeInMillis()-t < 30000){
+            while(!hasFilteredLocation && Calendar.getInstance().getTimeInMillis()-t < 30000){
                 try {
                     Thread.sleep(1000);
+                    publishProgress();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -1851,6 +1965,13 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements Navig
         @Override
         protected void onProgressUpdate(Void... values) {
 
+            if(hasLocation && !hasFilteredLocation){
+                pd.setTitle("Looking for Best GPS Data");
+            }
+
+            if(hasLocation && hasFilteredLocation){
+                pd.setTitle("Found, Finishing Setup");
+            }
 
 
         }
@@ -1858,16 +1979,19 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements Navig
         @Override
         protected void onPostExecute(Void result) {
 
-            if(hasLocation){
+            if(hasLocation && hasFilteredLocation){
                 rlGPSError.setVisibility(View.GONE);
                 initCompassLinearView();
                 initRadarOverlayView();
                 initCameraOverlayView();
                 initMapOverlayView();
                 initDistanceOverlayView();
+                tvTtff.setText("Post");
 
             }else{
                 rlGPSError.setVisibility(View.VISIBLE);
+                tvTtff.setText("No Fixed");
+
             }
 
             if (pd.isShowing()) {

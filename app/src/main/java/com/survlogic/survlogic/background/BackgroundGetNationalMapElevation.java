@@ -29,10 +29,13 @@ public class BackgroundGetNationalMapElevation extends AsyncTask<String,String,S
 
     private ProgressDialog pd;
 
-    public BackgroundGetNationalMapElevation(Context context, Location targetLocation, GetNationalMapElevationListener listener) {
+    private Integer mPoi;
+
+    public BackgroundGetNationalMapElevation(Context context, Location targetLocation, GetNationalMapElevationListener listener, Integer poi) {
         this.mContext = context;
         this.targetLocation = targetLocation;
         this.mListener = listener;
+        this.mPoi = poi;
     }
 
     @Override
@@ -115,7 +118,7 @@ public class BackgroundGetNationalMapElevation extends AsyncTask<String,String,S
         }
 
         String elevationResults = Double.toString(parseResultsForElevation(result));
-        mListener.getNationalMapResults(elevationResults, parseResultsForUnits(result),parseResultsForSource(result));
+        mListener.getNationalMapResults(elevationResults, parseResultsForUnits(result),parseResultsForSource(result),mPoi);
 
     }
 

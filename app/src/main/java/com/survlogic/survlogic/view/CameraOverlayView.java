@@ -92,6 +92,8 @@ public class CameraOverlayView extends View {
     private static final int END_COLOR = 0xFFFFC107;
     private boolean isAnimatingPulse = false;
 
+    private static final int ROD_HEIGHT = 1; //in meters
+
     public CameraOverlayView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
 
@@ -227,7 +229,7 @@ public class CameraOverlayView extends View {
     }
 
     public void setDTMModelCurrent(float currentFalseElevation){
-        this.mCurrentFalseAltitudeMsl = currentFalseElevation;
+        this.mCurrentFalseAltitudeMsl = currentFalseElevation + ROD_HEIGHT;
     }
 
 
@@ -246,6 +248,10 @@ public class CameraOverlayView extends View {
 
     public void setTargetPoiFalseElevation(float mTargetPoiFalseElevation) {
         this.mTargetPoiFalseAltitudeMsl = mTargetPoiFalseElevation;
+    }
+
+    public float getTargetPoiFalseAltitudeMsl() {
+        return mTargetPoiFalseAltitudeMsl;
     }
 
     public void setAngleRange(float lowerRange, float upperRange){
@@ -372,7 +378,6 @@ public class CameraOverlayView extends View {
         if(useDTMModelCurrent){
             return mCurrentFalseAltitudeMsl;
         }else{
-
             if(mCurrentAltitudeMsl !=0){
                 return mCurrentAltitudeMsl;
             }else{
@@ -387,7 +392,6 @@ public class CameraOverlayView extends View {
         Log.d(TAG, "getTargetLocationElevation: Started");
 
         if(useDTMModelTarget){
-
             if(mTargetPoiFalseAltitudeMsl !=0){
                 return mTargetPoiFalseAltitudeMsl;
             }else{
