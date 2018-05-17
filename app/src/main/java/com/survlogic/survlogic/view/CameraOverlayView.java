@@ -209,7 +209,7 @@ public class CameraOverlayView extends View {
                 setGmfForSensor();
 
                 if (gmf !=null){
-                    Log.d(TAG, "onSensorChanged: Declination: " + gmf.getDeclination());
+                    Log.d(TAG, "onSensorChangedFiltered: Declination: " + gmf.getDeclination());
                     mAzimuthObserved += gmf.getDeclination();
                     orientation[0] += Math.toRadians(gmf.getDeclination());
                 }

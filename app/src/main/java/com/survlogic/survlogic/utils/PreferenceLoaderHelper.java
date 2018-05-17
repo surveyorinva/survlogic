@@ -2,7 +2,6 @@ package com.survlogic.survlogic.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -35,6 +34,8 @@ public class PreferenceLoaderHelper {
     private float defaultProjectionScaleGridToGround, defaultProjectionOriginNorth, defaultProjectionOriginEast;
 
     private int cogoSurveySetHAngle, cogoSurveySetDistance;
+
+    private int gps_location_use_prediction;
 
     public PreferenceLoaderHelper(Context mContext) {
         Log.d(TAG, "PreferenceLoaderHelper: Starting...");
@@ -126,6 +127,10 @@ public class PreferenceLoaderHelper {
         defaultProjectionScaleGridToGround = sharedPreferences.getFloat(mContext.getString(R.string.pref_key_default_project_projection_scale),1.00F);
         defaultProjectionOriginNorth = sharedPreferences.getFloat(mContext.getString(R.string.pref_key_default_project_projection_origin_North),0.00F);
         defaultProjectionOriginEast = sharedPreferences.getFloat(mContext.getString(R.string.pref_key_default_project_projection_origin_East),0.00F);
+
+        //GPS Options Menu
+        gps_location_use_prediction = sharedPreferences.getInt(mContext.getString(R.string.pref_gps_location_use_prediction),1);
+
 
     }
 
@@ -387,4 +392,19 @@ public class PreferenceLoaderHelper {
     public void setGeneral_over_units(int general_over_units) {
         this.general_over_units = general_over_units;
     }
+
+    public int getGPSLocationUsePrediction(){
+        return gps_location_use_prediction;
+    }
+
+    public void setGPSLocationUsePrediction(int usePrediction){
+        this.gps_location_use_prediction = usePrediction;
+
+        editor = sharedPreferences.edit();
+        editor.putInt(mContext.getString(R.string.pref_gps_location_use_prediction),usePrediction);
+        editor.apply();
+
+
+    }
+
 }

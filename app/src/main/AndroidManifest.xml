@@ -30,7 +30,19 @@
                 android:resource="@xml/provider_paths"/>
         </provider>
 
+        <service
+            android:name=".ARvS.utils.GnssService"
+            android:enabled="true"
+            android:exported="false">
 
+        </service>
+
+        <service
+            android:name=".ARvS.utils.SensorService"
+            android:enabled="true"
+            android:exported="false">
+
+        </service>
 
         <activity
             android:name=".activity.SplashActivity"
@@ -160,6 +172,10 @@
             android:theme="@style/SuperMaterialTheme"/>
 
         <activity android:name=".ARvS.JobGPSSurveyARvSActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/SuperMaterialTheme"/>
+
+        <activity android:name=".ARvS.JobGPSSurveyArvTActivity"
             android:screenOrientation="portrait"
             android:theme="@style/SuperMaterialTheme"/>
 

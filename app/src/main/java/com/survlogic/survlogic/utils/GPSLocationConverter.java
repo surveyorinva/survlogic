@@ -4,8 +4,12 @@ package com.survlogic.survlogic.utils;
  * Created by chrisfillmore on 5/19/2017.
  */
 
+import android.content.Context;
 import android.location.Location;
 import android.support.annotation.NonNull;
+import android.util.Log;
+
+import com.survlogic.survlogic.R;
 
 public class GPSLocationConverter {
 
@@ -58,6 +62,32 @@ public class GPSLocationConverter {
         }
 
         return valueOUT;
+    }
+
+
+    public static String getLocationAccuracyStatus(Context context, Location location){
+        String valueOut;
+
+        // Accuracy
+        float mPositionAutonomousMeters = 20;
+        float mPositionFloatMeters = 10;
+        float mPositionFixedMeters = 5;
+        float mAccuarcy = location.getAccuracy();
+
+        if (mAccuarcy > mPositionAutonomousMeters){
+            valueOut = context.getResources().getString(R.string.gnss_status_no_fix);
+
+        }else if(mAccuarcy < mPositionAutonomousMeters && mAccuarcy > mPositionFloatMeters){
+            valueOut = context.getResources().getString(R.string.gnss_status_autonomous);
+
+        }else if(mAccuarcy < mPositionFloatMeters && mAccuarcy > mPositionFixedMeters){
+            valueOut = context.getResources().getString(R.string.gnss_status_float);
+
+        }else {
+            valueOut = context.getResources().getString(R.string.gnss_status_fix);
+
+        }
+        return valueOut;
     }
 
 }

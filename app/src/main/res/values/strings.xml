@@ -60,6 +60,9 @@
     <string name="dialog_delete_image">Remove this photo?</string>
 
     <!--fragment_gps_survey_map-->
+    <string name="gps_title_header">Onboard GPS</string>
+    <string name="gps_app_switch_off">Survey</string>
+    <string name="gps_app_switch_on">Stake</string>
     <string name="debug_error_gps_not_found">This device does not Support GPS Locations</string>
     <string name="enable_gps_message">GPS Service is disabled.  Would you like to enable it now?</string>
     <string name="gps_warm_boot_go">Started GNSS Services \nInterval = %1$ss min. \nDist. = %2$sm</string>

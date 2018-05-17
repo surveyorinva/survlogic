@@ -52,6 +52,8 @@ dependencies {
     //https://github.com/orbisgis/cts  FROM https://jitpack.io/
     implementation 'com.github.orbisgis:cts:v1.5.1'
     implementation 'sk.baka.slf4j:slf4j-handroid:1.7.26'
+    //https://github.com/florent37/ShapeOfView
+    implementation 'com.github.florent37:shapeofview:1.0.7'
 
 
     testImplementation 'junit:junit:4.12'

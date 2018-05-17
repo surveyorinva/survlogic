@@ -82,4 +82,9 @@
     <!--Filter Menu-->
     <dimen name="filter_menu_height">300dp</dimen>
 
+
+    <!--Custom View - Arc View -->
+    <dimen name="custom_arc_full">50dp</dimen>
+    <dimen name="custom_arc_none">0dp</dimen>
+
 </resources>

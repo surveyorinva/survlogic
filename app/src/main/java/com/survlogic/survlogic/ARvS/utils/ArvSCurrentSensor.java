@@ -11,7 +11,7 @@ import android.util.Log;
 import android.view.Surface;
 import android.view.WindowManager;
 
-import com.survlogic.survlogic.ARvS.interf.ArvSOnAzimuthChangeListener;
+import com.survlogic.survlogic.ARvS.interf.ArvSOnSensorChangeListener;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -20,9 +20,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Created by chrisfillmore on 3/18/2018.
  */
 
-public class ArvSCurrentAzimuth implements SensorEventListener {
+public class ArvSCurrentSensor implements SensorEventListener {
 
-    private static final String TAG = "ArvSCurrentAzimuth";
+    private static final String TAG = "ArvSCurrentSensor";
     private Context mContext;
 
     private static SensorManager mSensorManager;
@@ -56,9 +56,9 @@ public class ArvSCurrentAzimuth implements SensorEventListener {
 
     private boolean isSimpleSensor;
 
-    private ArvSOnAzimuthChangeListener mAzimuthListener;
+    private ArvSOnSensorChangeListener mAzimuthListener;
 
-    public ArvSCurrentAzimuth(Context mContext, ArvSOnAzimuthChangeListener mAzimuthListener, boolean isSimpleSensor ) {
+    public ArvSCurrentSensor(Context mContext, ArvSOnSensorChangeListener mAzimuthListener, boolean isSimpleSensor ) {
         this.mContext = mContext;
 
         Activity mActivity = (Activity) mContext;
@@ -68,8 +68,8 @@ public class ArvSCurrentAzimuth implements SensorEventListener {
         this.isSimpleSensor = isSimpleSensor;
     }
 
-    public void startAzimuth(){
-        Log.d(TAG, "startAzimuth: Started");
+    public void startReading(){
+        Log.d(TAG, "startReading: Started");
 
         mSensorManager = (SensorManager) mContext.getSystemService(mContext.SENSOR_SERVICE);
 
@@ -80,12 +80,12 @@ public class ArvSCurrentAzimuth implements SensorEventListener {
         }else{
             sensors = mSensorManager.getSensorList(Sensor.TYPE_ACCELEROMETER);
             if (sensors.size() >0) {
-                Log.d(TAG, "startAzimuth: Sensor Size Acc:" + sensors.size());
+                Log.d(TAG, "startReading: Sensor Size Acc:" + sensors.size());
                 sensorGrav = sensors.get(0);
             }
             sensors = mSensorManager.getSensorList(Sensor.TYPE_MAGNETIC_FIELD);
             if (sensors.size() >0) {
-                Log.d(TAG, "startAzimuth: Sensor Size Acc:" + sensors.size());
+                Log.d(TAG, "startReading: Sensor Size Acc:" + sensors.size());
                 sensorMag = sensors.get(0);
             }
 
@@ -95,8 +95,8 @@ public class ArvSCurrentAzimuth implements SensorEventListener {
 
     }
 
-    public void stopAzimith(){
-        Log.d(TAG, "stopAzimith: Started");
+    public void stopReading(){
+        Log.d(TAG, "stopReading: Started");
 
 
         if(isSimpleSensor){
@@ -111,7 +111,7 @@ public class ArvSCurrentAzimuth implements SensorEventListener {
 
     }
 
-    public void setOnShakeListener(ArvSOnAzimuthChangeListener listener){
+    public void setOnShakeListener(ArvSOnSensorChangeListener listener){
         Log.d(TAG, "setOnShakeListener: Started");
 
         mAzimuthListener = listener;
@@ -126,7 +126,7 @@ public class ArvSCurrentAzimuth implements SensorEventListener {
     //----------------------------------------------------------------------------------------------//
     @Override
     public void onSensorChanged(SensorEvent event) {
-        Log.d(TAG, "onSensorChanged- Started");
+        Log.d(TAG, "onSensorChangedFiltered- Started");
 
         if(isSimpleSensor){
             //onSimpleSensorChange(event);
@@ -152,7 +152,7 @@ public class ArvSCurrentAzimuth implements SensorEventListener {
             int azimuthTo_Original = (int) (Math.toDegrees(orientation[0]) + 360) % 360;
             Log.d(TAG, "onSimpleSensorChangeSmoothed: Original Orientation: " + azimuthTo_Original);
             Log.d(TAG, "onSimpleSensorChangeSmoothed: Orientation: " + Math.toDegrees(orientation[0]));
-            mAzimuthListener.onAzimuthChanged(azimuthFrom, azimuthTo_Original, orientation);
+            mAzimuthListener.onSensorChangedFiltered(azimuthFrom, azimuthTo_Original, orientation);
         }
     }
 
@@ -201,7 +201,7 @@ public class ArvSCurrentAzimuth implements SensorEventListener {
             Log.d(TAG, "onSimpleSensorChangeSmoothed: Original Orientation: " + azimuthTo_Original);
             Log.d(TAG, "onSimpleSensorChangeSmoothed: Orientation: " + Math.toDegrees(orientation[0]));
 
-            mAzimuthListener.onAzimuthChanged(azimuthFrom, azimuthTo_Original, orientation);
+            mAzimuthListener.onSensorChangedFiltered(azimuthFrom, azimuthTo_Original, orientation);
         }
     }
 
@@ -220,7 +220,7 @@ public class ArvSCurrentAzimuth implements SensorEventListener {
             azimuthTo = (int) (Math.toDegrees(SensorManager.getOrientation(rMat, orientation)[0]) + 360) % 360;
 
             Log.d(TAG, "onSimpleSensorChangeOriginal: Correct: " + azimuthTo);
-            mAzimuthListener.onAzimuthChanged(azimuthFrom, azimuthTo, orientation);
+            mAzimuthListener.onSensorChangedFiltered(azimuthFrom, azimuthTo, orientation);
         }
     }
 
@@ -228,14 +228,14 @@ public class ArvSCurrentAzimuth implements SensorEventListener {
         Log.d(TAG, "OnAdvanceSensorChange: Started");
 
         if (!computing.compareAndSet(false,true )){
-            Log.d(TAG, "onSensorChanged: Returning...");
+            Log.d(TAG, "onSensorChangedFiltered: Returning...");
             return;
         }
 
         azimuthFrom = azimuthTo;
 
         if(event.sensor.getType() == Sensor.TYPE_ACCELEROMETER){
-            Log.d(TAG, "onSensorChanged: Sensor is Accelerometer");
+            Log.d(TAG, "onSensorChangedFiltered: Sensor is Accelerometer");
 
             smoothed = ArvSLowPassFilter.filter(event.values,grav);
 
@@ -244,7 +244,7 @@ public class ArvSCurrentAzimuth implements SensorEventListener {
             grav[2] = smoothed[2];
 
         }else if(event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD){
-            Log.d(TAG, "onSensorChanged: Sensor is Magnetic Field");
+            Log.d(TAG, "onSensorChangedFiltered: Sensor is Magnetic Field");
 
             smoothed = ArvSLowPassFilter.filter(event.values, mag);
 
@@ -275,7 +275,7 @@ public class ArvSCurrentAzimuth implements SensorEventListener {
         floatBearing = orientation[0];
 
         floatBearing = Math.toDegrees(floatBearing);
-        Log.d(TAG, "onSensorChanged: Floating Bearing: " + floatBearing);
+        Log.d(TAG, "onSensorChangedFiltered: Floating Bearing: " + floatBearing);
 
 
         if (floatBearing <0) {
@@ -284,10 +284,10 @@ public class ArvSCurrentAzimuth implements SensorEventListener {
 
         azimuthTo = (int) floatBearing;
 
-        Log.d(TAG, "onSensorChanged: Azimuth From: " + azimuthFrom + ", To:" + azimuthTo );
+        Log.d(TAG, "onSensorChangedFiltered: Azimuth From: " + azimuthFrom + ", To:" + azimuthTo );
 
-        mAzimuthListener.onAzimuthChanged(azimuthFrom, azimuthTo, orientation);
-        mAzimuthListener.onDeviceSensorChange(event);
+        mAzimuthListener.onSensorChangedFiltered(azimuthFrom, azimuthTo, orientation);
+        mAzimuthListener.onSensorChangedRaw(event);
 
         computing.set(false);
     }

@@ -199,6 +199,11 @@
 
     </style>
 
+    <style name="Button.Flat.Primary.Map.NoCaps">
+        <item name="android:textAllCaps">false</item>
+
+    </style>
+
     <style name="Button.Flat.Primary.Save">
         <item name="android:textAllCaps">true</item>
         <item name="android:textColor">@color/button_text</item>
@@ -206,10 +211,20 @@
 
     </style>
 
+    <style name="Button.Flat.Primary.Save.NoCaps">
+        <item name="android:textAllCaps">false</item>
+
+    </style>
+
     <style name="Button.Flat.Primary.Cancel">
         <item name="android:textAllCaps">true</item>
         <item name="android:textColor">@color/button_text</item>
         <item name="android:background">@drawable/button_ripple_red</item>
+
+    </style>
+
+    <style name="Button.Flat.Primary.Cancel.NoCaps">
+        <item name="android:textAllCaps">false</item>
 
     </style>
 

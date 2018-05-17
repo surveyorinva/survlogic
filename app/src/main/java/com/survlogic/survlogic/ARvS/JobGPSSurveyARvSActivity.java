@@ -68,12 +68,12 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.survlogic.survlogic.ARvS.interf.ArvSOnAzimuthChangeListener;
+import com.survlogic.survlogic.ARvS.interf.ArvSOnSensorChangeListener;
 import com.survlogic.survlogic.ARvS.interf.ArvSOnLocationChangeListener;
 import com.survlogic.survlogic.ARvS.interf.GetNationalMapElevationListener;
 import com.survlogic.survlogic.ARvS.interf.JobGPSSurveyARvSActivityListener;
 import com.survlogic.survlogic.ARvS.model.ArvSLocationPOI;
-import com.survlogic.survlogic.ARvS.utils.ArvSCurrentAzimuth;
+import com.survlogic.survlogic.ARvS.utils.ArvSCurrentSensor;
 import com.survlogic.survlogic.ARvS.utils.ArvSCurrentLocation;
 import com.survlogic.survlogic.ARvS.utils.ArvSGnss;
 import com.survlogic.survlogic.R;
@@ -102,7 +102,7 @@ import java.util.TimerTask;
  */
 
 public class JobGPSSurveyARvSActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
-                                                                            ArvSOnAzimuthChangeListener, ArvSOnLocationChangeListener,
+                                                                            ArvSOnSensorChangeListener, ArvSOnLocationChangeListener,
                                                                             GpsSurveyListener,
                                                                             GetNationalMapElevationListener,
                                                                             JobPointsMapListener, OnMapReadyCallback,
@@ -144,7 +144,7 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements Navig
     private Location mRawLocation;
     private Location mCurrentLocation, mFilteredLocation;
 
-    private ArvSCurrentAzimuth myCurrentAzimuthListener;
+    private ArvSCurrentSensor myCurrentAzimuthListener;
     private ArvSCurrentLocation myCurrentLocationListener;
     private ArvSGnss myGnss;
 
@@ -277,7 +277,7 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements Navig
     @Override
     protected void onStop() {
         Log.d(TAG, "onStop: Started");
-        myCurrentAzimuthListener.stopAzimith();
+        myCurrentAzimuthListener.stopReading();
         // myCurrentLocationListener.stopGPS();
         myGnss.stopGPS();
 
@@ -302,7 +302,7 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements Navig
             txvCameraView.setSurfaceTextureListener(surfaceTextureListener);
         }
 
-        myCurrentAzimuthListener.startAzimuth();
+        myCurrentAzimuthListener.startReading();
         //myCurrentLocationListener.startGPS();
 
         ArvSGnss.getInstance().addListener(this);
@@ -328,8 +328,8 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements Navig
 //        myCurrentLocationListener.buildGoogleApiClient(this);
 //        myCurrentLocationListener.startGPS();
 
-        myCurrentAzimuthListener = new ArvSCurrentAzimuth(this, this, useFusedSensors);
-        myCurrentAzimuthListener.startAzimuth();
+        myCurrentAzimuthListener = new ArvSCurrentSensor(this, this, useFusedSensors);
+        myCurrentAzimuthListener.startReading();
 
         myGnss = new ArvSGnss(this);
         myGnss.buildGnssClient(this);
@@ -924,17 +924,17 @@ public class JobGPSSurveyARvSActivity extends AppCompatActivity implements Navig
     }
 
     //----------------------------------------------------------------------------------------------//
-    //ArvSOnAzimuthChangeListener-------------------------------------------------------------------//
+    //ArvSOnSensorChangeListener-------------------------------------------------------------------//
     @Override
-    public void onAzimuthChanged(float azimuthFrom, float azimuthTo, float[] orientation) {
-        Log.d(TAG, "onAzimuthChanged....Started");
+    public void onSensorChangedFiltered(float azimuthFrom, float azimuthTo, float[] deviceOrientation) {
+        Log.d(TAG, "onSensorChangedFiltered....Started");
 
-        handleSensorDataFiltered(azimuthTo, orientation);
+        handleSensorDataFiltered(azimuthTo, deviceOrientation);
     }
 
     @Override
-    public void onDeviceSensorChange(SensorEvent event) {
-        Log.d(TAG, "onDeviceSensorChange: Started");
+    public void onSensorChangedRaw(SensorEvent event) {
+        Log.d(TAG, "onSensorChangedRaw: Started");
 
         updateCameraOverlayViewSensorEvent(event);
 

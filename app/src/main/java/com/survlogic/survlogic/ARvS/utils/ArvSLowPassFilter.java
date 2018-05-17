@@ -12,7 +12,7 @@ public class ArvSLowPassFilter {
      * basically means more smoothing See:
      * http://en.wikipedia.org/wiki/Low-pass_filter#Discrete-time_realization
      */
-    private static final float ALPHA = 0.02f;
+    private static float ALPHA = 0.10f;
 
     // Time constant in seconds
     static final float timeConstant = 0.297f;
@@ -40,6 +40,19 @@ public class ArvSLowPassFilter {
     public static float[] filter(float[] input, float[] output) {
         if (input == null || output == null) throw new NullPointerException("input and prev float arrays must be non-NULL");
         if (input.length != output.length) throw new IllegalArgumentException("input and prev must be the same length");
+
+        for (int i = 0; i < input.length; i++) {
+            output[i] = output[i] + ALPHA * (input[i] - output[i]);
+        }
+        return output;
+    }
+
+
+    public static float[] filter(float[] input, float[] output, float mAlpha) {
+        if (input == null || output == null) throw new NullPointerException("input and prev float arrays must be non-NULL");
+        if (input.length != output.length) throw new IllegalArgumentException("input and prev must be the same length");
+
+        ALPHA = mAlpha;
 
         for (int i = 0; i < input.length; i++) {
             output[i] = output[i] + ALPHA * (input[i] - output[i]);
