@@ -384,6 +384,8 @@ public class GnssService extends Service implements LocationListener {
         predictedLocation.setLatitude(predictedLat);
         predictedLocation.setLongitude(predictedLng);
         predictedLocation.setAccuracy(predictedAcc);
+        predictedLocation.setSpeed(location.getSpeed());
+        predictedLocation.setBearing(location.getBearing());
 
         float predictedDeltaInMeters = predictedLocation.distanceTo(location);
 
@@ -401,9 +403,8 @@ public class GnssService extends Service implements LocationListener {
             kalmanFilter.consecutiveRejectCount = 0;
         }
 
-        Intent intent = new Intent("PredictLocation");
-        intent.putExtra("location",predictedLocation);
-        LocalBroadcastManager.getInstance(this.getApplication()).sendBroadcast(intent);
+        broadcastLocationPredicted(predictedLocation);
+        sendLocationMetadata(location);
 
         currentSpeed = location.getSpeed();
         filteredLocationList.add(location);
@@ -442,10 +443,7 @@ public class GnssService extends Service implements LocationListener {
 
         }
 
-        Intent intent = new Intent("LocationUpdated");
-        intent.putExtra("location", location);
-        LocalBroadcastManager.getInstance(this.getApplication()).sendBroadcast(intent);
-
+        broadcastLocationRaw(location);
 
     }
     //----------------------------------------------------------------------------------------------Location Listener Support Methods
@@ -704,10 +702,8 @@ public class GnssService extends Service implements LocationListener {
         Log.d(TAG, "updateGnssStatus: No. Sats: " + mSvCount);
         Log.d(TAG, "updateGnssStatus: Locked: " + mUsedInFixCount);
 
-        Intent intent = new Intent("GnssStatus");
-        intent.putExtra("svCount", mSvCount);
-        intent.putExtra("usedInFixCount", mUsedInFixCount);
-        LocalBroadcastManager.getInstance(this.getApplication()).sendBroadcast(intent);
+
+        broadcastGnssStatusData();
 
     }
 
@@ -745,7 +741,8 @@ public class GnssService extends Service implements LocationListener {
 
         }
     }
-    
+
+
     //---------------------------------------------------------------------------------------------- Battery Services
     private void initBatteryService(){
         Log.d(TAG, "initBatteryService: Started");
@@ -787,6 +784,55 @@ public class GnssService extends Service implements LocationListener {
 
 
     }
+
+    //---------------------------------------------------------------------------------------------- Broadcast Senders
+
+    private void broadcastLocationRaw(Location location){
+        Log.d(TAG, "sendLocationRaw: Started");
+
+        Intent intent = new Intent("LocationUpdated");
+        intent.putExtra("location", location);
+        LocalBroadcastManager.getInstance(this.getApplication()).sendBroadcast(intent);
+
+
+    }
+
+
+    private void broadcastLocationPredicted(Location location){
+        Log.d(TAG, "sendPredictLocation: Started");
+
+        Intent intent = new Intent("PredictLocation");
+        intent.putExtra("location",location);
+        LocalBroadcastManager.getInstance(this.getApplication()).sendBroadcast(intent);
+
+    }
+
+
+    private void broadcastGnssStatusData(){
+        Log.d(TAG, "sendGnssStatusData: Started");
+
+
+        Intent intent = new Intent("GnssStatus");
+        intent.putExtra("svCount", mSvCount);
+        intent.putExtra("usedInFixCount", mUsedInFixCount);
+        LocalBroadcastManager.getInstance(this.getApplication()).sendBroadcast(intent);
+
+    }
+
+
+    private void sendLocationMetadata(Location location){
+        Log.d(TAG, "sendLocationMetadata: Started");
+
+        float gpsAzimuth = location.getBearing();
+        float gpsSpeed = location.getSpeed();
+
+        Intent intent = new Intent("GPSLocationMetadata");
+        intent.putExtra("azimuth", gpsAzimuth);
+        intent.putExtra("speed", gpsSpeed);
+        LocalBroadcastManager.getInstance(this.getApplication()).sendBroadcast(intent);
+
+    }
+
 
 
 }

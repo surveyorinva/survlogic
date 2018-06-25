@@ -190,7 +190,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
 
             case R.id.menu_item4_id:
-
+                intent.setClass(this, CameraActivity.class);
+                startActivity(intent);
                 break;
 
             case R.id.menu_item5_id:

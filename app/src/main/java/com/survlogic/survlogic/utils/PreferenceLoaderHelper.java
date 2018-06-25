@@ -35,7 +35,7 @@ public class PreferenceLoaderHelper {
 
     private int cogoSurveySetHAngle, cogoSurveySetDistance;
 
-    private int gps_location_use_prediction;
+    private boolean gps_location_use_prediction, gps_location_sensor_use_fusion, gps_location_sensor_use_gmf;
 
     public PreferenceLoaderHelper(Context mContext) {
         Log.d(TAG, "PreferenceLoaderHelper: Starting...");
@@ -129,8 +129,9 @@ public class PreferenceLoaderHelper {
         defaultProjectionOriginEast = sharedPreferences.getFloat(mContext.getString(R.string.pref_key_default_project_projection_origin_East),0.00F);
 
         //GPS Options Menu
-        gps_location_use_prediction = sharedPreferences.getInt(mContext.getString(R.string.pref_gps_location_use_prediction),1);
-
+        gps_location_use_prediction = sharedPreferences.getBoolean(mContext.getString(R.string.pref_gps_location_use_prediction),true);
+        gps_location_sensor_use_fusion  = sharedPreferences.getBoolean(mContext.getString(R.string.pref_gps_location_sensor_use_fusion),false);
+        gps_location_sensor_use_gmf = sharedPreferences.getBoolean(mContext.getString(R.string.pref_gps_location_sensor_use_gmf),false);
 
     }
 
@@ -393,18 +394,53 @@ public class PreferenceLoaderHelper {
         this.general_over_units = general_over_units;
     }
 
-    public int getGPSLocationUsePrediction(){
+    public boolean getGPSLocationUsePrediction(){
         return gps_location_use_prediction;
     }
 
-    public void setGPSLocationUsePrediction(int usePrediction){
+    public void setGPSLocationUsePrediction(boolean usePrediction){
         this.gps_location_use_prediction = usePrediction;
 
         editor = sharedPreferences.edit();
-        editor.putInt(mContext.getString(R.string.pref_gps_location_use_prediction),usePrediction);
+        editor.putBoolean(mContext.getString(R.string.pref_gps_location_use_prediction),usePrediction);
         editor.apply();
 
 
+    }
+
+
+    public boolean getGPSLocationSensorUseFusion(){
+        return gps_location_sensor_use_fusion;
+    }
+
+    public void setGPSLocationSensorUseFusion(boolean useFusion, boolean isForceSave){
+        this.gps_location_sensor_use_fusion = useFusion;
+        editor = sharedPreferences.edit();
+        editor.putBoolean(mContext.getString(R.string.pref_gps_location_sensor_use_fusion),useFusion);
+
+        if(isForceSave){
+            editor.commit();
+        }else{
+            editor.apply();
+        }
+
+    }
+
+    public boolean getGPSLocationSensorUseGMF(){
+        return gps_location_sensor_use_gmf;
+    }
+
+    public void setGPSLocationSensorUseGMF(boolean useGMF, boolean isForceSave){
+        this.gps_location_sensor_use_gmf = useGMF;
+
+        editor = sharedPreferences.edit();
+        editor.putBoolean(mContext.getString(R.string.pref_gps_location_sensor_use_gmf),useGMF);
+
+        if(isForceSave){
+            editor.commit();
+        }else{
+            editor.apply();
+        }
     }
 
 }

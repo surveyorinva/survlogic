@@ -19,6 +19,22 @@
 
     </RelativeLayout>
 
+<!-- Camera View -->
+    <RelativeLayout
+        android:id="@+id/rl_camera_view"
+        android:layout_below="@id/appBar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:animateLayoutChanges="true"
+        android:visibility="invisible">
+
+        <TextureView
+            android:id="@+id/camera_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+
+    </RelativeLayout>
 
 <!-- Map View -->
     <RelativeLayout

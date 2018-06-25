@@ -4,10 +4,12 @@ import android.app.Activity;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.hardware.GeomagneticField;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.location.Location;
 import android.os.Binder;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
@@ -49,9 +51,15 @@ public class SensorService extends Service implements SensorEventListener {
     private static final float rotation[] = new float[9];
     private static final float orientation[] = new float[3];
     private static float smoothed[] = new float[3];
+    private int angleOfDevice = 45;
 
     //Filter Variables
     private float filterAlpha;
+
+    //GMF Compensation
+    private GeomagneticField gmf = null;
+    private boolean hasLocation = false;
+    private Location mCurrentLocation;
 
     public SensorService() {
 
@@ -132,20 +140,22 @@ public class SensorService extends Service implements SensorEventListener {
 
     }
 
-    public boolean isUseFusedSensor() {
-        return useFusedSensor;
-    }
 
     public void setUseFusedSensor(boolean useFusedSensor) {
         this.useFusedSensor = useFusedSensor;
     }
 
-    public float getFilterAlpha() {
-        return filterAlpha;
-    }
 
     public void setFilterAlpha(float filterAlpha) {
         this.filterAlpha = filterAlpha;
+    }
+
+    public void setHasLocation(boolean hasLocation){
+        this.hasLocation = hasLocation;
+    }
+
+    public void setSensorLocation(Location currentLocation){
+        this.mCurrentLocation = currentLocation;
     }
 
     //----------------------------------------------------------------------------------------------Sensor Methods Start Up/Stop
@@ -202,12 +212,16 @@ public class SensorService extends Service implements SensorEventListener {
         if(event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
             float[] orientation = new float[3];
             float[] rMat = new float[9];
+            float[] adjustedRotationMatrix = new float[9];
 
             SensorManager.getRotationMatrixFromVector(rMat, event.values);
             final int worldAxisForDeviceAxisX;
             final int worldAxisForDeviceAxisY;
 
-            switch (mWindowManager.getDefaultDisplay().getRotation()) {
+            int windowsOrientation = mWindowManager.getDefaultDisplay().getRotation();
+
+            //--------------------------------------------------------------------------------------//
+            switch (windowsOrientation) {
                 case Surface.ROTATION_0:
                 default:
                     worldAxisForDeviceAxisX = SensorManager.AXIS_X;
@@ -226,9 +240,11 @@ public class SensorService extends Service implements SensorEventListener {
                     worldAxisForDeviceAxisY = SensorManager.AXIS_X;
                     break;
             }
-            float[] adjustedRotationMatrix = new float[9];
+            //--------------------------------------------------------------------------------------//
             SensorManager.remapCoordinateSystem(rMat, worldAxisForDeviceAxisX, worldAxisForDeviceAxisY, adjustedRotationMatrix);
 
+
+            //--------------------------------------------------------------------------------------//
             // Transform rotation matrix into azimuth/pitch/roll
             SensorManager.getOrientation(adjustedRotationMatrix, orientation);
 
@@ -246,11 +262,15 @@ public class SensorService extends Service implements SensorEventListener {
             intent.putExtra("roll",roll);
             LocalBroadcastManager.getInstance(this.getApplication()).sendBroadcast(intent);
 
+            //------------------------------------------------------------------------------------------//
+            getGmfSensorCompensation(orientation);
+
         }
     }
 
     private void sensorTypeMultipleSensors(SensorEvent event){
         Log.d(TAG, "sensorTypeMultipleSensors: Started");
+        float[] adjustedRotationMatrix = new float[9];
 
         if (!computing.compareAndSet(false,true )){
             Log.d(TAG, "onSensorChangedFiltered: Returning...");
@@ -282,8 +302,8 @@ public class SensorService extends Service implements SensorEventListener {
 
         final int worldAxisForDeviceAxisX;
         final int worldAxisForDeviceAxisY;
-
-        switch (mWindowManager.getDefaultDisplay().getRotation()) {
+        int windowsOrientation = mWindowManager.getDefaultDisplay().getRotation();
+        switch (windowsOrientation) {
             case Surface.ROTATION_0:
             default:
                 worldAxisForDeviceAxisX = SensorManager.AXIS_X;
@@ -302,18 +322,21 @@ public class SensorService extends Service implements SensorEventListener {
                 worldAxisForDeviceAxisY = SensorManager.AXIS_X;
                 break;
         }
-        float[] adjustedRotationMatrix = new float[9];
-        SensorManager.remapCoordinateSystem(rotation, worldAxisForDeviceAxisX, worldAxisForDeviceAxisY, adjustedRotationMatrix);
-
-        // Transform rotation matrix into azimuth/pitch/roll
-        SensorManager.getOrientation(adjustedRotationMatrix, orientation);
 
         //------------------------------------------------------------------------------------------//
+        SensorManager.remapCoordinateSystem(rotation, worldAxisForDeviceAxisX, worldAxisForDeviceAxisY, adjustedRotationMatrix);
+
+        //------------------------------------------------------------------------------------------//
+        // Transform rotation matrix into azimuth/pitch/roll
+        SensorManager.getOrientation(adjustedRotationMatrix, orientation);
 
         int azimuth = (int) (Math.toDegrees(orientation[0]) + 360) % 360;
         float pitch = (float) Math.toDegrees(orientation[1]);
         float roll = (float) Math.toDegrees(orientation[2]);
 
+        Log.i(TAG, "sensorTypeMultipleSensors: Azimuth: " + azimuth);
+        Log.i(TAG, "sensorTypeMultipleSensors: Pitch: " + pitch);
+        Log.i(TAG, "sensorTypeMultipleSensors: Roll: " + roll);
 
         Intent intent = new Intent("SensorData");
         intent.putExtra("azimuth",azimuth);
@@ -321,8 +344,60 @@ public class SensorService extends Service implements SensorEventListener {
         intent.putExtra("roll",roll);
         LocalBroadcastManager.getInstance(this.getApplication()).sendBroadcast(intent);
 
-
         computing.set(false);
+
+        //------------------------------------------------------------------------------------------//
+        getGmfSensorCompensation(orientation);
+
+
+    }
+
+    //---------------------------------------------------------------------------------------------- GMF Compensation
+
+    private void getGmfSensorCompensation(float[] orientation){
+        Log.d(TAG, "getGmfSensorCompensation: Started");
+        if(hasLocation){
+            setGmfForSensor();
+
+            if (gmf !=null){
+                Log.d(TAG, "onSensorChangedFiltered: Declination: " + gmf.getDeclination());
+
+                double declination = Math.toRadians(gmf.getDeclination());
+
+                if(declination < 0){
+                    orientation[0] += Math.abs(declination);
+                }else{
+                    orientation[0] += declination;
+                }
+
+                int azimuth = (int) (Math.toDegrees(orientation[0]) + 360) % 360;
+                float pitch = (float) Math.toDegrees(orientation[1]);
+                float roll = (float) Math.toDegrees(orientation[2]);
+
+                Log.i(TAG, "getGmfSensorCompensation: Azimuth: " + azimuth);
+                Log.i(TAG, "getGmfSensorCompensation: Pitch: " + pitch);
+                Log.i(TAG, "getGmfSensorCompensation: Roll: " + roll);
+
+                
+                Intent intent = new Intent("SensorGMFData");
+                intent.putExtra("azimuth",azimuth);
+                intent.putExtra("pitch",pitch);
+                intent.putExtra("roll",roll);
+                LocalBroadcastManager.getInstance(this.getApplication()).sendBroadcast(intent);
+
+            }
+        }
+    }
+
+    private synchronized void setGmfForSensor(){
+        Log.d(TAG, "setGmfForSensor: Started");
+
+            gmf = new GeomagneticField(
+                (float) mCurrentLocation.getLatitude(),
+                (float) mCurrentLocation.getLongitude(),
+                (float) mCurrentLocation.getAltitude(),
+                System.currentTimeMillis());
+
     }
 
 
@@ -342,11 +417,29 @@ public class SensorService extends Service implements SensorEventListener {
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
-        String sensorText = String.valueOf(sensor);
+        boolean sensorWarning = false;
+
+        switch (accuracy){
+            case SensorManager.SENSOR_STATUS_UNRELIABLE: case SensorManager.SENSOR_STATUS_ACCURACY_LOW:
+                Log.i(TAG, "evaluateSensorAccuracy: Unreliable/Low Sensor Reading on " + sensor);
+                sensorWarning = true;
+                break;
+
+            case SensorManager.SENSOR_STATUS_ACCURACY_MEDIUM:
+                Log.i(TAG, "evaluateSensorAccuracy: Medium Sensor Reading on " + sensor);
+                sensorWarning = false;
+                break;
+
+            case SensorManager.SENSOR_STATUS_ACCURACY_HIGH:
+                Log.i(TAG, "evaluateSensorAccuracy: High Sensor Reading on " + sensor);
+                sensorWarning = false;
+                break;
+
+        }
+
 
         Intent intent = new Intent("SensorAccuracy");
-        intent.putExtra("sensor",sensorText);
-        intent.putExtra("accuracy",accuracy);
+        intent.putExtra("sensorWarning",sensorWarning);
         LocalBroadcastManager.getInstance(this.getApplication()).sendBroadcast(intent);
 
     }

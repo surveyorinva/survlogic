@@ -64,6 +64,30 @@ public class GPSLocationConverter {
         return valueOUT;
     }
 
+    public static double convertSpeedMSToValue(double valueIN, int unitType){
+        double valueOUT = 0;
+
+        switch (unitType){
+            case 1:  //US Survey Foot
+                valueOUT = valueIN * 2.23694;
+                break;
+
+            case 2:  //International Foot
+                valueOUT = valueIN * 2.23694;
+                break;
+
+            case 3:
+                valueOUT = valueIN * 1;
+                break;
+
+            default:
+                valueOUT = 0;
+                break;
+        }
+
+        return valueOUT;
+    }
+
 
     public static String getLocationAccuracyStatus(Context context, Location location){
         String valueOut;

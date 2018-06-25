@@ -179,8 +179,16 @@
             android:screenOrientation="portrait"
             android:theme="@style/SuperMaterialTheme"/>
 
+        <activity android:name=".ARvS.ArvTSettings"
+            android:screenOrientation="portrait"/>
+
         <activity
             android:name=".activity.TestActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/SuperMaterialTheme"/>
+
+        <activity
+            android:name=".activity.CameraActivity"
             android:screenOrientation="portrait"
             android:theme="@style/SuperMaterialTheme"/>
 

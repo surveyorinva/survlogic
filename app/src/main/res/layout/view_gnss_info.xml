@@ -147,6 +147,7 @@
                         android:layout_height="wrap_content" />
 
                     <TextView
+                        android:id="@+id/gnss_location_header"
                         android:layout_toEndOf="@+id/gps_location_btn"
                         android:text="Location"
                         android:layout_marginTop="5dp"
@@ -427,6 +428,7 @@
     </RelativeLayout>
 
     <RelativeLayout
+        android:id="@+id/rl_footer"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="5dp"
         android:layout_width="wrap_content"
@@ -507,7 +509,7 @@
 
             <LinearLayout
                 android:id="@+id/rl_compass_info"
-                android:background="@drawable/table_background_white"
+                android:background="@drawable/table_background_white_ripple"
                 android:layout_weight="35"
                 android:weightSum="2"
                 android:orientation="vertical"
@@ -528,6 +530,7 @@
                         android:layout_height="20dp" />
 
                     <TextView
+                        android:id="@+id/compass_bearing_header"
                         android:layout_toEndOf="@+id/compass_bearing_btn"
                         android:text="Bearing"
                         android:layout_marginTop="5dp"
@@ -570,6 +573,7 @@
     </RelativeLayout>
 
     <RelativeLayout
+        android:layout_above="@+id/rl_footer"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="70dp"
         android:layout_width="wrap_content"
@@ -626,6 +630,56 @@
                     android:layout_marginEnd="10dp"
                     android:layout_alignParentEnd="true"
                     android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_above="@+id/rl_footer"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="70dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:weightSum="100"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <View
+                android:layout_weight="30"
+                android:layout_width="0dp"
+                android:layout_height="match_parent" />
+
+            <RelativeLayout
+                android:id="@+id/rl_location_metadata"
+                android:background="@drawable/table_background_white_ripple"
+                android:layout_weight="34"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:visibility="visible">
+
+                <TextView
+                    android:id="@+id/location_metadata_lbl"
+                    android:text="Speed"
+                    android:layout_marginStart="5dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:id="@+id/location_metadata_value"
+                    android:textSize="18dp"
+                    android:layout_marginTop="15dp"
+                    android:layout_marginStart="2dp"
+                    android:layout_marginEnd="2dp"
+                    android:layout_marginBottom="2dp"
+                    android:gravity="center"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
 
             </RelativeLayout>
@@ -828,7 +882,7 @@
             android:orientation="vertical">
 
             <LinearLayout
-                android:id="@+id/rl_sensor_info"
+                android:id="@+id/rl_sensor_pitch_info"
                 android:background="@drawable/table_background_white"
                 android:layout_weight="35"
                 android:orientation="vertical"
@@ -869,6 +923,69 @@
 
                     <TextView
                         android:id="@+id/compass_pitch_value"
+                        android:textSize="18dp"
+                        android:gravity="center"
+                        android:layout_marginTop="2dp"
+                        android:layout_marginBottom="2dp"
+                        android:layout_marginStart="2dp"
+                        android:layout_marginEnd="2dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                </RelativeLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp"/>
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="wrap_content"
+                android:layout_height="5dp" />
+
+            <LinearLayout
+                android:id="@+id/rl_sensor_roll_info"
+                android:background="@drawable/table_background_white"
+                android:layout_weight="35"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="0dp">
+
+                <RelativeLayout
+                    android:layout_marginBottom="2dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:id="@+id/sensor_roll_btn"
+                        android:src="@drawable/ic_action_compass_dark_blue"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginStart="5dp"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp" />
+
+                    <TextView
+                        android:layout_toEndOf="@+id/sensor_roll_btn"
+                        android:text="Roll"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginStart="5dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                </RelativeLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/grey_800"/>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/compass_roll_value"
                         android:textSize="18dp"
                         android:gravity="center"
                         android:layout_marginTop="2dp"

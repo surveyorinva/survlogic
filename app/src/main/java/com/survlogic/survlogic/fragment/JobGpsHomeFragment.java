@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import com.survlogic.survlogic.ARvS.JobGPSSurveyARvSActivity;
+import com.survlogic.survlogic.ARvS.JobGPSSurveyArvTActivity;
 import com.survlogic.survlogic.R;
 
 /**
@@ -70,7 +71,7 @@ public class JobGpsHomeFragment extends Fragment {
     private void openGpsStakeoutActivity(){
         Log.d(TAG, "openGpsStakeoutActivity: Started");
 
-        Intent i = new Intent(getActivity(), JobGPSSurveyARvSActivity.class);
+        Intent i = new Intent(getActivity(), JobGPSSurveyArvTActivity.class);
         i.putExtra(getString(R.string.KEY_PROJECT_ID),project_id);
         i.putExtra(getString(R.string.KEY_JOB_ID), job_id);
         i.putExtra(getString(R.string.KEY_JOB_DATABASE), jobDatabaseName);

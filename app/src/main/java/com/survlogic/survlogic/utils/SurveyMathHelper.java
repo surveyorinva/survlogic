@@ -1185,6 +1185,10 @@ public class SurveyMathHelper {
 
     }
 
+    public static boolean between(float i, float minValueInclusive, float maxValueInclusive) {
+        return (i >= minValueInclusive && i <= maxValueInclusive);
+    }
+
 
 
 }
