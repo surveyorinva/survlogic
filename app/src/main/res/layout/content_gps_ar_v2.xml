@@ -84,6 +84,20 @@
 
     </RelativeLayout>
 
+<!-- Survey Measure View -->
+    <RelativeLayout
+        android:id="@+id/rl_gnss_measure"
+        android:elevation="5dp"
+        android:layout_below="@id/appBar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="invisible">
+
+        <include
+            layout="@layout/view_gnss_measure"/>
+
+
+    </RelativeLayout>
 
     <View
         android:id="@+id/centerShim"

@@ -10,7 +10,6 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
-import android.graphics.Point;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -19,6 +18,7 @@ import android.os.IBinder;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -42,7 +42,6 @@ import android.widget.Toast;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.BitmapDescriptor;
@@ -53,25 +52,28 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.survlogic.survlogic.ARvS.interf.GPSMeasureHelperListener;
+import com.survlogic.survlogic.ARvS.interf.POIHelperListener;
 import com.survlogic.survlogic.ARvS.utils.CameraService;
+import com.survlogic.survlogic.ARvS.utils.GPSMeasureHelper;
 import com.survlogic.survlogic.ARvS.utils.GetPOIHelper;
 import com.survlogic.survlogic.ARvS.utils.GnssService;
 import com.survlogic.survlogic.ARvS.utils.SensorService;
 import com.survlogic.survlogic.R;
-import com.survlogic.survlogic.adapter.JobGpsStakeoutPointListAdapter;
+import com.survlogic.survlogic.dialog.DialogJobPointView;
 import com.survlogic.survlogic.model.PointGeodetic;
 import com.survlogic.survlogic.utils.GPSLocationConverter;
 import com.survlogic.survlogic.utils.PreferenceLoaderHelper;
+import com.survlogic.survlogic.utils.RumbleHelper;
 import com.survlogic.survlogic.utils.StringUtilityHelper;
 import com.survlogic.survlogic.utils.SurveyMathHelper;
 
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class JobGPSSurveyArvTActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class JobGPSSurveyWork extends AppCompatActivity implements POIHelperListener, GPSMeasureHelperListener, OnMapReadyCallback {
     private static final String TAG = "JobGPSSurveyArvTActivit";
 
     private Context mContext;
@@ -113,7 +115,12 @@ public class JobGPSSurveyArvTActivity extends AppCompatActivity implements OnMap
 
     //Widgets
     private RelativeLayout rlGPSErrorMessage;
+    private FloatingActionButton fabMenu;
+    private Switch swAppBarSwitch;
     private ImageButton ibSettings;
+    private DrawerLayout mDrawerLayout;
+
+    private boolean isDrawerOpen = false;
 
     //---------------------------------------------------------------------------------------------- View Controller
     private int view_stage_map = VIEW_MAP_START, view_stage_map_previous;
@@ -128,19 +135,29 @@ public class JobGPSSurveyArvTActivity extends AppCompatActivity implements OnMap
     private boolean hasGPSHubInit = false;
     private boolean isShownOptionsStatus = false, isShownOptionsSensor = false;
     private boolean isShownOptionsMetadata = true;
+    private boolean isPOIPOintActive = false;
     private static final boolean LOCATION_RAW = false, LOCATION_PREDICT = true;
     private static final boolean SENSOR_RAW = false, SENSOR_GMF = true;
 
     //Widgets
     private RelativeLayout rlGPSHUD, rlGPSHUDSat, rlGPSOptionsSat, rlGPSOptionsSensor;
     private RelativeLayout rlGPSHUDLocationMetadata;
+    private RelativeLayout rlGPSStakePointID, rlGPSStakePointDirection;
     private LinearLayout llGPSHUDCompass;
+
     private TextView tvGpsHud_Location_Header, tvGpsHud_Sensor_Header;
     private TextView tvGpsHud_Status_noSatellites, tvGpsHud_Status_noSatellitesLocked;
     private TextView tvGPSHud_Location_Lat, tvGpsHud_Location_Lon, tvGpsHud_Location_Alt;
     private TextView tvGpsHud_Location_Metadata, tvGpsHud_Location_Metadata_Header;
     private TextView tvGpsHud_Status_Value, tvGpsHud_Accuracy_Value;
     private TextView tvGpsHud_Sensor_Orientation, tvGpsHud_Sensor_Pitch, tvGpsHud_Sensor_Roll;
+    private TextView tvGpsHud_Stakeout_Point_Id;
+
+
+    //---------------------------------------------------------------------------------------------- GNSS Measure
+    private GPSMeasureHelper gpsMeasureHelper;
+
+    private boolean hasGPSMeasureInit = false;
 
     //---------------------------------------------------------------------------------------------- Map Overlay View
     //API
@@ -181,6 +198,9 @@ public class JobGPSSurveyArvTActivity extends AppCompatActivity implements OnMap
     private boolean isCameraStarted = false;
 
     //---------------------------------------------------------------------------------------------- Data
+    private String mJob_DatabaseName;
+    private int mProject_id, mJob_id;
+
     private boolean isDataSetup = false;
     private GetPOIHelper getPOIHelper;
 
@@ -196,6 +216,7 @@ public class JobGPSSurveyArvTActivity extends AppCompatActivity implements OnMap
     private int card_type = TYPE_NONE;
     private static final int TYPE_NONE = 0, TYPE_INTERNAL_JOB = 1, TYPE_EXTERNAL_NGS = 2;
 
+    //----------------------------------------------------------------------------------------------
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -206,7 +227,7 @@ public class JobGPSSurveyArvTActivity extends AppCompatActivity implements OnMap
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        mContext = JobGPSSurveyArvTActivity.this;
+        mContext = JobGPSSurveyWork.this;
         preferenceLoaderHelper = new PreferenceLoaderHelper(mContext);
 
         bindLocationService();
@@ -276,6 +297,21 @@ public class JobGPSSurveyArvTActivity extends AppCompatActivity implements OnMap
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(gpsMeasureHelper.isGPSMeasureSetupMenuOpen()){
+            gpsMeasureHelper.requestSetupMenuClose();
+            return;
+        }
+
+        if(isDrawerOpen){
+            mDrawerLayout.closeDrawer(GravityCompat.START);
+            return;
+        }
+
+
     }
 
     //---------------------------------------------------------------------------------------------- Location Service
@@ -696,8 +732,12 @@ public class JobGPSSurveyArvTActivity extends AppCompatActivity implements OnMap
         Bundle extras = getIntent().getExtras();
         final String jobDatabaseName = extras.getString(getString(R.string.KEY_JOB_DATABASE));
 
+        mProject_id = extras.getInt(getString(R.string.KEY_PROJECT_ID));
+        mJob_id = extras.getInt(getString(R.string.KEY_JOB_ID));
+        mJob_DatabaseName = extras.getString(getString(R.string.KEY_JOB_DATABASE));
+
         if(!isDataSetup){
-            getPOIHelper = new GetPOIHelper(mContext);
+            getPOIHelper = new GetPOIHelper(mContext,this);
 
             rlDataView = findViewById(R.id.pointListRecyclerView);
             getPOIHelper.initViewWidgets(rlDataView);
@@ -786,7 +826,7 @@ public class JobGPSSurveyArvTActivity extends AppCompatActivity implements OnMap
         TextView tvAppBarTitle = findViewById(R.id.DrawerLayout);
         tvAppBarTitle.setText(getResources().getText(R.string.gps_title_header));
 
-        ImageButton ibAppBarBackButton = findViewById(R.id.button_back);
+        ImageButton ibAppBarBackButton = findViewById(R.id.button_back_navigation_pane);
         ibAppBarBackButton.setVisibility(View.VISIBLE);
         ibAppBarBackButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -812,11 +852,12 @@ public class JobGPSSurveyArvTActivity extends AppCompatActivity implements OnMap
 
             @Override
             public void onDrawerOpened(View drawerView) {
-
+                isDrawerOpen = true;
             }
 
             @Override
             public void onDrawerClosed(View drawerView) {
+                isDrawerOpen = false;
 
             }
 
@@ -825,8 +866,9 @@ public class JobGPSSurveyArvTActivity extends AppCompatActivity implements OnMap
 
             }
         });
+        mDrawerLayout = drawerLayout;
 
-        FloatingActionButton fabMenu = findViewById(R.id.fab_menu);
+        fabMenu = findViewById(R.id.fab_menu);
         fabMenu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -846,11 +888,12 @@ public class JobGPSSurveyArvTActivity extends AppCompatActivity implements OnMap
         ibSettings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(JobGPSSurveyArvTActivity.this,ArvTSettings.class));
+                startActivity(new Intent(JobGPSSurveyWork.this,ArvTSettings.class));
             }
         });
 
         initGPSViewWidgets();
+        initGPSMeasureWidgets();
         initMapViewWidget();
 
         //Actions
@@ -862,7 +905,7 @@ public class JobGPSSurveyArvTActivity extends AppCompatActivity implements OnMap
         Log.d(TAG, "onClickListeners: Started");
 
         LinearLayout llAppBarSwitch = findViewById(R.id.ll_switch);
-        Switch swAppBarSwitch = findViewById(R.id.switch_value);
+        swAppBarSwitch = findViewById(R.id.switch_value);
         TextView tvAppBarSwitchOff = findViewById(R.id.switch_lbl_off);
         TextView tvAppBarSwitchOn = findViewById(R.id.switch_lbl_on);
 
@@ -876,13 +919,19 @@ public class JobGPSSurveyArvTActivity extends AppCompatActivity implements OnMap
             public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
                 if(!isChecked){
                     currentMode = MODE_SURVEY;
+
                     incrementMapView();
                     cycleCameraView();
+                    showGPSViewSurveyMeasureActions();
+                    showGPSViewStakeoutPointInfo();
+
                     isCameraStarted = cameraService.onStop();
                 }else{
                     currentMode = MODE_STAKE;
+
                     incrementMapView();
                     cycleCameraView();
+                    showGPSViewSurveyMeasureActions();
                     isCameraStarted = cameraService.onStart();
 
                 }
@@ -916,6 +965,7 @@ public class JobGPSSurveyArvTActivity extends AppCompatActivity implements OnMap
         Log.d(TAG, "switchBoardViewWidgets: Started");
 
         showGPSViewWidgets();
+        showGPSMeasureWidgets();
         showMapViewWidgets();
 
 
@@ -1069,6 +1119,9 @@ public class JobGPSSurveyArvTActivity extends AppCompatActivity implements OnMap
         rlGPSOptionsSat = findViewById(R.id.rl_option_sat);
         rlGPSOptionsSensor = findViewById(R.id.rl_option_sensor);
 
+        rlGPSStakePointID = findViewById(R.id.rl_destination_info);
+        rlGPSStakePointDirection = findViewById(R.id.rl_destination_bearing);
+
         tvGpsHud_Location_Header = findViewById(R.id.gnss_location_header);
         tvGpsHud_Sensor_Header = findViewById(R.id.compass_bearing_header);
 
@@ -1088,6 +1141,8 @@ public class JobGPSSurveyArvTActivity extends AppCompatActivity implements OnMap
         tvGpsHud_Sensor_Orientation = findViewById(R.id.compass_orientation_value);
         tvGpsHud_Sensor_Pitch = findViewById(R.id.compass_pitch_value);
         tvGpsHud_Sensor_Roll = findViewById(R.id.compass_roll_value);
+
+        tvGpsHud_Stakeout_Point_Id = findViewById(R.id.destination_value);
 
         setGPSHUDOnClickListeners();
 
@@ -1117,6 +1172,7 @@ public class JobGPSSurveyArvTActivity extends AppCompatActivity implements OnMap
                 showGPSViewOptionsLocationMetadata();
             }
         });
+
 
 
     }
@@ -1172,6 +1228,34 @@ public class JobGPSSurveyArvTActivity extends AppCompatActivity implements OnMap
 
     }
 
+    private void showGPSViewSurveyMeasureActions(){
+        Log.d(TAG, "showGPSViewSurveyMeasureActions: Started");
+
+        if(currentMode == MODE_SURVEY){
+            gpsMeasureHelper.setViewState(true);
+            //rlMeasureFooter.setVisibility(View.VISIBLE);
+        }else{
+            gpsMeasureHelper.setViewState(false);
+            //rlMeasureFooter.setVisibility(View.GONE);
+        }
+
+    }
+
+
+
+    private void showGPSViewStakeoutPointInfo(){
+        Log.d(TAG, "showGPSViewStakeoutPointInfo: Started");
+
+        if(currentMode == MODE_STAKE){
+            rlGPSStakePointDirection.setVisibility(View.VISIBLE);
+            rlGPSStakePointID.setVisibility(View.VISIBLE);
+        }else{
+            rlGPSStakePointDirection.setVisibility(View.INVISIBLE);
+            rlGPSStakePointID.setVisibility(View.INVISIBLE);
+        }
+    }
+
+
     private void updateHudLocation(boolean type, Location location){
         Log.d(TAG, "updateHudLocation: Started");
         DecimalFormat df2 = StringUtilityHelper.createUSNonBiasDecimalFormatSelect(2);
@@ -1180,7 +1264,7 @@ public class JobGPSSurveyArvTActivity extends AppCompatActivity implements OnMap
         if(hasGPSHubInit) {
 
             if (preferenceLoaderHelper.getGPSLocationUsePrediction() == type) {
-                //Latitude & Longtiude
+                //Latitude & Longitude
                 tvGPSHud_Location_Lat.setText(SurveyMathHelper.convertDECtoDMSGeodeticV2(location.getLatitude(), 4));
                 tvGpsHud_Location_Lon.setText(SurveyMathHelper.convertDECtoDMSGeodeticV2(location.getLongitude(), 4));
 
@@ -1302,8 +1386,48 @@ public class JobGPSSurveyArvTActivity extends AppCompatActivity implements OnMap
             }
         }
 
+    }
+
+    //---------------------------------------------------------------------------------------------- GPS Measure View
+    private void initGPSMeasureWidgets(){
+        Log.d(TAG, "initGPSMeasureWidgets: Started");
+
+        gpsMeasureHelper = new GPSMeasureHelper(mContext,mJob_DatabaseName,this);
+
+        hasGPSMeasureInit = true;
+
+    }
 
 
+
+    private void showGPSMeasureWidgets(){
+        Log.d(TAG, "showGPSMeasureWidgets: Started");
+        gpsMeasureHelper.setViewState(true);
+
+
+    }
+
+    @Override
+    public void setViewsForModal(boolean isModal) {
+        Log.d(TAG, "setViewsForModal: Started:" + isModal);
+        if(isModal){
+            Log.d(TAG, "setViewsForModal: True");
+            fabMenu.setEnabled(false);
+            swAppBarSwitch.setEnabled(false);
+
+            enableDisableViewGroup(rlMapOverlayView,false);
+            enableDisableViewGroup(rlGPSHUD,false);
+
+
+        }else{
+            Log.d(TAG, "setViewsForModal: False");
+            fabMenu.setEnabled(true);
+            swAppBarSwitch.setEnabled(true);
+
+            enableDisableViewGroup(rlMapOverlayView,true);
+            enableDisableViewGroup(rlGPSHUD,true);
+
+        }
     }
 
     //---------------------------------------------------------------------------------------------- Map View
@@ -1577,6 +1701,42 @@ public class JobGPSSurveyArvTActivity extends AppCompatActivity implements OnMap
             }
         }
     }
+    //---------------------------------------------------------------------------------------------- POIHelperListener Class Listener
+    @Override
+    public void isPOITargetSet(boolean isTargetSet) {
+        if(isTargetSet){
+
+            PointGeodetic targetPoint = getPOIHelper.getTargetLocation();
+            tvGpsHud_Stakeout_Point_Id.setText(String.valueOf(targetPoint.getPoint_no()));
+
+            if(currentMode == MODE_STAKE){
+
+                RumbleHelper.init(mContext);
+                RumbleHelper.once(50);
+
+                showGPSViewStakeoutPointInfo();
+                mDrawerLayout.closeDrawer(GravityCompat.START);
+
+            }
+
+        }
+    }
+
+    @Override
+    public void openPointViewDialogBox(boolean requestOpen) {
+        if(requestOpen){
+
+            PointGeodetic targetPoint = getPOIHelper.getTargetLocation();
+
+            long point_id = targetPoint.getId();
+            int pointNo = targetPoint.getPoint_no();
+
+            FragmentManager fm = getSupportFragmentManager();
+            android.support.v4.app.DialogFragment pointDialog = DialogJobPointView.newInstance(mProject_id, mJob_id, point_id, pointNo, mJob_DatabaseName,false);
+            pointDialog.show(fm,"dialog_point_view");
+
+        }
+    }
 
     //---------------------------------------------------------------------------------------------- INNER CLASS - Loading Screen
     private class LoadGPSDataTask extends AsyncTask<Void, Integer, Void> {
@@ -1677,6 +1837,17 @@ public class JobGPSSurveyArvTActivity extends AppCompatActivity implements OnMap
         } else{
             Toast.makeText(this, data, Toast.LENGTH_LONG).show();
 
+        }
+    }
+
+    public static void enableDisableViewGroup(ViewGroup viewGroup, boolean enabled) {
+        int childCount = viewGroup.getChildCount();
+        for (int i = 0; i < childCount; i++) {
+            View view = viewGroup.getChildAt(i);
+            view.setEnabled(enabled);
+            if (view instanceof ViewGroup) {
+                enableDisableViewGroup((ViewGroup) view, enabled);
+            }
         }
     }
 

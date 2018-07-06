@@ -171,7 +171,7 @@ public class JobPointsActivity extends AppCompatActivity implements NavigationVi
 
                 startActivity(i);
                 overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-
+                finish();
                 break;
 
             case R.id.menu_item2_id:
@@ -183,7 +183,7 @@ public class JobPointsActivity extends AppCompatActivity implements NavigationVi
 
                 startActivity(j);
                 overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-
+                finish();
                 break;
 
             case R.id.menu_item3_id:
@@ -195,6 +195,7 @@ public class JobPointsActivity extends AppCompatActivity implements NavigationVi
 
                 startActivity(k);
                 overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                finish();
                 break;
 
             case R.id.menu_item4_id:
@@ -206,12 +207,13 @@ public class JobPointsActivity extends AppCompatActivity implements NavigationVi
 
                 startActivity(l);
                 overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                finish();
                 break;
 
             case R.id.menu_item5_id:
                 intent.setClass(this, SettingsCurrentJobActivity.class);
                 startActivity(intent);
-
+                finish();
                 break;
 
         }
@@ -410,7 +412,7 @@ public class JobPointsActivity extends AppCompatActivity implements NavigationVi
         Log.d(TAG, "onDataClicked: Point_id: " + point_id);
 
         FragmentManager fm = getSupportFragmentManager();
-        android.support.v4.app.DialogFragment pointDialog = DialogJobPointView.newInstance(project_id, job_id, point_id, pointNo, jobDatabaseName);
+        android.support.v4.app.DialogFragment pointDialog = DialogJobPointView.newInstance(project_id, job_id, point_id, pointNo, jobDatabaseName,true);
         pointDialog.show(fm,"dialog_point_view");
     }
 

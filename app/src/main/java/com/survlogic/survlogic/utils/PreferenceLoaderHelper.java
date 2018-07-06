@@ -35,6 +35,9 @@ public class PreferenceLoaderHelper {
 
     private int cogoSurveySetHAngle, cogoSurveySetDistance;
 
+    private String gpsSurveyRate;
+    private float gpsSurveyHeight;
+
     private boolean gps_location_use_prediction, gps_location_sensor_use_fusion, gps_location_sensor_use_gmf;
 
     public PreferenceLoaderHelper(Context mContext) {
@@ -133,6 +136,34 @@ public class PreferenceLoaderHelper {
         gps_location_sensor_use_fusion  = sharedPreferences.getBoolean(mContext.getString(R.string.pref_gps_location_sensor_use_fusion),false);
         gps_location_sensor_use_gmf = sharedPreferences.getBoolean(mContext.getString(R.string.pref_gps_location_sensor_use_gmf),false);
 
+        gpsSurveyRate = sharedPreferences.getString(mContext.getString(R.string.pref_gps_min_time),"1.0s");
+        gpsSurveyHeight = sharedPreferences.getFloat(mContext.getString(R.string.pref_gps_height),3.0f);
+
+    }
+
+    public String getGpsSurveyRate() {
+        return gpsSurveyRate;
+    }
+
+    public void setGpsSurveyRate(String gpsSurveyRate) {
+        this.gpsSurveyRate = gpsSurveyRate;
+    }
+
+    public float getGpsSurveyHeight() {
+        return gpsSurveyHeight;
+    }
+
+    public void setGpsSurveyHeight(float gpsSurveyHeight, boolean isForceSave){
+        this.gpsSurveyHeight = gpsSurveyHeight;
+
+        editor = sharedPreferences.edit();
+        editor.putFloat(mContext.getString(R.string.pref_gps_height),gpsSurveyHeight);
+
+        if(isForceSave){
+            editor.commit();
+        }else{
+            editor.apply();
+        }
     }
 
     public String getValueSystemDistancePrecisionDisplay() {

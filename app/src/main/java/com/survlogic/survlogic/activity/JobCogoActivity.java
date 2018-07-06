@@ -184,7 +184,7 @@ public class JobCogoActivity extends AppCompatActivity implements NavigationView
 
                 startActivity(i);
                 overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-
+                finish();
                 break;
 
             case R.id.menu_item2_id:
@@ -196,7 +196,7 @@ public class JobCogoActivity extends AppCompatActivity implements NavigationView
 
                 startActivity(j);
                 overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-
+                finish();
                 break;
 
             case R.id.menu_item3_id:
@@ -208,6 +208,7 @@ public class JobCogoActivity extends AppCompatActivity implements NavigationView
 
                 startActivity(k);
                 overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                finish();
                 break;
 
             case R.id.menu_item4_id:
@@ -219,12 +220,13 @@ public class JobCogoActivity extends AppCompatActivity implements NavigationView
 
                 startActivity(l);
                 overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                finish();
                 break;
 
             case R.id.menu_item5_id:
                 intent.setClass(this, SettingsCurrentJobActivity.class);
                 startActivity(intent);
-
+                finish();
                 break;
 
         }

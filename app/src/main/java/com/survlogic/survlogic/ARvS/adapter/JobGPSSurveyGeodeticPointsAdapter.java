@@ -2,6 +2,7 @@ package com.survlogic.survlogic.ARvS.adapter;
 
 import android.content.Context;
 import android.location.Location;
+import android.os.Vibrator;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,6 +13,7 @@ import com.survlogic.survlogic.ARvS.interf.SetActiveTargetPOIGeodetic;
 import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.model.PointGeodetic;
 import com.survlogic.survlogic.utils.AnimateHelper;
+import com.survlogic.survlogic.utils.RumbleHelper;
 import com.survlogic.survlogic.utils.StringUtilityHelper;
 import com.survlogic.survlogic.utils.SurveyMathHelper;
 import com.survlogic.survlogic.view.Card_View_Holder_Job_Gps_Stakeout_Point_List;
@@ -124,10 +126,20 @@ public class JobGPSSurveyGeodeticPointsAdapter extends RecyclerView.Adapter<Recy
             }
 
 
+            vh1.mCardView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+
+                    listener.setTargetLocation(pointGeodetic);
+                    return true;
+                }
+            });
+
             vh1.mCardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    listener.setTargetLocation(pointGeodetic);
+                    
+                    listener.callPointViewDialogBox(pointGeodetic);
 
                 }
             });

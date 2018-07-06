@@ -1,20 +1,15 @@
 package com.survlogic.survlogic.activity;
 
-import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -27,26 +22,21 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewAnimationUtils;
-import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.survlogic.survlogic.ARvS.JobGPSSurveyARvSActivity;
-import com.survlogic.survlogic.ARvS.JobGPSSurveyArvTActivity;
+import com.survlogic.survlogic.ARvS.JobGPSSurveyWork;
 import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.adapter.ActivityViewPagerAdapter;
-import com.survlogic.survlogic.background.BackgroundProjectList;
 import com.survlogic.survlogic.background.BackgroundProjectListFromActivity;
 import com.survlogic.survlogic.fragment.MainHomeFragment;
 import com.survlogic.survlogic.fragment.MainToolsFragment;
 import com.survlogic.survlogic.interf.ProjectListListener;
 import com.survlogic.survlogic.model.Project;
+import com.survlogic.survlogic.utils.RumbleHelper;
 import com.survlogic.survlogic.utils.UniversalImageLoader;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
@@ -185,12 +175,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
 
             case R.id.menu_item3_id:
-                intent.setClass(this, JobGPSSurveyArvTActivity.class);
+                intent.setClass(this, JobGPSSurveyWork.class);
                 startActivity(intent);
                 break;
 
             case R.id.menu_item4_id:
                 intent.setClass(this, CameraActivity.class);
+
+                RumbleHelper.init(mContext);
+                RumbleHelper.once(50);
+
                 startActivity(intent);
                 break;
 

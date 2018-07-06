@@ -6,4 +6,6 @@ public interface SetActiveTargetPOIGeodetic {
 
         void setTargetLocation(PointGeodetic pointGeodetic);
 
+        void callPointViewDialogBox(PointGeodetic pointGeodetic);
+
 }

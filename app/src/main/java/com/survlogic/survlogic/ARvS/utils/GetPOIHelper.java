@@ -1,15 +1,18 @@
 package com.survlogic.survlogic.ARvS.utils;
 
+import android.app.Activity;
+import android.app.FragmentManager;
 import android.content.Context;
 import android.location.Location;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-
 import com.survlogic.survlogic.ARvS.adapter.JobGPSSurveyGeodeticPointsAdapter;
 import com.survlogic.survlogic.ARvS.background.BackgroundGeodeticPointGetV2;
 import com.survlogic.survlogic.ARvS.interf.GeodeticPointsGetter;
+import com.survlogic.survlogic.ARvS.interf.POIHelperListener;
 import com.survlogic.survlogic.ARvS.interf.SetActiveTargetPOIGeodetic;
+import com.survlogic.survlogic.dialog.DialogJobPointView;
 import com.survlogic.survlogic.model.PointGeodetic;
 
 import java.util.ArrayList;
@@ -18,6 +21,7 @@ public class GetPOIHelper  implements GeodeticPointsGetter, SetActiveTargetPOIGe
 
     private static final String TAG = "GetPOIHelper";
     private Context mContext;
+    POIHelperListener listener;
 
     //----------------------------------------------------------------------------------------------Datasets
     //Geodetic Points from Job
@@ -43,9 +47,9 @@ public class GetPOIHelper  implements GeodeticPointsGetter, SetActiveTargetPOIGe
     //Target Location
     PointGeodetic mTargetPointGeodetic;
 
-    public GetPOIHelper(Context context) {
+    public GetPOIHelper(Context context, POIHelperListener listener) {
         this.mContext = context;
-
+        this.listener = listener;
     }
 
     public void initViewWidgets(RecyclerView rvPointList){
@@ -159,7 +163,19 @@ public class GetPOIHelper  implements GeodeticPointsGetter, SetActiveTargetPOIGe
     @Override
     public void setTargetLocation(PointGeodetic pointGeodetic) {
         Log.d(TAG, "setTargetLocation: Target Set");
-        //Sets the activeTarget for use by the UI for tracking
+        //Sets the activeTarget for use by the UI for tracking by long press
         this.mTargetPointGeodetic = pointGeodetic;
+
+        listener.isPOITargetSet(true);
+
+    }
+
+    @Override
+    public void callPointViewDialogBox(PointGeodetic pointGeodetic) {
+        Log.d(TAG, "callPointViewDialogBox: Calling Point Info Screen");
+        //Sets the activeTarget for use by the UI for opening point information screen
+        this.mTargetPointGeodetic = pointGeodetic;
+        listener.openPointViewDialogBox(true);
+
     }
 }

@@ -79,6 +79,9 @@
     <string name="pref_key_default_project_projection_origin_North">pref_key_default_project_projection_origin_East</string>
     <string name="pref_key_default_project_projection_origin_East">pref_key_default_project_projection_origin_East</string>
 
+    <!--Gps Measure Preferences -->
+    <string name="pref_gps_min_time">pref_gps_min_time</string>
+    <string name="pref_gps_height">pref_gps_height</string>
     <!-- Default preference values -->
     <string name="pref_gps_min_time_default_sec">1</string>
     <string name="pref_gps_unit_measurement_default">3</string>

@@ -199,6 +199,7 @@ public class JobHomeActivity extends AppCompatActivity implements NavigationView
 
                 startActivity(k);
                 overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+
                 break;
 
             case R.id.menu_item4_id:
@@ -210,6 +211,7 @@ public class JobHomeActivity extends AppCompatActivity implements NavigationView
 
                 startActivity(l);
                 overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+
                 break;
 
             case R.id.menu_item5_id:

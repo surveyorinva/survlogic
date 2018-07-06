@@ -121,6 +121,7 @@ public class DialogJobPointView extends DialogFragment{
     private Button btTakePhoto, btAddSketch;
 
     private boolean isPointCardExpanded = false, isPointCommandsShown = false, isProjection = false;
+    private boolean isFromPointList = false;
 
     private PreferenceLoaderHelper preferenceLoaderHelper;
     private SurveyProjectionHelper surveyProjectionHelper;
@@ -145,7 +146,7 @@ public class DialogJobPointView extends DialogFragment{
 
 
 
-    public static DialogJobPointView newInstance(int projectId, int jobId, long pointId, int pointNo, String databaseName) {
+    public static DialogJobPointView newInstance(int projectId, int jobId, long pointId, int pointNo, String databaseName, boolean isFromPointList) {
         Log.d(TAG, "newInstance: Starting...");
 
         DialogJobPointView frag = new DialogJobPointView();
@@ -155,6 +156,7 @@ public class DialogJobPointView extends DialogFragment{
         args.putLong("point_id", pointId);
         args.putInt("pointNo", pointNo);
         args.putString("databaseName", databaseName);
+        args.putBoolean("fromPointList",isFromPointList);
         frag.setArguments(args);
         return frag;
 
@@ -172,6 +174,7 @@ public class DialogJobPointView extends DialogFragment{
         pointNo = getArguments().getInt("pointNo");
         databaseName = getArguments().getString("databaseName");
 
+        isFromPointList = getArguments().getBoolean("fromPointList");
 
         Log.d(TAG, "onCreateDialog: Project Id: " + projectID );
         Log.d(TAG, "onCreateDialog: Job Id: " + jobId );
@@ -726,8 +729,11 @@ public class DialogJobPointView extends DialogFragment{
     private void closeThisView(){
         Log.d(TAG, "closeThisView: Started");
 
-        JobPointsActivityListener jobPointsActivityListener = (JobPointsActivityListener) getActivity();
-        jobPointsActivityListener.refreshPointArrays();
+
+        if(isFromPointList){
+            JobPointsActivityListener jobPointsActivityListener = (JobPointsActivityListener) getActivity();
+            jobPointsActivityListener.refreshPointArrays();
+        }
 
         dismiss();
 

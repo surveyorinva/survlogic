@@ -6,7 +6,7 @@
     android:layout_height="match_parent">
 
         <include
-            layout="@layout/nav_header_gps_ar"/>
+            layout="@layout/nav_header_gps_ar_v2"/>
 
         <LinearLayout
             android:orientation="horizontal"

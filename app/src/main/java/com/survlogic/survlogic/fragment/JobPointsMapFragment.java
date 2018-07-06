@@ -588,7 +588,7 @@ public class JobPointsMapFragment extends Fragment implements OnMapReadyCallback
             long point_id = pointSurvey.getId();
             int pointNo = pointSurvey.getPoint_no();
 
-            android.support.v4.app.DialogFragment pointDialog = DialogJobPointView.newInstance(project_id, job_id, point_id, pointNo, jobDatabaseName);
+            android.support.v4.app.DialogFragment pointDialog = DialogJobPointView.newInstance(project_id, job_id, point_id, pointNo, jobDatabaseName,true);
             pointDialog.show(getFragmentManager(),"dialog");
 
 

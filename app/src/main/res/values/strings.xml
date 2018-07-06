@@ -695,7 +695,7 @@
     <string name="pref_value_measurement_dialog_title">Choose Unit Type</string>
 
     <!--Survey-->
-    <string name="pref_gps_height">Rod Height</string>
+    <string name="pref_gps_height_lbl">Rod Height</string>
     <string name="pref_gps_auto_stop_category_title">Store Point</string>
     <string name="pref_gps_auto_stop_gps_title">Auto-Stop Survey </string>
     <string name="pref_gps_auto_stop_gps_summary">Stops the observations after a defined number of Epochs</string>

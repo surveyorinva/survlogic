@@ -240,7 +240,6 @@ public class CameraService {
 
         try {
             SurfaceTexture surfaceTexture = txvCameraView.getSurfaceTexture();
-            showToast(String.valueOf(mPreviewSize),true);
 
             surfaceTexture.setDefaultBufferSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
 

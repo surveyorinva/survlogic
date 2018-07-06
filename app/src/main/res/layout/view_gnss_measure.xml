@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@null"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:id="@+id/rl_floating_footer"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="16dp"
+        android:layout_marginStart="5dp"
+        android:layout_width="wrap_content"
+        android:layout_height="60dp">
+
+        <mehdi.sakout.fancybuttons.FancyButton
+            android:id="@+id/btn_measure"
+            android:layout_centerVertical="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="15dp"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:paddingTop="15dp"
+            android:elevation="4dp"
+            app:fb_borderColor="@color/white"
+            app:fb_borderWidth="1dp"
+            app:fb_defaultColor="@color/colorAccent"
+            app:fb_focusColor="#ff838b"
+            app:fb_iconPosition="left"
+            app:fb_radius="15dp"
+            app:fb_text="Measure"
+            app:fb_textColor="#FFFFFF"
+            android:visibility="visible"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/background_filter"
+        android:background="@color/semi_transparent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+
+    </RelativeLayout>
+
+
+    <RelativeLayout
+        android:id="@+id/rl_setup"
+        android:background="@drawable/table_background_white"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone">
+
+        <RelativeLayout
+            android:id="@+id/rl_setup_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <View
+                android:background="@color/colorPrimary"
+                android:layout_width="match_parent"
+                android:layout_height="25dp">
+
+            </View>
+
+            <TextView
+                android:text="Setup"
+                android:layout_marginTop="2dp"
+                android:layout_marginStart="5dp"
+                android:textColor="@color/white"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+
+        </RelativeLayout>
+
+
+        <RelativeLayout
+            android:id="@+id/rl_setup_body"
+            android:layout_below="@id/rl_setup_header"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="200dp">
+
+            <LinearLayout
+                android:id="@+id/ll_setup_line1"
+                android:orientation="horizontal"
+                android:weightSum="2"
+
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <RelativeLayout
+                    android:focusableInTouchMode="true"
+                    android:layout_weight="1.15"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:id="@+id/left_item1_img"
+                        android:background="@drawable/vc_circle_green"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp" />
+
+                    <TextView
+                        android:id="@+id/left_item1_header"
+                        android:text="Start At"
+                        style="@style/Labels.Card.ProjectHeader"
+                        android:layout_alignTop="@id/left_item1_img"
+                        android:layout_toEndOf="@id/left_item1_img"
+                        android:layout_marginStart="5dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <EditText
+                        android:id="@+id/pointNumber"
+                        android:transitionName="occupy_animation"
+                        android:inputType="number"
+                        android:gravity="center"
+                        android:layout_marginEnd="5dp"
+                        android:layout_marginBottom="5dp"
+                        android:layout_alignStart="@id/left_item1_header"
+                        android:layout_toStartOf="@+id/occupy_from_list"
+                        android:layout_below="@id/left_item1_header"
+                        android:layout_width="wrap_content"
+                        android:layout_height="45dp"
+                        style="@style/InputField.EditText"
+                        android:background="@drawable/editbox_background_normal"/>
+
+                    <ImageButton
+                        android:id="@+id/occupy_from_list"
+                        android:background="@null"
+                        android:src="@drawable/ic_bottom_list_add"
+                        android:layout_marginEnd="5dp"
+                        android:scaleType="centerCrop"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:visibility="invisible"/>
+
+
+                </RelativeLayout>
+
+            </LinearLayout>
+
+            <RelativeLayout
+                android:layout_below="@id/ll_setup_line1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:id="@+id/ll_setup_height"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <Space
+                        android:layout_width="5dp"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:text="Height:"
+                        android:gravity="center_vertical"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent" />
+
+                    <Space
+                        android:layout_width="5dp"
+                        android:layout_height="wrap_content" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <EditText
+                            android:id="@+id/gps_height"
+                            style="@style/InputField.EditText"
+                            android:inputType="numberDecimal"
+                            android:background="@drawable/editbox_background_normal"
+                            android:layout_width="100dp"
+                            android:layout_height="wrap_content">
+
+                        </EditText>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+
+
+                <LinearLayout
+                    android:id="@+id/ll_setup_rate"
+                    android:layout_below="@id/ll_setup_height"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <Space
+                        android:layout_width="5dp"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:text="Rate:"
+                        android:gravity="center_vertical"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent" />
+
+                    <Space
+                        android:layout_width="17dp"
+                        android:layout_height="wrap_content" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/table_background_white_square">
+
+                        <Spinner
+                            android:id="@+id/spinner_rate"
+                            android:entries="@array/pref_gps_frequency_titles"
+                            android:entryValues="@array/pref_gps_frequency_values"
+                            android:layout_width="125dp"
+                            android:layout_height="35dp">
+
+                        </Spinner>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </RelativeLayout>
+
+            <mehdi.sakout.fancybuttons.FancyButton
+                android:id="@+id/btn_settings_save"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentBottom="true"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="10dp"
+                android:paddingBottom="10dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:paddingTop="10dp"
+                android:elevation="4dp"
+                app:fb_borderColor="@color/colorPrimary"
+                app:fb_borderWidth="1dp"
+                app:fb_defaultColor="@color/colorAccent"
+                app:fb_focusColor="#ff838b"
+                app:fb_iconPosition="left"
+                app:fb_radius="5dp"
+                app:fb_text="Close"
+                app:fb_textColor="#FFFFFF"
+                android:visibility="visible"/>
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+
+</RelativeLayout>

@@ -8,6 +8,25 @@
     android:layout_height="wrap_content">
 
     <LinearLayout
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginTop="12dp"
+        android:layout_marginStart="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageButton
+            android:id="@+id/button_back_navigation_pane"
+            android:background="@drawable/ic_arrow_back"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:visibility="visible"/>
+
+
+    </LinearLayout>
+
+
+    <LinearLayout
         android:id="@+id/rl_gnss_info_app_bar"
         android:orientation="horizontal"
         android:gravity="end"
@@ -33,7 +52,8 @@
         android:layout_marginStart="3dp"
         android:layout_marginEnd="5dp"
         android:layout_width="match_parent"
-        android:layout_height="40dp">
+        android:layout_height="40dp"
+        android:visibility="gone">
 
         <ImageButton
             android:id="@+id/gps_satellite_btn"
