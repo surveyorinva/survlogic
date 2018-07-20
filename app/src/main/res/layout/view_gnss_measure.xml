@@ -38,6 +38,15 @@
 
     </RelativeLayout>
 
+    <View
+        android:id="@+id/reveal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/semi_transparent"
+        android:visibility="gone" />
+
+
+
     <RelativeLayout
         android:id="@+id/background_filter"
         android:background="@color/semi_transparent"
@@ -201,8 +210,6 @@
 
                 </LinearLayout>
 
-
-
                 <LinearLayout
                     android:id="@+id/ll_setup_rate"
                     android:layout_below="@id/ll_setup_height"
@@ -273,5 +280,76 @@
 
     </RelativeLayout>
 
+
+    <RelativeLayout
+        android:id="@+id/rl_measure_status"
+        android:background="@color/semi_transparent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/lbl_measure_status_point_no"
+            android:text="Measuring to Point:"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="85dp"
+            android:textSize="@dimen/text_size_header"
+            android:textColor="@color/white"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/value_measure_status_point_no"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/lbl_measure_status_point_no"
+            android:layout_toEndOf="@+id/lbl_measure_status_point_no"
+            android:textColor="@color/white"
+            android:textSize="50sp" />
+
+        <TextView
+            android:id="@+id/measure_countdown"
+            android:textColor="@color/white"
+            android:textSize="100sp"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <mehdi.sakout.fancybuttons.FancyButton
+            android:id="@+id/btn_measure_cancel"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="100dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="15dp"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:paddingTop="15dp"
+            app:fb_borderColor="@color/white"
+            app:fb_borderWidth="2dp"
+            app:fb_focusColor="#ff838b"
+            app:fb_iconPosition="left"
+            app:fb_radius="15dp"
+            app:fb_text="Stop"
+            app:fb_textColor="#FFFFFF"
+            app:fb_ghost="true"
+            android:visibility="visible">
+
+        </mehdi.sakout.fancybuttons.FancyButton>
+
+
+
+    </RelativeLayout>
+
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_measure_hidden"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="@dimen/fab_margin"
+        android:visibility="invisible"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
 </RelativeLayout>

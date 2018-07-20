@@ -52,6 +52,7 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.survlogic.survlogic.ARvS.dialog.DialogGPSSurveyMeasureResults;
 import com.survlogic.survlogic.ARvS.interf.GPSMeasureHelperListener;
 import com.survlogic.survlogic.ARvS.interf.POIHelperListener;
 import com.survlogic.survlogic.ARvS.utils.CameraService;
@@ -69,6 +70,7 @@ import com.survlogic.survlogic.utils.StringUtilityHelper;
 import com.survlogic.survlogic.utils.SurveyMathHelper;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -156,7 +158,9 @@ public class JobGPSSurveyWork extends AppCompatActivity implements POIHelperList
 
     //---------------------------------------------------------------------------------------------- GNSS Measure
     private GPSMeasureHelper gpsMeasureHelper;
+    private ArrayList<Location> measuringLocationList;
 
+    private boolean isMeasuringPosition = false;
     private boolean hasGPSMeasureInit = false;
 
     //---------------------------------------------------------------------------------------------- Map Overlay View
@@ -395,6 +399,10 @@ public class JobGPSSurveyWork extends AppCompatActivity implements POIHelperList
 
                     updateHudLocation(LOCATION_PREDICT,predicatedLocation);
                     updateMapLocation(LOCATION_PREDICT,predicatedLocation);
+
+                    if(isMeasuringPosition){
+                        measuringLocationList.add(mCurrentLocation);
+                    }
 
                 }
 
@@ -1393,6 +1401,7 @@ public class JobGPSSurveyWork extends AppCompatActivity implements POIHelperList
         Log.d(TAG, "initGPSMeasureWidgets: Started");
 
         gpsMeasureHelper = new GPSMeasureHelper(mContext,mJob_DatabaseName,this);
+        measuringLocationList = new ArrayList<>();
 
         hasGPSMeasureInit = true;
 
@@ -1427,6 +1436,30 @@ public class JobGPSSurveyWork extends AppCompatActivity implements POIHelperList
             enableDisableViewGroup(rlMapOverlayView,true);
             enableDisableViewGroup(rlGPSHUD,true);
 
+        }
+    }
+
+    @Override
+    public void startStopMeasureData(boolean start) {
+        Log.d(TAG, "startStopMeasureData: Started");
+
+        if(start){
+            measuringLocationList.clear();
+            isMeasuringPosition = true;
+        }else{
+
+            isMeasuringPosition = false;
+        }
+
+    }
+
+    @Override
+    public void showResultsDialog(boolean show) {
+        Log.d(TAG, "showResultsDialog: Started");
+        if(show){
+            Log.d(TAG, "showResultsDialog: Results: " + measuringLocationList.size());
+            DialogGPSSurveyMeasureResults dialogGPSSurveyMeasureResults = DialogGPSSurveyMeasureResults.newInstance(measuringLocationList,gpsMeasureHelper.getPointNumber(),gpsMeasureHelper.getInstrumentHeight());
+            dialogGPSSurveyMeasureResults.show(getFragmentManager(),"results_dialog");
         }
     }
 

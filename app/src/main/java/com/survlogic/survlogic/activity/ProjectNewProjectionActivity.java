@@ -73,36 +73,36 @@ public class ProjectNewProjectionActivity extends AppCompatActivity implements P
     private void initViewWidgets(){
         Log.d(TAG, "initViewWidgets: Started");
 
-        ibBack = (ImageButton) findViewById(R.id.button_back);
-        btFinish = (Button) findViewById(R.id.button_finish);
+        ibBack = findViewById(R.id.button_back);
+        btFinish = findViewById(R.id.button_finish);
 
-        rlGridFramework = (RelativeLayout) findViewById(R.id.rlGridDatum);
-        rlGridFrameworkZone = (RelativeLayout) findViewById(R.id.rlGridFramework_Zone);
+        rlGridFramework = findViewById(R.id.rlGridDatum);
+        rlGridFrameworkZone = findViewById(R.id.rlGridFramework_Zone);
         animateViewSlideVisible(rlGridFrameworkZone,false,1);
 
-        rlStrategyScaleFactor = (RelativeLayout) findViewById(R.id.rl_Ground_Framework_Scale_Factor);
+        rlStrategyScaleFactor = findViewById(R.id.rl_Ground_Framework_Scale_Factor);
         animateViewSlideVisible(rlStrategyScaleFactor,false,1);
-        rlStrategyScaleOrigin = (RelativeLayout) findViewById(R.id.rl_Ground_Framework_Scale_Shift);
+        rlStrategyScaleOrigin = findViewById(R.id.rl_Ground_Framework_Scale_Shift);
         animateViewSlideVisible(rlStrategyScaleOrigin,false,1);
 
-        tvGridFramework = (TextView) findViewById(R.id.projection_value);
+        tvGridFramework = findViewById(R.id.projection_value);
         tvGridFramework.setText(getResources().getString(R.string.general_none));
 
-        tvZone = (TextView) findViewById(R.id.zone_value);
+        tvZone =  findViewById(R.id.zone_value);
 
-        spStrategy = (Spinner) findViewById(R.id.planar_strategy_value);
+        spStrategy = findViewById(R.id.planar_strategy_value);
         initStrategyAdapter();
 
-        ibListGrids = (ImageButton) findViewById(R.id.projection_from_list);
-        ibListZones = (ImageButton) findViewById(R.id.zone_from_list);
+        ibListGrids =  findViewById(R.id.projection_from_list);
+        ibListZones = findViewById(R.id.zone_from_list);
 
-        etProjectionScale = (EditText) findViewById(R.id.scale_value);
+        etProjectionScale =  findViewById(R.id.scale_value);
         etProjectionScale.setSelectAllOnFocus(true);
 
-        etProjectionOriginNorth = (EditText) findViewById(R.id.modified_north_value);
+        etProjectionOriginNorth = findViewById(R.id.modified_north_value);
         etProjectionOriginNorth.setSelectAllOnFocus(true);
 
-        etProjectionOriginEast = (EditText) findViewById(R.id.modified_easting_value);
+        etProjectionOriginEast =  findViewById(R.id.modified_easting_value);
         etProjectionOriginEast.setSelectAllOnFocus(true);
     }
 
