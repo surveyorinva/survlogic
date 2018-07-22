@@ -383,6 +383,7 @@ public class GnssService extends Service implements LocationListener {
         Location predictedLocation = new Location("");
         predictedLocation.setLatitude(predictedLat);
         predictedLocation.setLongitude(predictedLng);
+        predictedLocation.setAltitude(location.getAltitude());
         predictedLocation.setAccuracy(predictedAcc);
         predictedLocation.setSpeed(location.getSpeed());
         predictedLocation.setBearing(location.getBearing());

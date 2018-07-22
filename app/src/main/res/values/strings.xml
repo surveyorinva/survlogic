@@ -277,6 +277,8 @@
     <string name="job_new_validation_point_save_failed">Error Saving Point.  Please try again.</string>
 
 
+    <string name="dialog_gps_measure_item_height">Height</string>
+
     <!--Geodetic Point Add/Edit-->
     <string name="dialog_job_point_geodetic_app_title">Add/Edit Geodetic Position</string>
     <string name="dialog_job_point_geodetic_item_latitude">Latitude</string>

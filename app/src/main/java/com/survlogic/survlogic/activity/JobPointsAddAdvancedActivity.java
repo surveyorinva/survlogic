@@ -226,10 +226,7 @@ public class JobPointsAddAdvancedActivity extends AppCompatActivity implements P
                     }, 100);
                 } else {
                     // Required to show/hide white background behind floating label during focus change
-                    if (etPointNumber.getText().length() > 0)
-                        tvHiddenPointNumber.setVisibility(View.VISIBLE);
-                    else
-                        tvHiddenPointNumber.setVisibility(View.INVISIBLE);
+                    showHideMaterialEditTextBackground(etPointNumber,tvHiddenPointNumber);
                 }
             }
         });
@@ -249,11 +246,7 @@ public class JobPointsAddAdvancedActivity extends AppCompatActivity implements P
                     }, 100);
                 } else {
                     // Required to show/hide white background behind floating label during focus change
-                    if (etPointNorthing.getText().length() > 0) {
-                        tvHiddenPointNorthing.setVisibility(View.VISIBLE);
-                    }else {
-                        tvHiddenPointNorthing.setVisibility(View.INVISIBLE);
-                    }
+                    showHideMaterialEditTextBackground(etPointNorthing,tvHiddenPointNorthing);
 
                     //Add Correct Decimal Places After
                     try{
@@ -289,10 +282,8 @@ public class JobPointsAddAdvancedActivity extends AppCompatActivity implements P
                     }, 100);
                 } else {
                     // Required to show/hide white background behind floating label during focus change
-                    if (etPointEasting.getText().length() > 0) {
-                        tvHiddenPointEasting.setVisibility(View.VISIBLE);
-                    }else{
-                        tvHiddenPointEasting.setVisibility(View.INVISIBLE);}
+
+                    showHideMaterialEditTextBackground(etPointEasting,tvHiddenPointEasting);
 
                     //Add Correct Decimal Places After
                     try{
@@ -330,11 +321,8 @@ public class JobPointsAddAdvancedActivity extends AppCompatActivity implements P
                     }, 100);
                 } else {
                     // Required to show/hide white background behind floating label during focus change
-                    if (etPointElevation.getText().length() > 0) {
-                        tvHiddenPointElevation.setVisibility(View.VISIBLE);
-                    }else{
-                        tvHiddenPointElevation.setVisibility(View.INVISIBLE);}
 
+                    showHideMaterialEditTextBackground(etPointElevation,tvHiddenPointElevation);
 
                     //Add Correct Decimal Places After
                     try{
@@ -371,13 +359,21 @@ public class JobPointsAddAdvancedActivity extends AppCompatActivity implements P
                     }, 100);
                 } else {
                     // Required to show/hide white background behind floating label during focus change
-                    if (etPointDescription.getText().length() > 0)
-                        tvHiddenPointDescription.setVisibility(View.VISIBLE);
-                    else
-                        tvHiddenPointDescription.setVisibility(View.INVISIBLE);
+
+                    showHideMaterialEditTextBackground(etPointDescription,tvHiddenPointDescription);
+
                 }
             }
         });
+    }
+
+    private void showHideMaterialEditTextBackground(EditText lookAt, TextView background){
+        Log.d(TAG, "showHideMaterialEditTextBackground: Started");
+
+        if (lookAt.getText().length() > 0)
+            background.setVisibility(View.VISIBLE);
+        else
+            background.setVisibility(View.INVISIBLE);
     }
 
     private void populateValues(){

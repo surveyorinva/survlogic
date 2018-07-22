@@ -1,0 +1,543 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <LinearLayout
+        android:id="@+id/ll_details_extra"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="visible">
+
+        <TextView
+            android:id="@+id/card_label_photo"
+            android:text="@string/dialog_point_view_category_photo"
+            style="@style/Labels.Card.ProjectCategory"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="@dimen/card_margin_between_headers"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/card_photo_view"
+            card_view:elevation="10dp"
+            card_view:cardCornerRadius="4dp"
+            android:layout_margin="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <android.support.v4.widget.Space
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp" />
+
+                <GridView
+                    android:id="@+id/photo_grid_view"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="10dp"
+                    android:numColumns="4"
+                    android:verticalSpacing="1dp"
+                    android:horizontalSpacing="1dp"
+                    android:stretchMode="columnWidth"
+                    android:gravity="center"
+                    android:drawSelectorOnTop="true"
+                    android:listSelector="@drawable/grid_view_highlight_transparent"
+                    android:visibility="gone"
+                    android:layout_width="match_parent"
+                    android:layout_height="75dp" />
+
+                <RelativeLayout
+                    android:background="@drawable/box_accent_border_ltgrey"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp" >
+
+                    <Button
+                        android:id="@+id/card3_take_photo"
+                        android:background="@drawable/button_ripple_transparent"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+
+                    <ImageView
+                        android:id="@+id/card3_take_photo_img"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginTop="5dp"
+                        android:background="@drawable/vc_circle_blue"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp" />
+
+                    <TextView
+                        android:text="@string/dialog_point_view_add_photos"
+                        android:gravity="center_vertical"
+                        android:layout_toEndOf="@id/card3_take_photo_img"
+                        android:layout_marginStart="10dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+
+                </RelativeLayout>
+
+            </LinearLayout>
+
+
+        </android.support.v7.widget.CardView>
+
+        <TextView
+            android:id="@+id/card_label_sketch"
+            android:text="@string/dialog_point_view_category_sketch"
+            style="@style/Labels.Card.ProjectCategory"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="@dimen/card_margin_between_headers"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/card_sketch_view"
+            card_view:elevation="10dp"
+            card_view:cardCornerRadius="4dp"
+            android:layout_margin="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <android.support.v4.widget.Space
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp" />
+
+                <GridView
+                    android:id="@+id/sketch_grid_view"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="10dp"
+                    android:numColumns="4"
+                    android:verticalSpacing="1dp"
+                    android:horizontalSpacing="1dp"
+                    android:stretchMode="columnWidth"
+                    android:gravity="center"
+                    android:drawSelectorOnTop="true"
+                    android:listSelector="@drawable/grid_view_highlight_transparent"
+                    android:visibility="gone"
+                    android:layout_width="match_parent"
+                    android:layout_height="75dp" />
+
+                <RelativeLayout
+                    android:background="@drawable/box_accent_border_ltgrey"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp" >
+
+                    <Button
+                        android:id="@+id/card4_add_sketch"
+                        android:background="@drawable/button_ripple_transparent"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+
+                    <ImageView
+                        android:id="@+id/card4_add_sketch_img"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginTop="5dp"
+                        android:background="@drawable/vc_circle_blue"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp" />
+
+                    <TextView
+                        android:text="@string/dialog_point_view_add_sketch"
+                        android:gravity="center_vertical"
+                        android:layout_toEndOf="@id/card4_add_sketch_img"
+                        android:layout_marginStart="10dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+
+                </RelativeLayout>
+
+            </LinearLayout>
+
+
+        </android.support.v7.widget.CardView>
+
+        <RelativeLayout
+            android:id="@+id/rl_details_results"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone">
+
+            <RelativeLayout
+                android:id="@+id/rl_details_results_header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <View
+                    android:background="@color/colorPrimary"
+                    android:layout_width="match_parent"
+                    android:layout_height="25dp">
+
+                </View>
+
+                <TextView
+                    android:id="@+id/lbl_header_results"
+                    android:text="Results"
+                    android:layout_marginTop="2dp"
+                    android:layout_marginStart="5dp"
+                    android:textColor="@color/white"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+
+            </RelativeLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_details_results_values"
+                android:orientation="vertical"
+                android:layout_marginStart="5dp"
+                android:layout_below="@id/rl_details_results_header"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:weightSum="2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:text="Latitude:"
+                        android:textSize="@dimen/text_size_small"
+                        android:layout_weight="0.55"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content" />
+
+
+                    <TextView
+                        android:id="@+id/value_latitude"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="@dimen/text_size_normal"
+                        android:layout_weight="1.60"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:weightSum="2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:text="Longitude:"
+                        android:textSize="@dimen/text_size_small"
+                        android:layout_weight="0.55"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content" />
+
+
+                    <TextView
+                        android:id="@+id/value_longitude"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="@dimen/text_size_normal"
+                        android:layout_weight="1.60"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:weightSum="2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:text="Ellipsoid:"
+                        android:textSize="@dimen/text_size_small"
+                        android:layout_weight="0.55"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content" />
+
+
+                    <TextView
+                        android:textColor="@color/colorPrimary"
+                        android:id="@+id/value_ellipsoid"
+                        android:textSize="@dimen/text_size_normal"
+                        android:layout_weight="1.60"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:weightSum="2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:text="Orthometric:"
+                        android:textSize="@dimen/text_size_small"
+                        android:layout_weight="0.55"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content" />
+
+
+                    <ProgressBar
+                        android:id="@+id/progress_ortho"
+                        android:layout_gravity="center_vertical"
+                        android:layout_width="12dp"
+                        android:layout_height="12dp"
+                        android:visibility="visible"/>
+
+                    <TextView
+                        android:id="@+id/value_ortho"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="@dimen/text_size_normal"
+                        android:layout_weight="1.60"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:weightSum="2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <View
+                        android:background="@color/grey_800"
+                        android:layout_weight="1.5"
+                        android:layout_width="0dp"
+                        android:layout_height="1dp"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:weightSum="2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:text="Northing (Grid):"
+                        android:textSize="@dimen/text_size_small"
+                        android:layout_weight="0.55"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content" />
+
+
+                    <TextView
+                        android:id="@+id/value_grid_north"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="@dimen/text_size_normal"
+                        android:layout_weight="1.35"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:weightSum="2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:text="Easting (Grid):"
+                        android:textSize="@dimen/text_size_small"
+                        android:layout_weight="0.55"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content" />
+
+
+                    <TextView
+                        android:id="@+id/value_grid_east"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="@dimen/text_size_normal"
+                        android:layout_weight="1.35"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:weightSum="2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:text="Northing (Local):"
+                        android:textSize="@dimen/text_size_small"
+                        android:layout_weight="0.55"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content" />
+
+
+                    <TextView
+                        android:id="@+id/value_local_north"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="@dimen/text_size_normal"
+                        android:layout_weight="1.35"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:weightSum="2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:text="Easting (Local):"
+                        android:textSize="@dimen/text_size_small"
+                        android:layout_weight="0.55"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content" />
+
+
+                    <TextView
+                        android:id="@+id/value_local_east"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="@dimen/text_size_normal"
+                        android:layout_weight="1.35"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:weightSum="2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <View
+                        android:background="@color/grey_800"
+                        android:layout_weight="1.5"
+                        android:layout_width="0dp"
+                        android:layout_height="1dp"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                android:orientation="horizontal"
+                android:weightSum="2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:text="Epochs Collected:"
+                    android:textSize="@dimen/text_size_small"
+                    android:layout_weight="0.55"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content" />
+
+
+                <TextView
+                    android:id="@+id/value_epoch"
+                    android:textSize="@dimen/text_size_normal"
+                    android:textColor="@color/colorPrimary"
+                    android:layout_weight="1.60"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:weightSum="2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:text="Point Accuracy:"
+                        android:textSize="@dimen/text_size_small"
+                        android:layout_weight="0.55"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content" />
+
+
+                    <TextView
+                        android:id="@+id/value_accuracy"
+                        android:textSize="@dimen/text_size_normal"
+                        android:textColor="@color/colorPrimary"
+                        android:layout_weight="1.60"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:weightSum="2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:text="Std. Dev.:"
+                        android:textSize="@dimen/text_size_small"
+                        android:layout_weight="0.55"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content" />
+
+
+                    <TextView
+                        android:id="@+id/value_result_std_dev"
+                        android:textSize="@dimen/text_size_normal"
+                        android:textColor="@color/colorPrimary"
+                        android:layout_weight="1.60"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:weightSum="2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:text="Variance:"
+                        android:textSize="@dimen/text_size_small"
+                        android:layout_weight="0.55"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:id="@+id/value_result_variance"
+                        android:textSize="@dimen/text_size_normal"
+                        android:textColor="@color/colorPrimary"
+                        android:layout_weight="1.60"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content" />
+
+                </LinearLayout>
+
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+
+    </LinearLayout>
+
+
+
+
+
+</LinearLayout>
