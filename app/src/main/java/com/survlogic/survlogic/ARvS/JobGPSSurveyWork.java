@@ -22,6 +22,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -30,6 +31,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.LinearInterpolator;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -55,15 +57,17 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.survlogic.survlogic.ARvS.dialog.DialogGPSSurveyMeasureResults;
 import com.survlogic.survlogic.ARvS.interf.GPSMeasureHelperListener;
 import com.survlogic.survlogic.ARvS.interf.POIHelperListener;
-import com.survlogic.survlogic.ARvS.utils.CameraService;
+import com.survlogic.survlogic.ARvS.interf.PopupDialogBoxListener;
+import com.survlogic.survlogic.ARvS.services.CameraService;
 import com.survlogic.survlogic.ARvS.utils.GPSMeasureHelper;
 import com.survlogic.survlogic.ARvS.utils.GetPOIHelper;
-import com.survlogic.survlogic.ARvS.utils.GnssService;
-import com.survlogic.survlogic.ARvS.utils.SensorService;
+import com.survlogic.survlogic.ARvS.services.GnssService;
+import com.survlogic.survlogic.ARvS.services.SensorService;
 import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.dialog.DialogJobPointView;
 import com.survlogic.survlogic.model.PointGeodetic;
 import com.survlogic.survlogic.utils.GPSLocationConverter;
+import com.survlogic.survlogic.utils.PopupDialogBoxWizard;
 import com.survlogic.survlogic.utils.PreferenceLoaderHelper;
 import com.survlogic.survlogic.utils.RumbleHelper;
 import com.survlogic.survlogic.utils.StringUtilityHelper;
@@ -75,7 +79,7 @@ import java.util.Calendar;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class JobGPSSurveyWork extends AppCompatActivity implements POIHelperListener, GPSMeasureHelperListener, OnMapReadyCallback {
+public class JobGPSSurveyWork extends AppCompatActivity implements POIHelperListener, GPSMeasureHelperListener, OnMapReadyCallback, PopupDialogBoxListener {
     private static final String TAG = "JobGPSSurveyArvTActivit";
 
     private Context mContext;
@@ -89,7 +93,7 @@ public class JobGPSSurveyWork extends AppCompatActivity implements POIHelperList
     public GnssService locationService;
     private BroadcastReceiver locationUpdateReceiver;
     private BroadcastReceiver predictedLocationReceiver;
-    private BroadcastReceiver locationMetadataReceier;
+    private BroadcastReceiver locationMetadataReceiver;
     private BroadcastReceiver gnssStatusReceiver;
     private BroadcastReceiver batteryCriticalReceiver;
 
@@ -117,6 +121,7 @@ public class JobGPSSurveyWork extends AppCompatActivity implements POIHelperList
 
     //Widgets
     private RelativeLayout rlGPSErrorMessage;
+    private Button btErrorTryAgain;
     private FloatingActionButton fabMenu;
     private Switch swAppBarSwitch;
     private ImageButton ibSettings;
@@ -439,7 +444,7 @@ public class JobGPSSurveyWork extends AppCompatActivity implements POIHelperList
         );
 
     //----------------------------------------------------------------------------------------------
-        locationMetadataReceier = new BroadcastReceiver() {
+        locationMetadataReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
 
@@ -456,7 +461,7 @@ public class JobGPSSurveyWork extends AppCompatActivity implements POIHelperList
                         if (mSpeed > MOTION_THRESHOLD) {
 
                             camera_bearing_speed = mAzimuth;
-                            Log.d(TAG, "locationMetadataReceier: " + CAMERA_POSITION_SPEED);
+                            Log.d(TAG, "locationMetadataReceiver: " + CAMERA_POSITION_SPEED);
                             mCurrentCameraPosition = CAMERA_POSITION_SPEED;
 
                         }
@@ -467,7 +472,7 @@ public class JobGPSSurveyWork extends AppCompatActivity implements POIHelperList
         };
 
         LocalBroadcastManager.getInstance(this).registerReceiver(
-                locationMetadataReceier,
+                locationMetadataReceiver,
                 new IntentFilter("GPSLocationMetadata")
         );
 
@@ -585,10 +590,6 @@ public class JobGPSSurveyWork extends AppCompatActivity implements POIHelperList
                 sensorPitch = intent.getFloatExtra("pitch",sensorPitch);
                 sensorRoll = intent.getFloatExtra("roll",sensorRoll);
 
-                Log.d(TAG, "onReceive: Sensor Azimuth:" + sensorOrientation);
-                Log.d(TAG, "onReceive: Sensor Pitch:" + sensorPitch);
-                Log.d(TAG, "onReceive: Filtered Location: " + hasFilteredLocation);
-
                 if(hasFilteredLocation){
                     evaluateSensorData(SENSOR_RAW,sensorOrientation,sensorPitch,sensorRoll);
                 }
@@ -612,10 +613,6 @@ public class JobGPSSurveyWork extends AppCompatActivity implements POIHelperList
                 sensorOrientation = intent.getIntExtra("azimuth",sensorOrientation);
                 sensorPitch = intent.getFloatExtra("pitch",sensorPitch);
                 sensorRoll = intent.getFloatExtra("roll",sensorRoll);
-
-                Log.d(TAG, "onReceive: Sensor Azimuth:" + sensorOrientation);
-                Log.d(TAG, "onReceive: Sensor Pitch:" + sensorPitch);
-                Log.d(TAG, "onReceive: Filtered Location: " + hasFilteredLocation);
 
                 evaluateSensorData(SENSOR_GMF,sensorOrientation,sensorPitch,sensorRoll);
 
@@ -674,8 +671,6 @@ public class JobGPSSurveyWork extends AppCompatActivity implements POIHelperList
     //---------------------------------------------------------------------------------------------- Sensor Methods
 
     private void evaluateSensorData(boolean type, int orientation, float pitch, float roll){
-        Log.d(TAG, "evaluateSensorData: Started");
-
 
         if(hasGMFSensorLocationSent){
 
@@ -695,8 +690,6 @@ public class JobGPSSurveyWork extends AppCompatActivity implements POIHelperList
     }
 
     private void updateSensorWithLocation(Location location){
-        Log.d(TAG, "updateSensorWithLocation: Started");
-
         if(!hasGMFSensorLocationSent){
 
             sensorService.setSensorLocation(location);
@@ -890,6 +883,21 @@ public class JobGPSSurveyWork extends AppCompatActivity implements POIHelperList
 
         //Views
         rlGPSErrorMessage = findViewById(R.id.rl_error_message);
+        btErrorTryAgain = findViewById(R.id.bt_action_retry);
+        btErrorTryAgain.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                hasLocation = false;
+                hasFilteredLocation = false;
+
+                gpsRawCount = 0;
+                gpsFilteredCount = 0;
+
+                LoadGPSDataTask loadGPSDataTask = new LoadGPSDataTask();
+                loadGPSDataTask.execute();
+            }
+        });
 
         //Widgets
         ibSettings = findViewById(R.id.settings_btn);
@@ -1091,11 +1099,8 @@ public class JobGPSSurveyWork extends AppCompatActivity implements POIHelperList
     }
 
     private void curveMapView(boolean curveMapView){
-        Log.d(TAG, "animateMapView: Started");
         final boolean viewType = curveMapView;
         final com.github.florent37.shapeofview.shapes.ArcView view = findViewById(R.id.view_container_map);
-
-        Log.d(TAG, "curveMapView: " + curveMapView);
 
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
@@ -1265,7 +1270,6 @@ public class JobGPSSurveyWork extends AppCompatActivity implements POIHelperList
 
 
     private void updateHudLocation(boolean type, Location location){
-        Log.d(TAG, "updateHudLocation: Started");
         DecimalFormat df2 = StringUtilityHelper.createUSNonBiasDecimalFormatSelect(2);
 
 
@@ -1309,7 +1313,6 @@ public class JobGPSSurveyWork extends AppCompatActivity implements POIHelperList
     }
 
     private void updateHudGnssStatus(int noSatellites, int noSatellitesLocked){
-        Log.d(TAG, "updateHudGnssStatus: Started");
 
         if(hasGPSHubInit) {
 
@@ -1321,7 +1324,6 @@ public class JobGPSSurveyWork extends AppCompatActivity implements POIHelperList
     }
 
     private void updateHudLocationMetadata(float speed, float bearing){
-        Log.d(TAG, "updateHudLocationMetadata: Started");
         double convertedSpeed = 0;
 
         if(hasGPSHubInit){
@@ -1358,9 +1360,6 @@ public class JobGPSSurveyWork extends AppCompatActivity implements POIHelperList
     }
 
     private void updateHudSensors(int azimuth, float pitch, float roll){
-        Log.d(TAG, "updateHudSensors: Started");
-        Log.d(TAG, "updateHudSensors: Azimuth: " + azimuth);
-
         int pitchShown = (int) pitch;  //show pitch without decimal
         int rollShown = (int) roll;
 
@@ -1458,9 +1457,42 @@ public class JobGPSSurveyWork extends AppCompatActivity implements POIHelperList
         Log.d(TAG, "showResultsDialog: Started");
         if(show){
             Log.d(TAG, "showResultsDialog: Results: " + measuringLocationList.size());
-            DialogGPSSurveyMeasureResults dialogGPSSurveyMeasureResults = DialogGPSSurveyMeasureResults.newInstance(measuringLocationList,gpsMeasureHelper.getPointNumber(),gpsMeasureHelper.getInstrumentHeight());
+            DialogGPSSurveyMeasureResults dialogGPSSurveyMeasureResults = DialogGPSSurveyMeasureResults.newInstance(measuringLocationList,mJob_DatabaseName, gpsMeasureHelper.getPointNumber(),gpsMeasureHelper.getInstrumentHeight(),this);
             dialogGPSSurveyMeasureResults.show(getFragmentManager(),"results_dialog");
         }
+    }
+
+    //---------------------------------------------------------------------------------------------- PopUp Dialog Listener
+    @Override
+    public void onSave() {
+
+        int previousPointNumber = gpsMeasureHelper.getPointNumber();
+        int nextPointNumber = previousPointNumber + 1;
+
+        gpsMeasureHelper.setPointNumber(nextPointNumber);
+
+        PopupDialogBoxWizard popupDialogBoxWizard = new PopupDialogBoxWizard(mContext);
+        final AlertDialog saveSuccess = popupDialogBoxWizard.genericPointSaveStatus();
+        //final AlertDialog saveSuccess = dialogSaveStatus();
+        saveSuccess.show();
+
+        final Timer t = new Timer();
+        t.schedule(new TimerTask() {
+            public void run() {
+                saveSuccess.dismiss(); // when the task active then close the dialog
+                t.cancel(); // also just stop the timer thread, otherwise, you may receive a crash report
+            }
+        }, 2000);
+    }
+
+    @Override
+    public void onCancel() {
+
+    }
+
+    @Override
+    public void onDismiss() {
+
     }
 
     //---------------------------------------------------------------------------------------------- Map View
@@ -1570,7 +1602,6 @@ public class JobGPSSurveyWork extends AppCompatActivity implements POIHelperList
     }
 
     private void drawUserPositionMarker(Location location){
-        Log.d(TAG, "drawUserPositionMarker: Started");
 
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
 
@@ -1628,7 +1659,6 @@ public class JobGPSSurveyWork extends AppCompatActivity implements POIHelperList
 
     //---------------------------------------------------------------------------------------------- Map Zooms
     private void updateMapLocation(boolean type, Location location) {
-        Log.d(TAG, "updateMapLocation: Started");
 
         if (hasMapViewInit) {
             if (prefUsePredictedLocation == type) {
@@ -1639,7 +1669,6 @@ public class JobGPSSurveyWork extends AppCompatActivity implements POIHelperList
     }
 
     private CameraPosition setCameraPosition(LatLng latLng){
-        Log.d(TAG, "setCameraPosition: " + mCurrentCameraPosition);
         CameraPosition cameraPosition;
 
         switch(mCurrentCameraPosition){
@@ -1685,7 +1714,6 @@ public class JobGPSSurveyWork extends AppCompatActivity implements POIHelperList
 
 
     private void zoomMapTo(Location location) {
-        Log.d(TAG, "zoomMapTo: Started");
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
 
 
@@ -1860,6 +1888,8 @@ public class JobGPSSurveyWork extends AppCompatActivity implements POIHelperList
         }
 
     }
+
+
 
     //---------------------------------------------------------------------------------------------- Helpers
     private void showToast(String data, boolean shortTime) {

@@ -94,6 +94,7 @@
     <string name="pref_gps_location_sensor_use_fusion">pref_gps_location_sensor_use_fusion</string>
     <string name="pref_gps_location_sensor_use_gmf">pref_gps_location_sensor_use_gmf</string>
 
+    <string name="pref_camera_location_use">pref_camera_location_use</string>
 
 
     <!--Intent Keys-->
@@ -106,11 +107,20 @@
     <string name="KEY_JOB_SETTINGS">KEY_JOB_SETTINGS</string>
 
     <string name="KEY_Intent_FROM">KEY_Intent_FROM</string>
+    <string name="KEY_POSITION_USE">KEY_POSITION_USE</string>
     <string name="KEY_POSITION_LATITUDE">KEY_LATITUDE</string>
     <string name="KEY_POSITION_LONGITUDE">KEY_LONGITUDE</string>
     <string name="KEY_POSITION_ELLIPSOID">KEY_ELLIPSOID</string>
     <string name="KEY_POSITION_ORTHO">KEY_ORTHO</string>
+    <string name="KEY_POSITION_ACCURACY">KEY_ACCURACY</string>
     <string name="KEY_POSITION">KEY_POSITION</string>
+
+    <string name="KEY_SENSOR_USE">KEY_SENSOR_USE</string>
+    <string name="KEY_SENSOR_AZIMUTH">KEY_AZIMUTH</string>
+    <string name="KEY_SENSOR_PITCH">KEY_PITCH</string>
+    <string name="KEY_SENSOR_ROLL">KEY_ROLL</string>
+
+    <string name="KEY_IMAGE_FILE">KEY_BITMAP</string>
 
     <string name="KEY_GALLERY_IMAGE_PATH">KEY_GALLERY_IMAGE_PATH</string>
 

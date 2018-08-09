@@ -1,4 +1,4 @@
-package com.survlogic.survlogic.ARvS.utils;
+package com.survlogic.survlogic.ARvS.services;
 
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -25,6 +25,7 @@ import android.support.annotation.RequiresApi;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.survlogic.survlogic.ARvS.utils.ArvKalmanLatLong;
 import com.survlogic.survlogic.interf.GpsSurveyListener;
 import com.survlogic.survlogic.model.Dop;
 import com.survlogic.survlogic.utils.GpsHelper;
@@ -339,12 +340,9 @@ public class GnssService extends Service implements LocationListener {
     //----------------------------------------------------------------------------------------------Filtering and Adding Methods
 
     private boolean filterAndAddLocation(Location location){
-        Log.d(TAG, "filterAndAddLocation: Started");
-
         long age = getLocationAge(location);
 
         if(age > gpsFreqInMillis){
-            Log.d(TAG, "filterAndAddLocation: Location is Old");
             oldLocationList.add(location);
             return false;
         }
@@ -409,9 +407,6 @@ public class GnssService extends Service implements LocationListener {
 
         currentSpeed = location.getSpeed();
         filteredLocationList.add(location);
-
-
-        Log.d(TAG, "filterAndAddLocation: Added at: " + predictedDeltaInMeters + " -- Location List: " + filteredLocationList.size());
 
         return true;
 
@@ -650,7 +645,6 @@ public class GnssService extends Service implements LocationListener {
 
     //----------------------------------------------------------------------------------------------//Gnss Status Listener Methods
     private void setNavigationMode(boolean navigating){
-        Log.d(TAG, "setNavigationMode: Started");
 
         if (navigating != mNavigating) {
             if (navigating) {
@@ -700,23 +694,14 @@ public class GnssService extends Service implements LocationListener {
             mSvCount++;
         }
 
-        Log.d(TAG, "updateGnssStatus: No. Sats: " + mSvCount);
-        Log.d(TAG, "updateGnssStatus: Locked: " + mUsedInFixCount);
-
-
         broadcastGnssStatusData();
 
     }
 
     //---------------------------------------------------------------------------------------------- Nmea Listener Methods
     private void parseDOPSFromNmeaMessage(String message, long timestamp){
-        Log.d(TAG, "getDOPSFromNmeaMessage: Started");
-
         if (message.startsWith("$GNGSA") || message.startsWith("$GPGSA")) {
             Dop dop = GpsHelper.getDop(message);
-
-            Log.d(TAG, "parseDOPSFromNmeaMessage: dop" + dop);
-            Log.d(TAG, "parseDOPSFromNmeaMessage: mNavigating: " + mNavigating);
 
             if (dop != null && mNavigating) {
 
@@ -729,8 +714,6 @@ public class GnssService extends Service implements LocationListener {
     }
 
     private void parseOrthometricHeightFromNmeaMesage(String message){
-        Log.d(TAG, "parseOrthometricHeightFromNmeaMesage: Started");
-
 
         if (message.startsWith("$GPGGA") || message.startsWith("$GNGNS")) {
             Double altitudeMsl = GpsHelper.getAltitudeMeanSeaLevel(message);
@@ -789,8 +772,6 @@ public class GnssService extends Service implements LocationListener {
     //---------------------------------------------------------------------------------------------- Broadcast Senders
 
     private void broadcastLocationRaw(Location location){
-        Log.d(TAG, "sendLocationRaw: Started");
-
         Intent intent = new Intent("LocationUpdated");
         intent.putExtra("location", location);
         LocalBroadcastManager.getInstance(this.getApplication()).sendBroadcast(intent);
@@ -800,8 +781,6 @@ public class GnssService extends Service implements LocationListener {
 
 
     private void broadcastLocationPredicted(Location location){
-        Log.d(TAG, "sendPredictLocation: Started");
-
         Intent intent = new Intent("PredictLocation");
         intent.putExtra("location",location);
         LocalBroadcastManager.getInstance(this.getApplication()).sendBroadcast(intent);
@@ -810,9 +789,6 @@ public class GnssService extends Service implements LocationListener {
 
 
     private void broadcastGnssStatusData(){
-        Log.d(TAG, "sendGnssStatusData: Started");
-
-
         Intent intent = new Intent("GnssStatus");
         intent.putExtra("svCount", mSvCount);
         intent.putExtra("usedInFixCount", mUsedInFixCount);
@@ -822,8 +798,6 @@ public class GnssService extends Service implements LocationListener {
 
 
     private void sendLocationMetadata(Location location){
-        Log.d(TAG, "sendLocationMetadata: Started");
-
         float gpsAzimuth = location.getBearing();
         float gpsSpeed = location.getSpeed();
 
@@ -833,7 +807,6 @@ public class GnssService extends Service implements LocationListener {
         LocalBroadcastManager.getInstance(this.getApplication()).sendBroadcast(intent);
 
     }
-
 
 
 }

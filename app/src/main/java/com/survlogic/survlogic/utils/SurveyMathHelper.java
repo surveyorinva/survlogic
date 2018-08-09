@@ -263,12 +263,8 @@ public class SurveyMathHelper {
     }
 
     public static String convertDECtoDMSGeodeticV2(double angle, int decimalPlace){
-        Log.d(TAG, "convertDECtoDMSGeodeticV2: Started...");
-
         boolean neg = angle < 0;
         String myAngleDMS;
-        Log.d(TAG, "convertDECtoDMSGeodeticV2: Angle In: " + angle);
-        Log.d(TAG, "convertDECtoDMSGeodeticV2: Decimal: " + decimalPlace);
 
         if (angle ==0){
             myAngleDMS = "0";
@@ -308,7 +304,6 @@ public class SurveyMathHelper {
             sSec = sSec + "\"";
 
             myAngleDMS = sDeg + sMin + sSec;
-            Log.d(TAG, "convertDECtoDMSGeodeticV2: Angle Out: " + myAngleDMS);
 
             if (neg){
                 myAngleDMS = myAngleDMS + " W";

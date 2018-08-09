@@ -13,6 +13,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera.autofocus" />
 
     <uses-feature android:name="android.hardware.camera2"/>
 
@@ -36,14 +37,14 @@
         </provider>
 
         <service
-            android:name=".ARvS.utils.GnssService"
+            android:name=".ARvS.services.GnssService"
             android:enabled="true"
             android:exported="false">
 
         </service>
 
         <service
-            android:name=".ARvS.utils.SensorService"
+            android:name=".ARvS.services.SensorService"
             android:enabled="true"
             android:exported="false">
 
@@ -193,7 +194,20 @@
             android:theme="@style/SuperMaterialTheme"/>
 
         <activity
-            android:name=".activity.CameraActivity"
+            android:name=".activity.CameraActivityV1"
+            android:screenOrientation="portrait"
+            android:theme="@style/SuperMaterialTheme"/>
+
+
+        <activity android:name=".camera.CameraActivityLauncher"
+            android:screenOrientation="portrait"
+            android:theme="@style/SuperMaterialTheme"/>
+
+        <activity android:name=".camera.CaptureImageActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/SuperMaterialTheme"/>
+
+        <activity android:name=".camera.util.CaptureImageSettings"
             android:screenOrientation="portrait"
             android:theme="@style/SuperMaterialTheme"/>
 

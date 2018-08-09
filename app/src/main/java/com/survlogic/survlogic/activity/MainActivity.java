@@ -29,6 +29,7 @@ import com.survlogic.survlogic.ARvS.JobGPSSurveyWork;
 import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.adapter.ActivityViewPagerAdapter;
 import com.survlogic.survlogic.background.BackgroundProjectListFromActivity;
+import com.survlogic.survlogic.camera.CameraActivityLauncher;
 import com.survlogic.survlogic.fragment.MainHomeFragment;
 import com.survlogic.survlogic.fragment.MainToolsFragment;
 import com.survlogic.survlogic.interf.ProjectListListener;
@@ -180,7 +181,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
 
             case R.id.menu_item4_id:
-                intent.setClass(this, CameraActivity.class);
+                intent.setClass(this, CameraActivityLauncher.class);
 
                 RumbleHelper.init(mContext);
                 RumbleHelper.once(50);

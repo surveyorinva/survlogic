@@ -193,6 +193,49 @@ public class FileHelper {
     }
 
 
+    public File getPhotoFile(){
+        Log.d(TAG, "saveImagetoFilePath: Creating file path");
+
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "IMG_" + timeStamp;
+
+        //String path = Environment.getExternalStorageDirectory().toString();
+
+        boolean mediaMount;
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state) || Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
+            mediaMount =  true;
+        }else{
+            mediaMount = false;
+        }
+
+        Log.d(TAG, "Media Mounted: " + mediaMount);
+
+
+        String path = getPathToFolder(0);
+
+        Log.d(TAG, "Save Path:" + path);
+
+        File folder = new File(path);
+
+        File file = new File(path,imageFileName + ".jpg");
+
+        try{
+
+            if (!folder.isDirectory()|| !folder.exists()) {
+                folder.mkdirs();
+            }
+
+        }catch (Exception e){
+            e.printStackTrace();
+
+        }
+
+        return file;
+
+    }
+
+
     public String uriToString(Uri uri){
         return uri.toString();
     }

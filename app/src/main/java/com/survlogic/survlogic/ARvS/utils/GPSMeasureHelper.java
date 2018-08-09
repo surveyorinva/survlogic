@@ -106,6 +106,11 @@ public class GPSMeasureHelper implements DatabaseDoesPointExistFromAsyncListener
         Log.d(TAG, "setPointNumber: ");
 
         this.mValuePointNo = pointNumber;
+        etPointNumber.setText(String.valueOf(mValuePointNo));
+
+        checkPointNumberFromDatabase(mValuePointNo);
+
+
     }
 
     public int getPointNumber(){
@@ -496,6 +501,11 @@ public class GPSMeasureHelper implements DatabaseDoesPointExistFromAsyncListener
             Log.d(TAG, "does point exist:btSaveObservation: Locked");
             ibGpsMeasure_Setup_Close.setClickable(false);
             isPointNoSet = false;
+
+            if(!isGPSMeasureSetupMenuOpen){
+                openMeasureSetupDialogBox();
+            }
+
         }else{
             etPointNumber.setError(null);
             Log.d(TAG, "does point exist:btSaveObservation: UnLocked");

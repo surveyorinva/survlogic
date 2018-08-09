@@ -59,8 +59,6 @@
     <style name="MyToolbarTheme.TabLayout">
         <item name="android:textColorPrimary">@color/white</item>  <!-- Text color of Toolbar Title -->
         <item name="android:textColorSecondary">@color/white</item>
-
-
     </style>
 
     <style name="MyPopupTheme" parent="ThemeOverlay.AppCompat.Light">
@@ -117,6 +115,13 @@
         <item name="android:windowCloseOnTouchOutside">false</item>
     </style>
 
+    <style name = "DialogSlideDown" parent="@android:style/Theme.Material.Light.Dialog.Alert">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowCloseOnTouchOutside">true</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:windowAnimationStyle">@style/TranslateDialogAnimationSlideFromTopDown</item>
+    </style>
+
     <style name="DialogPointViewStyle" parent="@android:style/Theme.Material.Light.Dialog.Alert">
         <item name="android:windowAnimationStyle">@style/MyAnimation.Window</item>
         <item name="android:windowIsFloating">true</item>
@@ -127,7 +132,6 @@
         <item name="android:windowEnterAnimation">@anim/anim_dialog_fade_in</item>
         <item name="android:windowExitAnimation">@anim/anim_dialog_fade_out</item>
     </style>
-
 
 
     <style name="DialogHintStyle" parent = "TextAppearance.AppCompat.Small">
@@ -160,7 +164,13 @@
         <item name="android:windowEnterAnimation">@anim/anim_dialog_explode_from_back</item>
         <item name="android:windowExitAnimation">@anim/anim_dialog_explode_to_front</item>
     </style>
-    
+
+    <style name="TranslateDialogAnimationSlideFromTopDown">
+        <item name="android:windowEnterAnimation">@anim/anim_in_from_top</item>
+        <item name="android:windowExitAnimation">@anim/anim_out_to_top</item>
+
+    </style>
+
     <style name="Theme.DialogActivity" parent="Theme.AppCompat.Dialog">
         <item name="android:windowFrame">@null</item>
         <item name="android:windowIsFloating">true</item>

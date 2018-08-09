@@ -4,6 +4,8 @@
     <!--General App strings-->
     <string name="general_save">Save</string>
     <string name="general_finish">Finish</string>
+    <string name="general_on">On</string>
+    <string name="general_off">Off</string>
     <string name="general_finished">Done</string>
     <string name="general_cancel">Cancel</string>
     <string name="general_edit">Edit</string>
@@ -207,6 +209,8 @@
     <string name="photo_dialog_title_point">Add Photo to Point</string>
     <string name="photo_dialog_title_sketch">Add Photo to Background</string>
     <string name="dialog_photo_header_1">ADD WATERMARK TO IMAGE</string>
+    <string name="dialog_photo_header_2">ADD PHOTO LOCATION TO IMAGE</string>
+    <string name="dialog_photo_header_3">ADD COMPASS AZIMUTH TO IMAGE</string>
     <string name="dialog_photo_description">Enter in Photo Description"</string>
     <string name="project_photo_new_validation_save_success">Project Photo Saved!</string>
     <string name="project_photo_new_validation_save_failed">Error Saving Project Photo.  Please try again.</string>
@@ -271,7 +275,8 @@
     <string name="dialog_job_point_item_error_pointNorthing">Enter a numeric point number</string>
     <string name="dialog_job_point_item_error_pointEasting">Enter a numeric point number</string>
     <string name="dialog_job_point_item_error_pointElevation">Enter a numeric point number</string>
-    <string name="dialog_job_point_item_error_pointDescription">Enter a numeric point number</string>
+    <string name="dialog_job_point_item_error_pointDescription">Enter a description of the point</string>
+    <string name="dialog_job_point_item_error_pointHeight">Enter height above the ground </string>
 
     <string name="job_new_validation_point_save_success">Point Saved!</string>
     <string name="job_new_validation_point_save_failed">Error Saving Point.  Please try again.</string>
@@ -349,6 +354,9 @@
 
     <string name="dialog_point_view_delete_point_title">Delete Point?</string>
     <string name="dialog_point_view_delete_point_description">Are you sure you want to remove this point from the Job Database?</string>
+
+
+    <string name="dialog_photo_editor_clear_watermark">Are you sure you want to clear the watermark?</string>
 
     <!--Sketch View-->
     <string name="sketch_menu_clear_canvas">Clear Canvas</string>
@@ -566,6 +574,35 @@
     <string name="cameraoverlayview_debug_metadata_gps">Metadata \n GPS Location Accuracy: %1$s \n Using GMF: %2$s \n Using DTM Target: %3$s (%4$s) \n Using DTM Current: %5$s (%6$s) \n</string>
     <string name="cameraoverlayview_debug_metadata_canvas">Screen Logic \n dX: %1$s   dY: %2$s \n Screen Width: %3$s Height: %4$s \n</string>
 
+    <string name="picture">Picture</string>
+    <string name="description_info">Info</string>
+    <string name="request_permission">This sample needs camera permission.</string>
+    <string name="camera_error">This device doesn\'t support Camera2 API.</string>
+
+
+    <string name="camera_metadata_message_intro">
+        <![CDATA[
+
+            Metadata for Camera are used throughout survLogic. Below represents the current
+            status of the GNSS and Compass Sensors used.
+
+        ]]>
+    </string>
+
+    <string name="camera_metadata_message_location_raw_data">\n GNSS Status: \n Raw Location: \n Lat: %1$s, Lon: %2$s, Acc.: %3$s \n </string>
+    <string name="camera_metadata_message_location_predict_data">Adjusted Location: \n Lat: %1$s, Lon: %2$s, Acc.: %3$s \n </string>
+    <string name="camera_metadata_message_sensor_data">\n Compass Sensor: \n Azimuth: %1$s \n</string>
+
+    <string name="camera_metadata_message_location_raw_no_data">GNSS Status: \n Raw Location: \n No Data \n</string>
+    <string name="camera_metadata_message_location_predict_no_data">GNSS Status: \n Adjusted Location: \n No Data \n</string>
+    <string name="camera_metadata_message_sensor_no_data">Compass Sensor: \n No Data \n</string>
+
+    <string name="camera_metadata_message_location_raw_error">GNSS Status: \n Raw Location: \n Error Loading \n</string>
+    <string name="camera_metadata_message_location_predict_error">GNSS Status: \n Adjusted Location: \n Error Loading \n</string>
+    <string name="camera_metadata_message_sensor_error">Compass Sensor: \n Error Loading \n</string>
+
+    <string name="camera_metadata_message_location_raw_off">GNSS Status: \n Raw Location: \n Turned Off \n</string>
+    <string name="camera_metadata_message_location_predict_off">GNSS Status: \n Adjusted Location: \n Turned Off \n</string>
 
     <!-- ******************************Strings related to Settings****************************** -->
 
@@ -719,6 +756,10 @@
     <string name="pref_gps_ar_sensor_use_gmf_title">Use GMF Declination</string>
     <string name="pref_gps_ar_sensor_use_gmf_summary">Apply the geomagnetic declination to sensor reading</string>
 
+    
+    <string name="pref_gps_turn_gps_on_title">Use GPS Positions</string>
+    <string name="pref_gps_turn_gps_on_summary">Using GPS Positions to attached coordinate values to the camera photo. Should be turned off when taking pictures inside.</string>
+    
     <!-- Example General settings -->
     <string name="choose_email_client">Choose email client</string>
     <string name="pref_header_general">General</string>

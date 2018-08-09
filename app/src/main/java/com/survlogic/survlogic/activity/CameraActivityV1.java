@@ -13,12 +13,12 @@ import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 
-import com.survlogic.survlogic.ARvS.utils.CameraService;
+import com.survlogic.survlogic.ARvS.services.CameraService;
 import com.survlogic.survlogic.R;
 
-public class CameraActivity extends AppCompatActivity {
+public class CameraActivityV1 extends AppCompatActivity {
 
-    private static final String TAG = "CameraActivity";
+    private static final String TAG = "CameraActivityV1";
 
     private Context mContext;
 
@@ -42,7 +42,7 @@ public class CameraActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gps_ar_v2);
 
-        mContext = CameraActivity.this;
+        mContext = CameraActivityV1.this;
 
         initViewWidgets();
         startCameraService();

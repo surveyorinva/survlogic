@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/black"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:id="@+id/rl_header"
+        android:layout_alignParentTop="true"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+
+        <Button
+            android:id="@+id/button_save"
+            android:text="@string/general_save"
+            android:textColor="@color/white"
+            android:layout_toEndOf="@+id/button_cancel"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:background="@color/transparent"/>
+
+        <Button
+            android:id="@+id/button_cancel"
+            android:text="@string/general_cancel"
+            android:textColor="@color/white"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:background="@color/transparent"/>
+
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_below="@id/rl_header"
+        android:layout_above="@+id/rl_footer"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.github.chrisbanes.photoview.PhotoView
+            android:id="@+id/picture"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+
+        <ProgressBar
+            android:id="@+id/picture_progress"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"/>
+
+    </RelativeLayout>
+
+
+    <RelativeLayout
+        android:id="@+id/rl_footer"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <View
+            android:id="@+id/view_header"
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:background="@color/grey_800"/>
+
+        <TextView
+            android:text="Metadata"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp"
+            android:textSize="15sp"
+            android:textColor="@color/white"
+            android:layout_toEndOf="@+id/card_expand_content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <ImageButton
+            android:id="@+id/card_expand_content"
+            style="@style/Button.Cards"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginStart="@dimen/text_size_small"
+            android:src="@drawable/ic_keyboard_arrow_down_white"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"/>
+
+
+        <RelativeLayout
+            android:id="@+id/rl_footer_content"
+            android:animateLayoutChanges="true"
+            android:layout_below="@id/view_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="visible">
+
+            <RelativeLayout
+                android:id="@+id/photo_description_layout1"
+                android:background="@drawable/divider_horizontal_bottom_grey"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:visibility="visible">
+
+                <TextView
+                    android:id="@+id/description_header"
+                    android:text="@string/dialog_photo_header_1"
+                    style="@style/Labels.EditBoxHeaders"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <ImageView
+                    android:src="@drawable/ic_description"
+                    android:layout_centerVertical="true"
+                    android:layout_below="@id/description_header"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp" />
+
+                <EditText
+                    android:id="@+id/photo_description"
+                    android:hint="@string/dialog_photo_description"
+                    android:layout_marginStart="40dp"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentBottom="true"
+                    android:layout_marginBottom="10dp"
+                    android:background="@null"
+                    android:inputType="textAutoCorrect|textCapSentences"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/rl_photo_actions"
+                android:background="@color/white"
+                android:paddingTop="2dp"
+                android:layout_below="@id/photo_description_layout1"
+                android:layout_width="match_parent"
+                android:layout_height="50dp">
+
+                <mehdi.sakout.fancybuttons.FancyButton
+                    android:id="@+id/btn_add_watermark"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:paddingBottom="10dp"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:paddingTop="10dp"
+                    android:elevation="4dp"
+                    app:fb_borderColor="@color/colorPrimary"
+                    app:fb_borderWidth="1dp"
+                    app:fb_defaultColor="@color/colorAccent"
+                    app:fb_focusColor="#ff838b"
+                    app:fb_iconPosition="left"
+                    app:fb_radius="5dp"
+                    app:fb_text="@string/general_add"
+                    app:fb_textColor="#FFFFFF"
+                    android:visibility="visible"/>
+
+                <mehdi.sakout.fancybuttons.FancyButton
+                    android:id="@+id/btn_clear_watermark"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginEnd="70dp"
+                    android:layout_marginBottom="10dp"
+                    android:paddingBottom="10dp"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:paddingTop="10dp"
+                    android:elevation="4dp"
+                    app:fb_borderColor="@color/colorPrimary"
+                    app:fb_defaultColor="@color/white"
+                    app:fb_borderWidth="1dp"
+                    app:fb_focusColor="#ff838b"
+                    app:fb_iconPosition="left"
+                    app:fb_radius="5dp"
+                    app:fb_text="@string/general_clear"
+                    app:fb_textColor="@color/black"
+                    android:visibility="visible"/>
+
+                <ImageButton
+                    android:id="@+id/card_expand_hidden"
+                    style="@style/Button.Cards"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginStart="@dimen/text_size_small"
+                    android:src="@drawable/ic_keyboard_arrow_down"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentBottom="true"
+                    android:visibility="gone"/>
+
+
+            </RelativeLayout>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/rl_footer_hidden"
+            android:animateLayoutChanges="true"
+            android:layout_below="@+id/rl_footer_content"
+            android:background="@color/white"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone">
+
+            <RelativeLayout
+                android:id="@+id/rl_footer_hidden_location"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/location_header"
+                    android:text="@string/dialog_photo_header_2"
+                    style="@style/Labels.EditBoxHeaders"
+                    android:layout_marginTop="15dp"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <LinearLayout
+                    android:id="@+id/ll_switch"
+                    android:layout_alignParentEnd="true"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_width="wrap_content"
+                    android:layout_height="50dp"
+                    android:visibility="visible">
+
+                    <TextView
+                        android:id="@+id/switch_lbl_off"
+                        android:textColor="@color/black"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <View
+                        android:layout_width="5dp"
+                        android:layout_height="wrap_content" />
+
+                    <Switch
+                        android:id="@+id/switch_location_value"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:id="@+id/switch_lbl_on"
+                        android:textColor="@color/grey_800"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <View
+                        android:layout_width="5dp"
+                        android:layout_height="wrap_content" />
+
+
+                </LinearLayout>
+
+
+            </RelativeLayout>
+
+
+            <RelativeLayout
+                android:id="@+id/rl_footer_hidden_compass"
+                android:layout_below="@+id/rl_footer_hidden_location"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/sensor_header"
+                    android:text="@string/dialog_photo_header_3"
+                    style="@style/Labels.EditBoxHeaders"
+                    android:layout_marginTop="15dp"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <LinearLayout
+                    android:id="@+id/ll_switch_sensor"
+                    android:layout_alignParentEnd="true"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_width="wrap_content"
+                    android:layout_height="50dp"
+                    android:visibility="visible">
+
+                    <TextView
+                        android:id="@+id/switch_sensor_lbl_off"
+                        android:textColor="@color/black"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <View
+                        android:layout_width="5dp"
+                        android:layout_height="wrap_content" />
+
+                    <Switch
+                        android:id="@+id/switch_sensor_value"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:id="@+id/switch_sensor_lbl_on"
+                        android:textColor="@color/grey_800"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <View
+                        android:layout_width="5dp"
+                        android:layout_height="wrap_content" />
+
+
+                </LinearLayout>
+
+            </RelativeLayout>
+
+
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+</RelativeLayout>

@@ -24,8 +24,6 @@ import java.util.ArrayList;
 public class BackgroundGeodeticPointGetV2 extends AsyncTask <PointGeodetic,PointGeodetic,ArrayList<PointGeodetic>> {
 
     private static final String TAG = "BackgroundGeodeticPoint";
-    private ProgressDialog dialog;
-
     private Context context;
     private Activity activity;
 
@@ -39,7 +37,6 @@ public class BackgroundGeodeticPointGetV2 extends AsyncTask <PointGeodetic,Point
 
     public BackgroundGeodeticPointGetV2(Context context, String DB_NAME, GeodeticPointsGetter listener) {
         this.context = context;
-        this.dialog = new ProgressDialog(context);
         this.DB_NAME = DB_NAME;
 
         mListener = listener;

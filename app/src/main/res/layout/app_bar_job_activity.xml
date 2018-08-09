@@ -26,6 +26,14 @@
                     android:layout_height="25dp"
                     android:visibility="gone"/>
 
+                <ImageButton
+                    android:id="@+id/button_settings_left"
+                    android:background="@drawable/ic_action_gear"
+                    android:layout_centerVertical="true"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:visibility="gone"/>
+
                 <TextView
                     android:id="@+id/DrawerLayout"
                     style="@style/Labels.Toolbar"
@@ -43,6 +51,16 @@
                     style="@style/Button.Flat.Transparent"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:visibility="gone"/>
+
+                <ImageButton
+                    android:id="@+id/button_settings_right"
+                    android:background="@drawable/ic_action_gear"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="10dp"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
                     android:visibility="gone"/>
 
                 <LinearLayout

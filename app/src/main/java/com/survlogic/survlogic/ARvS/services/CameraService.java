@@ -1,4 +1,4 @@
-package com.survlogic.survlogic.ARvS.utils;
+package com.survlogic.survlogic.ARvS.services;
 
 import android.Manifest;
 import android.app.Activity;

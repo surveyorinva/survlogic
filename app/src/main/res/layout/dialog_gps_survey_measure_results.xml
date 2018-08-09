@@ -142,6 +142,7 @@
                         android:visibility="invisible"/>
 
                     <android.support.design.widget.TextInputLayout
+                        android:id="@+id/dialog_item_header_height"
                         app:hintTextAppearance="@style/HintTextStyle"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
@@ -190,6 +191,7 @@
                         android:visibility="invisible"/>
 
                     <android.support.design.widget.TextInputLayout
+                        android:id="@+id/dialog_item_header_description"
                         app:hintTextAppearance="@style/HintTextStyle"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">

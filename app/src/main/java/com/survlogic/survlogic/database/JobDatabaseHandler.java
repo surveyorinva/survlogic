@@ -282,6 +282,29 @@ public class JobDatabaseHandler extends SQLiteOpenHelper {
 
     }
 
+
+    public long reservePointGeodeticToDB(SQLiteDatabase db, PointGeodetic pointGeodetic){
+        Log.d(TAG, "reservePOintGeodeticToDB: Stated");
+
+        ContentValues contentValues = new ContentValues();
+
+        //Required - From PointSurvey
+        contentValues.put(JobContract.PointEntry.KEY_POINT_NO, pointGeodetic.getPoint_no());
+        contentValues.put(JobContract.PointEntry.KEY_DATE_CREATED,(int) (new Date().getTime()/1000));
+
+        Long result = db.insert(JobContract.PointEntry.TABLE_NAME, null, contentValues);
+        db.close();
+
+        if (result==-1){
+            Log.d(TAG,"Error, Something went wrong...");
+            return -1;
+        } else {
+            Log.d(TAG,"Success, Row inserted into Table...");
+            return result;
+        }
+
+    }
+
     public long addPointGeodeticToDB(SQLiteDatabase db, PointGeodetic pointGeodetic){
         Log.d(TAG, "addPointGeodeticToDB: Starting...");
 
@@ -619,6 +642,7 @@ public class JobDatabaseHandler extends SQLiteOpenHelper {
                 new String[] {String.valueOf(point_no)});
 
     }
+
 
 
     public void deletePointByPointNo(SQLiteDatabase db, int point_no){

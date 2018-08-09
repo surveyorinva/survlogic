@@ -268,8 +268,6 @@ public class CompassLinearView extends View {
         }
 
 
-
-
     }
 
     public void setDegrees(float degrees) {

@@ -40,6 +40,8 @@ public class PreferenceLoaderHelper {
 
     private boolean gps_location_use_prediction, gps_location_sensor_use_fusion, gps_location_sensor_use_gmf;
 
+    private boolean camera_location_use;
+
     public PreferenceLoaderHelper(Context mContext) {
         Log.d(TAG, "PreferenceLoaderHelper: Starting...");
         this.mContext = mContext;
@@ -138,6 +140,8 @@ public class PreferenceLoaderHelper {
 
         gpsSurveyRate = sharedPreferences.getString(mContext.getString(R.string.pref_gps_min_time),"1.0s");
         gpsSurveyHeight = sharedPreferences.getFloat(mContext.getString(R.string.pref_gps_height),3.0f);
+
+        camera_location_use = sharedPreferences.getBoolean(mContext.getString(R.string.pref_camera_location_use),true);
 
     }
 
@@ -472,6 +476,25 @@ public class PreferenceLoaderHelper {
         }else{
             editor.apply();
         }
+    }
+
+    public boolean getCameraLocationUse(){
+        return camera_location_use;
+    }
+
+    public void setCameraLocationUse(boolean useGps,  boolean isForceSave){
+        this.camera_location_use = useGps;
+
+        editor = sharedPreferences.edit();
+        editor.putBoolean(mContext.getString(R.string.pref_camera_location_use),useGps);
+
+        if(isForceSave){
+            editor.commit();
+        }else{
+            editor.apply();
+        }
+
+
     }
 
 }

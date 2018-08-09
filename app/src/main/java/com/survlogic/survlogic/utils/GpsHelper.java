@@ -243,8 +243,6 @@ public class GpsHelper {
      * @return the dilution of precision, or null if dilution of precision can't be parsed
      */
     public static Dop getDop(String nmeaSentence) {
-        Log.d(TAG, "getDop: Started");
-
         final int PDOP_INDEX = 15;
         final int HDOP_INDEX = 16;
         final int VDOP_INDEX = 17;

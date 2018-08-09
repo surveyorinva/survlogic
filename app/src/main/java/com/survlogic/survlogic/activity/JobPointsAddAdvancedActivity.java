@@ -396,22 +396,27 @@ public class JobPointsAddAdvancedActivity extends AppCompatActivity implements P
 
         if(pointNumber !=0){
             etPointNumber.setText(String.valueOf(pointNumber));
+            showHideMaterialEditTextBackground(etPointNumber,tvHiddenPointNumber);
         }
 
         if(pointNorthing != 0){
             etPointNorthing.setText(String.valueOf(pointNorthing));
+            showHideMaterialEditTextBackground(etPointNorthing,tvHiddenPointNorthing);
         }
 
         if (pointEasting !=0) {
             etPointEasting.setText(String.valueOf(pointEasting));
+            showHideMaterialEditTextBackground(etPointEasting,tvHiddenPointEasting);
         }
 
         if (pointEasting !=0){
             etPointElevation.setText(String.valueOf(pointElevation));
+            showHideMaterialEditTextBackground(etPointElevation,tvHiddenPointElevation);
         }
 
         if(!StringUtilityHelper.isStringNull(pointDescription)){
             etPointDescription.setText(String.valueOf(pointDescription));
+            showHideMaterialEditTextBackground(etPointDescription,tvHiddenPointDescription);
         }
 
     }

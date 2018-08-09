@@ -1,4 +1,4 @@
-package com.survlogic.survlogic.ARvS.utils;
+package com.survlogic.survlogic.ARvS.services;
 
 import android.app.Activity;
 import android.app.Service;
@@ -17,6 +17,8 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.Surface;
 import android.view.WindowManager;
+
+import com.survlogic.survlogic.ARvS.utils.ArvSLowPassFilter;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -252,10 +254,6 @@ public class SensorService extends Service implements SensorEventListener {
             float pitch = (float) Math.toDegrees(orientation[1]);
             float roll = (float) Math.toDegrees(orientation[2]);
 
-            Log.i(TAG, "sensorTypeRotationVector: Azimuth: " + azimuth);
-            Log.i(TAG, "sensorTypeRotationVector: Pitch: " + pitch);
-            Log.i(TAG, "sensorTypeRotationVector: Roll: " + roll);
-
             Intent intent = new Intent("SensorData");
             intent.putExtra("azimuth",azimuth);
             intent.putExtra("pitch",pitch);
@@ -269,7 +267,6 @@ public class SensorService extends Service implements SensorEventListener {
     }
 
     private void sensorTypeMultipleSensors(SensorEvent event){
-        Log.d(TAG, "sensorTypeMultipleSensors: Started");
         float[] adjustedRotationMatrix = new float[9];
 
         if (!computing.compareAndSet(false,true )){
@@ -278,8 +275,6 @@ public class SensorService extends Service implements SensorEventListener {
         }
 
         if(event.sensor.getType() == Sensor.TYPE_ACCELEROMETER){
-            Log.d(TAG, "sensorTypeMultipleSensors: Sensor is Accelerometer");
-
             smoothed = ArvSLowPassFilter.filter(event.values,grav, filterAlpha);
 
             grav[0] = smoothed[0];
@@ -287,8 +282,6 @@ public class SensorService extends Service implements SensorEventListener {
             grav[2] = smoothed[2];
 
         }else if(event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD){
-            Log.d(TAG, "sensorTypeMultipleSensors: Sensor is Magnetic Field");
-
             smoothed = ArvSLowPassFilter.filter(event.values, mag, filterAlpha);
 
             mag[0] = smoothed[0];
@@ -334,10 +327,6 @@ public class SensorService extends Service implements SensorEventListener {
         float pitch = (float) Math.toDegrees(orientation[1]);
         float roll = (float) Math.toDegrees(orientation[2]);
 
-        Log.i(TAG, "sensorTypeMultipleSensors: Azimuth: " + azimuth);
-        Log.i(TAG, "sensorTypeMultipleSensors: Pitch: " + pitch);
-        Log.i(TAG, "sensorTypeMultipleSensors: Roll: " + roll);
-
         Intent intent = new Intent("SensorData");
         intent.putExtra("azimuth",azimuth);
         intent.putExtra("pitch",pitch);
@@ -355,13 +344,10 @@ public class SensorService extends Service implements SensorEventListener {
     //---------------------------------------------------------------------------------------------- GMF Compensation
 
     private void getGmfSensorCompensation(float[] orientation){
-        Log.d(TAG, "getGmfSensorCompensation: Started");
         if(hasLocation){
             setGmfForSensor();
 
             if (gmf !=null){
-                Log.d(TAG, "onSensorChangedFiltered: Declination: " + gmf.getDeclination());
-
                 double declination = Math.toRadians(gmf.getDeclination());
 
                 if(declination < 0){
@@ -374,11 +360,6 @@ public class SensorService extends Service implements SensorEventListener {
                 float pitch = (float) Math.toDegrees(orientation[1]);
                 float roll = (float) Math.toDegrees(orientation[2]);
 
-                Log.i(TAG, "getGmfSensorCompensation: Azimuth: " + azimuth);
-                Log.i(TAG, "getGmfSensorCompensation: Pitch: " + pitch);
-                Log.i(TAG, "getGmfSensorCompensation: Roll: " + roll);
-
-                
                 Intent intent = new Intent("SensorGMFData");
                 intent.putExtra("azimuth",azimuth);
                 intent.putExtra("pitch",pitch);
@@ -390,8 +371,6 @@ public class SensorService extends Service implements SensorEventListener {
     }
 
     private synchronized void setGmfForSensor(){
-        Log.d(TAG, "setGmfForSensor: Started");
-
             gmf = new GeomagneticField(
                 (float) mCurrentLocation.getLatitude(),
                 (float) mCurrentLocation.getLongitude(),
@@ -431,12 +410,10 @@ public class SensorService extends Service implements SensorEventListener {
                 break;
 
             case SensorManager.SENSOR_STATUS_ACCURACY_HIGH:
-                Log.i(TAG, "evaluateSensorAccuracy: High Sensor Reading on " + sensor);
                 sensorWarning = false;
                 break;
 
         }
-
 
         Intent intent = new Intent("SensorAccuracy");
         intent.putExtra("sensorWarning",sensorWarning);

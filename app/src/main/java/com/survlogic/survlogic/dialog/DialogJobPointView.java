@@ -1424,7 +1424,7 @@ public class DialogJobPointView extends DialogFragment{
 
         TextView title = new TextView(getActivity());  //was context not this
 
-        title.setText(getString(R.string.photo_dialog_title));
+        title.setText(getString(R.string.photo_dialog_title_point));
         title.setBackgroundColor(Color.WHITE);
         title.setPadding(10, 15, 15, 10);
         title.setGravity(Gravity.CENTER);

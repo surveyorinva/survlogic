@@ -53,6 +53,7 @@ public class CameraOverlayView extends View {
 
     private static int screenWidth, screenHeight;
 
+
     private SensorEvent mSensorEvent;
     private String mSensorMetaData;
     private double mAzimuthObserved = 0;
