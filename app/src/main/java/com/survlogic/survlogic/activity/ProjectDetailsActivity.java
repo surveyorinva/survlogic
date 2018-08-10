@@ -20,7 +20,6 @@ import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.content.FileProvider;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
@@ -59,7 +58,7 @@ import com.survlogic.survlogic.model.Point;
 import com.survlogic.survlogic.model.Project;
 import com.survlogic.survlogic.model.ProjectImages;
 import com.survlogic.survlogic.model.ProjectJobs;
-import com.survlogic.survlogic.utils.ImageHelper;
+import com.survlogic.survlogic.PhotoEditor.utils.ImageHelper;
 import com.survlogic.survlogic.utils.StringUtilityHelper;
 import com.survlogic.survlogic.utils.SurveyMathHelper;
 import com.survlogic.survlogic.utils.SurveyProjectionHelper;
@@ -69,8 +68,6 @@ import com.survlogic.survlogic.dialog.DialogProjectDescriptionAdd;
 import com.survlogic.survlogic.dialog.DialogProjectJobAdd;
 import com.survlogic.survlogic.dialog.DialogProjectPhotoAdd;
 import com.survlogic.survlogic.dialog.DialogProjectPhotoView;
-
-import org.w3c.dom.Text;
 
 import java.io.File;
 import java.io.IOException;

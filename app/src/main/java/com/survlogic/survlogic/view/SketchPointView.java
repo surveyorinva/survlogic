@@ -14,17 +14,14 @@ import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.MotionEvent;
-import android.view.ScaleGestureDetector;
 import android.view.View;
 
 import com.survlogic.survlogic.R;
-import com.survlogic.survlogic.interf.SketchInterfaceListener;
 import com.survlogic.survlogic.model.SketchFingerPath;
-import com.survlogic.survlogic.utils.ImageHelper;
+import com.survlogic.survlogic.PhotoEditor.utils.ImageHelper;
 
 import java.util.ArrayList;
 

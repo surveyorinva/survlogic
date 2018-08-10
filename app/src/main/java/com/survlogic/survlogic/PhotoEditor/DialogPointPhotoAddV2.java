@@ -24,9 +24,8 @@ import android.widget.Toast;
 import com.github.chrisbanes.photoview.PhotoView;
 import com.survlogic.survlogic.PhotoEditor.interf.DialogPointPhotoAddV2Listener;
 import com.survlogic.survlogic.R;
-import com.survlogic.survlogic.interf.DialogPointPhotoAddListener;
 import com.survlogic.survlogic.utils.FileHelper;
-import com.survlogic.survlogic.utils.ImageHelper;
+import com.survlogic.survlogic.PhotoEditor.utils.ImageHelper;
 
 import mehdi.sakout.fancybuttons.FancyButton;
 

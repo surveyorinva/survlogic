@@ -20,7 +20,7 @@ import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.adapter.GalleryImageAdapter;
 import com.survlogic.survlogic.database.ProjectDatabaseHandler;
 import com.survlogic.survlogic.model.ProjectImages;
-import com.survlogic.survlogic.utils.ImageHelper;
+import com.survlogic.survlogic.PhotoEditor.utils.ImageHelper;
 import com.survlogic.survlogic.dialog.DialogProjectPhotoView;
 
 import java.util.ArrayList;

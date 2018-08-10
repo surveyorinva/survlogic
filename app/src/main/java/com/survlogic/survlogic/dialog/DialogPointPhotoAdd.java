@@ -15,11 +15,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import com.survlogic.survlogic.R;
-import com.survlogic.survlogic.activity.ProjectDetailsActivity;
 import com.survlogic.survlogic.background.BackgroundProjectImagesSetup;
 import com.survlogic.survlogic.model.ProjectImages;
 import com.survlogic.survlogic.utils.FileHelper;
-import com.survlogic.survlogic.utils.ImageHelper;
+import com.survlogic.survlogic.PhotoEditor.utils.ImageHelper;
 
 /**
  * Created by chrisfillmore on 7/12/2017.
