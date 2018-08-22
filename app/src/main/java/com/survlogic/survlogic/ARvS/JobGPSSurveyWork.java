@@ -66,6 +66,7 @@ import com.survlogic.survlogic.ARvS.services.SensorService;
 import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.dialog.DialogJobPointView;
 import com.survlogic.survlogic.model.PointGeodetic;
+import com.survlogic.survlogic.model.ProjectJobs;
 import com.survlogic.survlogic.utils.GPSLocationConverter;
 import com.survlogic.survlogic.utils.PopupDialogBoxWizard;
 import com.survlogic.survlogic.utils.PreferenceLoaderHelper;
@@ -79,7 +80,9 @@ import java.util.Calendar;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class JobGPSSurveyWork extends AppCompatActivity implements POIHelperListener, GPSMeasureHelperListener, OnMapReadyCallback, PopupDialogBoxListener {
+public class JobGPSSurveyWork extends AppCompatActivity implements POIHelperListener, GPSMeasureHelperListener,
+                                                                    OnMapReadyCallback,
+                                                                    PopupDialogBoxListener {
     private static final String TAG = "JobGPSSurveyArvTActivit";
 
     private Context mContext;
@@ -1493,6 +1496,17 @@ public class JobGPSSurveyWork extends AppCompatActivity implements POIHelperList
     @Override
     public void onDismiss() {
 
+    }
+
+    @Override
+    public ProjectJobs getProjectJob() {
+
+        ProjectJobs projectJob = new ProjectJobs();
+        projectJob.setId(mJob_id);
+        projectJob.setProjectId(mProject_id);
+        projectJob.setmJobDbName(mJob_DatabaseName);
+
+        return projectJob;
     }
 
     //---------------------------------------------------------------------------------------------- Map View

@@ -305,77 +305,75 @@ public class DialogJobPointView extends DialogFragment{
     private void initViewWidgets(){
         Log.d(TAG, "initViewWidgets: Started...");
 
-        gridView = (GridView) getDialog().findViewById(R.id.photo_grid_view);
-        sketchGridView = (GridView) getDialog().findViewById(R.id.sketch_grid_view);
+        gridView = getDialog().findViewById(R.id.photo_grid_view);
+        sketchGridView = getDialog().findViewById(R.id.sketch_grid_view);
 
-        rlPointOptions = (RelativeLayout) getDialog().findViewById(R.id.rl_point_options);
-        rlGridView = (RelativeLayout) getDialog().findViewById(R.id.rlGridView);
+        rlPointOptions =  getDialog().findViewById(R.id.rl_point_options);
+        rlGridView = getDialog().findViewById(R.id.rlGridView);
 
-        rlPlanarViewDetails = (RelativeLayout) getDialog().findViewById(R.id.rl_planar_view_details);
-        rlWorldViewDetails = (RelativeLayout) getDialog().findViewById(R.id.rl_geographic_view_details);
-        rlGridViewDetails = (RelativeLayout) getDialog().findViewById(R.id.rl_grid_view_details);
+        rlPlanarViewDetails = getDialog().findViewById(R.id.rl_planar_view_details);
+        rlWorldViewDetails = getDialog().findViewById(R.id.rl_geographic_view_details);
+        rlGridViewDetails =  getDialog().findViewById(R.id.rl_grid_view_details);
 
-        rlPointCommands = (RelativeLayout) getDialog().findViewById(R.id.rl_points_commands);
-        rlPlanarCommands = (RelativeLayout) getDialog().findViewById(R.id.rl_points_commands_planar);
-        rlGeodeticCommands = (RelativeLayout) getDialog().findViewById(R.id.rl_points_commands_geographic);
-        rlGridCommands = (RelativeLayout) getDialog().findViewById(R.id.rl_points_commands_grid);
+        rlPointCommands = getDialog().findViewById(R.id.rl_points_commands);
+        rlPlanarCommands = getDialog().findViewById(R.id.rl_points_commands_planar);
+        rlGeodeticCommands = getDialog().findViewById(R.id.rl_points_commands_geographic);
+        rlGridCommands = getDialog().findViewById(R.id.rl_points_commands_grid);
 
-        cardViewPoint = (CardView) getDialog().findViewById(R.id.layout_area_1);
-        cardViewPlanar = (CardView) getDialog().findViewById(R.id.card_planar_view);
-        cardViewWorld = (CardView) getDialog().findViewById(R.id.card_geographic_view);
-        cardViewGrid = (CardView) getDialog().findViewById(R.id.card_grid_view);
-        cardViewPhotos = (CardView) getDialog().findViewById(R.id.card_photo_view);
-        cardViewSketchs = (CardView) getDialog().findViewById(R.id.card_sketch_view);
+        cardViewPoint = getDialog().findViewById(R.id.layout_area_1);
+        cardViewPlanar = getDialog().findViewById(R.id.card_planar_view);
+        cardViewWorld = getDialog().findViewById(R.id.card_geographic_view);
+        cardViewGrid = getDialog().findViewById(R.id.card_grid_view);
+        cardViewPhotos = getDialog().findViewById(R.id.card_photo_view);
+        cardViewSketchs =  getDialog().findViewById(R.id.card_sketch_view);
 
-        tvPointNo = (TextView) getDialog().findViewById(R.id.pointNoValue);
-        tvPointDesc = (TextView) getDialog().findViewById(R.id.pointDescValue);
+        tvPointNo = getDialog().findViewById(R.id.pointNoValue);
+        tvPointDesc = getDialog().findViewById(R.id.pointDescValue);
 
-        tvPointClassPlanar = (TextView) getDialog().findViewById(R.id.planarPointTypeValue);
-        tvPointClassWorld = (TextView) getDialog().findViewById(R.id.geographicPointTypeValue);
-        tvPointClassGrid = (TextView) getDialog().findViewById(R.id.gridPointTypeValue);
+        tvPointClassPlanar = getDialog().findViewById(R.id.planarPointTypeValue);
+        tvPointClassWorld = getDialog().findViewById(R.id.geographicPointTypeValue);
+        tvPointClassGrid = getDialog().findViewById(R.id.gridPointTypeValue);
 
-        tvPointNorth = (TextView) getDialog().findViewById(R.id.northingValue);
-        tvPointEast = (TextView) getDialog().findViewById(R.id.eastingValue);
-        tvPointElev = (TextView) getDialog().findViewById(R.id.elevationValue);
+        tvPointNorth =  getDialog().findViewById(R.id.northingValue);
+        tvPointEast = getDialog().findViewById(R.id.eastingValue);
+        tvPointElev = getDialog().findViewById(R.id.elevationValue);
 
-        tvPointLatHeader = (TextView) getDialog().findViewById(R.id.latitudeTitle);
-        tvPointLongHeader = (TextView) getDialog().findViewById(R.id.longitudeTitle);
-        tvPointEllipsoidHeader = (TextView) getDialog().findViewById(R.id.ellipsoidHeightTitle);
-        tvPointOrthoHeader = (TextView) getDialog().findViewById(R.id.orthoHeightTitle);
+        tvPointLatHeader =  getDialog().findViewById(R.id.latitudeTitle);
+        tvPointLongHeader =  getDialog().findViewById(R.id.longitudeTitle);
+        tvPointEllipsoidHeader =  getDialog().findViewById(R.id.ellipsoidHeightTitle);
+        tvPointOrthoHeader =  getDialog().findViewById(R.id.orthoHeightTitle);
 
-        tvPointLat  = (TextView) getDialog().findViewById(R.id.latitudeValue);
-        tvPointLong = (TextView) getDialog().findViewById(R.id.longitudeValue);
-        tvPointEllipsoid = (TextView) getDialog().findViewById(R.id.ellipsoidHeightValue);
-        tvPointOrtho = (TextView) getDialog().findViewById(R.id.orthoHeightValue);
+        tvPointLat  =  getDialog().findViewById(R.id.latitudeValue);
+        tvPointLong =  getDialog().findViewById(R.id.longitudeValue);
+        tvPointEllipsoid =  getDialog().findViewById(R.id.ellipsoidHeightValue);
+        tvPointOrtho =  getDialog().findViewById(R.id.orthoHeightValue);
 
-        tvPointGridNorthHeader = (TextView) getDialog().findViewById(R.id.gridNorthTitle);
-        tvPointGridEastHeader = (TextView) getDialog().findViewById(R.id.gridEastTitle);
-        tvPointGridNorth = (TextView) getDialog().findViewById(R.id.gridNorthValue);
-        tvPointGridEast = (TextView) getDialog().findViewById(R.id.gridEastValue);
+        tvPointGridNorthHeader =  getDialog().findViewById(R.id.gridNorthTitle);
+        tvPointGridEastHeader =  getDialog().findViewById(R.id.gridEastTitle);
+        tvPointGridNorth =  getDialog().findViewById(R.id.gridNorthValue);
+        tvPointGridEast =  getDialog().findViewById(R.id.gridEastValue);
 
-        ibPointCardExpand = (ImageButton) getDialog().findViewById(R.id.card_point_expand);
+        ibPointCardExpand =  getDialog().findViewById(R.id.card_point_expand);
 
-        ibPointOption_1 = (ImageButton) getDialog().findViewById(R.id.points_options_1);
-        ibPointOption_2 = (ImageButton) getDialog().findViewById(R.id.points_options_2);
+        ibPointOption_1 =  getDialog().findViewById(R.id.points_options_1);
+        ibPointOption_2 =  getDialog().findViewById(R.id.points_options_2);
 
-        ivPointCommands = (ImageView) getDialog().findViewById(R.id.survey_image_center);
-        ibPointCommand_1 = (ImageButton) getDialog().findViewById(R.id.points_command_1);
-        ibPointCommand_2 = (ImageButton) getDialog().findViewById(R.id.points_command_2);
-        ibPointCommand_3 = (ImageButton) getDialog().findViewById(R.id.points_command_3);
+        ivPointCommands =  getDialog().findViewById(R.id.survey_image_center);
+        ibPointCommand_1 =  getDialog().findViewById(R.id.points_command_1);
+        ibPointCommand_2 =  getDialog().findViewById(R.id.points_command_2);
+        ibPointCommand_3 =  getDialog().findViewById(R.id.points_command_3);
 
-        ibPlanarCommand_1 = (ImageButton) getDialog().findViewById(R.id.planar_command_1);
+        ibPlanarCommand_1 =  getDialog().findViewById(R.id.planar_command_1);
 
-        ibGeodeticCommand_1 = (ImageButton) getDialog().findViewById(R.id.geographic_command_1);
-        ibGeodeticCommand_2 = (ImageButton) getDialog().findViewById(R.id.geographic_command_2);
+        ibGeodeticCommand_1 =  getDialog().findViewById(R.id.geographic_command_1);
+        ibGeodeticCommand_2 =  getDialog().findViewById(R.id.geographic_command_2);
 
-        ibGridCommand_1 = (ImageButton) getDialog().findViewById(R.id.grid_command_1);
+        ibGridCommand_1 =  getDialog().findViewById(R.id.grid_command_1);
 
-        pbProgressCircle = (ProgressBar) getDialog().findViewById(R.id.progressBar_Loading_point);
+        pbProgressCircle =  getDialog().findViewById(R.id.progressBar_Loading_point);
 
-        btTakePhoto = (Button) getDialog().findViewById(R.id.card3_take_photo);
-        btAddSketch = (Button) getDialog().findViewById(R.id.card4_add_sketch);
-
-
+        btTakePhoto =  getDialog().findViewById(R.id.card3_take_photo);
+        btAddSketch =  getDialog().findViewById(R.id.card4_add_sketch);
 
     }
 

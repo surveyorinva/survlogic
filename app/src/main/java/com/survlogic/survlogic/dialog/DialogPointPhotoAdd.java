@@ -131,7 +131,7 @@ public class DialogPointPhotoAdd extends DialogFragment {
                 if(!isStringNull(description)){
                     mAddWatermark = true;
 
-                    mImageWatermark = imageHelper.setWatermarkAtBottom(mImageLocal, description, true);
+                    mImageWatermark = imageHelper.setWatermarkDescription(mImageLocal, description, true);
 
                     ivPhoto.setImageBitmap(mImageWatermark);
 
@@ -159,11 +159,11 @@ public class DialogPointPhotoAdd extends DialogFragment {
         String mImagePath;
 
             if (mAddWatermark){
-                Uri uri = fileHelper.saveImageToExternal(mImageWatermark);
+                Uri uri = fileHelper.saveImageToExternal(mImageWatermark,fileHelper.FOLDER_JOB_PHOTOS);
                 mImagePath = uriToString(uri);
 
             }else{
-                Uri uri = fileHelper.saveImageToExternal(mImageLocal);
+                Uri uri = fileHelper.saveImageToExternal(mImageLocal,fileHelper.FOLDER_JOB_PHOTOS);
                 mImagePath = uriToString(uri);
 
             }

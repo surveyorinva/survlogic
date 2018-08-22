@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -22,10 +23,18 @@ import android.widget.Switch;
 import android.widget.Toast;
 
 import com.github.chrisbanes.photoview.PhotoView;
+import com.survlogic.survlogic.PhotoEditor.background.BackgroundProjectImagesSave;
 import com.survlogic.survlogic.PhotoEditor.interf.DialogPointPhotoAddV2Listener;
 import com.survlogic.survlogic.R;
+import com.survlogic.survlogic.activity.ProjectDetailsActivity;
+import com.survlogic.survlogic.background.BackgroundProjectImagesSetup;
+import com.survlogic.survlogic.model.ProjectImages;
 import com.survlogic.survlogic.utils.FileHelper;
 import com.survlogic.survlogic.PhotoEditor.utils.ImageHelper;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import mehdi.sakout.fancybuttons.FancyButton;
 
@@ -39,7 +48,7 @@ public class DialogPointPhotoAddV2 extends DialogFragment {
     private FileHelper fileHelper;
 
     //In Variables
-    private Bitmap mImageRaw, mImageDefault, mImageProcessed;
+    private Bitmap mImageRaw;
     private Location mPhotoLocation;
     private int mPhotoAzimuth;
 
@@ -47,15 +56,25 @@ public class DialogPointPhotoAddV2 extends DialogFragment {
     private DialogPointPhotoAddV2Listener listener;
 
     //Method Helpers
-    private boolean hasMetaDataIn = false, hasGPSLocation, hasAzimuth;
-    private boolean isContentMenuShown = true, isHiddenMenuShown = false;
-    private boolean mAddWatermark = false, mAddCompass = false;
+    private String mDescription;
 
+    private boolean hasMetaDataIn = false, hasGPSLocation = false, hasAzimuth = false;
+    private boolean isContentMenuShown = true, isHiddenMenuShown = false;
+    private boolean isWatermarkDescOn = false, isWatermarkCompassOn = false, isWatermarkLocationOn = false;
+    private boolean isWatermarkTimestampOn = true;
+    private boolean isKeepRawFile = true;
+
+    private Bitmap mImageDefault, mImageProcessed;
+    private ArrayList<Bitmap> mImageArray = new ArrayList<>();
+    private HashMap<Integer,Bitmap> mImageMap = new HashMap<>();
+
+    private static final Integer KEY_RAW = 0, KEY_POINT_NO = 1, KEY_DESC = 2, KEY_AZIMUTH = 3, KEY_LOCATION = 4, KEY_BACKGROUND = 5;
+    private final long DELAY_SHORT = 250, DELAY_MEDIUM = 500, DELAY_LONG = 800;
     //Widgets
     private RelativeLayout rlContentView, rlHiddenView, rlHiddenViewLocation, rlHiddenViewAzimuth;
 
     private EditText etDescription;
-    private Switch swLocation, swCompass;
+    private Switch swLocation, swCompass, swTimestamp, swRawFile;
     private PhotoView ivPhoto;
 
     private FancyButton fbAdd, fbClear;
@@ -104,7 +123,7 @@ public class DialogPointPhotoAddV2 extends DialogFragment {
 
         showHideMetadataOptions();
 
-        watermarkSetPointNumber();
+        autoRunWatermarks();
 
     }
 
@@ -122,6 +141,8 @@ public class DialogPointPhotoAddV2 extends DialogFragment {
 
         swLocation = getDialog().findViewById(R.id.switch_location_value);
         swCompass = getDialog().findViewById(R.id.switch_sensor_value);
+        swTimestamp = getDialog().findViewById(R.id.switch_timestamp_value);
+        swRawFile = getDialog().findViewById(R.id.switch_raw_value);
 
         btFinish = getDialog().findViewById(R.id.button_save);
         btCancel = getDialog().findViewById(R.id.button_cancel);
@@ -156,7 +177,8 @@ public class DialogPointPhotoAddV2 extends DialogFragment {
         fbAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                watermarkSetDescription();
+                isWatermarkDescOn = true;
+                watermarkSetDescription(500);
             }
         });
 
@@ -169,16 +191,56 @@ public class DialogPointPhotoAddV2 extends DialogFragment {
         });
 
 
+        swLocation.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                if(!isChecked){
+                    isWatermarkLocationOn = false;
+                    watermarkSetLocationPhoto(DELAY_MEDIUM);
+                }else{
+                    isWatermarkLocationOn = true;
+                    watermarkSetLocationPhoto(DELAY_MEDIUM);
+                }
+            }
+        });
+
         swCompass.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
                 if(!isChecked){
-                    mAddCompass = false;
-
+                    isWatermarkCompassOn = false;
+                    watermarkSetCompass(DELAY_MEDIUM);
                 }else{
-                    mAddCompass = true;
-                    watermarkSetCompass();
+                    isWatermarkCompassOn = true;
+                    watermarkSetCompass(DELAY_MEDIUM);
                 }
+            }
+        });
+
+        swTimestamp.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                if(!isChecked){
+                    isWatermarkTimestampOn = false;
+                    watermarkSetTimestamp(DELAY_MEDIUM);
+                }else{
+                    isWatermarkTimestampOn = true;
+                    watermarkSetTimestamp(DELAY_MEDIUM);
+                }
+            }
+        });
+
+        btFinish.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                submitForm();
+            }
+        });
+
+        btCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dismiss();
             }
         });
 
@@ -255,7 +317,15 @@ public class DialogPointPhotoAddV2 extends DialogFragment {
 
     //---------------------------------------------------------------------------------------------- Watermarks
 
-    private void watermarkSetPointNumber(){
+    private void autoRunWatermarks(){
+        watermarkSetPointNumber(DELAY_SHORT);
+
+        watermarkSetTimestamp(DELAY_LONG);
+
+    }
+
+
+    private void watermarkSetPointNumber(long delayTime){
 
         progressImage.setVisibility(View.VISIBLE);
 
@@ -265,49 +335,105 @@ public class DialogPointPhotoAddV2 extends DialogFragment {
             public void run() {
             String pointNo = String.valueOf(listener.getPointNumber());
             mImageDefault = imageHelper.setWatermarkAtTop(mImageRaw, pointNo, true);
+            mImageProcessed = mImageDefault;
+
             ivPhoto.setImageBitmap(mImageDefault);
+
+            mImageArray.add(mImageDefault);
+            mImageMap.put(KEY_POINT_NO,mImageDefault);
 
             progressImage.setVisibility(View.GONE);
 
             }
-        }, 400);
+        }, delayTime);
 
     }
 
-    private void watermarkSetDescription(){
+    private void watermarkSetDescription(long delayTime){
         progressImage.setVisibility(View.VISIBLE);
 
+        final Bitmap mBitmapIn = mImageArray.get(mImageArray.size() - 1);
         new Handler().postDelayed(new Runnable() {
 
             @Override
             public void run() {
-                String description = etDescription.getText().toString();
-                if(!isStringNull(description)) {
-                    mAddWatermark = true;
-                    mImageProcessed = imageHelper.setWatermarkAtBottom(mImageDefault, description, true);
+                mDescription = etDescription.getText().toString();
+
+                if(!isStringNull(mDescription)) {
+                    generateWatermarks();
+
                     ivPhoto.setImageBitmap(mImageProcessed);
                 }
 
+                mImageArray.add(mImageProcessed);
+                mImageMap.put(KEY_DESC,mImageProcessed);
+
                 progressImage.setVisibility(View.GONE);
             }
-        },400);
+        },delayTime);
 
     }
 
-    private void watermarkSetCompass(){
+    private void watermarkSetCompass(long delayTime){
         progressImage.setVisibility(View.VISIBLE);
 
         new Handler().postDelayed(new Runnable() {
 
             @Override
             public void run() {
+                generateWatermarks();
 
-                mImageProcessed = imageHelper.setWatermarkCompass(mImageDefault,mPhotoAzimuth,true);
                 ivPhoto.setImageBitmap(mImageProcessed);
-                progressImage.setVisibility(View.GONE);
-            }
-        },400);
 
+                mImageArray.add(mImageProcessed);
+                mImageMap.put(KEY_AZIMUTH,mImageProcessed);
+
+                progressImage.setVisibility(View.GONE);
+
+            }
+        },delayTime);
+
+    }
+
+    private void watermarkSetLocationPhoto(long delayTime){
+        progressImage.setVisibility(View.VISIBLE);
+
+        new Handler().postDelayed(new Runnable() {
+
+            @Override
+            public void run() {
+                generateWatermarks();
+
+                ivPhoto.setImageBitmap(mImageProcessed);
+
+                mImageArray.add(mImageProcessed);
+                mImageMap.put(KEY_LOCATION,mImageProcessed);
+
+                progressImage.setVisibility(View.GONE);
+
+            }
+        },delayTime);
+
+    }
+
+    private void watermarkSetTimestamp(long delayTime){
+        progressImage.setVisibility(View.VISIBLE);
+
+        new Handler().postDelayed(new Runnable() {
+
+            @Override
+            public void run() {
+                generateWatermarks();
+
+                ivPhoto.setImageBitmap(mImageProcessed);
+
+                mImageArray.add(mImageProcessed);
+                mImageMap.put(KEY_LOCATION,mImageProcessed);
+
+                progressImage.setVisibility(View.GONE);
+
+            }
+        },delayTime);
     }
 
     private void watermarkClearMetaData(){
@@ -315,19 +441,159 @@ public class DialogPointPhotoAddV2 extends DialogFragment {
             @Override
             public void run() {
                 etDescription.setText("");
-                mAddWatermark = false;
-                ivPhoto.setImageBitmap(mImageDefault);
+                mDescription = "";
+
+                isWatermarkDescOn = false;
+                generateWatermarks();
+
+                ivPhoto.setImageBitmap(mImageProcessed);
             }
         },400);
 
     }
 
 
+    private void generateWatermarks(){
+
+        Bitmap bitmap;
+
+        if(isWatermarkDescOn && isWatermarkCompassOn){
+            imageHelper.setWatermarkDesc(mDescription);
+
+            bitmap = imageHelper.setWatermarkBackgroundAtBottom(mImageDefault,imageHelper.TYPE_COMBINED);
+            bitmap = imageHelper.setWatermarkDescription(bitmap, false);
+            bitmap = imageHelper.setWatermarkCompass(bitmap,mPhotoAzimuth,false);
+
+        }else if(isWatermarkDescOn){
+            imageHelper.setWatermarkDesc(mDescription);
+
+            bitmap = imageHelper.setWatermarkBackgroundAtBottom(mImageDefault,imageHelper.TYPE_DESC_ONLY);
+            bitmap = imageHelper.setWatermarkDescription(bitmap, false);
+
+        }else{
+            bitmap = mImageDefault;
+        }
+
+        if(isWatermarkCompassOn) {
+            bitmap = imageHelper.setWatermarkBackgroundAtBottom(bitmap, imageHelper.TYPE_COMPASS_ONLY);
+
+            bitmap = imageHelper.setWatermarkCompass(bitmap, mPhotoAzimuth, false);
+        }
+
+
+        if(isWatermarkLocationOn){
+            imageHelper.setPhotoLocation(mPhotoLocation);
+
+            bitmap = imageHelper.setWatermarkLocationUnderPoint(bitmap);
+
+        }
+
+        if(isWatermarkTimestampOn){
+            bitmap = imageHelper.setWatermarkTimestamp(bitmap);
+        }
+
+
+        mImageProcessed = bitmap;
+
+
+    }
+
+    //---------------------------------------------------------------------------------------------- Photo Out
+    private void submitForm() {
+
+        String mImagePath;
+
+        Uri uri = fileHelper.saveImageToExternal(mImageProcessed,fileHelper.FOLDER_JOB_PHOTOS);
+        mImagePath = uriToString(uri);
+
+        // Create Project model
+        int project_id = listener.getProjectId();
+        int job_id = listener.getJobId();
+        int point_id = listener.getPointId();
+
+        ProjectImages projectImage = new ProjectImages(project_id,job_id,point_id,mImagePath,0,0,0);
+
+
+        if(hasGPSLocation){
+            projectImage.setLocationLat(mPhotoLocation.getLatitude());
+            projectImage.setLocationLong(mPhotoLocation.getLongitude());
+        }
+
+        if(hasAzimuth){
+            projectImage.setBearingAngle(mPhotoAzimuth);
+
+        }
+
+        // Setup Background Task
+        BackgroundProjectImagesSave backgroundProjectImagesSave = new BackgroundProjectImagesSave(getActivity());
+
+        // Execute background task
+        backgroundProjectImagesSave.execute(projectImage);
+        Log.d(TAG, "submitForm: Complete.  Photo with ProjectID: " + project_id + " Saved");
+
+
+        if(!isKeepRawFile){
+            boolean isDeleteSuccess = deleteRawFile();
+        }
+
+        listener.requestPhotoRefresh();
+
+        getDialog().dismiss();
+
+
+    }
+
+    private String uriToString(Uri uri){
+        return uri.toString();
+    }
+
+    private Uri stringToUri(String stringUri){
+        return Uri.parse(stringUri);
+    }
+
+    private boolean deleteRawFile(){
+        boolean results = false;
+
+        try{
+            File rawFile = listener.getPhotoFile();
+            results = rawFile.delete();
+
+        }catch (Exception e){
+
+        }
+
+        return results;
+    }
+
     //---------------------------------------------------------------------------------------------- Modal Prompts
     private android.support.v7.app.AlertDialog checkToClearWatermarkDialog(){
 
         android.support.v7.app.AlertDialog myDialogBox = new android.support.v7.app.AlertDialog.Builder(mContext)
                 .setMessage(getResources().getString(R.string.dialog_photo_editor_clear_watermark))
+                .setPositiveButton(getResources().getString(R.string.general_yes), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        watermarkClearMetaData();
+                        dialog.dismiss();
+                    }
+                })
+                .setNegativeButton(getResources().getString(R.string.general_no), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+
+                    }
+                })
+
+                .create();
+
+        return myDialogBox;
+    }
+
+    private android.support.v7.app.AlertDialog checkToDeleteRawFileDialog(){
+
+        android.support.v7.app.AlertDialog myDialogBox = new android.support.v7.app.AlertDialog.Builder(mContext)
+                .setMessage(getResources().getString(R.string.dialog_photo_editor_delete_raw_file))
                 .setPositiveButton(getResources().getString(R.string.general_yes), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {

@@ -142,7 +142,7 @@ public class JobHomeActivity extends AppCompatActivity implements NavigationView
      */
 
     private void initViewToolbar(){
-        toolbar = (Toolbar) findViewById(R.id.toolbar_in_job_view);
+        toolbar = findViewById(R.id.toolbar_in_job_view);
         toolbar.setTitle("");
         setSupportActionBar(toolbar);
 
@@ -150,9 +150,9 @@ public class JobHomeActivity extends AppCompatActivity implements NavigationView
     }
 
     private void initViewNavigation() {
-        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_in_job);
+        drawerLayout = findViewById(R.id.drawer_in_job);
 
-        navigationView = (NavigationView) findViewById(R.id.navigation_view);
+        navigationView = findViewById(R.id.navigation_view);
         navigationView.setNavigationItemSelectedListener(JobHomeActivity.this);
 
         actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close);
@@ -175,6 +175,7 @@ public class JobHomeActivity extends AppCompatActivity implements NavigationView
 
                 startActivity(i);
                 overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                finish();
 
                 break;
 
@@ -187,6 +188,7 @@ public class JobHomeActivity extends AppCompatActivity implements NavigationView
 
                 startActivity(j);
                 overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                finish();
 
                 break;
 
@@ -199,6 +201,7 @@ public class JobHomeActivity extends AppCompatActivity implements NavigationView
 
                 startActivity(k);
                 overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                finish();
 
                 break;
 
@@ -211,12 +214,14 @@ public class JobHomeActivity extends AppCompatActivity implements NavigationView
 
                 startActivity(l);
                 overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                finish();
 
                 break;
 
             case R.id.menu_item5_id:
                 intent.setClass(this, SettingsCurrentJobActivity.class);
                 startActivity(intent);
+                finish();
 
                 break;
 
@@ -233,15 +238,15 @@ public class JobHomeActivity extends AppCompatActivity implements NavigationView
         Log.d(TAG, "initView: Started");
 
         Bundle extras = getIntent().getExtras();
-        project_id = extras.getInt(getString(R.string.KEY_PROJECT_ID));
+        project_id = extras.getInt(getString(R.string.KEY_PROJECT_ID),0);
         job_id = extras.getInt(getString(R.string.KEY_JOB_ID));
         jobDatabaseName = extras.getString(getString(R.string.KEY_JOB_DATABASE));
         Log.d(TAG, "||Database in Home Activity|| : " + jobDatabaseName);
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
-        rlLayout2 = (RelativeLayout) findViewById(R.id.relLayout_2) ;
-        progressBar = (ProgressBar) findViewById(R.id.progressStatus);
+        rlLayout2 = findViewById(R.id.relLayout_2) ;
+        progressBar = findViewById(R.id.progressStatus);
 
     }
 
@@ -408,6 +413,7 @@ public class JobHomeActivity extends AppCompatActivity implements NavigationView
             db.close();
         }catch (Exception e) {
             e.printStackTrace();
+            showToast("Error Loading From Preferences",true);
         }
 
 
@@ -625,7 +631,7 @@ public class JobHomeActivity extends AppCompatActivity implements NavigationView
 
     private void initFragmentContainer(@Nullable Bundle savedInstanceState) {
         Log.d(TAG, "initFragmentContainer: Starting...");
-        container = (FrameLayout) findViewById(R.id.container_in_job_home);
+        container = findViewById(R.id.container_in_job_home);
 
         if (container != null) {
             if (savedInstanceState != null) {

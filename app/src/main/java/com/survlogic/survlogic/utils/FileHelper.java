@@ -26,6 +26,8 @@ public class FileHelper {
     private static final String TAG = "FileHelper";
     private Context mContext;
 
+    public final int FOLDER_PHOTO = 0, FOLDER_SKETCH = 1, FOLDER_JOB = 2, FOLDER_JOB_PHOTOS = 3;
+
     public FileHelper(Context mContext) {
         this.mContext = mContext;
 
@@ -41,6 +43,7 @@ public class FileHelper {
         path = path  +"/"+ mContext.getString(R.string.app_name);
 
         String pathJobs = path + "/jobs";
+        String pathJobPhotos = path + "/jobs/photos";
         String pathPhotos = path + "/photos";
         String pathSketch = path + "/sketches";
 
@@ -49,6 +52,10 @@ public class FileHelper {
 
         File folderSketch = new File(pathSketch);
         File noMediaSketch = new File(pathSketch,".nomedia");
+
+        File folderJobPhotos = new File(pathJobPhotos);
+        File noMediaJobPhotos = new File(pathJobPhotos,".nomedia");
+
 
         File folderJob = new File(pathJobs);
 
@@ -62,6 +69,16 @@ public class FileHelper {
                         FileOutputStream noMediaPhotosFile = new FileOutputStream(noMediaPhotos);
                         noMediaPhotosFile.write(0);
                         noMediaPhotosFile.close();
+                    }
+                }
+
+                if (!folderJobPhotos.isDirectory()|| !folderJobPhotos.exists()) {
+                    folderJobPhotos.mkdirs();
+
+                    if(!noMediaJobPhotos.exists()) {
+                        FileOutputStream noMediaJobPhotosFile = new FileOutputStream(noMediaJobPhotos);
+                        noMediaJobPhotosFile.write(0);
+                        noMediaJobPhotosFile.close();
                     }
                 }
 
@@ -107,21 +124,29 @@ public class FileHelper {
 
         switch (folderValue){
 
-            case 0:  //Photos
+            case FOLDER_PHOTO:  //Photos
                 path = Environment.getExternalStorageDirectory().toString();
                 path = path  +"/"+ mContext.getString(R.string.app_name) + "/photos";
 
                 break;
 
-            case 1:  //Sketches
+            case FOLDER_SKETCH:  //Sketches
                 path = Environment.getExternalStorageDirectory().toString();
                 path = path  +"/"+ mContext.getString(R.string.app_name) + "/sketches";
 
                 break;
 
-            case 2: //Jobs
+            case FOLDER_JOB: //Jobs
                 path = Environment.getExternalStorageDirectory().toString();
                 path = path + "/" + mContext.getString(R.string.app_name) + "/jobs";
+
+                break;
+
+            case FOLDER_JOB_PHOTOS: //Jobs/Photos
+                path = Environment.getExternalStorageDirectory().toString();
+                path = path + "/" + mContext.getString(R.string.app_name) + "/jobs/photos";
+
+                break;
 
             default:
                 path = "crashes";
@@ -136,7 +161,7 @@ public class FileHelper {
     }
 
 
-    public Uri saveImageToExternal(Bitmap image){
+    public Uri saveImageToExternal(Bitmap image, int folderType){
         Log.d(TAG, "saveImagetoFilePath: Creating file path");
 
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
@@ -155,7 +180,8 @@ public class FileHelper {
         Log.d(TAG, "Media Mounted: " + mediaMount);
 
 
-        String path = getPathToFolder(0);
+        String path = getPathToFolder(folderType);
+
 
         Log.d(TAG, "Save Path:" + path);
 
@@ -177,6 +203,8 @@ public class FileHelper {
             stream.flush();
             stream.close();
 
+
+            Toast.makeText(mContext, "Saved", Toast.LENGTH_SHORT).show();
             Log.d(TAG, "saveImagetoFilePath: Image Saved");
         }catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -192,6 +220,36 @@ public class FileHelper {
 
     }
 
+
+    public boolean deleteImage(Bitmap bitmap){
+            //String path = Environment.getExternalStorageDirectory().toString();
+
+            boolean mediaMount;
+            String state = Environment.getExternalStorageState();
+            if (Environment.MEDIA_MOUNTED.equals(state) || Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
+                mediaMount =  true;
+            }else{
+                mediaMount = false;
+            }
+
+            String path = getPathToFolder(0);
+            File folder = new File(path);
+
+            String imageFileName = "";
+
+            File file = new File(path,imageFileName + ".jpg");
+
+            try{
+               file.delete();
+                return true;
+
+            }catch (Exception e) {
+                e.printStackTrace();
+                return false;
+
+            }
+
+    }
 
     public File getPhotoFile(){
         Log.d(TAG, "saveImagetoFilePath: Creating file path");

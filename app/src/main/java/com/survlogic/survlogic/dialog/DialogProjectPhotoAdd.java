@@ -110,7 +110,7 @@ public class DialogProjectPhotoAdd extends DialogFragment {
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                submitForm(v);
+                submitForm();
             }
         });
 
@@ -122,7 +122,7 @@ public class DialogProjectPhotoAdd extends DialogFragment {
                 if(!isStringNull(description)){
                     mAddWatermark = true;
 
-                    mImageWatermark = imageHelper.setWatermarkAtBottom(mImageLocal, description, true);
+                    mImageWatermark = imageHelper.setWatermarkDescription(mImageLocal, description, true);
 
                     ivPhoto.setImageBitmap(mImageWatermark);
 
@@ -145,16 +145,16 @@ public class DialogProjectPhotoAdd extends DialogFragment {
 
 
     }
-    private void submitForm(View v) {
+    private void submitForm() {
 
         String mImagePath;
 
             if (mAddWatermark){
-                Uri uri = fileHelper.saveImageToExternal(mImageWatermark);
+                Uri uri = fileHelper.saveImageToExternal(mImageWatermark,fileHelper.FOLDER_JOB_PHOTOS);
                 mImagePath = uriToString(uri);
 
             }else{
-                Uri uri = fileHelper.saveImageToExternal(mImageLocal);
+                Uri uri = fileHelper.saveImageToExternal(mImageLocal,fileHelper.FOLDER_JOB_PHOTOS);
                 mImagePath = uriToString(uri);
 
             }

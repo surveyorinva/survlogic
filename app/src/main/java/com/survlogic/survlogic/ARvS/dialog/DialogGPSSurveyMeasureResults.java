@@ -16,12 +16,14 @@ import android.os.Handler;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -32,6 +34,7 @@ import com.survlogic.survlogic.ARvS.background.BackgroundGPSPointUpdate;
 import com.survlogic.survlogic.ARvS.interf.GPSPointBackgroundGetters;
 import com.survlogic.survlogic.ARvS.interf.GetNationalMapElevationListener;
 import com.survlogic.survlogic.ARvS.interf.PopupDialogBoxListener;
+import com.survlogic.survlogic.ARvS.utils.DialogPhotoGridHelper;
 import com.survlogic.survlogic.PhotoEditor.interf.DialogPointPhotoAddV2Listener;
 import com.survlogic.survlogic.R;
 import com.survlogic.survlogic.background.BackgroundGetNationalMapElevation;
@@ -42,6 +45,7 @@ import com.survlogic.survlogic.database.JobDatabaseHandler;
 import com.survlogic.survlogic.PhotoEditor.DialogPointPhotoAddV2;
 import com.survlogic.survlogic.model.PointGeodetic;
 import com.survlogic.survlogic.model.PointSurvey;
+import com.survlogic.survlogic.model.ProjectJobs;
 import com.survlogic.survlogic.utils.FileHelper;
 import com.survlogic.survlogic.utils.GPSLocationConverter;
 import com.survlogic.survlogic.utils.MathHelper;
@@ -58,10 +62,6 @@ import java.util.List;
 
 import mehdi.sakout.fancybuttons.FancyButton;
 
-/**
- * Created by chrisfillmore on 7/22/2017.
- */
-
 public class DialogGPSSurveyMeasureResults extends DialogFragment implements    GetNationalMapElevationListener, GPSPointBackgroundGetters,
                                                                                 DialogPointPhotoAddV2Listener {
     private static final String TAG = "DialogProjectDescr";
@@ -76,6 +76,8 @@ public class DialogGPSSurveyMeasureResults extends DialogFragment implements    
     private FileHelper fileHelper;
 
     //---------------------------------------------------------------------------------------------- In Variables
+
+    private ProjectJobs mProjectJobInfo;
     private ArrayList<Location> measuredResults;
     private String mJob_DatabaseName, mCurrentPhotoPath;
     private int pointNumber = 0;
@@ -85,6 +87,9 @@ public class DialogGPSSurveyMeasureResults extends DialogFragment implements    
     private RelativeLayout rlResultsView;
     private LinearLayout llResultsContainer;
     private NestedScrollView nsResultsContainer;
+
+    private GridView gridView, sketchGridView;
+    private CardView cardViewPhotos;
 
     private ProgressBar progressBar, progressOrtho;
     private FancyButton fbDialogCancel, fbDialogSave;
@@ -122,14 +127,19 @@ public class DialogGPSSurveyMeasureResults extends DialogFragment implements    
 
     private Bitmap mBitmap, mBitmapRaw;
 
+    //---------------------------------------------------------------------------------------------- Photos
+    private DialogPhotoGridHelper dialogPhotoGridHelper;
+    private boolean isGridHelperLoaded = false;
+
     //---------------------------------------------------------------------------------------------- Database Methods
     private long mReservedPoint_id;
-    private boolean isReserved = false;
+    private boolean isReserved = false, isPointReserveSaved = false;
 
     //---------------------------------------------------------------------------------------------- Out Variables
     private Location mAverageLocation;
     private PointSurvey mAverageGridPoint, mAverageLocalPoint;
 
+    private File mPhotoFileRaw;
     private Bitmap mPhotoBitmap;
     private boolean usePhotoLocation = true, usePhotoSensor = true;
     private Location mPhotoLocation;
@@ -190,7 +200,11 @@ public class DialogGPSSurveyMeasureResults extends DialogFragment implements    
         initFocusChangeListeners();
         setOnClickListeners();
 
-        reserveSpotInJobDatabase();
+        loadProjectJob();
+
+        if(!isPointReserveSaved){
+            reserveSpotInJobDatabase();
+        }
 
         loadDataset();
 
@@ -203,6 +217,8 @@ public class DialogGPSSurveyMeasureResults extends DialogFragment implements    
         if (REQUEST_TAKE_PHOTO == requestCode && resultCode == Activity.RESULT_OK) {
             File file = (File) data.getExtras().get(getString(R.string.KEY_IMAGE_FILE));
             Uri imageUri = Uri.fromFile(file);
+
+            mPhotoFileRaw = file;
 
 
             usePhotoLocation = data.getBooleanExtra(getResources().getString(R.string.KEY_POSITION_USE),true);
@@ -339,6 +355,9 @@ public class DialogGPSSurveyMeasureResults extends DialogFragment implements    
         btTakePhoto = (Button) getDialog().findViewById(R.id.card3_take_photo);
         btAddSketch = (Button) getDialog().findViewById(R.id.card4_add_sketch);
 
+        gridView = getDialog().findViewById(R.id.photo_grid_view);
+        cardViewPhotos = getDialog().findViewById(R.id.card_photo_view);
+
     }
 
     private void initFocusChangeListeners() {
@@ -460,6 +479,11 @@ public class DialogGPSSurveyMeasureResults extends DialogFragment implements    
     }
 
 
+    private void loadProjectJob(){
+        mProjectJobInfo = listener.getProjectJob();
+
+    }
+
 
 //--------------------------------------------------------------------------------------------------// Dataset In Actions
     private void loadDataset(){
@@ -480,6 +504,8 @@ public class DialogGPSSurveyMeasureResults extends DialogFragment implements    
             public void run() {
                 findAverageGeodeticPosition(measuredResults);
                 findAverageGridPosition(measuredResults);
+
+                loadGridViewHelper();
 
                 progressBar.setVisibility(View.INVISIBLE);
             }
@@ -810,6 +836,8 @@ public class DialogGPSSurveyMeasureResults extends DialogFragment implements    
 
         BackgroundGPSPointReserve backgroundGPSPointReserve = new BackgroundGPSPointReserve(mContext, mJob_DatabaseName, this);
         backgroundGPSPointReserve.execute(pointGeodeticReserve);
+
+        isPointReserveSaved = true;
     }
 
     @Override
@@ -954,7 +982,7 @@ public class DialogGPSSurveyMeasureResults extends DialogFragment implements    
             return isSuccess;
     }
 
-    //-------------------------------------------------------------------------------------------------------------------------//Photo
+    //-------------------------------------------------------------------------------------------------------------------------//Camera
 
     private void callImageSelectionDialog(){
         Log.d(TAG, "callImageSelectionDialog: Started...");
@@ -1001,8 +1029,6 @@ public class DialogGPSSurveyMeasureResults extends DialogFragment implements    
 
     private void startCamera() {
         try {
-            //dispatchTakePictureIntent();
-
             dispatchCameraIntent();
 
         } catch (IOException e) {
@@ -1044,10 +1070,25 @@ public class DialogGPSSurveyMeasureResults extends DialogFragment implements    
 
     }
 
+    //---------------------------------------------------------------------------------------------- Photo Grid View
+
+    private void loadGridViewHelper(){
+        dialogPhotoGridHelper = new DialogPhotoGridHelper(mContext);
+
+        dialogPhotoGridHelper.setProjectJob(mProjectJobInfo,gridView,cardViewPhotos);
+        dialogPhotoGridHelper.setPointSurveyPoint(mReservedPoint_id);
+
+        dialogPhotoGridHelper.buildGridViews();
+        isGridHelperLoaded = true;
+
+
+    }
+
     //---------------------------------------------------------------------------------------------- Photo Dialog listener
 
     @Override
     public void requestPhotoRefresh() {
+        dialogPhotoGridHelper.refreshGridViews();
 
     }
 
@@ -1079,6 +1120,26 @@ public class DialogGPSSurveyMeasureResults extends DialogFragment implements    
     @Override
     public int getPhotoAzimuth() {
         return mPhotoAzimuth;
+    }
+
+    @Override
+    public int getPointId() {
+        return (int) mReservedPoint_id;
+    }
+
+    @Override
+    public int getProjectId() {
+        return mProjectJobInfo.getProjectId();
+    }
+
+    @Override
+    public int getJobId() {
+        return mProjectJobInfo.getId();
+    }
+
+    @Override
+    public File getPhotoFile() {
+        return mPhotoFileRaw;
     }
 
     //---------------------------------------------------------------------------------------------- Helpers

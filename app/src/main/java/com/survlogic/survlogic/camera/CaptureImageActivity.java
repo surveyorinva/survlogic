@@ -188,6 +188,7 @@ public class CaptureImageActivity extends AppCompatActivity{
 
 
         ImageButton ibSettings = findViewById(R.id.button_settings_right);
+        ibSettings.setVisibility(View.VISIBLE);
         ibSettings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

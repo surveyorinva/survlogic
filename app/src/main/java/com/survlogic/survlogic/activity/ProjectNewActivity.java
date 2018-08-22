@@ -248,7 +248,7 @@ public class ProjectNewActivity extends AppCompatActivity {
                 mBitmap = rotateImageIfRequired(mBitmapRaw,imageUri);
                 ivPreview.setImageBitmap(mBitmap);
 
-                Uri uri = fileHelper.saveImageToExternal(mBitmap);
+                Uri uri = fileHelper.saveImageToExternal(mBitmap,fileHelper.FOLDER_JOB_PHOTOS);
                 mImagePath = fileHelper.uriToString(uri);
 
                 mImageSystem = 1;
@@ -273,7 +273,7 @@ public class ProjectNewActivity extends AppCompatActivity {
                         mBitmap = rotateImageIfRequired(mBitmapRaw,imageUri);
                         ivPreview.setImageBitmap(mBitmap);
 
-                        Uri uri = fileHelper.saveImageToExternal(mBitmap);
+                        Uri uri = fileHelper.saveImageToExternal(mBitmap,fileHelper.FOLDER_JOB_PHOTOS);
                         mImagePath = fileHelper.uriToString(uri);
 
                         mImageSystem = 1;

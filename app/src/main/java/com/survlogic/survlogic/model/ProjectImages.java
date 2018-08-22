@@ -10,7 +10,7 @@ public class ProjectImages {
     byte[] image;
     String imagePath;
     float bearingAngle;
-    double LocationLat, LocationLong;
+    double locationLat, locationLong;
 
 
     public ProjectImages(){
@@ -53,8 +53,8 @@ public class ProjectImages {
         this.pointId = pointId;
         this.image = image;
         this.bearingAngle = bearingAngle;
-        LocationLat = locationLat;
-        LocationLong = locationLong;
+        this.locationLat = locationLat;
+        this.locationLong = locationLong;
     }
 
     public ProjectImages(int projectId, int jobId, int pointId, String imagePath, float bearingAngle, double locationLat, double locationLong) {
@@ -63,8 +63,8 @@ public class ProjectImages {
         this.pointId = pointId;
         this.imagePath = imagePath;
         this.bearingAngle = bearingAngle;
-        LocationLat = locationLat;
-        LocationLong = locationLong;
+        this.locationLat = locationLat;
+        this.locationLong = locationLong;
     }
 
     public int getId() {
@@ -124,18 +124,18 @@ public class ProjectImages {
     }
 
     public double getLocationLat() {
-        return LocationLat;
+        return locationLat;
     }
 
     public void setLocationLat(double locationLat) {
-        LocationLat = locationLat;
+        this.locationLat = locationLat;
     }
 
     public double getLocationLong() {
-        return LocationLong;
+        return locationLong;
     }
 
     public void setLocationLong(double locationLong) {
-        LocationLong = locationLong;
+        this.locationLong = locationLong;
     }
 }

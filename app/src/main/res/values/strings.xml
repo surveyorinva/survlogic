@@ -211,6 +211,8 @@
     <string name="dialog_photo_header_1">ADD WATERMARK TO IMAGE</string>
     <string name="dialog_photo_header_2">ADD PHOTO LOCATION TO IMAGE</string>
     <string name="dialog_photo_header_3">ADD COMPASS AZIMUTH TO IMAGE</string>
+    <string name="dialog_photo_header_4">ADD TIMESTAMP TO IMAGE</string>
+    <string name="dialog_photo_header_5">KEEP RAW IMAGE IN PHOTO DIRECTORY</string>
     <string name="dialog_photo_description">Enter in Photo Description"</string>
     <string name="project_photo_new_validation_save_success">Project Photo Saved!</string>
     <string name="project_photo_new_validation_save_failed">Error Saving Project Photo.  Please try again.</string>
@@ -357,7 +359,7 @@
 
 
     <string name="dialog_photo_editor_clear_watermark">Are you sure you want to clear the watermark?</string>
-
+    <string name="dialog_photo_editor_delete_raw_file">Are you sure you want to delete the Raw File?</string>
     <!--Sketch View-->
     <string name="sketch_menu_clear_canvas">Clear Canvas</string>
     <string name="sketch_dialog_delete_title"> Clear Canvas?</string>
@@ -540,6 +542,12 @@
     <string name="ar_sensor_status_moving">Rotating</string>
 
     <!-- Compass View -->
+    <string name="compassview_compass_cardinal_north">N</string>
+    <string name="compassview_compass_cardinal_east">E</string>
+    <string name="compassview_compass_cardinal_south">S</string>
+    <string name="compassview_compass_cardinal_west">W</string>
+
+
     <string name="compassview_compass_north">0</string>
     <string name="compassview_compass_east">90</string>
     <string name="compassview_compass_south">180</string>
@@ -603,6 +611,9 @@
 
     <string name="camera_metadata_message_location_raw_off">GNSS Status: \n Raw Location: \n Turned Off \n</string>
     <string name="camera_metadata_message_location_predict_off">GNSS Status: \n Adjusted Location: \n Turned Off \n</string>
+
+
+    <string name="photo_editor_photo_location_title">Photo at: </string>
 
     <!-- ******************************Strings related to Settings****************************** -->
 

@@ -12,6 +12,7 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -81,7 +82,14 @@ public class JobGpsActivity extends AppCompatActivity implements NavigationView.
 
     }
 
-
+    @Override
+    public void onBackPressed() {
+        if(drawerLayout.isDrawerOpen(GravityCompat.START)){
+            drawerLayout.closeDrawer(GravityCompat.START);
+        }else{
+            drawerLayout.openDrawer(GravityCompat.START);
+        }
+    }
 
 
     //---------------------------------------------------------------------------------------------//
@@ -124,6 +132,7 @@ public class JobGpsActivity extends AppCompatActivity implements NavigationView.
 
                 startActivity(i);
                 overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                finish();
 
                 break;
 
@@ -136,6 +145,7 @@ public class JobGpsActivity extends AppCompatActivity implements NavigationView.
 
                 startActivity(j);
                 overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                finish();
 
                 break;
 
@@ -148,6 +158,8 @@ public class JobGpsActivity extends AppCompatActivity implements NavigationView.
 
                 startActivity(k);
                 overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                finish();
+
                 break;
 
             case R.id.menu_item4_id:
@@ -159,11 +171,14 @@ public class JobGpsActivity extends AppCompatActivity implements NavigationView.
 
                 startActivity(l);
                 overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                finish();
+
                 break;
 
             case R.id.menu_item5_id:
                 intent.setClass(this, SettingsCurrentJobActivity.class);
                 startActivity(intent);
+                finish();
 
                 break;
 
@@ -180,15 +195,15 @@ public class JobGpsActivity extends AppCompatActivity implements NavigationView.
         Log.d(TAG, "initView: Started");
 
         Bundle extras = getIntent().getExtras();
-        project_id = extras.getInt("PROJECT_ID");
-        job_id = extras.getInt("JOB_ID");
-        jobDatabaseName = extras.getString("JOB_DB_NAME");
-        Log.d(TAG, "||Database|| : " + jobDatabaseName);
+        project_id = extras.getInt(getString(R.string.KEY_PROJECT_ID));
+        job_id = extras.getInt(getString(R.string.KEY_JOB_ID));
+        jobDatabaseName = extras.getString(getString(R.string.KEY_JOB_DATABASE));
+        Log.d(TAG, "||Database in GPS Activity|| : " + jobDatabaseName);
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
-        rlLayout2 = (RelativeLayout) findViewById(R.id.relLayout_2) ;
-        progressBar = (ProgressBar) findViewById(R.id.progressStatus);
+        rlLayout2 = findViewById(R.id.relLayout_2) ;
+        progressBar = findViewById(R.id.progressStatus);
 
     }
 

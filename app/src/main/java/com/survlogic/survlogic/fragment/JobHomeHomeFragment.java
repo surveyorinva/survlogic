@@ -72,15 +72,15 @@ public class JobHomeHomeFragment extends Fragment {
 
         jobHomeActivityListener = (JobHomeActivityListener) getActivity();
 
-        cardViewDetails = (CardView) v.findViewById(R.id.card_details);
-        rlCardDetails = (RelativeLayout) v.findViewById(R.id.rlLayout_details);
+        cardViewDetails =v.findViewById(R.id.card_details);
+        rlCardDetails = v.findViewById(R.id.rlLayout_details);
 
-        tvItemJobName = (TextView) v.findViewById(R.id.project_name);
-        tvItem1Units = (TextView) v.findViewById(R.id.left_item1_value);
-        tvItem2Projection = (TextView) v.findViewById(R.id.left_item2_value);
-        tvItem3Zone = (TextView) v.findViewById(R.id.left_item3_value);
+        tvItemJobName = v.findViewById(R.id.project_name);
+        tvItem1Units = v.findViewById(R.id.left_item1_value);
+        tvItem2Projection =  v.findViewById(R.id.left_item2_value);
+        tvItem3Zone =  v.findViewById(R.id.left_item3_value);
 
-        ibCardExpand = (ImageButton) v.findViewById(R.id.button_card_expand);
+        ibCardExpand = v.findViewById(R.id.button_card_expand);
 
         animCard_1_down_btn = AnimationUtils.loadAnimation(mContext,R.anim.rotate_card_down);
 

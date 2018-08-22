@@ -1,5 +1,7 @@
 package com.survlogic.survlogic.ARvS.interf;
 
+import com.survlogic.survlogic.model.ProjectJobs;
+
 public interface PopupDialogBoxListener {
 
     void onSave();
@@ -8,5 +10,6 @@ public interface PopupDialogBoxListener {
 
     void onDismiss();
 
+    ProjectJobs getProjectJob();
 
 }
